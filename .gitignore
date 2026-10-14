@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.env
+hot_backup.csv
+*.log
+.DS_Store
