@@ -52,20 +52,17 @@ COMPS = {
         },
     },
     "U3": {
-        "value": "MAX31865 RTD front-end module (Rref 430R)",
-        "mpn": "MAX31865",
-        "fp": "Module:MAX31865",
+        "value": "MAX6675 K-type thermocouple module",
+        "mpn": "MAX6675",
+        "fp": "Module:MAX6675",
         "pins": {
-            "VIN":  ("1", "VIN",   "pwr",     "VIN 3.3V"),
+            "VIN":  ("1", "VCC",   "pwr",     "VCC 3.0-3.6V (generic board)"),
             "GND":  ("2", "GND",   "gnd",     "GND"),
-            "SCLK": ("3", "SCLK",  "in",      "SCLK"),
-            "SDI":  ("4", "SDI",   "in",      "SDI (MOSI)"),
-            "SDO":  ("5", "SDO",   "out",     "SDO (MISO)"),
-            "CS":   ("6", "CS",    "in",      "CS"),
-            "FP":   ("7", "F+",    "passive", "F+ force"),
-            "FN":   ("8", "F-",    "passive", "F- force"),
-            "RP":   ("9", "RTD+",  "passive", "RTD+ sense"),
-            "RN":   ("10", "RTD-", "passive", "RTD- sense"),
+            "SCLK": ("3", "SCK",   "in",      "SCK (SPI clock)"),
+            "CS":   ("4", "CS",    "in",      "CS active low"),
+            "SO":   ("5", "SO",    "out",     "SO = MISO, read only"),
+            "TP":   ("6", "T+",    "passive", "T+ thermocouple +"),
+            "TN":   ("7", "T-",    "passive", "T- thermocouple -"),
         },
     },
     "U4": {
@@ -81,10 +78,9 @@ COMPS = {
             "SD":  ("6", "SD",    "out",     "SD data out"),
         },
     },
-    "R1": {"value": "PT100 3-wire probe M6", "mpn": "PT100-M6", "fp": "Module:PT100_M6",
-           "pins": {"A": ("1", "A", "passive", "single lead"),
-                    "B": ("2", "B", "passive", "matched lead 1"),
-                    "C": ("3", "C", "passive", "matched lead 2 (compensation)")}},
+    "R1": {"value": "K-type probe M6 (class 1)", "mpn": "TC-K-M6", "fp": "Module:TC_K_M6",
+           "pins": {"P": ("1", "T+", "passive", "chromel lead"),
+                    "N": ("2", "T-", "passive", "alumel lead")}},
     "C1": {"value": "100nF X7R", "mpn": "100nF", "fp": "Capacitor_SMD:C_0402_1005Metric",
            "pins": {"1": ("1", "1", "passive", "1"), "2": ("2", "2", "passive", "2")}},
     "C2": {"value": "100nF X7R", "mpn": "100nF", "fp": "Capacitor_SMD:C_0402_1005Metric",
@@ -118,15 +114,13 @@ NETS = {
     "I2C_SDA":    {"color": "#2471a3", "kind": "signal", "nodes": [("U1", "SDA"), ("U2", "SDA")]},
     "I2C_SCL":    {"color": "#2471a3", "kind": "signal", "nodes": [("U1", "SCL"), ("U2", "SCL")]},
     "SPI_SCLK":   {"color": "#b9770e", "kind": "signal", "nodes": [("U1", "SCLK"), ("U3", "SCLK")]},
-    "SPI_MOSI":   {"color": "#b9770e", "kind": "signal", "nodes": [("U1", "MOSI"), ("U3", "SDI")]},
-    "SPI_MISO":   {"color": "#b9770e", "kind": "signal", "nodes": [("U3", "SDO"), ("U1", "MISO")]},
+    "SPI_MISO":   {"color": "#b9770e", "kind": "signal", "nodes": [("U3", "SO"), ("U1", "MISO")]},
     "SPI_CS0":    {"color": "#b9770e", "kind": "signal", "nodes": [("U1", "CE0"), ("U3", "CS"), ("R2", "2")]},
     "I2S_BCLK":   {"color": "#117a65", "kind": "signal", "nodes": [("U1", "BCLK"), ("U4", "BCLK")]},
     "I2S_WS":     {"color": "#117a65", "kind": "signal", "nodes": [("U1", "WS"), ("U4", "WS")]},
     "I2S_SD":     {"color": "#117a65", "kind": "signal", "nodes": [("U1", "DIN"), ("U4", "SD")]},
-    "RTD_SENSE_P":{"color": "#8e44ad", "kind": "analog", "nodes": [("R1", "A"), ("U3", "FP"), ("U3", "RP")]},
-    "RTD_SENSE_N":{"color": "#8e44ad", "kind": "analog", "nodes": [("R1", "B"), ("U3", "RN")]},
-    "RTD_FORCE_N":{"color": "#8e44ad", "kind": "analog", "nodes": [("R1", "C"), ("U3", "FN")]},
+    "TC_P":       {"color": "#8e44ad", "kind": "analog", "nodes": [("R1", "P"), ("U3", "TP")]},
+    "TC_N":       {"color": "#8e44ad", "kind": "analog", "nodes": [("R1", "N"), ("U3", "TN")]},
     "LED_A":      {"color": "#7f8c8d", "kind": "signal", "nodes": [("U1", "LED"), ("R4", "1")]},
     "LED_K":      {"color": "#7f8c8d", "kind": "signal", "nodes": [("R4", "2"), ("D1", "A")]},
 }
@@ -136,8 +130,15 @@ DESIGN = {
     "fs_hz": 800,            # ADXL345 ODR = 800 Hz, FIFO burst read
     "window": 4096,          # 5.12 s at 800 Hz
     "g_range": 4,            # +/-4 g
-    "rref_ohm": 430.0,       # Adafruit-compatible MAX31865 board
-    "r0_ohm": 100.0,         # PT100 nominal
+    "tc_res_c": 0.25,        # MAX6675 12-bit output
+    "tc_acc_c": 2.0,         # restated M4, class-1 probe + calibration
+    "tc_class1_c": 1.5,      # probe tolerance, class 1 (0.004|t| at 100 C)
+    "tc_cj_c": 0.5,          # cold-junction tracking error
+    "tc_lin_c": 0.5,         # internal linearisation + offset
+    "tc_tau_s": 4.0,
+    "tc_emf_uv_c": 41.0,     # K-type Seebeck coefficient near 25 C
+    "box_rise_c": 12.0,
+    "cj_distance_cm": 15,
     "i2c_rp_ohm": 1800.0,    # Pi 4 onboard pull-ups on GPIO2/3
     "i2c_cb_pf": 60.0,       # ~10 cm shielded pair
     "vdd": 3.3,

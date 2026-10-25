@@ -1,7 +1,7 @@
 flowchart LR
   subgraph SENSE["Sensing"]
     A["ADXL345<br/>I2C 0x53<br/>800 Hz FIFO"]:::s
-    B["PT100 + MAX31865<br/>SPI0<br/>0.2 Hz"]:::s
+    B["K-type + MAX6675<br/>SPI0<br/>0.2 Hz"]:::s
     C["INMP441<br/>I2S 16 kHz"]:::s
   end
   subgraph EDGE["Raspberry Pi 4 8GB (edge, offline)"]

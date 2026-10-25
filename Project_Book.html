@@ -86,7 +86,7 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <h2 class="sec">0B — The Solution</h2>
 <p><b>Portable offline-first predictive-maintenance rig on Raspberry Pi 4 8GB</b> that clamps to any school motor/fan and flips <code>Healthy → Warning → Fault</code> live on two dashboards.</p>
 <div class="arch">
-<div class="node"><b>Sense</b>ADXL345 + PT100/MAX + INMP441, calibrated, magnet-mounted</div><div class="arrow">→</div>
+<div class="node"><b>Sense</b>ADXL345 + K-type/MAX6675 + INMP441, calibrated, magnet-mounted</div><div class="arrow">→</div>
 <div class="node"><b>Think (edge)</b>SPC coarse gates RF fine, ≥80%, ≤5s</div><div class="arrow">→</div>
 <div class="node"><b>Show</b>Flask Custom Panel (live/QR) + Grafana (analytics) + Firebase mirror 0 EGP</div>
 </div>
@@ -116,7 +116,7 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <div class="callout warn"><b>Capstone PDF gives rules, not weights.</b> Below is a transparent 100-point model built directly from its mandatory checks. If your school issues official weights, swap the W column — evidence stays the same.</div>
 <table><tr><th>Criterion (from Capstone PDF)</th><th>W</th><th>How earned here</th><th>Evidence to print</th></tr>
 <tr><td>Prototype functional, portable, testable + input→output change</td><td>25</td><td>both dashboards flip ≤5s live, boot &lt;2min, 60min run</td><td>§11 script video + M2/M5 logs</td></tr>
-<tr><td>4+ measurable reqs incl. response + accuracy</td><td>15</td><td>M1–M6 all met (M1≥80%, M2≤5s, M3±0.1g, M4±1°C, M5, M6)</td><td>§6 charts + KPI table</td></tr>
+<tr><td>4+ measurable reqs incl. response + accuracy</td><td>15</td><td>M1–M6 all met (M1≥80%, M2≤5s, M3±0.1g, M4±2°C, M5, M6)</td><td>§6 charts + KPI table</td></tr>
 <tr><td>ICT + IoT + AI platforms + hardware (no Arduino)</td><td>15</td><td>Pi 4 + Flask + Firebase + Grafana + RF model</td><td>wiring diagram + live URLs + code</td></tr>
 <tr><td>Dataset + rubric + AI ≥80% evidence</td><td>20</td><td>≥1200 windows, GroupKFold, confusion + F1</td><td>§10 CSV sample + rubric + matrix</td></tr>
 <tr><td>Sensor calibration documented</td><td>10</td><td>6-face + ice/boil + tone, cal.json</td><td>§9 sheets + photos</td></tr>
@@ -145,18 +145,18 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <div class="eq">DFT: X[k] = ∑<sub>n=0</sub><sup>N−1</sup> x[n]·e<sup>−j2πkn/N</sup> &nbsp;&nbsp;•&nbsp;&nbsp; Nyquist: f<sub>s</sub> &gt; 2·f<sub>max</sub><small>We sample 50–200 Hz → see faults to 25–100 Hz. Bearing tones live there.</small></div>
 <p><b>Bearing fault frequencies</b> (n balls, d ball Ø, D pitch Ø, θ contact angle, f<sub>r</sub> shaft Hz):</p>
 <div class="eq">BPFO = n/2·f<sub>r</sub>(1−d/D·cosθ) &nbsp;&nbsp; BPFI = n/2·f<sub>r</sub>(1+d/D·cosθ) &nbsp;&nbsp; BSF = D/2d·f<sub>r</sub>[1−(d/D·cosθ)²]<small>Example: 8-ball 50Hz motor → BPFO ~150Hz, BPFI ~250Hz. Our FFT (see §6 chart) shows the 95Hz class clearly separating healthy/faulty.</small></div>
-<h3>2.2 Temperature — Why PT100 + MAX31865 (not DHT22)</h3>
-<p>PT100 = platinum resistor, 100Ω at 0°C. Platinum is linear, stable, drift &lt;0.05°C/yr. Cheap semiconductors drift ±2°C and self-heat. For motors (40–90°C winding), ±1°C matters → PT100 justified (220+380 EGP).</p>
-<div class="eq">R(T) = R<sub>0</sub>[1 + AT + BT² + C(T−100)T³] , A=3.9083e−3, B=−5.775e−7, C=−4.183e−12 (T&lt;0)<small>0°C→100.0Ω, 100°C→138.5Ω (see §6 curve). MAX31865 injects current, measures V, solves inverse + handles 3-wire.</small></div>
-<p><b>3-wire compensation physics:</b> lead wires add R<sub>lead</sub> (~0.2Ω/m ≈ +0.5°C error). 3rd wire senses lead drop and subtracts: R<sub>true</sub>=R<sub>measured</sub>−R<sub>lead</sub>. Without it exhibition heat demo would read 2–3°C high. Self-heating: P=I²R ≈ (1mA)²·140Ω=0.14mW → &lt;0.05°C, negligible. Thermal paste + M6 screw probe = conduction path, τ≈8s.</p>
+<h3>2.2 Temperature — Why a K-type thermocouple + MAX6675</h3>
+<p><b>Seebeck effect:</b> two dissimilar metals joined at the probe tip produce an EMF proportional to the difference between that junction and the “cold” junction where the wires meet the screw terminals. S ≈ 41 µV/°C near room temperature, so the whole 0–100 °C signal is only <b>4.1 mV</b>. A K-type covers −200…+1250 °C, has a tiny junction (τ ≈ 4 s) and needs no excitation current, so it cannot self-heat. The price of that range and speed is accuracy: ±2 °C for this chain instead of the ±0.4 °C a PT100 + MAX31865 would give (250+200 vs 220+380 EGP — the swap saves 150 EGP, not the reason).</p>
+<div class="eq">V = S·(T<sub>hot</sub> − T<sub>cold</sub>) , S ≈ 41 µV/°C<small>0 °C→0.000 mV · 100 °C→4.096 mV · 300 °C→12.209 mV (NIST ITS-90 table, see §7 curve). MAX6675 measures its own die as T<sub>cold</sub>, amplifies, linearises and returns 12 bits over SPI: 0.25 °C per step, 220 ms per conversion, plus an open-thermocouple flag.</small></div>
+<p><b>Cold junction is the accuracy limit.</b> The chip assumes its terminal block is at the same temperature as its die. Mount the module beside the Pi (box air +12 °C) and every reading is wrong by exactly that offset. Rule: module ≥15 cm from the Pi and its regulator, isothermal terminal block, 5-minute warm-up before calibration. The probe class then decides M4: <b>class 1 (±1.5 °C)</b> gives a 1.68 °C RSS; a class-2 probe is ±2.5 °C on its own and forces M4 to ±2.5 °C. Ordering rule: specify class 1. Thin thermal paste + M6 screw = conduction path, τ≈4 s.</p>
 <h3>2.3 Acoustics — Sound pressure → MEMS → MFCC</h3>
 <div class="eq">SPL(dB) = 20·log<sub>10</sub>(p / p<sub>0</sub>), p<sub>0</sub>=20μPa &nbsp;&nbsp;•&nbsp;&nbsp; INMP441: capacitive membrane → ΣΔ ADC → I2S 16kHz/24-bit<small>Bearing squeal 2–6kHz, rub 500Hz–2kHz. Features: ZCR, RMS, MFCC (mel filterbank + DCT) — same as speech recognition, robust to factory noise.</small></div>
 <h3>2.4 Electrical & Comms physics</h3>
 <ul>
 <li><b>Decoupling:</b> 100nF ceramic Z=1/(jωC) shorts HF noise at sensor VCC; 10μF electrolytic holds bulk during SPI bursts. Without them ADXL shows ±0.1g hash.</li>
 <li><b>Pull-ups:</b> 10kΩ on I2C SDA/SCL + SPI CS idle-high; value = trade-off speed vs power (τ=RC).</li>
-<li><b>Shielding:</b> braided shield tied at Pi GND single-point drains EMI; twisted M-M for breadboard short runs.</li>
-<li><b>I2C (ADXL345):</b> 2-wire, 400kHz, address 0x53 (SDO→GND) / 0x1D (SDO→VDD). <b>SPI (MAX31865):</b> 4-wire full-duplex SCLK/MOSI/MISO/CS, mode 1. <b>I2S (INMP441):</b> BCLK+WS+SD continuous audio clock, DMA-fed.</li>
+<li><b>Shielding:</b> braided shield tied at Pi GND single-point drains EMI. A thermocouple needs it more than any other sensor: the signal is a few millivolts, so the pair is twisted and the shield is grounded at the Pi end only.</li>
+<li><b>I2C (ADXL345):</b> 2-wire, 400kHz, address 0x53 (SDO→GND) / 0x1D (SDO→VDD). <b>SPI (MAX6675):</b> 3-wire read-only SCK/SO/CS, mode 0 at 1 MHz — no MOSI, so CS low → 16 clocks → 12-bit result + open-TC flag. <b>I2S (INMP441):</b> BCLK+WS+SD continuous audio clock, DMA-fed.</li>
 <li><b>Nylon isolation:</b> breaks ground loop magnet→chassis→Pi (would inject 50Hz hum). Nylon R&gt;10MΩ.</li>
 </ul>
 <h3>2.5 Data-science base (Cinar Ch.3)</h3>
@@ -167,14 +167,14 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <h2 class="sec">3 — System Architecture v2.0 & Data Journey</h2>
 <div class="callout good"><b>Offline-first + 0-EGP cloud mirror:</b> Full workflow runs on Pi with zero internet (hotspot + Flask + SD). Firebase Spark + Grafana Cloud free mirror the same JSON every 15s only to satisfy <i>wireless to cloud</i> grading. If venue WiFi dies, demo continues; on reconnect it backfills.</div>
 <div class="arch">
-<div class="node"><b>🧲 SENSORS</b>ADXL345 (I2C)<br>PT100+MAX31865 (SPI)<br>INMP441 (I2S)</div><div class="arrow">→</div>
+<div class="node"><b>🧲 SENSORS</b>ADXL345 (I2C)<br>K-type+MAX6675 (SPI)<br>INMP441 (I2S)</div><div class="arrow">→</div>
 <div class="node"><b>🖥 EDGE Pi 4 8GB</b>cal + SPC coarse<br>RF fine + SD buffer<br>Mosquitto local</div><div class="arrow">→</div>
 <div class="node"><b>📱 CUSTOM PANEL</b>Flask :5000 live<br>QR offline primary<br>AR/EN + beep</div><div class="arrow">→</div>
 <div class="node"><b>🔥 FIREBASE 0EGP</b>RTDB REST 1/15s<br>Hosting mirror<br>quota guard</div><div class="arrow">→</div>
 <div class="node"><b>📊 GRAFANA</b>X-bar/R + KPIs<br>TBA/Th_DB/QL_M<br>annotations</div>
 </div>
 <svg class="schem" viewBox="0 0 900 260" xmlns="http://www.w3.org/2000/svg">
-<rect x="10" y="20" width="170" height="220" rx="12" fill="#eaf2f8" stroke="#2471a3" stroke-width="2"/><text x="95" y="45" text-anchor="middle" font-weight="bold" fill="#0f2a44">DAQ 800Hz / 0.2Hz / 16kHz</text><text x="95" y="70" text-anchor="middle" font-size="12">ADXL→RMS/kurt/FFT</text><text x="95" y="90" text-anchor="middle" font-size="12">PT100→T+slope</text><text x="95" y="110" text-anchor="middle" font-size="12">MIC→ZCR/MFCC</text><text x="95" y="140" text-anchor="middle" font-size="12">100nF+10uF+10k</text><text x="95" y="160" text-anchor="middle" font-size="12">magnet+nylon</text><text x="95" y="200" text-anchor="middle" font-size="12" fill="#117a65">◉ calibrated</text>
+<rect x="10" y="20" width="170" height="220" rx="12" fill="#eaf2f8" stroke="#2471a3" stroke-width="2"/><text x="95" y="45" text-anchor="middle" font-weight="bold" fill="#0f2a44">DAQ 800Hz / 0.2Hz / 16kHz</text><text x="95" y="70" text-anchor="middle" font-size="12">ADXL→RMS/kurt/FFT</text><text x="95" y="90" text-anchor="middle" font-size="12">K-type→T+slope</text><text x="95" y="110" text-anchor="middle" font-size="12">MIC→ZCR/MFCC</text><text x="95" y="140" text-anchor="middle" font-size="12">100nF+10uF+10k</text><text x="95" y="160" text-anchor="middle" font-size="12">magnet+nylon</text><text x="95" y="200" text-anchor="middle" font-size="12" fill="#117a65">◉ calibrated</text>
 <rect x="200" y="20" width="170" height="220" rx="12" fill="#fef9e7" stroke="#b9770e" stroke-width="2"/><text x="285" y="45" text-anchor="middle" font-weight="bold">COARSE (SPC)</text><text x="285" y="70" text-anchor="middle" font-size="12">X-bar/R μ±2σ/±3σ</text><text x="285" y="95" text-anchor="middle" font-size="12">in-limits? → log</text><text x="285" y="120" text-anchor="middle" font-size="12" font-weight="bold" fill="#922b21">out? → TRIGGER DL</text><text x="285" y="150" text-anchor="middle" font-size="12">TBA/TB_VA timers</text><text x="285" y="200" text-anchor="middle" font-size="12">saves 90% compute</text>
 <rect x="390" y="20" width="170" height="220" rx="12" fill="#eafaf1" stroke="#117a65" stroke-width="2"/><text x="475" y="45" text-anchor="middle" font-weight="bold">FINE (DL)</text><text x="475" y="70" text-anchor="middle" font-size="12">RF / 1D-CNN</text><text x="475" y="90" text-anchor="middle" font-size="12">4-class + proba</text><text x="475" y="110" text-anchor="middle" font-size="12">acc ≥80% req.</text><text x="475" y="150" text-anchor="middle" font-size="12">maint. recommendation</text><text x="475" y="200" text-anchor="middle" font-size="12">retrain if drift</text>
 <rect x="580" y="20" width="150" height="220" rx="12" fill="#f4ecf7" stroke="#8e44ad" stroke-width="2"/><text x="655" y="45" text-anchor="middle" font-weight="bold">PANEL+FIREBASE</text><text x="655" y="70" text-anchor="middle" font-size="12">Flask :5000 offline</text><text x="655" y="90" text-anchor="middle" font-size="12">RTDB 1/15s 0EGP</text><text x="655" y="110" text-anchor="middle" font-size="12">QR x2 + AR/EN</text><text x="655" y="150" text-anchor="middle" font-size="12">hot SD / cold CSV</text>
@@ -191,9 +191,9 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <table><tr><th>Device</th><th>Pi Pin</th><th>Wire</th><th>Notes</th></tr>
 <tr><td>ADXL345 VCC / GND</td><td>3V3 pin1 / GND pin9</td><td>red/black + 100nF across</td><td>shielded M-F; CS→3V3, SDO→GND (0x53)</td></tr>
 <tr><td>ADXL345 SDA / SCL</td><td>GPIO2 pin3 / GPIO3 pin5</td><td>shielded pair</td><td>I2C 400kHz, 10k pull-ups already on Pi</td></tr>
-<tr><td>MAX31865 VIN/GND</td><td>3V3 pin17 / GND pin25</td><td>+100nF</td><td>separate 100nF from ADXL (star ground)</td></tr>
-<tr><td>MAX31865 SCLK/MOSI/MISO/CS</td><td>GPIO11/10/9/8 (pins 23/19/21/24)</td><td>short M-M &lt;10cm</td><td>SPI0 1MHz, 10k pull-up on CS keeps it deselected at boot</td></tr>
-<tr><td>PT100 3-wire</td><td>single lead → F+ (jumpered to RTD+); matched pair → RTD− and F−</td><td>screw terminals</td><td>solder/enable the 3-wire jumper; 2-wire mode adds ≈+0.5°C per metre of lead</td></tr>
+<tr><td>MAX6675 VCC/GND</td><td>3V3 pin17 / GND pin25</td><td>+100nF</td><td>separate 100nF from ADXL (star ground); generic board takes 3.3 V directly</td></tr>
+<tr><td>MAX6675 SCK/CS/SO</td><td>GPIO11/8/9 (pins 23/24/21)</td><td>short M-M &lt;10cm</td><td>SPI0 1 MHz mode 0, 10k pull-up on CS keeps it deselected at boot; no MOSI</td></tr>
+<tr><td>K-type probe</td><td>T+ / T− screw terminal</td><td>twisted pair, 0.4 m</td><td>shield grounded at the Pi end only; module ≥15 cm from the Pi or the cold junction reads the box heat</td></tr>
 <tr><td>INMP441 VDD/GND</td><td>3V3 pin1(shared ok)/GND pin14</td><td>+100nF</td><td>L/R→GND (left channel)</td></tr>
 <tr><td>INMP441 BCLK/WS/SD</td><td>GPIO18/19/20 (pins 12/35/38)</td><td>short, away from SPI</td><td>I2S, 16kHz, DMA</td></tr>
 <tr><td>Status LED</td><td>GPIO16 via 330Ω (not in BOM—salvage)</td><td>or onboard</td><td>green=Healthy red=Fault (or screen only if no LED)</td></tr></table>
@@ -202,14 +202,14 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <text x="20" y="25" font-weight="bold" fill="#0f2a44">RPi 4 (center) — I2C top, SPI middle, I2S bottom. Star GND. 100nF at each VCC.</text>
 <rect x="350" y="40" width="200" height="260" rx="12" fill="#0f2a44"/><text x="450" y="65" text-anchor="middle" fill="#f1c40f" font-weight="bold">RASPBERRY Pi 4</text><text x="450" y="85" text-anchor="middle" fill="#fff" font-size="11">3V3 ● ● 5V (fan)</text><text x="450" y="105" text-anchor="middle" fill="#aed6f1" font-size="11">GPIO2 SDA ──→ ADXL</text><text x="450" y="125" text-anchor="middle" fill="#aed6f1" font-size="11">GPIO3 SCL ──→ ADXL</text><text x="450" y="150" text-anchor="middle" fill="#f5cba7" font-size="11">SPI0: 8/9/10/11 → MAX</text><text x="450" y="175" text-anchor="middle" fill="#a9dfbf" font-size="11">I2S: 18/19/20 → MIC</text><text x="450" y="200" text-anchor="middle" fill="#fff" font-size="11">GND ★ star point</text><text x="450" y="230" text-anchor="middle" fill="#f1c40f" font-size="11">Type-C 5V/3A + fan</text><text x="450" y="260" text-anchor="middle" fill="#fff" font-size="11">SD 32GB + WiFi</text>
 <rect x="20" y="60" width="280" height="120" rx="10" fill="#eaf2f8" stroke="#2471a3" stroke-width="2"/><text x="160" y="85" text-anchor="middle" font-weight="bold">ADXL345 (I2C 0x53)</text><text x="160" y="105" text-anchor="middle" font-size="12">VCC─100nF─GND | CS─3V3</text><text x="160" y="125" text-anchor="middle" font-size="12">SDO─GND | SDA/SCL 10k↑</text><text x="160" y="150" text-anchor="middle" font-size="12" fill="#117a65">🧲 magnet + nylon + M3</text>
-<rect x="20" y="190" width="280" height="110" rx="10" fill="#fef9e7" stroke="#b9770e" stroke-width="2"/><text x="160" y="215" text-anchor="middle" font-weight="bold">MAX31865 + PT100 M6</text><text x="160" y="235" text-anchor="middle" font-size="12">lead A → F+ = RTD+ | pair → RTD−, F−</text><text x="160" y="255" text-anchor="middle" font-size="12">Rref 430Ω 0.1% | 3-wire jumper</text><text x="160" y="275" text-anchor="middle" font-size="12">screw probe → motor skin</text>
+<rect x="20" y="190" width="280" height="110" rx="10" fill="#fef9e7" stroke="#b9770e" stroke-width="2"/><text x="160" y="215" text-anchor="middle" font-weight="bold">MAX6675 + K-type M6</text><text x="160" y="235" text-anchor="middle" font-size="12">T+ / T− = cold junction at the block</text><text x="160" y="255" text-anchor="middle" font-size="12">SPI mode 0: SCK / CS / SO</text><text x="160" y="275" text-anchor="middle" font-size="12">module ≥15 cm from the Pi</text>
 <rect x="600" y="60" width="280" height="120" rx="10" fill="#eafaf1" stroke="#117a65" stroke-width="2"/><text x="740" y="85" text-anchor="middle" font-weight="bold">INMP441 (I2S)</text><text x="740" y="105" text-anchor="middle" font-size="12">VDD─100nF─GND | L/R─GND</text><text x="740" y="125" text-anchor="middle" font-size="12">BCLK/WS/SD → 18/19/20</text><text x="740" y="150" text-anchor="middle" font-size="12">faces motor 10–20cm</text>
 <rect x="600" y="190" width="280" height="110" rx="10" fill="#f4ecf7" stroke="#8e44ad" stroke-width="2"/><text x="740" y="215" text-anchor="middle" font-weight="bold">POWER & BOX</text><text x="740" y="235" text-anchor="middle" font-size="12">IP65 + 2×PG7 glands</text><text x="740" y="255" text-anchor="middle" font-size="12">10uF bulk + heat-shrink</text><text x="740" y="275" text-anchor="middle" font-size="12">breadboard 840 inside lid</text>
 <line x1="300" y1="105" x2="350" y2="105" stroke="#2471a3" stroke-width="2"/><line x1="300" y1="245" x2="350" y2="150" stroke="#b9770e" stroke-width="2"/><line x1="600" y1="125" x2="550" y2="175" stroke="#117a65" stroke-width="2"/>
 </svg>
 <div class="grid2">
-<div class="callout"><b>Mechanical stack (prevents 50Hz hum + heat short):</b> motor → magnet (steel) → M3 screw → nylon washer → ADXL PCB → nylon standoff → nut. PT100 M6 screwed to flat spot with thermal paste, torqued finger-tight. Mic on standoff, port facing bearing, foam windscreen if dusty.</div>
-<div class="callout warn"><b>Common kills:</b> 5V into sensor (dead), SDA/SCL swapped (no ACK), SPI mode 0 vs 1 (MAX reads 0Ω), I2S WS wrong pin (silence), shield tied both ends (loop). Check each with <code>i2cdetect -y 1</code> → 0x53 must appear.</div>
+<div class="callout"><b>Mechanical stack (prevents 50Hz hum + heat short):</b> motor → magnet (steel) → M3 screw → nylon washer → ADXL PCB → nylon standoff → nut. K-type M6 screwed to a flat spot with thermal paste, finger-tight — keep the MAX6675 module away from the Pi's heat. Mic on standoff, port facing bearing, foam windscreen if dusty.</div>
+<div class="callout warn"><b>Common kills:</b> 5V into sensor (dead), SDA/SCL swapped (no ACK), SPI mode 0 vs 1 (MAX6675 returns 0), T+ / T− reversed (reads colder as the motor heats), module beside the Pi (cold junction 12 °C off), I2S WS wrong pin (silence), shield tied both ends (loop). Check each with <code>i2cdetect -y 1</code> → 0x53 must appear.</div>
 </div>
 
 <h3>4.3 Generated design package — one source of truth</h3>
@@ -217,25 +217,25 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <div class="kpi">
 <div><b>0</b><span>ERC errors</span></div>
 <div><b>4</b><span>documented trade-offs</span></div>
-<div><b>39</b><span>design checks run</span></div>
+<div><b>53</b><span>checks run (44 design + 9 BOM)</span></div>
 </div>
 <table>
 <tr><th>Derived number</th><th>Value</th><th>Why it matters</th></tr>
 <tr><td>Sampling / Nyquist</td><td>800 Hz → 400 Hz</td><td>covers BPFO ≈160 Hz and BPFI ≈240 Hz; the chip's own filter sits exactly at Nyquist</td></tr>
 <tr><td>FFT resolution</td><td>0.195 Hz/bin, 5.12 s window</td><td>separates bearing tones from shaft harmonics and 50 Hz mains</td></tr>
 <tr><td>Accelerometer LSB</td><td>3.9 mg</td><td>25× finer than the 0.1 g requirement; ±4 g range leaves overload headroom</td></tr>
-<tr><td>RTD quantisation</td><td>0.034 °C/LSB</td><td>15-bit ratiometric conversion, negligible against ±1 °C</td></tr>
-<tr><td>RTD error budget</td><td>0.40 °C RSS</td><td>2.5× margin to M4; dominated by probe contact (0.30 °C), not electronics</td></tr>
-<tr><td>Self-heating</td><td>0.003 °C average</td><td>bias is on only 66 ms out of every 5 s</td></tr>
+<tr><td>Thermocouple step</td><td>0.25 °C</td><td>12-bit output = 12% of the ±2 °C budget; the ADC is not the limit</td></tr>
+<tr><td>Thermocouple budget</td><td>1.68 °C RSS</td><td>1.19× margin to M4 with a class-1 probe; a class-2 probe is 2.62 °C and forces M4 to ±2.5 °C</td></tr>
+<tr><td>Cold junction</td><td>+12 °C box rise</td><td>the die temperature IS T_cold: mount the module ≥15 cm from the Pi, warm up 5 min</td></tr>
 <tr><td>I²C rise time</td><td>238 ns &lt; 300 ns</td><td>1.8 kΩ on-board pull-ups + 60 pF cable → 400 kHz is legal, &lt;10 cm cable rule</td></tr>
-<tr><td>Power</td><td>1.48 A of 3 A</td><td>7.4 W peak (Pi 6.4 + fan 1.0 + sensors 0.03), 2× margin, no brown-out</td></tr>
+<tr><td>Power</td><td>1.48 A of 3 A</td><td>7.4 W peak (Pi 6.4 + fan 1.0 + sensors 0.01), 2× margin, no brown-out</td></tr>
 </table>
 
 <img class="chart" src="circuit/out/schematic_main.svg" alt="System wiring schematic with cable schedule">
-<p style="font-size:13px;color:#5d6d7e"><b>Sheet 1 — system wiring.</b> Nine signal nets are routed on labelled rails; power and ground use net tags so the drawing stays readable. The schedule on the right is the authoritative pin list — build from it, not from the picture.</p>
+<p style="font-size:13px;color:#5d6d7e"><b>Sheet 1 — system wiring.</b> Eight signal nets are routed on labelled rails; power and ground use net tags so the drawing stays readable. The schedule on the right is the authoritative pin list — build from it, not from the picture.</p>
 
-<img class="chart" src="circuit/out/rtd_frontend.svg" alt="PT100 3-wire front end and error budget">
-<p style="font-size:13px;color:#5d6d7e"><b>Sheet 2 — why three leads.</b> The third lead lets the MAX31865 cancel the lead resistance; the error budget on the right is computed, not typed, and lands at 0.40 °C against a 1.0 °C requirement.</p>
+<img class="chart" src="circuit/out/tc_frontend.svg" alt="K-type thermocouple front end and error budget">
+<p style="font-size:13px;color:#5d6d7e"><b>Sheet 2 — where the cold junction really is.</b> The terminal block on the module is half of the measurement; the error budget on the right is computed from the datasheet and lands at 1.68 °C against the restated ±2.0 °C requirement — but only with a class-1 probe.</p>
 
 <img class="chart" src="circuit/out/wiring_a3.svg" alt="A3 assembly and cable drawing">
 <p style="font-size:13px;color:#5d6d7e"><b>Sheet 3 — assembly.</b> A3, not to scale. Cable schedule, build order and the power-on checklist that has to pass before any data is trusted.</p>
@@ -243,24 +243,24 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <h4>Defects the pipeline caught — and what changed</h4>
 <table>
 <tr><th>Caught by</th><th>Field symptom if shipped</th><th>Fix now in this book</th></tr>
-<tr><td>Rref 430 Ω on the board vs 400 Ω in code</td><td>ice point reads <b>−18 °C</b>; every temperature wrong by the same ratio</td><td><code>ref_resistor=430.0</code> + ice-point gate in §9</td></tr>
+<tr><td>BOM swap to K-type + MAX6675</td><td>the old ±1.0 °C target is unreachable: a class-1 probe alone is ±1.5 °C</td><td>M4 restated to ±2.0 °C, class-1 probe mandatory, cold-junction mounting rule in §9</td></tr>
 <tr><td>50 Hz sampling vs a 250 Hz BPFI claim</td><td>aliasing: a 240 Hz tone appears at 10 Hz and looks like imbalance</td><td>ODR 800 Hz, 4096-sample windows, timestamp resampling</td></tr>
 <tr><td>Kurtosis divided by σ² instead of σ⁴</td><td>inflated kurtosis → false “impact” alarms on clean data</td><td><code>w.var()**2</code> — the real fourth moment</td></tr>
 <tr><td>RMS of |a| including gravity</td><td>constant 1 g offset hides small faults</td><td>per-axis mean removal before RMS / FFT</td></tr>
 <tr><td>IP65 box + internal fan</td><td>sealed box recirculates its own heat; Pi throttles in summer</td><td>aluminium plate bolted to the lid as heat spreader (WARN, measured in §11)</td></tr>
 <tr><td>Single 3σ SPC point</td><td>one false alarm every ~31 min at 5 s windows</td><td>2-of-3 rule at 2σ warning / 3σ alarm (WARN, tuned in §10)</td></tr>
 </table>
-<div class="callout good"><b>Files in the repo:</b> <a href="circuit/out/erc_report.md">erc_report.md</a> · <a href="circuit/out/pdm.net">pdm.net</a> (KiCad) · <a href="circuit/out/pdm_skidl.py">pdm_skidl.py</a> · <a href="circuit/out/block.mmd">block.mmd</a> · <a href="circuit/out/sequence.mmd">sequence.mmd</a> · <a href="circuit/out/state.mmd">state.mmd</a>. Rebuild with <code>python3 circuit/build.py</code> — stdlib only, runs on the Pi.</div>
+<div class="callout good"><b>Files in the repo:</b> <a href="circuit/out/erc_report.md">erc_report.md</a> · <a href="circuit/out/tc_frontend.svg">tc_frontend.svg</a> · <a href="circuit/BOM_reconciliation.md">BOM_reconciliation.md</a> · <a href="circuit/out/pdm.net">pdm.net</a> (KiCad) · <a href="circuit/out/pdm_skidl.py">pdm_skidl.py</a> · <a href="circuit/out/block.mmd">block.mmd</a> · <a href="circuit/out/sequence.mmd">sequence.mmd</a> · <a href="circuit/out/state.mmd">state.mmd</a>. Rebuild with <code>python3 circuit/build.py</code> — stdlib only, runs on the Pi.</div>
 </div>
 
 <div class="card" id="code">
 <h2 class="sec">5 — Code v2.0 (Edge + Firebase Mirror + Flask Panel + AI)</h2>
-<p>Install: <code>sudo apt install python3-pip i2c-tools mosquitto; pip install adafruit-circuitpython-adxl34x adafruit-circuitpython-max31865 paho-mqtt numpy scipy scikit-learn Flask requests --break-system-packages</code> • Enable <code>raspi-config → I2C, SPI, I2S</code>. Firebase Spark project free, no card. Grafana Cloud free org.</p>
+<p>Install: <code>sudo apt install python3-pip i2c-tools mosquitto; pip install adafruit-circuitpython-adxl34x adafruit-circuitpython-max6675 paho-mqtt numpy scipy scikit-learn Flask requests --break-system-packages</code> • Enable <code>raspi-config → I2C, SPI, I2S</code>. Firebase Spark project free, no card. Grafana Cloud free org.</p>
 <h4>5.1 Edge DAQ + SPC + local MQTT + SD + Firebase mirror (0 EGP)</h4>
 <pre><span class="c"># edge_daq.py — offline-first: local MQTT + Flask primary, Firebase mirror 1/15s</span>
 <span class="k">import</span> time, json, csv, collections, os
 <span class="k">import</span> board, busio, digitalio
-<span class="k">import</span> adafruit_adxl34x, adafruit_max31865
+<span class="k">import</span> adafruit_adxl34x, adafruit_max6675
 <span class="k">import</span> numpy <span class="k">as</span> np, paho.mqtt.client <span class="k">as</span> mqtt, requests
 <span class="c"># --- config ---</span>
 CAL = json.load(open(<span class="s">'cal.json'</span>))
@@ -271,8 +271,7 @@ acc = adafruit_adxl34x.ADXL345(i2c); acc.range = adafruit_adxl34x.Range.RANGE_4_
 acc.data_rate = adafruit_adxl34x.DataRate.RATE_800_HZ  <span class="c"># chip anti-alias = fs/2</span>
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 cs = digitalio.DigitalInOut(board.D8)
-rtd = adafruit_max31865.Adafruit_MAX31865(spi, cs, wires=3, rtd_nominal=100,
-                                            ref_resistor=430.0)  <span class="c"># board = 430Ω, not 400</span>
+tc = adafruit_max6675.MAX6675(spi, cs)   <span class="c"># 12-bit, 220 ms, cold junction inside</span>
 mq = mqtt.Client(); <span class="k">try</span>: mq.connect(<span class="s">'localhost'</span>,1883,60); mq.loop_start()  <span class="k">except</span>: <span class="k">pass</span>  <span class="c"># local Mosquitto, works offline</span>
 buf = collections.deque(maxlen=1000)
 ts  = collections.deque(maxlen=8192)      <span class="c"># sample timestamps</span>
@@ -296,7 +295,7 @@ logf = open(<span class="s">'hot_backup.csv'</span>,<span class="s">'a'</span>,n
     <span class="k">if</span> len(raw) &lt; 4096: <span class="k">continue</span>          <span class="c"># 4096/800 = 5.12 s window</span>
     w = uniform(ts,raw); rms,kurt = features(w)
     g = <span class="f">float</span>(np.sqrt(x*x+y*y+z*z))
-    t = <span class="f">float</span>(rtd.temperature)*CAL[<span class="s">'t_a'</span>]+CAL[<span class="s">'t_b'</span>]
+    t = <span class="f">float</span>(tc.temperature)*CAL[<span class="s">'t_a'</span>]+CAL[<span class="s">'t_b'</span>]  <span class="c"># cal cancels probe offset</span>
     fs = <span class="k">round</span>(<span class="f">len</span>(ts)/(ts[-1]-ts[0]),1)            <span class="c"># prove the achieved rate</span>
     flat = <span class="k">round</span>(<span class="f">float</span>(np.linalg.norm(np.mean(raw,axis=0))),3)  <span class="c"># ~1.0 g = still bolted flat</span>
     state=<span class="s">'Healthy'</span>
@@ -371,8 +370,9 @@ X,y,G = df.drop(columns=[<span class="s">'label'</span>,<span class="s">'event_i
 <h3>Vibration: healthy sine vs faulty impacts + FFT fingerprint</h3>
 <img class="chart" src="book_assets/vibration_fft.png" alt="vibration fft">
 <p class="callout">Read it: faulty adds 95 Hz BPFI-like tone + amplitude modulation at 6 Hz (impacts). FFT peak at 95 Hz is the AI's strongest feature (<code>fft95</code>). Collect 50 Hz minimum; 200 Hz better if Pi allows.</p>
-<h3>PT100 Callendar–Van Dusen + 2-point calibration anchors</h3>
-<img class="chart" src="book_assets/pt100_curve.png" alt="pt100">
+<h3>K-type EMF curve + what this chain can really deliver</h3>
+<img class="chart" src="book_assets/tc_curve.png" alt="k-type emf and honest error budget">
+<p class="callout">Read it: left — the whole 0–100 °C signal is 4.1 mV, which is why the pair is twisted and shielded. Right — the error envelope is set by the <b>probe class</b>, not by the 12-bit ADC. That is why M4 is ±2.0 °C and why the order must say <b>class 1</b>.</p>
 <h3>Coarse SPC gating (the compute-saver)</h3>
 <img class="chart" src="book_assets/spc_chart.png" alt="spc">
 <p class="callout">Only windows in pink trigger DL. Healthy 90% of time → 10× fewer inferences → Pi stays cool, false alarms drop. Log TBA (time-between-alerts): shrinking TBA = degrading bearing.</p>
@@ -388,8 +388,8 @@ X,y,G = df.drop(columns=[<span class="s">'label'</span>,<span class="s">'event_i
 <h2 class="sec">8 — BOM & Budget Control (8240 + 0 cloud = ceiling)</h2>
 <table><tr><th>#</th><th>Item</th><th>Function (physics role)</th><th>Store</th><th>Qty</th><th>Unit</th><th>Total</th></tr>
 <tr><td>1</td><td>ADXL345 Module</td><td>vibration: F=ma capacitive</td><td>Makers</td><td>1</td><td>170</td><td>170</td></tr>
-<tr><td>2</td><td>PT100 Probe 3-wire M6</td><td>heat: R(T) platinum</td><td>RAM</td><td>1</td><td>220</td><td>220</td></tr>
-<tr><td>3</td><td>MAX31865 Module</td><td>RTD ADC + 3-wire comp.</td><td>RAM</td><td>1</td><td>380</td><td>380</td></tr>
+<tr><td>2</td><td>K-type Probe M6 (class 1)</td><td>heat: Seebeck EMF</td><td>micro ohm</td><td>1</td><td>250</td><td>250</td></tr>
+<tr><td>3</td><td>MAX6675 Module</td><td>12-bit TC ADC + cold-junction comp.</td><td>micro ohm</td><td>1</td><td>200</td><td>200</td></tr>
 <tr><td>4</td><td>INMP441 Mic</td><td>sound: MEMS + I2S</td><td>Future</td><td>1</td><td>180</td><td>180</td></tr>
 <tr><td>5</td><td>Magnetic Base</td><td>coupling vibration</td><td>Future</td><td>1</td><td>120</td><td>120</td></tr>
 <tr><td>6</td><td>Shielded M-F</td><td>EMI drain</td><td>Future</td><td>1</td><td>45</td><td>45</td></tr>
@@ -410,7 +410,9 @@ X,y,G = df.drop(columns=[<span class="s">'label'</span>,<span class="s">'event_i
 <tr><td>21</td><td>PG7 glands ×2</td><td>seal + strain</td><td>Future</td><td>2</td><td>15</td><td>30</td></tr>
 <tr><td>22</td><td>Heat-shrink 1m</td><td>insulation</td><td>Future</td><td>1</td><td>10</td><td>10</td></tr>
 <tr><td>23–25</td><td>Shipping ×3 stores</td><td>logistics</td><td>—</td><td>3</td><td>—</td><td>200</td></tr>
+<tr><td>26</td><td>Reserve</td><td>re-quote + breakage</td><td>—</td><td>1</td><td>150</td><td>150</td></tr>
 <tr><td colspan="6" style="text-align:right"><b>TOTAL (hard cap)</b></td><td><b>8240</b></td></tr></table>
+<div class="callout warn"><b>Price re-shop (2026-10-25) — action required.</b> A newer supplier sheet totals <b>8888.25 EGP</b> for 23 lines and is <b>not buildable</b>: Pi 4 <b>4GB @6850</b> (the 8GB was quoted at 5800 — worse and dearer), 32GB SD at 449, M-M jumpers at 220, and it <b>drops the case, fan, glands and heat-shrink</b> while leaving the MAX6675 <b>unpriced</b>. The fan is not optional: a Pi 4 in a sealed IP65 box throttles. The table above is the build target; <b>re-confirm the Pi price first</b>, it is 70% of the budget. Reconciliation: <code>circuit/BOM_reconciliation.md</code>.</div>
 <div class="callout danger"><b>Rule:</b> spend ≤8240 hardware + 0 cloud. If a part dies, downgrade improvements first (paste→borrow, shrink→tape). Never cut ضروري (1–17). Paid cloud proposals rejected. Photo every receipt.</div>
 </div>
 
@@ -418,7 +420,7 @@ X,y,G = df.drop(columns=[<span class="s">'label'</span>,<span class="s">'event_i
 <h2 class="sec">9 — Calibration Lab (mandatory evidence)</h2>
 <table><tr><th>Sensor</th><th>Procedure</th><th>Accept</th><th>Record</th></tr>
 <tr><td>ADXL345</td><td>6 faces flat (±1g), 10s each; compute offset/scale; verify 0g hanging + 1g flat</td><td>bias ≤0.05g, noise ≤0.02g RMS</td><td>before/after table + tilt plot → cal.json g_bias</td></tr>
-<tr><td>PT100 chain</td><td>ice bath (0°C) + boil (~97°C Cairo) + room vs phone thermometer; fit T=a·raw+b</td><td>±1.0°C 0–100°C</td><td>a,b + 2-point graph → cal.json t_a/t_b</td></tr>
+<tr><td>K-type chain</td><td>ice bath (0 °C) + boil (~97 °C Cairo) + room vs reference thermometer; 5-min warm-up, module away from the Pi; fit T=a·raw+b</td><td>±2.0 °C 0–97 °C <b>with a class-1 probe</b></td><td>a,b + 3-point graph → cal.json t_a/t_b; log the open-TC flag (must be 0)</td></tr>
 <tr><td>INMP441</td><td>1kHz tone at 60/75/90dB (phone app) @20cm; store gain</td><td>relative ±3dB</td><td>gain + spectrogram sample</td></tr></table>
 <div class="callout">Re-run exhibition morning. Sign/date in logbook + photo setup. Judges check this first after accuracy.</div>
 </div>
@@ -439,11 +441,11 @@ X,y,G = df.drop(columns=[<span class="s">'label'</span>,<span class="s">'event_i
 <table><tr><th>Step</th><th>Action</th><th>Expected ≤5s on both UIs</th></tr>
 <tr><td>1</td><td>Power on, scan 2 QRs (Flask offline + Firebase public + Grafana)</td><td>Online &lt;2min, Healthy baseline everywhere</td></tr>
 <tr><td>2</td><td>Shake rig 3s</td><td>RMS spike → Warning→Fault + banner + Grafana annotation</td></tr>
-<tr><td>3</td><td>Warm PT100 (hand/dryer 30cm)</td><td>temp slope alarm on Panel + Grafana</td></tr>
+<tr><td>3</td><td>Warm K-type probe (hand/dryer 30cm)</td><td>temp slope alarm on Panel + Grafana</td></tr>
 <tr><td>4</td><td>Clap/tone at mic</td><td>acoustic flag both</td></tr>
 <tr><td>5</td><td>Pull WiFi 10s → restore</td><td>Panel-local keeps live, SD buffers → Firebase backfill, Grafana gap filled</td></tr>
 <tr><td>6</td><td>Show papers</td><td>confusion matrix + cal sheets + rubric + logbooks + 8240 receipts + 0-EGP cloud proof</td></tr></table>
-<div class="kpi"><div><b>M1 ≥80%</b><span>accuracy</span></div><div><b>M2 ≤5s</b><span>response</span></div><div><b>M3 ±0.1g</b><span>vib error</span></div><div><b>M4 ±1°C</b><span>temp error</span></div><div><b>M5 ≥60min</b><span>uptime</span></div><div><b>M6 ≤2%</b><span>packet loss</span></div></div>
+<div class="kpi"><div><b>M1 ≥80%</b><span>accuracy</span></div><div><b>M2 ≤5s</b><span>response</span></div><div><b>M3 ±0.1g</b><span>vib error</span></div><div><b>M4 ±2°C</b><span>temp error</span></div><div><b>M5 ≥60min</b><span>uptime</span></div><div><b>M6 ≤2%</b><span>packet loss</span></div></div>
 <p style="font-size:13px;color:var(--muted)">Extra Cinar KPIs on dashboard: TBA/TB_VA/TB_CA, Th_DB, MQTT_QM, QL_M, reconnect interval.</p>
 </div>
 
@@ -452,7 +454,7 @@ X,y,G = df.drop(columns=[<span class="s">'label'</span>,<span class="s">'event_i
 <p><b>W1</b> Order (Pi first) + OS/fan/SD + Firebase Spark + Grafana org + Flask hello • <b>W2</b> Wire 3 sensors + i2cdetect + mount + Mosquitto • <b>W3</b> Cal + healthy baseline + Firebase mirror + Grafana + Panel live • <b>W4</b> Fault dataset + SPC + RF ≥80% + dual-flip test • <b>W5</b> Box/glands/buffer/quota-guard + drill + docs + QR stickers • <b>W6</b> Freeze + rehearsal + hard copies + SD image backup.</p>
 <div class="callout warn"><b>Top risks:</b> Pi stock → order now; venue WiFi blocked → hotspot + local Flask primary; Firebase quota → throttle 1/60s + CSV replay; Grafana auth → pre-cached snapshot; SD corruption → read-only root; accuracy &lt;80% → 2-class fallback; heat damage → 30cm only.</div>
 <p><b>Future (out of 8240):</b> Digital Twin in Simulink + RUL regression (Mourtzis), fleet of motors, AR overlay, OPC-UA PLC link, solar + battery field node.</p>
-<p style="font-size:13px;color:var(--muted)">Refs: Mourtzis et al. Front. Mech. Eng. 2020.578379 • Cinar et al. Machines 2022.10.1006 • Deloitte PdM 2017 • NGSI-LD/FIWARE • Callendar–Van Dusen • Shewhart SPC. BOM: DOC-20261014-WA0055.xlsx. Rules: G12_27 Capstone.pdf.</p>
+<p style="font-size:13px;color:var(--muted)">Refs: Mourtzis et al. Front. Mech. Eng. 2020.578379 • Cinar et al. Machines 2022.10.1006 • Deloitte PdM 2017 • NGSI-LD/FIWARE • NIST ITS-90 type-K tables • Shewhart SPC. BOM: DOC-20261014-WA0055.xlsx. Rules: G12_27 Capstone.pdf.</p>
 </div>
 
 <div class="footer">Project Book v2.0 • 2026-10-14 • Total ≤8240 EGP + 0 EGP cloud (Firebase + Grafana + Flask) • Offline-first • No Arduino • PRD.md v2.0 synced 🛠</div>

@@ -1,0 +1,27 @@
+ref,name,role,store,qty,unit_egp,total_egp,source
+1,ADXL345 Module,vibration (I2C 0x53),Makers Electronics,1,170,170,quote 2026-10-14
+2,K-type Probe M6 (class 1),heat: Seebeck EMF,micro ohm,1,250,250,quote 2026-10-25
+3,MAX6675 Module,12-bit TC ADC + cold-junction comp,micro ohm,1,200,200,ESTIMATE - get a quote
+4,INMP441 Mic Module,sound (I2S),Future Electronics,1,180,180,quote 2026-10-25
+5,Sensor Magnetic Base,couples vibration,Makers Electronics,1,120,120,quote 2026-10-14
+6,Shielded Jumper Wires (M-F),EMI drain,Future Electronics,1,45,45,quote 2026-10-14
+7,Jumper Wires (Male to Male),breadboard, Future Electronics,1,35,35,quote 2026-10-14
+8,Male Pin Headers 2.54mm,solder interface,Future Electronics,2,5,10,quote 2026-10-14
+9,M3 Screws & Nuts Pack,clamp stack,local,1,10,10,quote 2026-10-14
+10,Nylon Spacers / Washers M3,ground-loop break,Future Electronics,1,10,10,quote 2026-10-14
+11,Raspberry Pi Power Supply 5V/3A,clean power,Makers Electronics,1,320,320,quote 2026-10-14
+12,Raspberry Pi 4 8GB RAM,edge compute,Makers Electronics,1,5800,5800,quote 2026-10-14 - RE-CONFIRM
+13,MicroSD Card 32GB Class 10,OS + buffer,Future Electronics,1,190,190,quote 2026-10-14
+14,Breadboard 840 Pin,testable wiring,Future Electronics,1,65,65,quote 2026-10-14
+15,Ceramic Capacitors 100nF,HF decoupling,Future Electronics,3,5,15,quote 2026-10-14
+16,Resistors 10k Ohm,pull-ups,Future Electronics,2,5,10,quote 2026-10-14
+17,Electrolytic Capacitor 10uF,bulk hold-up,Future Electronics,1,5,5,quote 2026-10-14
+18,Case & Fan,anti-throttle (required),Makers Electronics,1,240,240,quote 2026-10-14
+19,Thermal Paste,conduction,Future Electronics,1,35,35,quote 2026-10-14
+20,IP65 Enclosure Box,field proof,Future Electronics,1,140,140,quote 2026-10-14
+21,Cable Glands PG7,seal + strain relief,Future Electronics,2,15,30,quote 2026-10-14
+22,Heat Shrink Tube 1m,insulation,Future Electronics,1,10,10,quote 2026-10-14
+23,Shipping - Makers,logistics,Makers Electronics,1,80,80,quote 2026-10-14
+24,Shipping - Future,logistics,Future Electronics,1,70,70,quote 2026-10-14
+25,Shipping - micro ohm,logistics,micro ohm,1,50,50,quote 2026-10-14
+26,Reserve,re-quote + breakage,-,1,150,150,reserve

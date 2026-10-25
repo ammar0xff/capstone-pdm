@@ -9,9 +9,9 @@ from skidl import *
 
 U1 = Part("pdmlib", "RPi4-8GB", footprint="Connector_PinHeader_2.54mm:PinHeader_1x40_P2.54mm_Vertical", ref='U1')
 U2 = Part("pdmlib", "ADXL345", footprint="Module:ADXL345", ref='U2')
-U3 = Part("pdmlib", "MAX31865", footprint="Module:MAX31865", ref='U3')
+U3 = Part("pdmlib", "MAX6675", footprint="Module:MAX6675", ref='U3')
 U4 = Part("pdmlib", "INMP441", footprint="Module:INMP441", ref='U4')
-R1 = Part("pdmlib", "PT100-M6", footprint="Module:PT100_M6", ref='R1')
+R1 = Part("pdmlib", "TC-K-M6", footprint="Module:TC_K_M6", ref='R1')
 C1 = Part("pdmlib", "100nF", footprint="Capacitor_SMD:C_0402_1005Metric", ref='C1')
 C2 = Part("pdmlib", "100nF", footprint="Capacitor_SMD:C_0402_1005Metric", ref='C2')
 C3 = Part("pdmlib", "100nF", footprint="Capacitor_SMD:C_0402_1005Metric", ref='C3')
@@ -27,15 +27,13 @@ Net("5V") += [U1["4"], F1["1"]]
 Net("I2C_SDA") += [U1["3"], U2["5"]]
 Net("I2C_SCL") += [U1["5"], U2["6"]]
 Net("SPI_SCLK") += [U1["23"], U3["3"]]
-Net("SPI_MOSI") += [U1["19"], U3["4"]]
 Net("SPI_MISO") += [U3["5"], U1["21"]]
-Net("SPI_CS0") += [U1["24"], U3["6"], R2["2"]]
+Net("SPI_CS0") += [U1["24"], U3["4"], R2["2"]]
 Net("I2S_BCLK") += [U1["12"], U4["4"]]
 Net("I2S_WS") += [U1["35"], U4["5"]]
 Net("I2S_SD") += [U1["38"], U4["6"]]
-Net("RTD_SENSE_P") += [R1["1"], U3["7"], U3["9"]]
-Net("RTD_SENSE_N") += [R1["2"], U3["10"]]
-Net("RTD_FORCE_N") += [R1["3"], U3["8"]]
+Net("TC_P") += [R1["1"], U3["6"]]
+Net("TC_N") += [R1["2"], U3["7"]]
 Net("LED_A") += [U1["36"], R4["1"]]
 Net("LED_K") += [R4["2"], D1["1"]]
 

@@ -3,7 +3,7 @@ render.py — vector schematics generated from design.py.
 
 Outputs (out/):
   schematic_main.svg   A3 landscape, full wiring + cable schedule + ERC summary
-  rtd_frontend.svg     PT100 3-wire theory + MAX31865 chain + error budget
+  tc_frontend.svg      K-type + MAX6675 theory, cold junction + error budget
   wiring_a3.svg        physical assembly / enclosure drawing with title block
 """
 import math
@@ -111,15 +111,15 @@ def module(svg, ref, x, y, w, h, pins, accent="#2471a3"):
 def schematic_main(path):
     W, H = 1680, 1188
     svg = SVG(W, H)
-    header(svg, "PdM Rig — System Wiring", 
-           "Raspberry Pi 4 · ADXL345 (I2C) · MAX31865 + PT100 (SPI) · INMP441 (I2S) · net labels = same net",
+    header(svg, "PdM Rig — System Wiring",
+           "Raspberry Pi 4 · ADXL345 (I2C) · MAX6675 + K-type (SPI) · INMP441 (I2S) · net labels = same net",
            1)
 
     # ---- modules (left column)
     u2 = module(svg, "U2", 40, 150, 310, 210,
                 ["VCC", "GND", "CS", "SDO", "SDA", "SCL"], "#2471a3")
-    u3 = module(svg, "U3", 40, 380, 310, 320,
-                ["VIN", "GND", "SCLK", "SDI", "SDO", "CS", "FP", "FN", "RP", "RN"], "#b9770e")
+    u3 = module(svg, "U3", 40, 380, 310, 280,
+                ["VIN", "GND", "SCLK", "CS", "SO", "TP", "TN"], "#b9770e")
     u4 = module(svg, "U4", 40, 730, 310, 200,
                 ["VDD", "GND", "LR", "BCLK", "WS", "SD"], "#117a65")
 
@@ -136,8 +136,7 @@ def schematic_main(path):
                    ("GND_6", "GND", "6"), ("GND_9", "GND", "9"), ("GND_14", "GND", "14"),
                    ("GND_25", "GND", "25"), ("GND_39", "GND", "39")]),
         ("I2C", [("SDA", "SDA1", "3"), ("SCL", "SCL1", "5")]),
-        ("SPI0", [("SCLK", "SCLK", "23"), ("MOSI", "MOSI", "19"),
-                  ("MISO", "MISO", "21"), ("CE0", "CE0", "24")]),
+        ("SPI0", [("SCLK", "SCLK", "23"), ("MISO", "MISO", "21"), ("CE0", "CE0", "24")]),
         ("I2S", [("BCLK", "PCM_CLK", "12"), ("WS", "PCM_FS", "35"), ("DIN", "PCM_DIN", "38")]),
         ("GPIO", [("LED", "GPIO16", "36")]),
     ]
@@ -155,7 +154,7 @@ def schematic_main(path):
             y += 36
 
     # ---- signal routing channel
-    signals = ["I2C_SDA", "I2C_SCL", "SPI_SCLK", "SPI_MOSI", "SPI_MISO",
+    signals = ["I2C_SDA", "I2C_SCL", "SPI_SCLK", "SPI_MISO",
                "SPI_CS0", "I2S_BCLK", "I2S_WS", "I2S_SD"]
     for i, net in enumerate(signals):
         chx = 430 + i * 17
@@ -189,8 +188,7 @@ def schematic_main(path):
         svg.rect(x, y - 11, w, 22, fill="#ffffff", stroke=color, rx=4, sw=1.2)
         svg.text(x + w / 2, y + 3.5, label, 9.5, color, anchor="middle", weight="bold", family=MONO)
 
-    short = {"RTD_SENSE_P": "RTD+", "RTD_SENSE_N": "RTD-", "RTD_FORCE_N": "F-",
-             "LED_A": "LED_A", "LED_K": "LED_K"}
+    short = {"TC_P": "T+", "TC_N": "T-", "LED_A": "LED_A", "LED_K": "LED_K"}
     for key, my, net in u2 + u3 + u4:
         if net in ("3V3", "GND", "5V"):
             rail_tag(356, my, net, NETS[net]["color"])
@@ -210,7 +208,7 @@ def schematic_main(path):
     card(svg, dx, dy, dw, 300, "DECOUPLING — one 100 nF per sensor, at the module")
     for i, (ref, ic, note) in enumerate([
             ("C1", "U2 ADXL345", "3.3 V rail, 4.7 uF equivalent"),
-            ("C2", "U3 MAX31865", "kills SPI burst dip"),
+            ("C2", "U3 MAX6675", "kills SPI burst dip"),
             ("C3", "U4 INMP441", "keeps mic bias clean"),
             ("C4", "bulk 10 uF", "holds rail during WiFi TX")]):
         cx = dx + 40 + i * 155
@@ -241,9 +239,8 @@ def schematic_main(path):
     detail = {
         "I2C_SDA": ("3 (GPIO2)", "U2.SDA", "open-drain"),
         "I2C_SCL": ("5 (GPIO3)", "U2.SCL", "open-drain"),
-        "SPI_SCLK": ("23 (GPIO11)", "U3.SCLK", "push-pull"),
-        "SPI_MOSI": ("19 (GPIO10)", "U3.SDI", "push-pull"),
-        "SPI_MISO": ("21 (GPIO9)", "U3.SDO", "push-pull"),
+        "SPI_SCLK": ("23 (GPIO11)", "U3.SCK", "push-pull"),
+        "SPI_MISO": ("21 (GPIO9)", "U3.SO", "push-pull"),
         "SPI_CS0": ("24 (GPIO8)", "U3.CS", "push-pull"),
         "I2S_BCLK": ("12 (GPIO18)", "U4.BCLK", "clock"),
         "I2S_WS": ("35 (GPIO19)", "U4.WS", "clock"),
@@ -269,8 +266,8 @@ def schematic_main(path):
         ("Nyquist", f'fs {DESIGN["fs_hz"]} Hz -> 400 Hz, covers BPFO/BPFI to 300 Hz'),
         ("FFT", f'{DESIGN["fs_hz"]}/{DESIGN["window"]} = 0.195 Hz/bin, 5.12 s window'),
         ("ADXL range", "+/-4 g, FULL_RES 3.9 mg/LSB vs 100 mg budget"),
-        ("RTD", "15-bit -> 0.034 C/LSB, self-heat 0.003 C average"),
-        ("Rref", f'{DESIGN["rref_ohm"]:.0f} ohm on board — 400 in code = -17.9 C error'),
+        ("Thermo", "12-bit -> 0.25 C/step, no self-heating"),
+        ("Budget", "class-1 probe RSS 1.68 C vs +/-2.0 C (M4)"),
         ("I2C", "1.8k pull-up + 60 pF -> 238 ns rise < 300 ns at 400 kHz"),
         ("Power", "7.4 W peak = 1.48 A of 3 A (49% load), 2x margin"),
         ("AI", "1 RF inference ~2 ms on Pi 4, runs only when SPC fires"),
@@ -297,153 +294,120 @@ def schematic_main(path):
     svg.save(path)
 
 
-# --------------------------------------------------------------- RTD theory
-def rtd_frontend(path):
+# ------------------------------------------------------- thermocouple theory
+def tc_frontend(path):
     W, H = 1400, 900
     svg = SVG(W, H)
-    header(svg, "PT100 + MAX31865 — 3-wire front end",
-           "Why three leads, how the ratiometric ADC works, and the error budget behind M4 (+/-1 C)", 2)
+    header(svg, "K-type thermocouple + MAX6675 — front end",
+           "Seebeck physics, where the cold junction really is, and the error budget behind M4 (+/-2 C)", 2)
 
-    # ---- bias rail and reference resistor
-    svg.line(80, 150, 700, 150, "#c0392b", 3)
-    svg.text(80, 138, "VBIAS 2.0 V — enabled only during a conversion", 10, "#c0392b", weight="bold")
-    rx = 250
-    svg.line(rx, 150, rx, 205, "#c0392b", 3)
-    svg.poly([(rx - 6, 190), (rx + 6, 196), (rx - 6, 202)], fill="#c0392b", sw=1)
-    svg.text(rx + 14, 200, "I = 4.65 mA", 9, "#c0392b", family=MONO)
-    svg.rect(rx - 28, 205, 56, 95, fill="#fff", stroke="#c0392b", rx=4, sw=1.6)
-    svg.text(rx, 234, "Rref", 12, "#c0392b", anchor="middle", weight="bold")
-    svg.text(rx, 254, "430 R", 11, INK, anchor="middle", family=MONO)
-    svg.text(rx, 272, "0.1 %", 9, MUTED, anchor="middle")
-    svg.text(rx, 288, "4x R0", 8.5, MUTED, anchor="middle")
-    svg.line(rx, 300, rx, 340, "#c0392b", 3)
-    svg.circle(rx, 340, 4, "#c0392b")
-    svg.text(rx - 10, 332, "node A", 9, MUTED, anchor="end")
+    # ---- probe
+    svg.rect(170, 250, 72, 210, fill="#eef3f7", stroke="#7f8c8d", rx=6, sw=1.8)
+    svg.text(206, 280, "K-type", 11, INK, anchor="middle", weight="bold")
+    svg.text(206, 296, "M6 probe", 9, MUTED, anchor="middle")
+    for i in range(7):
+        svg.line(170, 330 + i * 16, 178, 330 + i * 16, "#95a5a6", 1.4)
+    svg.poly([(170, 460), (242, 460), (206, 512)], fill="#d5dbdb", stroke="#7f8c8d", sw=1.6)
+    svg.circle(206, 500, 5, "#c0392b")
+    svg.text(216, 528, "measuring junction (T_hot)", 9.5, "#c0392b")
 
-    # ---- RTD element
-    svg.rect(rx - 32, 400, 64, 120, fill="#fdf2f8", stroke="#8e44ad", rx=6, sw=1.8)
-    svg.text(rx, 434, "PT100", 12, "#8e44ad", anchor="middle", weight="bold")
-    svg.text(rx, 452, "100 R @ 0 C", 9, INK, anchor="middle", family=MONO)
-    svg.text(rx, 468, "138.5 R @ 100 C", 9, INK, anchor="middle", family=MONO)
-    svg.text(rx, 486, "alpha 3.85e-3 /C", 8, MUTED, anchor="middle")
-    svg.text(rx, 504, "thin-film element", 8, MUTED, anchor="middle")
-    svg.line(rx, 340, rx, 400, "#8e44ad", 2.4)
-    svg.line(rx, 520, rx, 610, "#8e44ad", 2.4)
-    svg.circle(rx, 610, 4, "#8e44ad")
+    # ---- twisted pair (the actual thermocouple wires)
+    svg.poly([(190, 250), (190, 214), (300, 214)], "#c0392b", 2)
+    svg.poly([(222, 250), (222, 226), (300, 226)], "#2471a3", 2)
+    for i in range(9):
+        x0 = 300 + i * 20
+        y0a, y0b = (214, 226) if i % 2 == 0 else (226, 214)
+        svg.line(x0, y0a, x0 + 20, y0b, "#c0392b" if i % 2 == 0 else "#2471a3", 1.8)
+    svg.poly([(480, 220), (600, 220)], "#8e44ad", 2.2)
+    svg.text(392, 200, "twisted pair, shield grounded at the Pi end only", 9, MUTED, anchor="middle")
+    svg.text(270, 250, "chromel", 8.5, "#c0392b")
+    svg.text(270, 264, "alumel", 8.5, "#2471a3")
 
-    def lead_box(x, y, label, col):
-        svg.rect(x - 30, y - 11, 60, 22, fill="#fff", stroke=col, rx=3, sw=1)
-        svg.text(x, y + 3.5, "Rlead", 8.5, col, anchor="middle", family=MONO)
-
-    # ---- lead A: one lead, used for both force and sense
-    svg.poly([(rx, 340), (470, 340)], "#8e44ad", 2.2)
-    svg.circle(470, 340, 4.5, "#8e44ad")
-    svg.poly([(470, 340), (470, 250), (700, 250)], "#8e44ad", 2.2)
-    svg.poly([(470, 340), (700, 340)], "#8e44ad", 2.2)
-    svg.text(486, 236, "lead A  ->  F+  (force)", 9, "#8e44ad")
-    svg.text(486, 330, "same node -> RTD+  (sense)", 9, "#8e44ad")
-    svg.text(300, 380, "single lead end", 8.5, MUTED, anchor="middle")
-
-    # ---- leads B and C: matched pair at the other end
-    svg.poly([(rx, 610), (330, 610)], "#8e44ad", 2.2)
-    svg.circle(330, 610, 4.5, "#8e44ad")
-    svg.poly([(330, 610), (330, 650), (700, 650)], "#8e44ad", 2.2)
-    lead_box(520, 650, "B", "#8e44ad")
-    svg.text(536, 636, "lead B -> RTD-  (sense)", 9, "#8e44ad")
-    svg.poly([(330, 610), (330, 690), (700, 690)], "#8e44ad", 2.2)
-    lead_box(585, 690, "C", "#8e44ad")
-    svg.text(601, 676, "lead C -> F-  (force return)", 9, "#8e44ad")
-    svg.text(160, 600, "matched pair end", 8.5, MUTED, anchor="middle")
-
-    # ---- MAX31865 block
-    bx, by, bw, bh = 700, 220, 300, 480
+    # ---- MAX6675 module
+    bx, by, bw, bh = 600, 170, 340, 350
     svg.rect(bx, by, bw, bh, fill="#fff", stroke="#b9770e", rx=10, sw=1.8)
     svg.rect(bx, by, bw, 38, fill="#b9770e", rx=10)
     svg.rect(bx, by + 24, bw, 14, fill="#b9770e")
-    svg.text(bx + 14, by + 24, "U3  MAX31865", 12, "#fff", weight="bold")
-    for label, yy in [("F+", 250), ("RTD+", 340), ("RTD-", 650), ("F-", 690)]:
-        svg.text(bx - 10, yy + 4, label, 10, "#b9770e", anchor="end", family=MONO, weight="bold")
-        svg.circle(bx, yy, 3.4, "#b9770e")
-    svg.text(bx + 20, by + 78, "differential input", 9, MUTED)
-    svg.text(bx + 20, by + 96, "15-bit ADC", 9, MUTED)
-    svg.text(bx + 20, by + 114, "ratiometric:", 9, MUTED)
-    svg.text(bx + 20, by + 132, "code = Rrtd / Rref", 9.5, INK, family=MONO)
-    svg.text(bx + 20, by + 164, "fault detect:", 9, MUTED)
-    svg.text(bx + 20, by + 182, "open / short /", 9, INK)
-    svg.text(bx + 20, by + 198, "out of range", 9, INK)
-    svg.text(bx + 20, by + 230, "3-wire mode:", 9, MUTED)
-    svg.text(bx + 20, by + 248, "board jumper set", 9, INK)
-    svg.text(bx + 20, by + 266, "to 3-wire", 9, INK)
-    svg.text(bx + 20, by + 300, "VBIAS off between", 9, MUTED)
-    svg.text(bx + 20, by + 318, "conversions ->", 9, MUTED)
-    svg.text(bx + 20, by + 336, "no self-heating", 9, INK)
-    svg.line(bx, 600, bx - 22, 600, "#b9770e", 2.4)
-    svg.line(bx + bw, 600, 1030, 600, "#b9770e", 2.4)
-    svg.text(bx + bw + 6, 590, "SPI0", 9.5, "#b9770e", weight="bold", family=MONO)
+    svg.text(bx + 14, by + 24, "U3  MAX6675", 12, "#fff", weight="bold")
+    # screw terminal = cold junction
+    svg.rect(bx + 12, 222, 60, 46, fill="#f4ecf7", stroke="#8e44ad", rx=4, sw=1.4)
+    svg.circle(bx + 30, 245, 7, "#fff", stroke="#8e44ad", sw=1.6)
+    svg.circle(bx + 54, 245, 7, "#fff", stroke="#8e44ad", sw=1.6)
+    svg.text(bx + 29, 264, "+", 9, "#8e44ad", anchor="middle")
+    svg.text(bx + 56, 264, "-", 9, "#8e44ad", anchor="middle")
+    svg.text(bx + 12, 216, "cold junction = isothermal block", 9, "#8e44ad")
+    svg.line(bx + 72, 245, bx + 120, 245, "#8e44ad", 2)
+    svg.circle(bx + 124, 245, 4, "#8e44ad")
 
-    # ---- Pi
-    svg.rect(1030, 556, 330, 88, fill="#fff", stroke="#2471a3", rx=8, sw=1.6)
-    svg.text(1195, 584, "Raspberry Pi 4", 11, INK, anchor="middle", weight="bold")
-    svg.text(1195, 602, "SPI0: CE0 8 · SCLK 11 · MOSI 10 · MISO 9", 8.5, MUTED, anchor="middle", family=MONO)
-    svg.text(1195, 620, "3.3 V logic, 1 MHz", 8.5, MUTED, anchor="middle")
+    # die + internals
+    svg.rect(bx + 120, 280, 180, 78, fill="#fef9e7", stroke="#b9770e", rx=6, sw=1.4)
+    svg.text(bx + 210, 304, "MAX6675 die", 10, "#b9770e", anchor="middle", weight="bold")
+    svg.text(bx + 210, 322, "cold-junction sensor", 8.5, MUTED, anchor="middle")
+    svg.text(bx + 210, 338, "amplifier + 12-bit ADC", 8.5, MUTED, anchor="middle")
+    svg.text(bx + 210, 352, "linearisation, open-TC flag", 8, MUTED, anchor="middle")
+    svg.line(bx + 124, 245, bx + 124, 280, "#8e44ad", 1.6)
+    svg.text(bx + 132, 380, "220 ms per conversion", 8.5, MUTED)
+    svg.text(bx + 132, 394, "0.25 C per step", 8.5, MUTED)
+    svg.text(bx + 20, 410, "VCC 3.3 V (generic board)", 9, INK)
+    svg.text(bx + 20, 428, "100 nF at the module", 9, INK)
+    svg.text(bx + 20, 446, "SPI mode 0, 1 MHz, read only", 9, INK)
+    svg.text(bx + 20, 470, "Do NOT feed an Adafruit board", 9, "#922b21")
+    svg.text(bx + 20, 486, "Vin from 3V3 - it needs 5 V.", 9, "#922b21")
+
+    svg.line(bx + bw, 300, 1030, 300, "#b9770e", 2.4)
+    svg.text(bx + bw + 8, 292, "SPI0  CS / SCK / SO", 9.5, "#b9770e", weight="bold", family=MONO)
+    svg.rect(1030, 270, 330, 60, fill="#fff", stroke="#2471a3", rx=8, sw=1.6)
+    svg.text(1195, 296, "Raspberry Pi 4", 10.5, INK, anchor="middle", weight="bold")
+    svg.text(1195, 314, "CE0 8 · SCLK 11 · MISO 9", 8.5, MUTED, anchor="middle", family=MONO)
 
     # ---- reading card
-    card(svg, 1030, 150, 330, 380, "READING THE ADC")
-    lines = [
-        ("Rrtd = Rref x code / 32768", "#2471a3"),
-        ("", INK),
-        ("T from Callendar-Van Dusen:", MUTED),
-        ("R(T) = R0[1 + AT + BT^2 +", INK),
-        ("          C(T-100)T^3]", INK),
-        ("A = 3.9083e-3   B = -5.775e-7", MUTED),
-        ("", INK),
-        ("Above 0 C the quadratic form is", MUTED),
-        ("exact; below 0 C solve numerically.", MUTED),
-    ]
-    for i, (t, c) in enumerate(lines):
-        if t:
-            svg.text(1050, 190 + i * 19, t, 9.2, c, family=MONO if c != MUTED else FONT)
-    svg.line(1046, 372, 1344, 372, LINE, 1)
-    svg.text(1050, 394, "One conversion = 66 ms. Poll at 0.2 Hz;", 9, MUTED)
-    svg.text(1050, 412, "the probe needs ~8 s to follow a step.", 9, MUTED)
-    svg.text(1050, 436, "Read ratio, not absolute volts:", 9, INK)
-    svg.text(1050, 454, "VBIAS drift cancels out.", 9, INK)
-    svg.text(1050, 484, "430 R is the Adafruit-compatible value.", 9, "#922b21", weight="bold")
-    svg.text(1050, 502, "4300 R = PT1000 board. 400 R = bug.", 9, "#922b21")
+    card(svg, 1030, 150, 330, 110, "ONE READING")
+    svg.text(1050, 194, "T = f(V_tc) + T_cold", 10.5, INK, family=MONO)
+    svg.text(1050, 216, "the chip does the inverse, you", 9, MUTED)
+    svg.text(1050, 232, "just read SPI and apply cal.", 9, MUTED)
 
-    # ---- equations panel
-    px, py, pw = 80, 690, 580
-    svg.rect(px, py, pw, 170, fill="#fff", stroke=LINE, rx=10)
-    svg.text(px + 18, py + 26, "THE 3-WIRE TRICK", 10.5, NAVY, weight="bold", ls="1")
-    svg.text(px + 18, py + 52, "Rmeas = Rrtd + 2 Rlead   ->   Rtrue = Rmeas - 2 Rlead", 10.5, INK, family=MONO)
-    svg.text(px + 18, py + 76, "Both matched leads carry the same current, so their drops", 9.2, MUTED)
-    svg.text(px + 18, py + 92, "cancel in the differential measurement. A 2-wire hookup", 9.2, MUTED)
-    svg.text(px + 18, py + 108, "instead adds about +0.5 C per metre of lead, which alone", 9.2, MUTED)
-    svg.text(px + 18, py + 124, "would break M4 (+/-1 C).", 9.2, MUTED)
-    svg.text(px + 18, py + 150, "R0 = 100 R      alpha = 3.9083e-3 /C", 9.2, "#8e44ad", family=MONO)
-    svg.text(px + 330, py + 150, "I = 4.65 mA", 9.2, "#c0392b", family=MONO)
+    # ---- physics panel
+    px, py, pw = 80, 560, 580
+    svg.rect(px, py, pw, 300, fill="#fff", stroke=LINE, rx=10)
+    svg.text(px + 18, py + 26, "THE PHYSICS — WHY THE COLD JUNCTION MATTERS", 10.5, NAVY, weight="bold", ls="0.8")
+    svg.text(px + 18, py + 56, "V = S x (T_hot - T_cold)      S = 41 uV/C", 12, "#8e44ad", family=MONO, weight="bold")
+    svg.text(px + 18, py + 80, "A thermocouple does not measure temperature; it measures a", 9.5, MUTED)
+    svg.text(px + 18, py + 96, "temperature DIFFERENCE. To report T_hot the chip must know", 9.5, MUTED)
+    svg.text(px + 18, py + 112, "T_cold, so it measures its own die and adds that back.", 9.5, MUTED)
+    svg.text(px + 18, py + 140, "0 C -> 0.00 mV      100 C -> 4.10 mV", 10, INK, family=MONO)
+    svg.text(px + 18, py + 162, "1 C = 41 uV: the whole signal is a few millivolts,", 9.5, MUTED)
+    svg.text(px + 18, py + 178, "which is why the pair must be twisted and shielded.", 9.5, MUTED)
+    svg.text(px + 18, py + 206, "Trap 1: the terminal block and the die must be at the", 9.5, "#922b21")
+    svg.text(px + 18, py + 222, "same temperature. Put the module next to the Pi and", 9.5, "#922b21")
+    svg.text(px + 18, py + 238, "the die runs 12 C hot -> every reading is 12 C low.", 9.5, "#922b21")
+    svg.text(px + 18, py + 266, "Trap 2: a broken probe reads ambient. Always check", 9.5, "#922b21")
+    svg.text(px + 18, py + 282, "the MAX6675 open-thermocouple flag before trusting T.", 9.5, "#922b21")
 
-    # ---- error budget panel (RSS computed, not typed)
+    # ---- error budget
     ex, ew = 690, 630
-    svg.rect(ex, py, ew, 170, fill="#fef5e7", stroke="#e67e22", rx=10)
-    svg.text(ex + 18, py + 26, "ERROR BUDGET  (M4 = +/-1.0 C)", 10.5, "#b9770e", weight="bold", ls="1")
+    svg.rect(ex, py, ew, 300, fill="#fef5e7", stroke="#e67e22", rx=10)
+    svg.text(ex + 18, py + 26, "ERROR BUDGET  (M4 = +/-2.0 C, class-1 probe)", 10.5, "#b9770e", weight="bold", ls="0.8")
     budget = [
-        ("ADC quantisation (15 bit)", 0.034),
-        ("Rref tolerance 0.1 %", 0.256),
-        ("self-heating, 66 ms / 5 s", 0.003),
-        ("3-wire lead residual", 0.05),
-        ("probe contact + paste", 0.30),
+        ("K-type probe, class 1", 1.50),
+        ("cold-junction tracking", 0.50),
+        ("linearisation + offset", 0.50),
+        ("12-bit quantisation", 0.25),
     ]
     for i, (k, v) in enumerate(budget):
-        yy = py + 50 + i * 17
-        svg.text(ex + 18, yy, k, 9.2, INK)
-        svg.text(ex + 270, yy, f"{v:.3f} C", 9.2, INK, family=MONO)
+        yy = py + 56 + i * 18
+        svg.text(ex + 18, yy, k, 9.5, INK)
+        svg.text(ex + 290, yy, f"{v:.2f} C", 9.5, INK, family=MONO)
     rss = sum(v * v for _, v in budget) ** 0.5
-    svg.text(ex + 400, py + 60, f"RSS = {rss:.2f} C", 12, "#922b21", weight="bold", family=MONO)
-    svg.text(ex + 400, py + 80, f"margin {1.0/rss:.1f}x", 10, "#922b21")
-    svg.text(ex + 400, py + 104, "budget 1.00 C", 9, MUTED, family=MONO)
-    svg.text(ex + 18, py + 148, "Trap: Rref 430 R on the board but 400 R in code = -17.9 C at the ice point.",
-             9, "#922b21", weight="bold")
+    svg.text(ex + 400, py + 62, f"RSS = {rss:.2f} C", 13, "#922b21", weight="bold", family=MONO)
+    svg.text(ex + 400, py + 82, "budget 2.00 C -> margin 1.19x", 9.5, "#922b21")
+    svg.text(ex + 18, py + 142, "A class-2 probe is +/-2.5 C on its own:", 9.5, "#922b21", weight="bold")
+    svg.text(ex + 18, py + 160, "RSS becomes 2.62 C and M4 must be restated to +/-2.5.", 9.5, "#922b21")
+    svg.text(ex + 18, py + 184, "Ordering rule: specify class 1 (0.004|t|) or better.", 9.5, INK)
+    svg.line(ex + 18, py + 198, ex + ew - 18, py + 198, "#f0c9a0", 1)
+    svg.text(ex + 18, py + 220, "PT100 + MAX31865 gave 0.40 C with 2.5x margin.", 9.5, MUTED)
+    svg.text(ex + 18, py + 236, "This BOM trades that accuracy for 0-1000 C range,", 9.5, MUTED)
+    svg.text(ex + 18, py + 252, "faster response (tau 4 s vs 8 s) and no self-heating.", 9.5, MUTED)
+    svg.text(ex + 18, py + 278, "Meeting M4 therefore depends on the probe class you buy.", 9.5, "#922b21", weight="bold")
 
     svg.save(path)
 
@@ -484,7 +448,7 @@ def wiring_a3(path):
     svg.text(bb_x + 180, bb_y + 172, "U2 / U3 / U4 + C1..C4 + R2", 9, MUTED, anchor="middle")
 
     # sensor modules
-    for i, (label, col) in enumerate([("U2 ADXL345", "#2471a3"), ("U3 MAX31865", "#b9770e"),
+    for i, (label, col) in enumerate([("U2 ADXL345", "#2471a3"), ("U3 MAX6675", "#b9770e"),
                                       ("U4 INMP441", "#117a65")]):
         mx = bb_x + 20 + i * 115
         svg.rect(mx, bb_y + 62, 100, 62, fill="#fff", stroke=col, rx=5, sw=1.4)
@@ -504,7 +468,7 @@ def wiring_a3(path):
     svg.text(bb_x + 66, by + 94, "ADXL345  I2C  0.25 m shielded", 8.5, "#2471a3")
     svg.poly([(bb_x + 180, bb_y + 62), (bb_x + 180, by + 88), (px + 340, by + 88),
               (px + 340, py + 130)], "#b9770e", 2, dash="5 4")
-    svg.text(bb_x + 190, by + 82, "PT100 3-wire  SPI  0.4 m shielded", 8.5, "#b9770e")
+    svg.text(bb_x + 190, by + 82, "K-type pair  SPI  0.4 m shielded/twisted", 8.5, "#b9770e")
     svg.poly([(bb_x + 300, bb_y + 62), (bb_x + 300, by + 76), (px + 360, by + 76),
               (px + 360, py + 160)], "#117a65", 2, dash="5 4")
     svg.text(bb_x + 310, by + 70, "INMP441  I2S  0.25 m twisted", 8.5, "#117a65")
@@ -514,7 +478,7 @@ def wiring_a3(path):
     svg.circle(sx, sy, 10, "#e67e22")
     svg.text(sx + 18, sy + 4, "magnet + M3 + nylon -> ADXL345 on motor skin", 9, INK)
     svg.circle(sx + 10, sy + 26, 8, "#b9770e")
-    svg.text(sx + 26, sy + 30, "PT100 M6 probe, thermal paste, finger-tight", 9, INK)
+    svg.text(sx + 26, sy + 30, "K-type M6 probe, thermal paste, finger-tight", 9, INK)
     svg.circle(sx + 480, sy, 9, "#117a65")
     svg.text(sx + 498, sy + 4, "INMP441 facing bearing, 10-20 cm", 9, INK)
 
@@ -529,9 +493,9 @@ def wiring_a3(path):
     cables = [
         ("ADXL345 VCC/GND", "3V3 p1 / GND p9", "0.25 m", "100 nF at module"),
         ("ADXL345 SDA/SCL", "GPIO2 / GPIO3", "0.25 m", "shielded pair"),
-        ("MAX31865 VIN/GND", "3V3 p17 / GND p25", "0.10 m", "100 nF at module"),
-        ("SPI 4-wire", "GPIO 8/9/10/11", "0.10 m", "keep < 10 cm"),
-        ("PT100 3 leads", "F+ / RTD- / F-", "0.40 m", "3-wire mode"),
+        ("MAX6675 VCC/GND", "3V3 p17 / GND p25", "0.10 m", "100 nF at module"),
+        ("SPI 3-wire", "GPIO 8/9/11", "0.10 m", "keep < 10 cm, mode 0"),
+        ("K-type pair", "T+ / T-", "0.40 m", "twisted, shield 1 end"),
         ("INMP441 VDD/GND", "3V3 p1 / GND p14", "0.25 m", "100 nF at module"),
         ("INMP441 I2S", "GPIO 18/19/20", "0.25 m", "twisted, away from SPI"),
         ("Fan", "5V p4 / GND p6", "0.15 m", "never to 3V3"),
@@ -547,7 +511,7 @@ def wiring_a3(path):
     steps = ["1. Pi + heatsink + paste + fan in the case; boot and update.",
              "2. i2cdetect -y 1 must show 0x53 before anything else.",
              "3. Breadboard U2/U3/U4 with 100 nF each. Verify 3.3 V at every VCC.",
-             "4. Run the RTD ice-point test; if it reads -18 C, Rref is wrong.",
+             "4. Ice-point test 0 C; the open-TC flag must read 0 before you trust T.",
              "5. Bolt the sensor stack: magnet / M3 / nylon / PCB / nylon / nut.",
              "6. Cable glands + heat-shrink, strain-relief, then close the lid."]
     for i, s in enumerate(steps):
@@ -557,7 +521,7 @@ def wiring_a3(path):
     checks = ["[ ] 5 V/3 A official supply, not a phone charger",
               "[ ] 3.3 V at U2/U3/U4, no 5 V on any sensor pin",
               "[ ] i2cdetect 0x53, spidev0.0 present, arecord -l shows the mic",
-              "[ ] ice point 0 +/-1 C, boil ~97 C, ADXL flat = 1.00 g",
+              "[ ] ice point 0 +/-2 C, boil ~97 C, ADXL flat = 1.00 g",
               "[ ] Panel + Grafana both flip within 5 s, WiFi pull = no data loss"]
     for i, s in enumerate(checks):
         svg.text(rx + 18, 770 + i * 30, s, 9.5, INK)
@@ -569,7 +533,7 @@ def wiring_a3(path):
     svg.line(60 + 900, ty, 60 + 900, ty + 100, LINE, 1)
     svg.text(80, ty + 30, "Intelligent Predictive Maintenance Rig", 13, NAVY, weight="bold")
     svg.text(80, ty + 52, "G12 Capstone 2026/27 — Industrial pathway", 9.5, MUTED)
-    svg.text(80, ty + 72, "Raspberry Pi 4 8GB · ADXL345 · PT100/MAX31865 · INMP441", 9.5, MUTED)
+    svg.text(80, ty + 72, "Raspberry Pi 4 8GB · ADXL345 · K-type/MAX6675 · INMP441", 9.5, MUTED)
     svg.text(500, ty + 30, "SHEET 3 of 3", 11, NAVY, weight="bold")
     svg.text(500, ty + 52, "NTS  ·  A3  ·  print at 100%, do not fit to page", 9.5, MUTED)
     svg.text(500, ty + 72, "Print at 100% — do not fit-to-page", 9.5, MUTED)

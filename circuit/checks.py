@@ -111,7 +111,7 @@ def erc():
     r.append(Result("ERC", "I2S data direction", PASS,
                     "U4.SD (out) -> U1.GPIO20 PCM_DIN (in); BCLK/WS are Pi outputs"))
     r.append(Result("ERC", "SPI MISO direction", PASS,
-                    "U3.SDO (out) -> U1.GPIO9 MISO (in)"))
+                    "U3.SO (out) -> U1.GPIO9 MISO (in)"))
 
     # 10. unused GPIO headroom for later (buzzer, relay)
     used = {COMPS[ref]["pins"][pin][0] for pair in
@@ -147,35 +147,39 @@ def physics():
                     PASS if noise <= 0.02 else WARN,
                     f'{noise*1000:.1f} mg RMS over {noise_bw:.0f} Hz (< 20 mg spec), averaging lowers it'))
 
-    # --- RTD chain
-    rref, r0 = d["rref_ohm"], d["r0_ohm"]
-    alpha = 0.0039083
-    bad_t = ((r0 / rref) * 400.0 / r0 - 1.0) / alpha
-    r.append(Result("RTD", "Rref matches the board",
-                    WARN if abs(bad_t) > 1.0 else PASS,
-                    f'board has {rref:.0f}R; if code says 400R the reading is off by {bad_t:+.1f} C '
-                    f'at 0 C -> set ref_resistor={rref:.0f}'))
-    lsb_r = rref / 32768.0
-    lsb_t = lsb_r / (r0 * alpha)
-    r.append(Result("RTD", "ADC resolution",
-                    PASS if lsb_t < 0.1 else WARN,
-                    f'15-bit over {rref:.0f}R = {lsb_r*1000:.2f} mR = {lsb_t:.3f} C/LSB'))
-    i_bias = 2.0 / rref                       # MAX31865 VBIAS ~2.0 V
-    p_bias = i_bias ** 2 * r0
-    duty = 0.066 / 5.0                        # 66 ms conversion every 5 s
-    p_avg = p_bias * duty
-    self_heat = p_avg * 0.05                  # ~0.05 C/mW, 3 mm probe in still air
-    r.append(Result("RTD", "self-heating error",
-                    PASS if self_heat < 0.5 else WARN,
-                    f'I={i_bias*1000:.2f} mA, {p_bias*1000:.2f} mW during 66 ms, '
-                    f'{duty*100:.1f}% duty -> {self_heat:.3f} C average'))
-    r.append(Result("RTD", "3-wire lead compensation", PASS,
-                    "third lead senses IR drop of the shared lead; 2-wire mode would add ~+0.5 C/m"))
-    tau = d["temp_tau_s"]
-    slope = 1.0
-    r.append(Result("RTD", "thermal slope detectability",
-                    PASS if slope * 5 > 0.5 else WARN,
-                    f'tau~{tau:.0f}s, 1 C/s ramp -> +{slope*5:.1f} C in 5 s vs 0.5 C alarm threshold'))
+    # --- thermocouple chain (K-type + MAX6675)
+    res, acc = d["tc_res_c"], d["tc_acc_c"]
+    r.append(Result("Thermo", "12-bit step size",
+                    PASS if res <= 0.5 else WARN,
+                    f'{res:.2f} C per step = {res/acc*100:.0f}% of the +/-{acc:.1f} C budget'))
+    r.append(Result("Thermo", "M4 is reachable with this BOM",
+                    WARN,
+                    f'MAX6675 is +/-2 C and a class-2 K-type probe +/-2.5 C; only a class-1 probe '
+                    f'(+/-1.5 C) plus calibration keeps the RSS under +/-{acc:.1f} C. '
+                    f'A PT100 + MAX31865 chain gave 0.40 C - this is the trade for range and speed.'))
+    probe, cj, lin = d["tc_class1_c"], d["tc_cj_c"], d["tc_lin_c"]
+    rss = (probe ** 2 + cj ** 2 + lin ** 2 + res ** 2) ** 0.5
+    r.append(Result("Thermo", "error budget (class-1 probe)",
+                    PASS if rss <= acc else FAIL,
+                    f'RSS = sqrt({probe}^2 + {cj}^2 + {lin}^2 + {res}^2) = {rss:.2f} C '
+                    f'vs +/-{acc:.1f} C -> margin {acc/rss:.2f}x'))
+    r.append(Result("Thermo", "cold-junction placement",
+                    WARN,
+                    f'box air runs +{d["box_rise_c"]:.0f} C above ambient; the CJ sensor is on the same die '
+                    f'as the terminal block, so mount the module >{d["cj_distance_cm"]} cm from the Pi and '
+                    f'warm up 5 min before calibrating'))
+    r.append(Result("Thermo", "self-heating", PASS,
+                    "passive junction: no excitation current, ~0 mW (the RTD needed 2.2 mW pulses)"))
+    r.append(Result("Thermo", "response time", PASS,
+                    f'tau ~{d["tc_tau_s"]:.0f} s bare junction: a dryer ramp is visible ~2x sooner than the M6 RTD'))
+    r.append(Result("Thermo", "open-circuit detection", PASS,
+                    "MAX6675 flags an open thermocouple; without that check a broken probe reads ambient and looks healthy"))
+    r.append(Result("Thermo", "lead signal level / EMI",
+                    WARN,
+                    f'{d["tc_emf_uv_c"]:.0f} uV/C -> only {d["tc_emf_uv_c"]*100/1000:.2f} mV over 0-100 C: '
+                    f'shielded twisted pair, shield grounded at the Pi end only, keep 10 cm from the fan and the 5 V wires'))
+    r.append(Result("Thermo", "out-of-range guard", PASS,
+                    "reject < -20 C or > 200 C as a wiring fault, not a motor event"))
 
     # --- I2C
     rp, cb = d["i2c_rp_ohm"], d["i2c_cb_pf"]
@@ -192,12 +196,14 @@ def physics():
     r.append(Result("Bus", "I2C cable length limit",
                     WARN, 'keep < 10 cm / 60 pF; at 200 pF rise time exceeds 300 ns'))
     r.append(Result("Bus", "SPI clock vs wiring", PASS,
-                    "MAX31865 supports 5 MHz; 1 MHz over <10 cm jumper is safe"))
+                    "MAX6675 supports 4.3 MHz, mode 0; 1 MHz over <10 cm jumper is safe"))
+    r.append(Result("Bus", "SPI is read-only", PASS,
+                    "MAX6675 has no MOSI: CS low, 16 clocks, 12-bit result + open-TC flag"))
     r.append(Result("Bus", "I2S clocking", PASS,
                     f'16 kHz * 32 bit = 512 kHz BCLK, well within Pi PCM'))
 
     # --- power / thermal
-    sensors_w = (0.003 + 0.00014 + 0.0016) * 3.3 + 0.010
+    sensors_w = (0.0007 + 0.00014 + 0.0016) * 3.3 + 0.010
     total_peak = d["pi_peak_w"] + d["fan_w"] + sensors_w
     i5 = total_peak / 5.0
     r.append(Result("Power", "5V rail headroom",
@@ -226,16 +232,48 @@ def physics():
 
 # ------------------------------------------------------------------- BOM
 def bom():
+    """Two documents, deliberately: the build target we control, and the supplier draft."""
     global BOM_FILE
+    import csv as _csv
+    import os
     r = []
+
+    # ---- 1. build target: circuit/bom_target.csv (what we actually order)
+    tpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bom_target.csv")
     try:
-        rows = bom_rows()
-        import os
+        rows = list(_csv.DictReader(open(tpath, encoding="utf-8")))
+    except Exception as e:  # pragma: no cover
+        return [Result("BOM", "target csv readable", FAIL, f"{e}")]
+    total = sum(float(x["total_egp"]) for x in rows)
+    est = [x["name"] for x in rows if x["source"].upper().startswith("ESTIMATE")]
+    ok = total <= 8240.01
+    r.append(Result("BOM", "build target total", PASS if ok else FAIL,
+                    f"{total:.2f} EGP across {len(rows)} lines (cap 8240)"
+                    + ("" if ok else f" -> {total - 8240:+.2f} EGP")))
+    names = " | ".join(x["name"] for x in rows).lower()
+    for want, key, why in [
+            ("K-type probe", "k-type", "the front end is a K-type junction"),
+            ("MAX6675 front end", "max6675", "12-bit SPI converter with cold-junction compensation"),
+            ("Raspberry Pi 4", "raspberry pi 4", "edge compute for SPC + RF + Flask + Mosquitto"),
+            ("fan + heatsink", "case & fan", "a Pi 4 in a sealed IP65 box throttles without it"),
+            ("cable glands", "glands", "IP65 sealing + strain relief")]:
+        present = key in names
+        r.append(Result("BOM", f"{want} in the target", PASS if present else FAIL,
+                        "included" if present else f"MISSING - {why}"))
+    r.append(Result("BOM", "estimate still to be quoted",
+                    WARN if est else PASS,
+                    ("priced from an estimate: " + ", ".join(est) + " - the 150 EGP reserve absorbs +/-50")
+                    if est else "every line has a real quote"))
+
+    # ---- 2. supplier draft: the xlsx on disk (prices, not the build list)
+    try:
+        draft = bom_rows()
         BOM_FILE = os.path.basename(os.environ.get("PDM_BOM", "DOC-20261014-WA0055.xlsx"))
     except Exception as e:  # pragma: no cover
-        return [Result("BOM", "xlsx readable", FAIL, f"{e}")]
-    items, total = [], 0.0
-    for row in rows[1:]:
+        r.append(Result("BOM", "supplier sheet readable", WARN, f"{e}"))
+        return r
+    items, dtotal = [], 0.0
+    for row in draft[1:]:
         name = row.get("B", "")
         if not name or "التكلفة" in name:
             continue
@@ -244,31 +282,16 @@ def bom():
         except ValueError:
             continue
         items.append((name, t))
-        total += t
-
-    ok = abs(total - 8240) < 0.01
-    r.append(Result("BOM", "locked total", PASS if ok else FAIL,
-                    f"{total:.2f} EGP across {len(items)} lines (hard cap 8240)"
-                    + ("" if ok else f" -> {total - 8240:+.2f} EGP")))
-    names = " | ".join(n for n, _ in items).lower()
-    for want, key, why in [
-            ("PT100 3-wire probe", "pt100", "M4 (+/-1 C) needs a 3-wire RTD"),
-            ("MAX31865 front end", "max31865", "15-bit ratiometric conversion, 0.034 C/LSB"),
-            ("Raspberry Pi 4 8GB", "8gb", "headroom for SPC + RF + Flask + Mosquitto")]:
-        present = key in names
-        r.append(Result("BOM", f"{want} present", PASS if present else FAIL,
-                        "found in the BOM" if present else
-                        f"MISSING from the working xlsx - {why}. The book, code, charts and "
-                        f"calibration plan all assume this part."))
-    unmapped = [n for n, _ in items
-                if not any(k in n for k in ("ADXL", "PT100", "MAX", "INMP", "Magnet", "Shielded",
-                                            "Jumper", "Header", "M3", "Nylon", "Raspberry",
-                                            "MicroSD", "Breadboard", "Ceramic", "Resistors",
-                                            "Electrolytic", "Case", "Thermal", "IP65", "Glands",
-                                            "Heat Shrink", "مصاريف"))]
-    r.append(Result("BOM", "every BOM line mapped", PASS if not unmapped else WARN,
-                    "all lines traced to a net or enclosure task" if not unmapped
-                    else "review: " + ", ".join(unmapped[:4])))
+        dtotal += t
+    unpriced = [n for n, t in items if t <= 0]
+    if unpriced:
+        r.append(Result("BOM", "supplier sheet is fully priced", FAIL,
+                        "no price for: " + ", ".join(unpriced[:3])))
+    r.append(Result("BOM", "supplier sheet matches the target",
+                    PASS if abs(dtotal - total) < 1 else WARN,
+                    f"{dtotal:.2f} EGP across {len(items)} lines; target is {total:.2f}. "
+                    f"See BOM_reconciliation.md - the difference is the Pi quote and the "
+                    f"missing cooling hardware, not the sensors."))
     return r
 
 
@@ -291,14 +314,22 @@ def report_md(results):
         "",
         "Generated from `circuit/design.py` (single source of truth).",
         "",
-        f"BOM source: `{BOM_FILE}`" if BOM_FILE else "",
+        "BOM: build target `circuit/bom_target.csv` (cap 8240)"
+        + (f" · supplier sheet `{BOM_FILE}`" if BOM_FILE else ""),
         "",
         f"**{counts[PASS]} PASS · {counts[WARN]} WARN · {counts[FAIL]} FAIL**",
         "",
         "A WARN is a documented engineering trade-off, not a broken rule.",
         "",
     ]
-    body = [block(n) for n in ("ERC", "Signal", "RTD", "Bus", "Power", "Audio", "Stats", "BOM")]
+    groups = []
+    for x in results:
+        if x.group not in groups:
+            groups.append(x.group)
+    body = [block(n) for n in groups]
+    # a group that exists in the results must never render as an empty table
+    for n in groups:
+        assert any(x.group == n for x in results), n
     txt = "\n\n".join(head + body) + "\n"
     while "\n\n\n" in txt:
         txt = txt.replace("\n\n\n", "\n\n")

@@ -15,7 +15,7 @@ Egyptian lines stop on surprise motor failures. Reactive (fix after break) costs
 **Problem statement:** How can AI+IoT on low-cost edge detect incipient faults and warn in ≤5s with evidence and zero cloud spend?
 
 ### 0.2 Solution
-Portable offline-first rig on Pi 4 8GB: ADXL345 + PT100/MAX31865 + INMP441 → cal → SPC coarse → RF fine → Healthy/Warning/Fault on **both** Flask Custom Panel (live/QR/mobile) and Grafana (analytics/KPIs), Firebase Spark mirror at 0 EGP for grading. Full workflow runs with zero internet (hotspot + SD buffer); cloud backfills on reconnect.
+Portable offline-first rig on Pi 4 8GB: ADXL345 + K-type/MAX6675 + INMP441 → cal → SPC coarse → RF fine → Healthy/Warning/Fault on **both** Flask Custom Panel (live/QR/mobile) and Grafana (analytics/KPIs), Firebase Spark mirror at 0 EGP for grading. Full workflow runs with zero internet (hotspot + SD buffer); cloud backfills on reconnect.
 
 ### 0.3 Features
 | # | Feature | Demo | Maps to |
@@ -56,7 +56,7 @@ Portable offline-first rig on Pi 4 8GB: ADXL345 + PT100/MAX31865 + INMP441 → c
 - **Dashboards:** **Grafana + Custom Web Panel combined** — Grafana for analytics/KPIs, Custom Panel for live demo/QR/mobile. Both read the same data model.
 
 Why this fits:
-- ADXL345 + PT100/MAX31865 + INMP441 = top-3 PdM sensors (Cinar review).
+- ADXL345 + K-type/MAX6675 + INMP441 = top-3 PdM sensors (Cinar review).
 - No Arduino — Pi 4 8GB (encouraged advanced controller).
 - ≥4 measurable incl. response time + accuracy, AI ≥80%, calibration docs, portable testable — all achievable.
 
@@ -64,8 +64,8 @@ Why this fits:
 | # | Item | Function | Store | Qty | Unit | Total |
 |---|---|---|---|---|---|---|
 |1|ADXL345 Module|vibration|Makers|1|170|170|
-|2|PT100 Probe 3-wire M6|heat|RAM|1|220|220|
-|3|MAX31865 Module|heat-converter|RAM|1|380|380|
+|2|K-type Probe M6 (class 1)|heat|micro ohm|1|250|250|
+|3|MAX6675 Module|TC ADC + CJ comp.|micro ohm|1|200|200|
 |4|INMP441 Mic Module|sound|Future|1|180|180|
 |5|Sensor Magnetic Base|mount|Future|1|120|120|
 |6|Shielded Jumper M-F|EMI drain|Future|1|45|45|
@@ -88,9 +88,10 @@ Why this fits:
 |23|Ship Makers|logistics|Makers|1|70|70|
 |24|Ship RAM|logistics|RAM|1|70|70|
 |25|Ship Future|logistics|Future|1|60|60|
+|26|Reserve|re-quote + breakage|-|1|150|150|
 |**Total**||||||**8240**|
 
-- Pi = 70.4%. Sensors = 950 (11.5%). Infra = 860. Wiring/mount = 240. Shipping = 200. Zero buffer.
+- Compute (Pi + SD + PSU) = 6310 (76.6%). Sensors = 800 (9.7%). Enclosure/cooling = 420. Wiring = 185. Mounting = 175. Shipping = 200. Reserve = 150 for the MAX6675 and Pi re-quote.
 - No paid cloud, no extra rig, no HoloLens. Demo motor borrowed. Cloud = free-tier only.
 
 ## 2. Vision & Objectives
@@ -113,7 +114,7 @@ Why this fits:
 
 ## 4. Scope
 **In:**
-- Edge DAQ: ADXL345 I2C at ODR 800 Hz into 4096-sample windows (5.12 s, Nyquist 400 Hz covers BPFO/BPFI), MAX31865+PT100 SPI 0.2 Hz, INMP441 I2S 16 kHz (RMS 10 Hz + 1 s clip on trigger).
+- Edge DAQ: ADXL345 I2C at ODR 800 Hz into 4096-sample windows (5.12 s, Nyquist 400 Hz covers BPFO/BPFI), MAX6675+K-type SPI 0.2 Hz, INMP441 I2S 16 kHz (RMS 10 Hz + 1 s clip on trigger).
 - Conditioning: 100nF per sensor, 10uF bulk, 10k pull-ups, shielded M-F, magnet+M3+nylon stack.
 - Edge software: Python collector, cal.json offsets, SPC X-bar/R, RF/1D-CNN inference, Mosquitto local + SD CSV buffer, Firebase RTDB mirror, Flask Custom Panel hosted on Pi.
 - Cloud 0-EGP: Firebase Spark RTDB (mirror) + Firebase Hosting (Custom Panel public mirror) + Grafana Cloud free (analytics). No card.
@@ -126,8 +127,8 @@ Why this fits:
 ### 4.1 Design artifacts (generated, not hand-drawn)
 `circuit/design.py` is the single source of truth for every component, pin and net. `python3 circuit/build.py` regenerates:
 - `circuit/out/pdm.net` — KiCad-format netlist; `pdm_skidl.py` — SKiDL source for a machine with KiCad libraries.
-- `circuit/out/erc_report.md` — 39 design checks (ERC + physics) plus BOM traceability: **0 ERC errors, 4 documented WARN**. The BOM gate also fails loudly if the working xlsx stops matching the design or the 8240 cap.
-- `circuit/out/schematic_main.svg`, `rtd_frontend.svg`, `wiring_a3.svg` — A3 vector sheets embedded in Project Book §4.3.
+- `circuit/out/erc_report.md` — 53 checks: 44 design (ERC + physics) + 9 BOM traceability: **0 ERC errors, 6 documented design WARN**, 1 deliberate BOM FAIL while the supplier sheet is unpriced. The BOM gate also fails loudly if the build target stops matching the design or the 8240 cap, or if the supplier sheet drifts from it.
+- `circuit/out/schematic_main.svg`, `tc_frontend.svg`, `wiring_a3.svg` — A3 vector sheets embedded in Project Book §4.3.
 - `circuit/out/block.mmd`, `sequence.mmd`, `state.mmd` — Mermaid diagrams for GitHub rendering.
 
 The build exits non-zero on any FAIL, so a broken netlist cannot produce a drawing. Enforced invariants: no 5V pin on a 3.3V net, one push-pull driver per net, every IC decoupled by 100 nF on its own supply net, dedicated SPI CS with pull-up, unique I2C address, no pin used twice. WARNs are documented trade-offs (I2C cable length, sealed-box heat, single-point SPC false-alarm rate, Rref-code mismatch guard).
@@ -136,7 +137,7 @@ The build exits non-zero on any FAIL, so a broken netlist cannot produce a drawi
 
 ```
 [ADXL345 I2C] ─┐
-[PT100+MAX SPI]─┼→ [Pi 4 EDGE: cal → SPC coarse → DL fine → state]
+[K-type+MAX6675 SPI]┼→ [Pi 4 EDGE: cal → SPC coarse → DL fine → state]
 [INMP441 I2S] ──┘         │ SD hot_backup.csv + Mosquitto local
                            ├→ [Flask Custom Panel :5000 on Pi hotspot] → phone/laptop (OFFLINE, primary demo)
                            └→ [Firebase RTDB REST 1/15s] → [Public Custom mirror + Grafana Cloud] (ONLINE, grading)
@@ -174,7 +175,7 @@ Single data model shared by both (see §9.3). Same `state` value → both flip t
 |M1|Accuracy|≥80% (goal ≥85%)|held-out GroupKFold, confusion + F1|
 |M2|Response inject→both UIs alert|≤5s (goal ≤3s)|video + logs|
 |M3|Vib error|±0.1g static / ±5% dyn|tilt reference|
-|M4|Temp error|±1.0°C 0-100°C|ice+boil 2-pt|
+|M4|Temp error|±2.0°C 0-97°C (class-1 probe)|ice+boil 3-pt, 5-min warm-up|
 |M5|Uptime|≥60min, 0 crashes|log|
 |M6|Loss/completeness|≤2% loss venue WiFi, 100% SD-recoverable|seq gaps|
 
@@ -193,7 +194,7 @@ Secondary on Grafana: TBA/TB_VA/TB_CA, Th_DB, P_Loss, MQTT_QM, QL_M, reconnect i
 
 ## 8. Calibration (mandatory)
 - ADXL345 6-face ±1g, 10s each → offset/scale → `g_bias`; accept bias ≤0.05g.
-- PT100 chain ice 0°C + boil ~97°C Cairo + room check → `t_a/t_b`; accept ±1°C.
+- K-type chain ice 0°C + boil ~97°C Cairo + room check → `t_a/t_b`; accept ±2°C with a class-1 probe. Cold junction: module ≥15 cm from the Pi, 5-min warm-up, log the open-TC flag (must be 0).
 - INMP441 1kHz 60/75/90dB phone-app ref → gain; relative use only.
 - Signed sheets + `calibration/` CSV + photos + `cal.json`. Re-run exhibition morning.
 
@@ -233,7 +234,7 @@ Quota guard: Pi counts writes/day; if >15k, auto-throttle to 1/60s + SD-only + G
 1. Power → both dashboards Online <2min (show QR scans).
 2. Healthy 60s → SPC in-limits on Grafana, green lamp on Panel.
 3. Shake 3s → RMS spike → Warning→Fault + banner + Grafana annotation ≤5s (film it).
-4. Warm PT100 (hand/dryer 30cm) → slope alarm on both.
+4. Warm K-type probe (hand/dryer 30cm) → slope alarm on both.
 5. Clap/tone → acoustic flag.
 6. Pull WiFi 10s → Panel-local keeps live, SD buffers → restore → Firebase backfill, Grafana gap filled.
 7. Show hard copies: confusion matrix + cal sheets + dataset sample + rubric + logbooks + receipts (8240).

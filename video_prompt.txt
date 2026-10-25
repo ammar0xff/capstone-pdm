@@ -1,14 +1,14 @@
 Cinematic engineering explainer, 90 seconds, 16:9, photorealistic, real electronics lab in Egypt, no cartoon, no silly faces, no stock smiles.
 
-SUBJECT: Portable AI predictive maintenance rig: Raspberry Pi 4 in IP65 box, ADXL345 vibration sensor on magnet, PT100 probe + MAX31865, INMP441 mic, breadboard wiring, motor test rig.
+SUBJECT: Portable AI predictive maintenance rig: Raspberry Pi 4 in IP65 box, ADXL345 vibration sensor on magnet, K-type probe on a MAX6675 module, INMP441 mic, breadboard wiring, motor test rig.
 
 STYLE: dynamic macro dolly + top-down wiring + HUD data overlays, teal/navy/amber grade, shallow depth of field, 24fps, energetic but professional.
 
 SCENES:
 0-10s: macro push-in on spinning motor bearing, vibration waveform HUD builds, title "Predict Failure Before It Happens - 8240 EGP".
-10-25s: animated signal flow SENSORS -> Pi -> SPC -> AI -> dashboards, glowing pulses, labels ADXL345 I2C / MAX31865 SPI / INMP441 I2S.
+10-25s: animated signal flow SENSORS -> Pi -> SPC -> AI -> dashboards, glowing pulses, labels ADXL345 I2C / K-type + MAX6675 SPI / INMP441 I2S.
 25-45s: split-screen Custom Panel (big green Healthy lamp, live temp/RMS) + Grafana (X-bar/R chart, FFT 95Hz peak lighting up). Hand shakes rig -> both flip to red Fault in sync, alert banner.
-45-65s: heat demo (hand + dryer 30cm from PT100, temp curve rising 25->68C) + clap tone spectrogram blooming, kurtosis 3.0->7.2 counter.
+45-65s: heat demo (hand + dryer 30cm from the K-type probe, temp curve rising 25->68C, cold-junction badge showing the module temperature tracking it) + clap tone spectrogram blooming, kurtosis 3.0->7.2 counter.
 65-80s: offline-first proof: WiFi icon cuts, local Flask 192.168.4.1 keeps live, SD buffer fills, reconnect backfills to Firebase + Grafana gap closes.
 80-90s: orbit around boxed rig with QR stickers, confusion matrix 87% + calibration sheets + logbooks on table, end card "Offline-First | Firebase + Grafana + Custom Panel | 0 EGP Cloud".
 

@@ -89,7 +89,7 @@ def mermaid(path_block, path_seq, path_state):
         f.write("""flowchart LR
   subgraph SENSE["Sensing"]
     A["ADXL345<br/>I2C 0x53<br/>800 Hz FIFO"]:::s
-    B["PT100 + MAX31865<br/>SPI0<br/>0.2 Hz"]:::s
+    B["K-type + MAX6675<br/>SPI0<br/>0.2 Hz"]:::s
     C["INMP441<br/>I2S 16 kHz"]:::s
   end
   subgraph EDGE["Raspberry Pi 4 8GB (edge, offline)"]
@@ -169,7 +169,7 @@ def main():
     mermaid(os.path.join(OUT, "block.mmd"), os.path.join(OUT, "sequence.mmd"),
             os.path.join(OUT, "state.mmd"))
     render.schematic_main(os.path.join(OUT, "schematic_main.svg"))
-    render.rtd_frontend(os.path.join(OUT, "rtd_frontend.svg"))
+    render.tc_frontend(os.path.join(OUT, "tc_frontend.svg"))
     render.wiring_a3(os.path.join(OUT, "wiring_a3.svg"))
 
     counts = {s: sum(1 for x in results if x.status == s) for s in ("PASS", "WARN", "FAIL")}
