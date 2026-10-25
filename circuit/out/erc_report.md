@@ -4,7 +4,7 @@ Generated from `circuit/design.py` (single source of truth).
 
 BOM: build target `circuit/bom_target.csv` (cap 8240) · supplier sheet `DOC-20261014-WA0055.xlsx`
 
-**42 PASS · 7 WARN · 3 FAIL**
+**44 PASS · 8 WARN · 0 FAIL**
 
 A WARN is a documented engineering trade-off, not a broken rule.
 
@@ -91,11 +91,11 @@ A WARN is a documented engineering trade-off, not a broken rule.
 
 | Check | Status | Detail |
 |---|---|---|
-| priced total vs the 8240 target | **FAIL** | 8888.25 EGP across 20 lines -> +648.25 EGP over, and 1 part(s) still unpriced |
-| every line has a price | **FAIL** | still unpriced: MAX6675 Module - the real total is unknown and the priced lines are already over |
-| headroom for the unpriced part | **FAIL** | -648.25 EGP - no price for the MAX6675 can make this legal; the BOM must change, not the quote |
+| planned total vs the signed ceiling | **PASS** | 9368.25 EGP across 23 lines (ceiling 9370, +1.75 headroom) |
+| every line has a firm quote | **WARN** | allowance, not a quote: MAX6675 Module - it must come in at or below 201.75 EGP |
+| slack if the converter quote is higher | **PASS** | +1.75 EGP inside the ceiling; collecting in person frees another 220.00 if the MAX6675 quote lands above 201.75 |
 | K-type probe in the target | **PASS** | included |
 | MAX6675 converter in the target | **PASS** | included |
 | Raspberry Pi 4 in the target | **PASS** | included |
-| sealed-enclosure hardware | **WARN** | no fan and no glands in this sheet: +280 EGP (240 + 30 + 10) if the box is sealed; otherwise the build must be a vented frame and the IP65 claim goes |
-| supplier sheet agrees with the target | **PASS** | 8888.25 EGP across 23 lines vs 8888.25 priced in the target |
+| sealed-enclosure hardware | **PASS** | fan, glands and heat-shrink included |
+| supplier sheet reconciles with the target | **WARN** | sheet 8888.25 vs target 9368.25: the target adds the re-added fan/glands/heat-shrink (280) and the MAX6675 allowance (200) under the raised ceiling |

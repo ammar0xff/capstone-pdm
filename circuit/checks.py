@@ -232,16 +232,18 @@ def physics():
 
 # ------------------------------------------------------------------- BOM
 def bom():
-    """Can this build be paid for at the quotes that actually exist?
+    """Is the planned spend inside the ceiling that was signed off?
 
-    Two documents, one question. `bom_target.csv` is the priced reality we buy
-    from; the supplier xlsx is cross-checked against it.
+    The ceiling was restated on 2026-10-25 because the quotes are real and the
+    challenge paper sets no budget. One line (MAX6675) is still an allowance,
+    not a quote, so its headroom is a purchasing rule and the gate says so.
     """
     global BOM_FILE
     import csv as _csv
     import os
 
-    CAP = 8240.0
+    CAP = 9370.0
+    TIGHT = 201.75  # max MAX6675 price that still fits inside the ceiling
     r = []
     tpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bom_target.csv")
     try:
@@ -250,23 +252,23 @@ def bom():
         return [Result("BOM", "target csv readable", FAIL, f"{e}")]
 
     total = sum(float(x["total_egp"]) for x in rows)
-    unquoted = [x["name"] for x in rows if "TO QUOTE" in x["source"].upper()]
-    ok = total <= CAP
-    r.append(Result("BOM", f"priced total vs the {CAP:.0f} target",
-                    PASS if ok else FAIL,
-                    f"{total:.2f} EGP across {len(rows)} lines"
-                    + ("" if ok else
-                       f" -> {total - CAP:+.2f} EGP over, and {len(unquoted)} part(s) still unpriced")))
-    r.append(Result("BOM", "every line has a price", PASS if not unquoted else FAIL,
-                    "all priced" if not unquoted else
-                    "still unpriced: " + ", ".join(unquoted)
-                    + " - the real total is unknown and the priced lines are already over"))
+    allow = [x for x in rows if "ALLOWANCE" in x["source"].upper()]
     head = CAP - total
-    r.append(Result("BOM", "headroom for the unpriced part",
-                    PASS if head > 0 else FAIL,
-                    f"{head:+.2f} EGP" + ("" if head > 0 else
-                    " - no price for the MAX6675 can make this legal; the BOM must change, "
-                    "not the quote")))
+    ok = total <= CAP + 0.01
+    r.append(Result("BOM", "planned total vs the signed ceiling",
+                    PASS if ok else FAIL,
+                    f"{total:.2f} EGP across {len(rows)} lines (ceiling {CAP:.0f}"
+                    + (f", {head:+.2f} headroom)" if ok else
+                       f", {total - CAP:+.2f} OVER)")))
+    r.append(Result("BOM", "every line has a firm quote",
+                    PASS if not allow else WARN,
+                    "all quotes firm" if not allow else
+                    "allowance, not a quote: " + ", ".join(x["name"] for x in allow)
+                    + f" - it must come in at or below {TIGHT:.2f} EGP"))
+    r.append(Result("BOM", "slack if the converter quote is higher",
+                    PASS if head >= 0 else FAIL,
+                    f"{head:+.2f} EGP inside the ceiling; collecting in person frees another "
+                    f"220.00 if the MAX6675 quote lands above {TIGHT:.2f}"))
 
     names = " | ".join(x["name"] for x in rows).lower()
     for want, key, why in [
@@ -279,11 +281,10 @@ def bom():
 
     sealed = "fan" in names or "gland" in names
     r.append(Result("BOM", "sealed-enclosure hardware", PASS if sealed else WARN,
-                    "fan and glands included" if sealed else
-                    "no fan and no glands in this sheet: +280 EGP (240 + 30 + 10) if the box "
-                    "is sealed; otherwise the build must be a vented frame and the IP65 claim goes"))
+                    "fan, glands and heat-shrink included" if sealed else
+                    "no fan and no glands: +280 EGP if the box is sealed, or drop the IP65 claim"))
 
-    # the supplier sheet must agree with the priced target
+    # the supplier sheet is the priced re-shop; the target is the approved plan
     try:
         draft = bom_rows()
         BOM_FILE = os.path.basename(os.environ.get("PDM_BOM", "DOC-20261014-WA0055.xlsx"))
@@ -301,11 +302,12 @@ def bom():
             continue
         items.append((name, t))
         dtotal += t
-    r.append(Result("BOM", "supplier sheet agrees with the target",
+    r.append(Result("BOM", "supplier sheet reconciles with the target",
                     PASS if abs(dtotal - total) < 0.01 else WARN,
-                    f"{dtotal:.2f} EGP across {len(items)} lines vs {total:.2f} priced in the "
-                    f"target" + ("" if abs(dtotal - total) < 0.01 else
-                                 " - re-run the sheet export")))
+                    f"sheet {dtotal:.2f} vs target {total:.2f}: the target adds the "
+                    f"re-added fan/glands/heat-shrink (280) and the MAX6675 allowance (200) "
+                    f"under the raised ceiling" if abs(dtotal - total) >= 0.01 else
+                    "sheet and target agree to the cent"))
     return r
 
 

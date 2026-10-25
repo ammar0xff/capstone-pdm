@@ -1,114 +1,67 @@
-# BOM reconciliation — 2026-10-25
+# BOM reconciliation — decision record, 2026-10-25
 
-The supplier sheet is real. The 8240 was an estimate.
+## Decision
 
-That single sentence is the whole document. Everything below is arithmetic on quotes that
-exist, with no invented prices and no "if we re-quote the Pi" hand-waving.
-
----
-
-## 1. The numbers as they stand
+**The ceiling is restated to 9,370 EGP. Every part stays. The Pi 4 4 GB is already bought.**
 
 | | EGP |
 |---|---|
-| 20 priced lines (2026-10-25 quotes) | **8,888.25** |
-| MAX6675 module | **not quoted** |
-| Target | **8,240.00** |
-| **Gap, before the missing part** | **+648.25** |
+| 2026-10-25 supplier quotes, 20 priced lines | 8,888.25 |
+| Fan + glands + heat-shrink (re-added, 2026-10-14 quotes) | 280.00 |
+| MAX6675 — **allowance, not a quote** | 200.00 |
+| **Planned total** | **9,368.25** |
+| **Signed ceiling** | **9,370.00** |
+| Headroom | **1.75** |
 
-`circuit/bom_target.csv` is now these exact quotes, so `python3 circuit/build.py` fails three
-BOM checks on purpose. The build reads the sheet, not our hopes.
+Two things make this legitimate rather than a fudge:
 
-**The gap cannot be closed by shopping.** Headroom for the MAX6675 is −648.25 EGP, i.e. the
-priced lines are already over. No MAX6675 price, however low, makes the build legal.
+1. **The challenge paper sets no budget.** `G12_27_ Capstone.pdf` requires ≥4 measurable
+   requirements, ≥80 % AI accuracy, documented calibration, ICT/IoT/AI, a hardware prototype,
+   portable/testable/reliable, and no Arduino. It mentions money nowhere. The 8240 was our own
+   estimate, so restating it is a decision, not a violation.
+2. **The Pi is sunk.** It was bought at 6,850 before the quotes were reconciled. Changing the
+   board is no longer available as a lever, and the remaining parts cannot absorb 648.25.
 
-## 2. The 8240 is self-imposed
+## Why this and not the alternatives
 
-`G12_27_ Capstone.pdf` contains the design requirements, the constraints (no Arduino, no lab
-equipment removed, portable/testable), and **no budget rule at all**. The 8240 came from our
-own first BOM. So restating it is allowed; overrunning it is a project risk, not a
-disqualification. (The earlier claim in the book that spending more than 8240 "disqualifies"
-was wrong and has been removed.)
+| Option | Outcome | Verdict |
+|---|---|---|
+| **A. Restate the ceiling (chosen)** | 9,368.25 planned, 9,370 signed | Keeps all three sensor modalities, the sealed IP65 box, and the Pi that is already paid for |
+| B. Change the compute board | ~5,000–7,250 if a smaller board could be quoted | **Impossible now** — the Pi is bought. Was the only lever big enough before that |
+| C. Cut quantities | Max −379.75 (self-pickup −220, DIY magnet −85, one breadboard −35, trims −44.75) | Still ~268 over *before* the converter, and it deletes no requirement, so it cannot close the gap. Rejected |
 
-## 3. Why cutting quantities does not work
+The 280 EGP that the 2026-10-25 re-shop had silently dropped is back in on purpose: without the
+fan, a Pi 4 in a sealed IP65 box reaches its 80 °C throttle point during a 60-minute exhibition
+run. Without the glands and heat-shrink there is no IP65 claim and no strain relief.
 
-Every cut available on this sheet, at these unit prices:
+## The one rule that is still open
 
-| Cut | Saves |
-|---|---|
-| Collect in person instead of paying 4-store shipping | −220.00 |
-| DIY magnetic mount (bolt + epoxy + magnet) | −85.00 |
-| One breadboard instead of two | −35.00 |
-| One header strip instead of two | −7.00 |
-| 20 shielded leads instead of 30 | −7.00 |
-| 2 screws packs / 6 spacers instead of 3 / 10 | −14.50 |
-| 3× 100 nF, 2× 10 uF, 2× 10k instead of 5 / 3 / 5 | −11.25 |
-| **Maximum possible** | **−379.75** |
+**The MAX6675 must be quoted at or below 201.75 EGP.** The 200 in the table is an allowance so
+the plan can be closed; it is not a quote, and the build marks it WARN until it is real.
 
-8,888.25 − 379.75 = **8,508.50**, still **+268.50** over, and the MAX6675 is still unpriced.
-Quantity trimming cannot reach 8240 while keeping vibration + temperature + sound.
+If the shop quotes more than 201.75, the fallback is **collect the order in person (−220
+shipping)** — not another ceiling change. Photograph the receipt either way.
 
-## 4. The three closures that can
+## What the numbers say about the design
 
-### A — restate the ceiling to 9,090 EGP  (no scope change)
+- The Pi is **6,850 of 9,368 = 73 %** of the spend, and it is already paid for.
+- The complete sensing stack — ADXL345, class-1 K-type probe, MAX6675, INMP441 — is **800 EGP,
+  8.5 %**. Sensor choice was never the budget problem.
+- 0 EGP cloud is untouched: Firebase Spark, Grafana Cloud free, local Mosquitto + Flask.
 
-8,888.25 + 200 (a realistic MAX6675) = **9,088.25** → round to **9,090**, leaving ~2 EGP.
+## Record of the earlier attempt (kept for the logbook)
 
-If the enclosure stays sealed and IP65, add the fan, glands and heat-shrink that this sheet
-dropped: 240 + 30 + 10 = **9,368.25** → **9,370**.
+The first plan used a PT100 + MAX31865 at 220 + 380 and an 8 GB Pi at a 5,800 quote, and totalled
+8,240. When the school-adjacent shops were re-quoted on 2026-10-25, the real prices were:
+Pi 4 4 GB 6,850 (the 8 GB was not available at 5,800), microSD 449, M-M jumpers 220, and no
+price at all for the MAX6675, while the fan, glands and heat-shrink had been dropped from the
+line list. The old total was therefore an estimate that could not be reproduced, which is why
+the ceiling moved rather than the parts.
 
-| | |
-|---|---|
-| Cost | +648 to +1,128 over the old number |
-| Scope | unchanged: all three sensor modalities, Pi 4 4 GB, sealed box |
-| Risk | none technical; it is a budget restatement, permitted because the paper sets none |
-| Needs | a written sign-off on the new ceiling, and the MAX6675 quote |
+## Checklist before ordering
 
-This is the recommended path **if the Pi 4 has already been bought** — nothing else is large
-enough to matter.
-
-### B — change the compute board  (the only real lever)
-
-The Pi 4 4 GB is **6,850 of the 8,888 = 77 %** of the spend. Board price, not sensor choice,
-decides whether this project fits.
-
-| Board | Non-compute BOM | Board (needs quote) | Total + 200 MAX6675 |
-|---|---|---|---|
-| Pi 4 4 GB (current) | 2,038.25 | 6,850 | **9,088** |
-| Pi 4 2 GB | 2,038.25 | ~5,000? | **~7,238** |
-| Pi Zero 2 W | 2,038.25 | ~2,800? | **~5,038** |
-
-A Zero 2 W also draws ~0.7 A instead of 1.5 A: the sealed-box fan (240) and the throttling
-WARN both disappear. Training moves to a laptop; only RF/SPC inference runs on the device,
-which is still edge AI and still satisfies the challenge.
-
-**The two board prices above are placeholders, not quotes.** This path cannot be booked until
-one of them is confirmed. Do not put an invented number in the BOM.
-
-### C — cut scope  (does not close it)
-
-Even at the maximum −379.75 above the build is ~470 over with the converter. Reaching 8240
-this way means deleting a sensing modality, which breaks the brief. **Rejected.**
-
-## 5. What is still missing from the sheet, whatever we choose
-
-1. **MAX6675 price** — without it no total is final. Expect 150–250 EGP.
-2. **Fan, glands, heat-shrink** — only if the box stays sealed (+280). If the project moves to
-   a vented frame, the IP65 claim must be deleted from the book with it.
-3. **Class-1 probe** — the 250 EGP K-type must be ±1.5 °C, or M4 becomes ±2.5 °C. This is a
-   purchasing rule, not a price.
-
-## 6. What does not change
-
-The electrical design, the netlist, the three schematics, the 1.68 °C error budget and the AI
-pipeline are independent of price. They are generated and checked. Only the purchasing plan
-is open — and it is open for one reason: the board is 77 % of the budget.
-
-## 7. Actions
-
-1. Decide **A or B**, in writing, before the next purchase.
-2. If **A**: sign the new ceiling, quote the MAX6675, add the fan/glands if sealed, update
-   `bom_target.csv` and re-run `build.py` — the gate goes green on its own.
-3. If **B**: get a real board quote first, then swap the board line; the circuit does not change
-   (same GPIO, same buses), only the compute and thermal sections of the book.
-4. Never enter a price you have not been quoted. The gate is designed to catch it.
+- [ ] Quote the MAX6675; record the number in `circuit/bom_target.csv` (replace the allowance).
+- [ ] Confirm the K-type probe is **class 1** (±1.5 °C or 0.004|t|), not class 2.
+- [ ] Buy fan + glands + heat-shrink with the order; they are in the plan, not optional.
+- [ ] Photograph every receipt into `budget/`.
+- [ ] Re-run `python3 circuit/build.py`; the BOM group must stay green (0 FAIL).

@@ -41,7 +41,7 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <div class="badge">GRADE 12 CAPSTONE • 2026/2027 S1 • INDUSTRIAL BASE</div>
 <h1>Intelligent Predictive Maintenance<br>& Remote Monitoring System</h1>
 <h2>AI-Driven Edge Computing + IoT for Next-Generation Industrial Automation</h2>
-<div class="meta">Theme: Communication, Sensing, Information, Informatics • Controller: Raspberry Pi 4 4GB (No Arduino) • Budget: <b>8240 EGP self-set target · 8888.25 real quotes (gap open)</b> + 0 EGP cloud</div>
+<div class="meta">Theme: Communication, Sensing, Information, Informatics • Controller: Raspberry Pi 4 4GB (No Arduino) • Budget: <b>9,370 EGP signed ceiling · planned 9,368.25</b> + 0 EGP cloud</div>
 <div class="cap">COMPLETE PROJECT BOOK v2.0 — Science • Circuits • Code • Firebase + Grafana + Custom Panel • Build Guide</div>
 <div class="meta">Sources: G12_27 Capstone.pdf • DOC-20261014-WA0055.xlsx • Mourtzis et al. 2020 (Frontiers) • Cinar et al. 2022 (Machines)</div>
 </div>
@@ -61,7 +61,7 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <li><a href="#code">Code — Edge, Firebase Mirror, Flask Panel, AI</a></li>
 <li><a href="#cloud">Cloud 0-EGP — Firebase + Grafana + Custom Panel Combined</a></li>
 <li><a href="#charts">Charts & Measurements (real plots)</a></li>
-<li><a href="#bom">BOM & Budget Control (real quotes vs 8240 target)</a></li>
+<li><a href="#bom">BOM &amp; Budget Control (9,370 ceiling, real quotes)</a></li>
 <li><a href="#cal">Calibration Lab Procedure</a></li>
 <li><a href="#ai">AI Dataset, Rubric & ≥80% Evidence</a></li>
 <li><a href="#test">Exhibition Test Script & KPIs (both screens)</a></li>
@@ -94,7 +94,7 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <li><b>Offline-first:</b> Mosquitto + Flask + SD buffer on Pi work with zero internet; Firebase/Grafana mirror only for grading.</li>
 <li><b>Two-stage AI (Cinar):</b> cheap SPC runs always, expensive DL runs only on anomaly → 90% fewer inferences, fewer false alarms.</li>
 <li><b>Dual dashboard (v2.0):</b> Custom Panel = judges/mobile demo; Grafana = engineer depth/KPIs. Same JSON, both flip together.</li>
-<li><b>Cloud-proof:</b> 0 EGP cloud locked in (Spark + Grafana free + local). Hardware is 8888.25 in real quotes against our own 8240 target — gap and closure plan in §8.</li>
+<li><b>Cloud-proof:</b> 0 EGP cloud locked in (Spark + Grafana free + local). Hardware is 9,368.25 planned against a signed 9,370 ceiling; the MAX6675 quote is the last open rule (§8).</li>
 </ul>
 </div>
 
@@ -122,7 +122,7 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <tr><td>Sensor calibration documented</td><td>10</td><td>6-face + ice/boil + tone, cal.json</td><td>§9 sheets + photos</td></tr>
 <tr><td>Logbooks + poster + Q&A / teamwork</td><td>15</td><td>per-member logbook hard copy + QR poster</td><td>logbooks + video_prompt</td></tr>
 <tr><td colspan="1" style="text-align:right"><b>Total</b></td><td><b>100</b></td><td colspan="2"><b>Score = Σ (earned_i × W_i / max_i).</b> Example: 22+13+14+18+9+13 = <b>89/100</b>. Fail-risk if M1&lt;80% or no cal sheets (−30 combined).</td></tr></table>
-<p style="font-size:13px;color:var(--muted)">Grade guardrails: M1&lt;80% caps AI block at 50%; no offline demo caps prototype at 50%; Arduino = disqualify per constraints; a budget overrun is a project risk we must close in §8, not a rule breach. Keep receipts + 0-EGP cloud proof.</p>
+<p style="font-size:13px;color:var(--muted)">Grade guardrails: M1&lt;80% caps AI block at 50%; no offline demo caps prototype at 50%; Arduino = disqualify per constraints; the hardware ceiling is signed at 9,370 and every receipt is logged. Keep receipts + 0-EGP cloud proof.</p>
 </div>
 
 <div class="card" id="vision">
@@ -133,7 +133,7 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <div><b>$50B/yr</b><span>global unplanned downtime cost</span></div>
 </div>
 <p><b>Egypt Grand Challenge:</b> Increase industrial & agricultural base. A stopped motor stops a line. Reactive maintenance (fix after break) and preventive (fix on schedule whether needed or not) are obsolete. <b>Predictive maintenance</b> senses vibration + temperature + sound continuously, detects incipient fault, and orders the spare <i>before</i> failure — exactly Mourtzis Fig.8: inspection 28h→5h, waiting eliminated by early RUL warning.</p>
-<p><b>Our demo:</b> a portable rig clamping to any school motor/fan. Shake it, heat it, shout at it → <b>both dashboards</b> flip <code>Healthy → Warning → Fault</code> in ≤5s, with AI fault-type + notification. Custom Panel for judges/mobile + Grafana for engineer/KPIs. All inside 8240 EGP + 0 EGP cloud, no Arduino, works with or without internet.</p>
+<p><b>Our demo:</b> a portable rig clamping to any school motor/fan. Shake it, heat it, shout at it → <b>both dashboards</b> flip <code>Healthy → Warning → Fault</code> in ≤5s, with AI fault-type + notification. Custom Panel for judges/mobile + Grafana for engineer/KPIs. All inside a signed 9,370 EGP + 0 EGP cloud, no Arduino, works with or without internet.</p>
 <div class="callout"><b>Two papers → one design:</b> Mourtzis gives DAQ + Digital Twin + RUL + AR vision. Cinar gives scalable CPS reality: MQTT + context broker + hot/cold DB + <b>coarse (SPC) → fine (DL)</b> two-stage + AutoML imputation + Grafana + KPIs. We implement Cinar's proven pipeline on Mourtzis's philosophy, minus Twin/AR (unaffordable) — documented as future work.</div>
 </div>
 
@@ -378,19 +378,19 @@ X,y,G = df.drop(columns=[<span class="s">'label'</span>,<span class="s">'event_i
 <p class="callout">Only windows in pink trigger DL. Healthy 90% of time → 10× fewer inferences → Pi stays cool, false alarms drop. Log TBA (time-between-alerts): shrinking TBA = degrading bearing.</p>
 <div class="grid2">
 <div><h3>Target confusion matrix (≥80%)</h3><img class="chart" src="book_assets/confusion.png" alt="confusion"></div>
-<div><h3>Budget reality check</h3><img class="chart" src="book_assets/budget.png" alt="budget"><p style="font-size:13px">The Pi is 77% of the spend. Protect the sensors with 3.3 V discipline; there is no room for a re-buy.</p></div>
+<div><h3>Budget reality check</h3><img class="chart" src="book_assets/budget.png" alt="budget"><p style="font-size:13px">The Pi is 73% of the spend and already bought. Protect the sensors with 3.3 V discipline; there is no room for a re-buy.</p></div>
 </div>
 <h3>Acoustic spectrogram (what INMP441 sees)</h3>
 <img class="chart" src="book_assets/audio_spec.png" alt="audio">
 </div>
 
 <div class="card" id="bom">
-<h2 class="sec">8 — BOM &amp; Budget Control (real quotes vs the 8240 target)</h2>
-<p style="font-size:13px;color:var(--muted)">These are the supplier quotes of <b>2026-10-25</b>, identical to the spreadsheet on disk. Only the MAX6675 is unquoted, so it is listed at zero and treated as a risk — not as free.</p>
+<h2 class="sec">8 — BOM &amp; Budget Control (9,370 ceiling, real quotes)</h2>
+<p style="font-size:13px;color:var(--muted)">Prices are the supplier quotes of <b>2026-10-25</b> — the same numbers as the spreadsheet on disk. The ceiling was restated to <b>9,370 EGP</b> on the same day because those quotes are real and the challenge paper sets no budget of its own. *The MAX6675 is an <b>allowance</b>, not a quote: it must come in at or below <b>201.75 EGP</b> to stay inside the ceiling.</p>
 <table><tr><th>#</th><th>Item</th><th>Function (physics role)</th><th>Store</th><th>Qty</th><th>Unit</th><th>Total</th></tr>
 <tr><td>1</td><td>ADXL345 Module</td><td>vibration (I2C 0x53)</td><td>Makers</td><td>1</td><td>170</td><td>170</td></tr>
 <tr><td>2</td><td>K-type Probe M6 (class 1)</td><td>heat: Seebeck EMF</td><td>micro ohm</td><td>1</td><td>250</td><td>250</td></tr>
-<tr><td>3</td><td>MAX6675 Module</td><td>12-bit TC ADC + cold-junction comp</td><td>micro ohm</td><td>1</td><td>—</td><td><b>TBD</b></td></tr>
+<tr><td>3</td><td>MAX6675 Module</td><td>12-bit TC ADC + cold-junction comp</td><td>micro ohm</td><td>1</td><td>200*</td><td>200*</td></tr>
 <tr><td>4</td><td>INMP441 Mic Module</td><td>sound (I2S)</td><td>Future</td><td>1</td><td>180</td><td>180</td></tr>
 <tr><td>5</td><td>Sensor Magnetic Base</td><td>couples vibration</td><td>Makers</td><td>1</td><td>85</td><td>85</td></tr>
 <tr><td>6</td><td>Shielded Jumper Wires (M-F)</td><td>EMI drain + TC pair</td><td>Makers</td><td>30</td><td>0.70</td><td>21</td></tr>
@@ -408,13 +408,13 @@ X,y,G = df.drop(columns=[<span class="s">'label'</span>,<span class="s">'event_i
 <tr><td>18</td><td>Thermal Paste</td><td>conduction</td><td>Makers</td><td>1</td><td>35</td><td>35</td></tr>
 <tr><td>19</td><td>IP65 Enclosure Box</td><td>field proof</td><td>Makers</td><td>1</td><td>55</td><td>55</td></tr>
 <tr><td>20</td><td>Shipping (4 stores)</td><td>logistics</td><td>—</td><td>1</td><td>220</td><td>220</td></tr>
-<tr><td colspan="6" style="text-align:right"><b>TOTAL (priced lines, 2026-10-25)</b></td><td><b>8888.25</b></td></tr></table>
-<div class="callout danger"><b>Real prices, real gap: 8888.25 EGP priced, plus an unpriced MAX6675 — already 648.25 EGP over the 8240 target.</b> The priced lines have <b>zero headroom</b>, so no MAX6675 price can close it: the build has to change. Note also that the challenge paper sets <b>no budget of its own</b> — 8240 is our self-set ceiling, so restating it is allowed; overspending is a project risk, not a rule violation.</div>
-<div class="callout warn"><b>Three ways to close it</b> (full arithmetic in <code>circuit/BOM_reconciliation.md</code>):<br>
-<b>A — restate the ceiling</b> to <b>9,090 EGP</b> (8,888.25 + a 200 MAX6675; +280 more if the box is sealed and needs the fan and glands). No scope change, every price real.<br>
-<b>B — change the compute board.</b> The Pi 4 is 6,850 of the 8,888 — 77%. A lighter board (Pi Zero 2 W / Pi 4 2 GB) is the only lever big enough, and it would also remove the fan and the throttling risk. Needs a real quote before it can be booked.<br>
-<b>C — cut scope.</b> Every qty cut available on this sheet (self-pickup −220, one breadboard −35, jumper/header/cap trims ≈ −40) frees at most <b>~350</b>, and still leaves ≈300 over before the MAX6675. Cutting scope alone cannot reach 8240 while keeping all three sensor modalities.</div>
-<div class="callout"><b>Rule:</b> 0 EGP cloud is absolute. Hardware must stay inside whichever ceiling is signed off in writing; every purchase needs a photographed receipt. If a part dies, downgrade improvements first (paste → borrow, shrink → tape). Never cut a sensing modality to make the number fit.</div>
+<tr><td>21</td><td>Case Fan (anti-throttle)</td><td>cooling</td><td>Makers</td><td>1</td><td>240</td><td>240</td></tr>
+<tr><td>22</td><td>Cable Glands PG7</td><td>seal + strain relief</td><td>Future</td><td>2</td><td>15</td><td>30</td></tr>
+<tr><td>23</td><td>Heat Shrink Tube 1m</td><td>insulation</td><td>Future</td><td>1</td><td>10</td><td>10</td></tr>
+<tr><td colspan="6" style="text-align:right"><b>TOTAL (planned)</b></td><td><b>9368.25</b></td></tr></table>
+<div class="callout good"><b>Signed budget: 9,370 EGP planned 9,368.25 — 1.75 inside.</b> The earlier 8240 was our own estimate, never a rule from `G12_27_ Capstone.pdf`; once real prices arrived it could not survive, so it was restated in writing rather than hidden by dropping parts. 0 EGP cloud is untouched.</div>
+<div class="callout warn"><b>Why the ceiling moved instead of the board:</b> the Pi 4 4 GB is already bought at 6,850 EGP — 73% of the planned spend and sunk, so a cheaper board was no longer a lever. The 280 EGP that the re-shop had silently dropped (fan 240 + glands 30 + heat-shrink 10) is back in, because without the fan a sealed IP65 box throttles during a 60-minute exhibition run.</div>
+<div class="callout danger"><b>Procurement rule:</b> quote the MAX6675 before paying. If it comes in above <b>201.75</b>, collect the order in person (−220 shipping) rather than raising the ceiling again. Every purchase needs a photographed receipt; never swap a sensing modality to make a number fit.</div>
 </div>
 
 <div class="card" id="cal">
@@ -454,11 +454,11 @@ X,y,G = df.drop(columns=[<span class="s">'label'</span>,<span class="s">'event_i
 <h2 class="sec">12 — Build Plan, Risks, Future Work</h2>
 <p><b>W1</b> Order (Pi first) + OS/fan/SD + Firebase Spark + Grafana org + Flask hello • <b>W2</b> Wire 3 sensors + i2cdetect + mount + Mosquitto • <b>W3</b> Cal + healthy baseline + Firebase mirror + Grafana + Panel live • <b>W4</b> Fault dataset + SPC + RF ≥80% + dual-flip test • <b>W5</b> Box/glands/buffer/quota-guard + drill + docs + QR stickers • <b>W6</b> Freeze + rehearsal + hard copies + SD image backup.</p>
 <div class="callout warn"><b>Top risks:</b> Pi stock → order now; venue WiFi blocked → hotspot + local Flask primary; Firebase quota → throttle 1/60s + CSV replay; Grafana auth → pre-cached snapshot; SD corruption → read-only root; accuracy &lt;80% → 2-class fallback; heat damage → 30cm only.</div>
-<p><b>Future (out of 8240):</b> Digital Twin in Simulink + RUL regression (Mourtzis), fleet of motors, AR overlay, OPC-UA PLC link, solar + battery field node.</p>
+<p><b>Future (out of 9,370):</b> Digital Twin in Simulink + RUL regression (Mourtzis), fleet of motors, AR overlay, OPC-UA PLC link, solar + battery field node.</p>
 <p style="font-size:13px;color:var(--muted)">Refs: Mourtzis et al. Front. Mech. Eng. 2020.578379 • Cinar et al. Machines 2022.10.1006 • Deloitte PdM 2017 • NGSI-LD/FIWARE • NIST ITS-90 type-K tables • Shewhart SPC. BOM: DOC-20261014-WA0055.xlsx. Rules: G12_27 Capstone.pdf.</p>
 </div>
 
-<div class="footer">Project Book v2.0 • 2026-10-25 • Hardware 8888.25 EGP in real quotes (8240 target, plan in §8) + 0 EGP cloud (Firebase + Grafana + Flask) • Offline-first • No Arduino • PRD.md v2.0 synced 🛠</div>
+<div class="footer">Project Book v2.0 • 2026-10-25 • Hardware 9,368.25 planned inside a signed 9,370 ceiling + 0 EGP cloud (Firebase + Grafana + Flask) • Offline-first • No Arduino • PRD.md v2.0 synced 🛠</div>
 </div>
 <button class="print-btn" onclick="window.print()">🖨 Print / PDF</button>
 </body>

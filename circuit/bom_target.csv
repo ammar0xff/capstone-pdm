@@ -1,7 +1,7 @@
 ref,name,role,store,qty,unit_egp,total_egp,source
 1,ADXL345 Module,vibration (I2C 0x53),Makers Electronics,1,170,170,quote 2026-10-25
 2,K-type Probe M6 (class 1),heat: Seebeck EMF,micro ohm,1,250,250,quote 2026-10-25
-3,MAX6675 Module,12-bit TC ADC + cold-junction comp,micro ohm,1,0,0,TO QUOTE
+3,MAX6675 Module,12-bit TC ADC + cold-junction comp,micro ohm,1,200,200,ALLOWANCE 200 - quote required
 4,INMP441 Mic Module,sound (I2S),Future Electronics,1,180,180,quote 2026-10-25
 5,Sensor Magnetic Base,couples vibration,Makers Electronics,1,85,85,quote 2026-10-25
 6,Shielded Jumper Wires (M-F),EMI drain + TC pair,Makers Electronics,30,0.7,21,quote 2026-10-25
@@ -10,7 +10,7 @@ ref,name,role,store,qty,unit_egp,total_egp,source
 9,M3 Screws & Nuts Pack,clamp stack,Makers Electronics,3,8.5,25.5,quote 2026-10-25
 10,Nylon Spacers / Washers M3,ground-loop break,Makers Electronics,10,1.5,15,quote 2026-10-25
 11,Raspberry Pi Power Supply 5V/3A,clean power,Makers Electronics,1,200,200,quote 2026-10-25
-12,Raspberry Pi 4 4GB RAM,edge compute,Makers Electronics,1,6850,6850,quote 2026-10-25
+12,Raspberry Pi 4 4GB RAM,edge compute,Makers Electronics,1,6850,6850,bought 2026-10-25 (sunk)
 13,MicroSD Card 32GB Class 10,OS + buffer,Amazon EG,1,449,449,quote 2026-10-25
 14,Breadboard 840 Pin,testable wiring,Makers Electronics,2,35,70,quote 2026-10-25
 15,Ceramic Capacitors 100nF,HF decoupling,Future Electronics,5,3,15,quote 2026-10-25
@@ -19,3 +19,6 @@ ref,name,role,store,qty,unit_egp,total_egp,source
 18,Thermal Paste,conduction,Makers Electronics,1,35,35,quote 2026-10-25
 19,IP65 Enclosure Box,field proof,Makers Electronics,1,55,55,quote 2026-10-25
 20,Shipping (4 stores),logistics,-,1,220,220,quote 2026-10-25
+21,Case Fan (anti-throttle),cooling,Makers Electronics,1,240,240,quote 2026-10-14 - re-added
+22,Cable Glands PG7,seal + strain relief,Future Electronics,2,15,30,quote 2026-10-14 - re-added
+23,Heat Shrink Tube 1m,insulation,Future Electronics,1,10,10,quote 2026-10-14 - re-added

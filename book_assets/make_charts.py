@@ -61,42 +61,37 @@ def tc_curve():
 
 
 def budget():
-    """Real 2026-10-25 quotes against the self-set 8240 target."""
+    """Signed 9,370 ceiling against the planned 9,368.25."""
     rows = [
         ("Compute (Pi 4 4GB + SD + PSU)", 7499.00, NAVY),
-        ("Sensors (ADXL + K-type + mic)", 600.00, AMBER),
+        ("Sensors (ADXL + K-type + MAX6675 allowance + mic)", 800.00, AMBER),
+        ("Enclosure + cooling + mounting", 495.50, TEAL),
         ("Wiring + decoupling", 353.75, BLUE),
         ("Shipping (4 stores)", 220.00, MUTED),
-        ("Enclosure + mounting", 215.50, TEAL),
     ]
     labels = [r[0] for r in rows]
     vals = [r[1] for r in rows]
     cols = [r[2] for r in rows]
     total = sum(vals)
 
-    fig, ax = plt.subplots(figsize=(11.4, 4.9), dpi=170)
+    fig, ax = plt.subplots(figsize=(11.4, 4.6), dpi=170)
     y = np.arange(len(rows))[::-1]
-    ax.barh(y, vals, color=cols, height=0.60)
+    ax.barh(y, vals, color=cols, height=0.58)
     for yy, v in zip(y, vals):
-        ax.text(v + 70, yy, f"{v:,.0f} EGP ({v / total * 100:.0f}%)", va="center",
+        ax.text(v + 70, yy, f"{v:,.2f} EGP ({v / total * 100:.0f}%)", va="center",
                 fontsize=9, color=NAVY)
     ax.set_yticks(y)
-    ax.set_yticklabels(labels, fontsize=9.5)
-    ax.axvline(8240, color=RED, lw=2)
-    ax.text(8240, len(rows) - 0.35, " self-set target 8240", color=RED,
+    ax.set_yticklabels(labels, fontsize=9.3)
+    ax.axvline(9370, color=RED, lw=2)
+    ax.text(9370, len(rows) - 0.28, " signed ceiling 9,370", color=RED,
             fontsize=9.5, weight="bold", va="center")
-    ax.axvspan(8240, total, color=RED, alpha=0.07)
-    ax.annotate(f"+{total - 8240:,.2f} EGP over\nbefore the MAX6675",
-                xy=(total, 0.02), xytext=(total - 1500, 0.55),
-                fontsize=9.5, color=RED, weight="bold",
-                arrowprops=dict(arrowstyle="->", color=RED, lw=1.2))
-    ax.text(120, -0.62, "MAX6675 has no quote yet - the real gap is larger than shown",
-            fontsize=8.5, color=MUTED, va="center")
-    ax.set_xlim(0, 9800)
-    ax.set_ylim(-1.0, len(rows) - 0.2)
+    ax.text(150, -0.72, f"planned {total:,.2f} EGP  ·  1.75 inside  ·  MAX6675 allowance 200 must be quoted at or below 201.75",
+            fontsize=8.6, color=MUTED, va="center")
+    ax.set_xlim(0, 10400)
+    ax.set_ylim(-1.05, len(rows) - 0.1)
     ax.set_xlabel("EGP")
-    ax.set_title(f"Real quotes {total:,.2f} EGP vs the 8240 target - the Pi is 77% of the spend",
-                 color=NAVY, fontsize=12.2, weight="bold")
+    ax.set_title("Signed budget 9,370 EGP - real quotes 9,368.25, the Pi is 73% and already bought",
+                 color=NAVY, fontsize=12.0, weight="bold")
     ax.grid(axis="x", alpha=0.25)
     fig.tight_layout()
     fig.savefig(os.path.join(HERE, "budget.png"), facecolor="white")

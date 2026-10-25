@@ -5,13 +5,13 @@
 - **Version:** v2.0 (updated: Firebase + Grafana + Custom Panel, 0-EGP cloud)
 - **Source folder:** `/home/ammar/Desktop/pro/`
 - **Status:** Approved for build
-- **Budget:** self-set target **8240 EGP**; the 2026-10-25 supplier quotes total **8888.25** plus an unpriced MAX6675 (648.25 over before that part). Closure plan in §1.3. The challenge paper imposes no budget.
+- **Budget:** signed ceiling **9,370 EGP** (planned 9,368.25). The 2026-10-25 quotes are real; the old 8240 was self-imposed — the challenge paper imposes no budget. The MAX6675 is a 200 allowance that must be quoted ≤201.75.
 - **Cloud budget:** **0 EGP** — no paid provider allowed. Free-tier only + offline-first.
 
 ## 0. Problem, Solution, Features, Grade Calculation (read first)
 
 ### 0.1 Problem
-Egyptian lines stop on surprise motor failures. Reactive (fix after break) costs $50B/yr downtime; preventive (fix on schedule) wastes healthy parts. Small factories have no vibration/heat/sound logging, no wireless to cloud, no AI early warning. Capstone demands a solution with sensing + wireless to cloud + AI + hardware + ≥80% accuracy + calibration + portable testable prototype ≤8240 EGP, no Arduino.
+Egyptian lines stop on surprise motor failures. Reactive (fix after break) costs $50B/yr downtime; preventive (fix on schedule) wastes healthy parts. Small factories have no vibration/heat/sound logging, no wireless to cloud, no AI early warning. Capstone demands a solution with sensing + wireless to cloud + AI + hardware + ≥80% accuracy + calibration + portable testable prototype, no Arduino.
 **Problem statement:** How can AI+IoT on low-cost edge detect incipient faults and warn in ≤5s with evidence and zero cloud spend?
 
 ### 0.2 Solution
@@ -38,13 +38,13 @@ Portable offline-first rig on Pi 4 4GB: ADXL345 + K-type/MAX6675 + INMP441 → c
 |Dataset + rubric + AI ≥80%|20|≥1200 windows, GroupKFold, matrix|CSV + rubric + §7|
 |Calibration documented|10|6-face + ice/boil + tone|§8 sheets|
 |Logbooks + poster + Q&A|15|per-member books + QR poster|books + video prompt|
-|**Total**|**100**|**Score = Σ(earned×W/max). Ex: 22+13+14+18+9+13=89.**|M1<80% or no cal = −30 risk; Arduino = fail; budget overrun = risk to close|
+|**Total**|**100**|**Score = Σ(earned×W/max). Ex: 22+13+14+18+9+13=89.**|M1<80% or no cal = −30 risk; Arduino = fail; hardware must stay inside the signed 9,370 ceiling|
 
 ## 1. Discovery Summary
 
 ### 1.1 Inputs analyzed
 1. `G12_27_ Capstone.pdf` (5 pp) — challenge + design requirements + constraints.
-2. `DOC-20261014-WA0055.xlsx` — supplier BOM (2026-10-25 quotes): 20 priced lines = **8888.25 EGP**, MAX6675 unpriced. Build list mirrored in `circuit/bom_target.csv`.
+2. `DOC-20261014-WA0055.xlsx` — supplier BOM (2026-10-25 quotes): 20 priced lines = **8888.25 EGP**, MAX6675 unpriced. Build list plus the re-added cooling/sealing items lives in `circuit/bom_target.csv`.
 3. `fmech-06-578379.pdf` (Mourtzis et al. 2020) — PdM + DAQ + Digital Twin/RUL + MR vision.
 4. `machines-10-01006-v3.pdf` (Cinar et al. 2022) — CPS PaaS, coarse→fine monitoring, AutoML, KPIs, MQTT/ROS/OPC-UA, Grafana.
 
@@ -60,12 +60,12 @@ Why this fits:
 - No Arduino — Pi 4 4GB (encouraged advanced controller).
 - ≥4 measurable incl. response time + accuracy, AI ≥80%, calibration docs, portable testable — all achievable.
 
-### 1.3 BOM — real quotes vs the 8240 target
+### 1.3 BOM — real quotes inside a signed 9,370 ceiling
 | # | Item | Function | Store | Qty | Unit | Total |
 |---|---|---|---|---|---|---|
 |1|ADXL345 Module|vibration (I2C 0x53)|Makers|1|170|170|
 |2|K-type Probe M6 (class 1)|heat: Seebeck EMF|micro ohm|1|250|250|
-|3|MAX6675 Module|12-bit TC ADC + cold-junction comp|micro ohm|1|—|**TBD**|
+|3|MAX6675 Module|12-bit TC ADC + cold-junction comp|micro ohm|1|200*|200*|
 |4|INMP441 Mic Module|sound (I2S)|Future|1|180|180|
 |5|Sensor Magnetic Base|couples vibration|Makers|1|85|85|
 |6|Shielded Jumper Wires (M-F)|EMI drain + TC pair|Makers|30|0.70|21|
@@ -83,11 +83,15 @@ Why this fits:
 |18|Thermal Paste|conduction|Makers|1|35|35|
 |19|IP65 Enclosure Box|field proof|Makers|1|55|55|
 |20|Shipping (4 stores)|logistics|—|1|220|220|
-|**Total (priced)**||||||**8888.25**|
+|21|Case Fan (anti-throttle)|cooling|Makers|1|240|240|
+|22|Cable Glands PG7|seal + strain relief|Future|2|15|30|
+|23|Heat Shrink Tube 1m|insulation|Future|1|10|10|
+|**Total (planned)**||||||**9368.25**|
 
-- **648.25 EGP over the 8240 target before the MAX6675 is even priced.** The priced lines have zero headroom, so a cheaper converter cannot close it.
-- Three documented closures in `circuit/BOM_reconciliation.md` and Book §8: (A) restate the ceiling to 9,090, (B) change the compute board (the Pi is 77% of the spend), (C) cut scope — which alone cannot close it.
-- The challenge paper (`G12_27_ Capstone.pdf`) sets **no budget**; 8240 is self-set, so restating it is permitted. 0 EGP cloud is the absolute constraint.
+- **Ceiling restated to 9,370 EGP on 2026-10-25** (planned 9,368.25, 1.75 headroom). The 2026-10-25 quotes are real: 8,888.25 priced, plus the fan/glands/heat-shrink the re-shop dropped (280) and a 200 MAX6675 allowance. The old 8240 was self-imposed; `G12_27_ Capstone.pdf` sets no budget.
+- ***MAX6675 is an allowance, not a quote.** It must come in at or below **201.75 EGP**. Above that, collect in person (−220 shipping) rather than raise the ceiling.
+- The Pi 4 4 GB is **already bought at 6,850** (73% of spend, sunk), so changing the board is no longer a lever — that is why the ceiling moved and the parts did not.
+- 0 EGP cloud is absolute: Firebase Spark + Grafana free + local Mosquitto/Flask only.
 
 - No paid cloud, no extra rig, no HoloLens. Demo motor borrowed. Cloud = free-tier only.
 
@@ -124,7 +128,7 @@ Why this fits:
 ### 4.1 Design artifacts (generated, not hand-drawn)
 `circuit/design.py` is the single source of truth for every component, pin and net. `python3 circuit/build.py` regenerates:
 - `circuit/out/pdm.net` — KiCad-format netlist; `pdm_skidl.py` — SKiDL source for a machine with KiCad libraries.
-- `circuit/out/erc_report.md` — 52 checks: 44 design (ERC + physics) + 8 BOM traceability: **0 ERC errors, 6 documented design WARN**, and 3 deliberate BOM FAILs: the real quotes are 648.25 over the 8240 target and the MAX6675 has no price, so the gate refuses to pass. It also fails if the target stops matching the design or the supplier sheet drifts from it.
+- `circuit/out/erc_report.md` — 52 checks: 44 design (ERC + physics) + 8 BOM traceability: **0 ERC errors, 8 documented WARN, 0 FAIL**. The BOM gate covers the signed 9,370 ceiling, the 201.75 converter allowance, part identity and the supplier-sheet reconciliation; it fails if any of them drifts.
 - `circuit/out/schematic_main.svg`, `tc_frontend.svg`, `wiring_a3.svg` — A3 vector sheets embedded in Project Book §4.3.
 - `circuit/out/block.mmd`, `sequence.mmd`, `state.mmd` — Mermaid diagrams for GitHub rendering.
 
@@ -237,9 +241,9 @@ Quota guard: Pi counts writes/day; if >15k, auto-throttle to 1/60s + SD-only + G
 7. Show hard copies: confusion matrix + cal sheets + dataset sample + rubric + logbooks + every receipt.
 
 ## 11. Budget Control
-- **Real quotes (2026-10-25): 8888.25 EGP priced, MAX6675 unpriced → 648.25 over the 8240 target.** The gate fails until this is resolved; the ceiling must be signed off in writing.
-- Decision required: **(A)** restate the ceiling to 9,090 EGP (9,370 if the box stays sealed and needs fan + glands) or **(B)** change the compute board — it is 77% of the spend and the only lever large enough. Full arithmetic: `circuit/BOM_reconciliation.md`.
-- Quantity cuts alone max out at −379.75 and still leave the build over; they cannot close it without deleting a sensing modality.
+- **Signed ceiling 9,370 EGP; planned 9,368.25 (1.75 headroom).** Set on 2026-10-25 from real supplier quotes after the self-imposed 8240 estimate failed. Decision record: `circuit/BOM_reconciliation.md`.
+- **MAX6675 rule:** allowance 200, must be quoted ≤201.75. Above that, collect in person (−220 shipping) instead of raising the ceiling.
+- Pi 4 4 GB already bought at 6,850 (73% of spend, sunk). Fan/glands/heat-shrink re-added (+280) so the sealed box does not throttle.
 - Spares: headers and caps are already over-ordered. Pi/SD failure = borrow, not rebuy.
 - `budget/` receipts photo log weekly. Cloud changes never add cost (free-tier lock).
 
