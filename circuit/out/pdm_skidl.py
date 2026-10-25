@@ -7,7 +7,7 @@ import os
 os.environ.setdefault("KICAD_SYMBOL_DIR", "/usr/share/kicad/symbols")
 from skidl import *
 
-U1 = Part("pdmlib", "RPi4-8GB", footprint="Connector_PinHeader_2.54mm:PinHeader_1x40_P2.54mm_Vertical", ref='U1')
+U1 = Part("pdmlib", "RPi4-4GB", footprint="Connector_PinHeader_2.54mm:PinHeader_1x40_P2.54mm_Vertical", ref='U1')
 U2 = Part("pdmlib", "ADXL345", footprint="Module:ADXL345", ref='U2')
 U3 = Part("pdmlib", "MAX6675", footprint="Module:MAX6675", ref='U3')
 U4 = Part("pdmlib", "INMP441", footprint="Module:INMP441", ref='U4')

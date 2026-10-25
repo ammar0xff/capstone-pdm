@@ -92,7 +92,7 @@ def mermaid(path_block, path_seq, path_state):
     B["K-type + MAX6675<br/>SPI0<br/>0.2 Hz"]:::s
     C["INMP441<br/>I2S 16 kHz"]:::s
   end
-  subgraph EDGE["Raspberry Pi 4 8GB (edge, offline)"]
+  subgraph EDGE["Raspberry Pi 4 4GB (edge, offline)"]
     D["Calibration<br/>cal.json"]:::e
     E{"SPC coarse<br/>X-bar / R<br/>mu +/- 2s / 3s"}:::e
     F["RF fine<br/>4-class + probability"]:::e

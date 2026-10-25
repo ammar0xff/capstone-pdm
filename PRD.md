@@ -5,7 +5,7 @@
 - **Version:** v2.0 (updated: Firebase + Grafana + Custom Panel, 0-EGP cloud)
 - **Source folder:** `/home/ammar/Desktop/pro/`
 - **Status:** Approved for build
-- **Hard budget cap:** **8240 EGP all-in, not more** (per `DOC-20261014-WA0055.xlsx`)
+- **Budget:** self-set target **8240 EGP**; the 2026-10-25 supplier quotes total **8888.25** plus an unpriced MAX6675 (648.25 over before that part). Closure plan in §1.3. The challenge paper imposes no budget.
 - **Cloud budget:** **0 EGP** — no paid provider allowed. Free-tier only + offline-first.
 
 ## 0. Problem, Solution, Features, Grade Calculation (read first)
@@ -15,7 +15,7 @@ Egyptian lines stop on surprise motor failures. Reactive (fix after break) costs
 **Problem statement:** How can AI+IoT on low-cost edge detect incipient faults and warn in ≤5s with evidence and zero cloud spend?
 
 ### 0.2 Solution
-Portable offline-first rig on Pi 4 8GB: ADXL345 + K-type/MAX6675 + INMP441 → cal → SPC coarse → RF fine → Healthy/Warning/Fault on **both** Flask Custom Panel (live/QR/mobile) and Grafana (analytics/KPIs), Firebase Spark mirror at 0 EGP for grading. Full workflow runs with zero internet (hotspot + SD buffer); cloud backfills on reconnect.
+Portable offline-first rig on Pi 4 4GB: ADXL345 + K-type/MAX6675 + INMP441 → cal → SPC coarse → RF fine → Healthy/Warning/Fault on **both** Flask Custom Panel (live/QR/mobile) and Grafana (analytics/KPIs), Firebase Spark mirror at 0 EGP for grading. Full workflow runs with zero internet (hotspot + SD buffer); cloud backfills on reconnect.
 
 ### 0.3 Features
 | # | Feature | Demo | Maps to |
@@ -38,13 +38,13 @@ Portable offline-first rig on Pi 4 8GB: ADXL345 + K-type/MAX6675 + INMP441 → c
 |Dataset + rubric + AI ≥80%|20|≥1200 windows, GroupKFold, matrix|CSV + rubric + §7|
 |Calibration documented|10|6-face + ice/boil + tone|§8 sheets|
 |Logbooks + poster + Q&A|15|per-member books + QR poster|books + video prompt|
-|**Total**|**100**|**Score = Σ(earned×W/max). Ex: 22+13+14+18+9+13=89.**|M1<80% or no cal = −30 risk; >8240 or Arduino = fail|
+|**Total**|**100**|**Score = Σ(earned×W/max). Ex: 22+13+14+18+9+13=89.**|M1<80% or no cal = −30 risk; Arduino = fail; budget overrun = risk to close|
 
 ## 1. Discovery Summary
 
 ### 1.1 Inputs analyzed
 1. `G12_27_ Capstone.pdf` (5 pp) — challenge + design requirements + constraints.
-2. `DOC-20261014-WA0055.xlsx` (Sheet `الورقة1`, A1:I26 + total A27) — locked BOM, 25 items, total 8240 EGP.
+2. `DOC-20261014-WA0055.xlsx` — supplier BOM (2026-10-25 quotes): 20 priced lines = **8888.25 EGP**, MAX6675 unpriced. Build list mirrored in `circuit/bom_target.csv`.
 3. `fmech-06-578379.pdf` (Mourtzis et al. 2020) — PdM + DAQ + Digital Twin/RUL + MR vision.
 4. `machines-10-01006-v3.pdf` (Cinar et al. 2022) — CPS PaaS, coarse→fine monitoring, AutoML, KPIs, MQTT/ROS/OPC-UA, Grafana.
 
@@ -57,45 +57,42 @@ Portable offline-first rig on Pi 4 8GB: ADXL345 + K-type/MAX6675 + INMP441 → c
 
 Why this fits:
 - ADXL345 + K-type/MAX6675 + INMP441 = top-3 PdM sensors (Cinar review).
-- No Arduino — Pi 4 8GB (encouraged advanced controller).
+- No Arduino — Pi 4 4GB (encouraged advanced controller).
 - ≥4 measurable incl. response time + accuracy, AI ≥80%, calibration docs, portable testable — all achievable.
 
-### 1.3 Locked BOM (8240 EGP ceiling)
+### 1.3 BOM — real quotes vs the 8240 target
 | # | Item | Function | Store | Qty | Unit | Total |
 |---|---|---|---|---|---|---|
-|1|ADXL345 Module|vibration|Makers|1|170|170|
-|2|K-type Probe M6 (class 1)|heat|micro ohm|1|250|250|
-|3|MAX6675 Module|TC ADC + CJ comp.|micro ohm|1|200|200|
-|4|INMP441 Mic Module|sound|Future|1|180|180|
-|5|Sensor Magnetic Base|mount|Future|1|120|120|
-|6|Shielded Jumper M-F|EMI drain|Future|1|45|45|
-|7|Jumper M-M|breadboard|Future|1|35|35|
-|8|Male Pin Headers 40p|solder|Future|2|5|10|
-|9|M3 Screws & Nuts 15mm|clamp|local|1|10|10|
-|10|Nylon Spacers M3|isolation|Future|1|10|10|
-|11|RPi PSU 5V/3A|power|Makers|1|320|320|
-|12|Raspberry Pi 4 8GB|edge AI+IoT|Makers|1|5800|5800|
-|13|MicroSD 32GB C10|OS+buffer|Future|1|190|190|
-|14|Breadboard 840|prototyping|Future|1|65|65|
-|15|Ceramic 100nF x3|decoupling|Future|3|5|15|
-|16|Resistors 10k x2|pull-up|Future|2|5|10|
-|17|Electrolytic 10uF|bulk|Future|1|5|5|
-|18|Case & Fan|cooling|Makers|1|240|240|
-|19|Thermal Paste|conduction|Future|1|35|35|
-|20|IP65 Box|field proof|Future|1|140|140|
-|21|PG7 Glands x2|seal|Future|2|15|30|
-|22|Heat Shrink 1m|insulation|Future|1|10|10|
-|23|Ship Makers|logistics|Makers|1|70|70|
-|24|Ship RAM|logistics|RAM|1|70|70|
-|25|Ship Future|logistics|Future|1|60|60|
-|26|Reserve|re-quote + breakage|-|1|150|150|
-|**Total**||||||**8240**|
+|1|ADXL345 Module|vibration (I2C 0x53)|Makers|1|170|170|
+|2|K-type Probe M6 (class 1)|heat: Seebeck EMF|micro ohm|1|250|250|
+|3|MAX6675 Module|12-bit TC ADC + cold-junction comp|micro ohm|1|—|**TBD**|
+|4|INMP441 Mic Module|sound (I2S)|Future|1|180|180|
+|5|Sensor Magnetic Base|couples vibration|Makers|1|85|85|
+|6|Shielded Jumper Wires (M-F)|EMI drain + TC pair|Makers|30|0.70|21|
+|7|Jumper Wires (Male to Male)|breadboard|Makers|1|220|220|
+|8|Male Pin Headers 2.54mm|header strip|Makers|2|7|14|
+|9|M3 Screws & Nuts Pack|clamp stack|Makers|3|8.50|25.50|
+|10|Nylon Spacers / Washers M3|ground-loop break|Makers|10|1.50|15|
+|11|Raspberry Pi Power Supply 5V/3A|clean power|Makers|1|200|200|
+|12|Raspberry Pi 4 4GB RAM|edge compute|Makers|1|6850|6850|
+|13|MicroSD Card 32GB Class 10|OS + buffer|Amazon|1|449|449|
+|14|Breadboard 840 Pin|testable wiring|Makers|2|35|70|
+|15|Ceramic Capacitors 100nF|HF decoupling|Future|5|3|15|
+|16|Resistors 10k Ohm|pull-ups|Future|5|0.50|2.50|
+|17|Electrolytic Capacitor 10uF|bulk hold-up|Makers|3|3.75|11.25|
+|18|Thermal Paste|conduction|Makers|1|35|35|
+|19|IP65 Enclosure Box|field proof|Makers|1|55|55|
+|20|Shipping (4 stores)|logistics|—|1|220|220|
+|**Total (priced)**||||||**8888.25**|
 
-- Compute (Pi + SD + PSU) = 6310 (76.6%). Sensors = 800 (9.7%). Enclosure/cooling = 420. Wiring = 185. Mounting = 175. Shipping = 200. Reserve = 150 for the MAX6675 and Pi re-quote.
+- **648.25 EGP over the 8240 target before the MAX6675 is even priced.** The priced lines have zero headroom, so a cheaper converter cannot close it.
+- Three documented closures in `circuit/BOM_reconciliation.md` and Book §8: (A) restate the ceiling to 9,090, (B) change the compute board (the Pi is 77% of the spend), (C) cut scope — which alone cannot close it.
+- The challenge paper (`G12_27_ Capstone.pdf`) sets **no budget**; 8240 is self-set, so restating it is permitted. 0 EGP cloud is the absolute constraint.
+
 - No paid cloud, no extra rig, no HoloLens. Demo motor borrowed. Cloud = free-tier only.
 
 ## 2. Vision & Objectives
-**Vision:** Factory-ready portable PdM demo proving downtime can be cut by early detection, built ≤8240 EGP, working with or without internet.
+**Vision:** Factory-ready portable PdM demo proving downtime can be cut by early detection, built to a documented budget, working with or without internet.
 
 **Objectives:**
 1. Sense 3 modalities concurrently on edge.
@@ -127,11 +124,11 @@ Why this fits:
 ### 4.1 Design artifacts (generated, not hand-drawn)
 `circuit/design.py` is the single source of truth for every component, pin and net. `python3 circuit/build.py` regenerates:
 - `circuit/out/pdm.net` — KiCad-format netlist; `pdm_skidl.py` — SKiDL source for a machine with KiCad libraries.
-- `circuit/out/erc_report.md` — 53 checks: 44 design (ERC + physics) + 9 BOM traceability: **0 ERC errors, 6 documented design WARN**, 1 deliberate BOM FAIL while the supplier sheet is unpriced. The BOM gate also fails loudly if the build target stops matching the design or the 8240 cap, or if the supplier sheet drifts from it.
+- `circuit/out/erc_report.md` — 52 checks: 44 design (ERC + physics) + 8 BOM traceability: **0 ERC errors, 6 documented design WARN**, and 3 deliberate BOM FAILs: the real quotes are 648.25 over the 8240 target and the MAX6675 has no price, so the gate refuses to pass. It also fails if the target stops matching the design or the supplier sheet drifts from it.
 - `circuit/out/schematic_main.svg`, `tc_frontend.svg`, `wiring_a3.svg` — A3 vector sheets embedded in Project Book §4.3.
 - `circuit/out/block.mmd`, `sequence.mmd`, `state.mmd` — Mermaid diagrams for GitHub rendering.
 
-The build exits non-zero on any FAIL, so a broken netlist cannot produce a drawing. Enforced invariants: no 5V pin on a 3.3V net, one push-pull driver per net, every IC decoupled by 100 nF on its own supply net, dedicated SPI CS with pull-up, unique I2C address, no pin used twice. WARNs are documented trade-offs (I2C cable length, sealed-box heat, single-point SPC false-alarm rate, Rref-code mismatch guard).
+The build exits non-zero on any FAIL, so a broken netlist cannot produce a drawing. Enforced invariants: no 5V pin on a 3.3V net, one push-pull driver per net, every IC decoupled by 100 nF on its own supply net, dedicated SPI CS with pull-up, unique I2C address, no pin used twice. WARNs are documented trade-offs (I2C cable length, sealed-box heat, single-point SPC false-alarm rate, cold-junction placement, thermocouple EMI at 41 uV/C).
 
 ## 5. System Architecture v2.0 (offline-first + dual dashboard)
 
@@ -237,12 +234,14 @@ Quota guard: Pi counts writes/day; if >15k, auto-throttle to 1/60s + SD-only + G
 4. Warm K-type probe (hand/dryer 30cm) → slope alarm on both.
 5. Clap/tone → acoustic flag.
 6. Pull WiFi 10s → Panel-local keeps live, SD buffers → restore → Firebase backfill, Grafana gap filled.
-7. Show hard copies: confusion matrix + cal sheets + dataset sample + rubric + logbooks + receipts (8240).
+7. Show hard copies: confusion matrix + cal sheets + dataset sample + rubric + logbooks + every receipt.
 
 ## 11. Budget Control
-- Freeze BOM. Spares already in BOM (headers/caps). Pi/SD failure = borrow, not rebuy.
-- Out-of-stock swap only at ≤ price; cut improvements first (paste→borrow, shrink→tape), never ضروري 1-17.
-- `budget/` receipts photo log weekly. Pi ordered W1 (volatility risk #1). Cloud changes never add cost (free-tier lock).
+- **Real quotes (2026-10-25): 8888.25 EGP priced, MAX6675 unpriced → 648.25 over the 8240 target.** The gate fails until this is resolved; the ceiling must be signed off in writing.
+- Decision required: **(A)** restate the ceiling to 9,090 EGP (9,370 if the box stays sealed and needs fan + glands) or **(B)** change the compute board — it is 77% of the spend and the only lever large enough. Full arithmetic: `circuit/BOM_reconciliation.md`.
+- Quantity cuts alone max out at −379.75 and still leave the build over; they cannot close it without deleting a sensing modality.
+- Spares: headers and caps are already over-ordered. Pi/SD failure = borrow, not rebuy.
+- `budget/` receipts photo log weekly. Cloud changes never add cost (free-tier lock).
 
 ## 12. Milestones (6 weeks)
 - W1: Order (Pi first) + OS/SD/power/fan + Firebase project + Grafana org created.
@@ -270,7 +269,7 @@ Quota guard: Pi counts writes/day; if >15k, auto-throttle to 1/60s + SD-only + G
 - [ ] Offline-only run ≥30min proven (WiFi off) + Firebase mirror proven (WiFi on).
 - [ ] AI ≥80% + confusion + dataset + rubric printed.
 - [ ] Cal docs signed + before/after + `cal.json`.
-- [ ] Spend ≤8240 + receipts; cloud spend = 0.
+- [ ] Hardware inside the signed-off ceiling + receipts; cloud spend = 0.
 - [ ] Portable rig + QR + logbooks ready; no Arduino; no lab gear removed; code/wiring frozen.
 
 ## 15. Traceability

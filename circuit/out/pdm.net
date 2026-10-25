@@ -5,9 +5,9 @@
     (tool "pdm-pipeline 1.0"))
   (components
     (comp (ref "U1")
-      (value "Raspberry Pi 4 Model B 8GB")
+      (value "Raspberry Pi 4 Model B 4GB")
       (footprint "Connector_PinHeader_2.54mm:PinHeader_1x40_P2.54mm_Vertical")
-      (fields (field (name "MPN") "RPi4-8GB"))
+      (fields (field (name "MPN") "RPi4-4GB"))
     )
     (comp (ref "U2")
       (value "ADXL345 3-axis accelerometer module")

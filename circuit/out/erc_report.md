@@ -4,7 +4,7 @@ Generated from `circuit/design.py` (single source of truth).
 
 BOM: build target `circuit/bom_target.csv` (cap 8240) · supplier sheet `DOC-20261014-WA0055.xlsx`
 
-**44 PASS · 8 WARN · 1 FAIL**
+**42 PASS · 7 WARN · 3 FAIL**
 
 A WARN is a documented engineering trade-off, not a broken rule.
 
@@ -91,12 +91,11 @@ A WARN is a documented engineering trade-off, not a broken rule.
 
 | Check | Status | Detail |
 |---|---|---|
-| build target total | **PASS** | 8240.00 EGP across 26 lines (cap 8240) |
+| priced total vs the 8240 target | **FAIL** | 8888.25 EGP across 20 lines -> +648.25 EGP over, and 1 part(s) still unpriced |
+| every line has a price | **FAIL** | still unpriced: MAX6675 Module - the real total is unknown and the priced lines are already over |
+| headroom for the unpriced part | **FAIL** | -648.25 EGP - no price for the MAX6675 can make this legal; the BOM must change, not the quote |
 | K-type probe in the target | **PASS** | included |
-| MAX6675 front end in the target | **PASS** | included |
+| MAX6675 converter in the target | **PASS** | included |
 | Raspberry Pi 4 in the target | **PASS** | included |
-| fan + heatsink in the target | **PASS** | included |
-| cable glands in the target | **PASS** | included |
-| estimate still to be quoted | **WARN** | priced from an estimate: MAX6675 Module - the 150 EGP reserve absorbs +/-50 |
-| supplier sheet is fully priced | **FAIL** | no price for: MAX6675 Module |
-| supplier sheet matches the target | **WARN** | 8888.25 EGP across 23 lines; target is 8240.00. See BOM_reconciliation.md - the difference is the Pi quote and the missing cooling hardware, not the sensors. |
+| sealed-enclosure hardware | **WARN** | no fan and no glands in this sheet: +280 EGP (240 + 30 + 10) if the box is sealed; otherwise the build must be a vented frame and the IP65 claim goes |
+| supplier sheet agrees with the target | **PASS** | 8888.25 EGP across 23 lines vs 8888.25 priced in the target |

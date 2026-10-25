@@ -14,8 +14,8 @@ INMP441 (I2S left channel), PT100 3-wire, 5V/3A PSU.
 #   etype: pwr gnd in out io od passive
 COMPS = {
     "U1": {
-        "value": "Raspberry Pi 4 Model B 8GB",
-        "mpn": "RPi4-8GB",
+        "value": "Raspberry Pi 4 Model B 4GB",
+        "mpn": "RPi4-4GB",
         "fp": "Connector_PinHeader_2.54mm:PinHeader_1x40_P2.54mm_Vertical",
         "pins": {
             "3V3_A":   ("1",  "3V3",      "pwr",     "3V3 (pin 1)"),

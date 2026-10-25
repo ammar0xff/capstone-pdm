@@ -1,7 +1,7 @@
 # Intelligent Predictive Maintenance & Remote Monitoring — G12 Capstone 2026/27
 
-AI-driven edge PdM on Raspberry Pi 4 8GB. Offline-first, 0-EGP cloud mirror.
-**Budget: 8240 EGP hardware ceiling + 0 EGP cloud.**
+AI-driven edge PdM on Raspberry Pi 4 4GB. Offline-first, 0-EGP cloud mirror.
+**Budget: 8240 EGP self-set hardware target — real 2026-10-25 quotes are 8,888.25 EGP, 648.25 over, before the unpriced MAX6675. 0 EGP cloud.**
 
 - 📖 Live book: GitHub Pages `index.html` (mirrors `Project_Book.html`)
 - 📋 PRD: `PRD.md` v2.0 (Problem → Solution → Features → Grade → Technical)
@@ -22,7 +22,7 @@ python3 circuit/build.py     # stdlib only — runs on the Pi, no KiCad needed
 
 | Output | What it is |
 |---|---|
-| `circuit/out/erc_report.md` | 53 checks = 44 design + 9 BOM — **0 ERC errors, 6 documented design WARN, 1 BOM FAIL** (unpriced MAX6675) |
+| `circuit/out/erc_report.md` | 52 checks = 44 design + 8 BOM — **0 ERC errors, 6 design WARN, 3 BOM FAIL** (real quotes over target, MAX6675 unpriced) |
 | `circuit/out/schematic_main.svg` | Sheet 1: system wiring + cable schedule (A3) |
 | `circuit/out/tc_frontend.svg` | Sheet 2: K-type/MAX6675 theory, cold junction + computed error budget |
 | `circuit/out/wiring_a3.svg` | Sheet 3: assembly, glands, cable lengths, power-on checklist |
@@ -42,10 +42,21 @@ Engineering corrections found by the checks and already applied to the book and 
 
 Open documentation issues (deliberate WARNs): I²C cable must stay <10 cm, the sealed IP65 box needs a lid heat-spreader, and the SPC layer uses a 2-of-3 rule because a single 3σ point false-alarms about every 31 minutes.
 
-## ⚠ Open decision — BOM
+## ⚠ BOM: real quotes breach the 8240 target
 
-The design is checked against `circuit/bom_target.csv`: **8240.00 EGP**, 26 lines, including a 150 EGP reserve and the MAX6675 at an estimated 200 EGP.
+`circuit/bom_target.csv` now carries the **2026-10-25 supplier quotes** — the same numbers as the spreadsheet — and the gate reports them honestly:
 
-The supplier sheet in the repo (`DOC-20261014-WA0055.xlsx`) is the 2026-10-14 quote. A **newer re-shop (2026-10-25)** is sitting in the working tree: it totals **8888.25 EGP** for 23 priced lines, prices the Pi 4 **4 GB at 6850** (the 8 GB was quoted at 5800), and **removes the case/fan, glands and heat-shrink** while leaving the MAX6675 unpriced. That configuration cannot be built: a Pi 4 without a fan throttles inside a sealed box.
+| | EGP |
+|---|---|
+| Priced lines (20) | **8,888.25** |
+| MAX6675 module | **unpriced** |
+| 8240 target | 8,240.00 |
+| **Gap before the missing part** | **+648.25** |
 
-The build marks the supplier sheet as a WARN and fails on the unpriced line. Full analysis and the ordered action list: **`circuit/BOM_reconciliation.md`**. The decisive item is the Pi quote — it is 70 % of the budget.
+The priced lines have zero headroom, so no MAX6675 price can close the gap — the build has to change. Three closures are costed in **`circuit/BOM_reconciliation.md`** and Book §8:
+
+- **A — restate the ceiling to 9,090** (all real prices + a 200 MAX6675; +280 if the box is sealed and needs the fan and glands). The challenge paper sets no budget, so this is permitted.
+- **B — change the compute board** (Pi Zero 2 W / Pi 4 2 GB). The Pi 4 is 6,850 of the 8,888 — 77%, and the only lever big enough.
+- **C — cut scope**: every qty cut on this sheet frees ~350 at most, still ~300 short. It cannot close the gap while keeping vibration + temperature + sound.
+
+The 8240 was never a rule from `G12_27_ Capstone.pdf`; it is our own ceiling, and the documents now say so. 0 EGP cloud remains absolute.

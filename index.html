@@ -41,7 +41,7 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <div class="badge">GRADE 12 CAPSTONE • 2026/2027 S1 • INDUSTRIAL BASE</div>
 <h1>Intelligent Predictive Maintenance<br>& Remote Monitoring System</h1>
 <h2>AI-Driven Edge Computing + IoT for Next-Generation Industrial Automation</h2>
-<div class="meta">Theme: Communication, Sensing, Information, Informatics • Controller: Raspberry Pi 4 8GB (No Arduino) • Budget: <b>8240 EGP hard cap + 0 EGP cloud</b></div>
+<div class="meta">Theme: Communication, Sensing, Information, Informatics • Controller: Raspberry Pi 4 4GB (No Arduino) • Budget: <b>8240 EGP self-set target · 8888.25 real quotes (gap open)</b> + 0 EGP cloud</div>
 <div class="cap">COMPLETE PROJECT BOOK v2.0 — Science • Circuits • Code • Firebase + Grafana + Custom Panel • Build Guide</div>
 <div class="meta">Sources: G12_27 Capstone.pdf • DOC-20261014-WA0055.xlsx • Mourtzis et al. 2020 (Frontiers) • Cinar et al. 2022 (Machines)</div>
 </div>
@@ -61,7 +61,7 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <li><a href="#code">Code — Edge, Firebase Mirror, Flask Panel, AI</a></li>
 <li><a href="#cloud">Cloud 0-EGP — Firebase + Grafana + Custom Panel Combined</a></li>
 <li><a href="#charts">Charts & Measurements (real plots)</a></li>
-<li><a href="#bom">BOM & Budget Control (8240 + 0 cloud lock)</a></li>
+<li><a href="#bom">BOM & Budget Control (real quotes vs 8240 target)</a></li>
 <li><a href="#cal">Calibration Lab Procedure</a></li>
 <li><a href="#ai">AI Dataset, Rubric & ≥80% Evidence</a></li>
 <li><a href="#test">Exhibition Test Script & KPIs (both screens)</a></li>
@@ -77,14 +77,14 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <li><b>Reactive maintenance</b> (fix after break): cheapest upfront, most expensive downtime — $50B/yr globally, 5–20% capacity lost (Deloitte 2017, Mourtzis 2020).</li>
 <li><b>Preventive maintenance</b> (fix on schedule): replaces healthy parts, still misses early faults, wastes spares and labour.</li>
 <li><b>Missing sensing:</b> small factories have no vibration / temperature / acoustic logging, no wireless to cloud, no AI — so no early warning, no data for decisions.</li>
-<li><b>School constraint:</b> must prove sensing + wireless to cloud + AI + hardware + ≥80% accuracy + calibration + portable testable prototype ≤8240 EGP, no Arduino.</li>
+<li><b>School constraint:</b> must prove sensing + wireless to cloud + AI + hardware + ≥80% accuracy + calibration + portable testable prototype, no Arduino.</li>
 </ul>
 <div class="callout danger"><b>Problem statement:</b> How can AI + IoT on a low-cost edge device detect incipient motor faults (vibration / heat / sound) and warn in ≤5s, with evidence, without paid cloud?</div>
 </div>
 
 <div class="card" id="solution">
 <h2 class="sec">0B — The Solution</h2>
-<p><b>Portable offline-first predictive-maintenance rig on Raspberry Pi 4 8GB</b> that clamps to any school motor/fan and flips <code>Healthy → Warning → Fault</code> live on two dashboards.</p>
+<p><b>Portable offline-first predictive-maintenance rig on Raspberry Pi 4 4GB</b> that clamps to any school motor/fan and flips <code>Healthy → Warning → Fault</code> live on two dashboards.</p>
 <div class="arch">
 <div class="node"><b>Sense</b>ADXL345 + K-type/MAX6675 + INMP441, calibrated, magnet-mounted</div><div class="arrow">→</div>
 <div class="node"><b>Think (edge)</b>SPC coarse gates RF fine, ≥80%, ≤5s</div><div class="arrow">→</div>
@@ -94,7 +94,7 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <li><b>Offline-first:</b> Mosquitto + Flask + SD buffer on Pi work with zero internet; Firebase/Grafana mirror only for grading.</li>
 <li><b>Two-stage AI (Cinar):</b> cheap SPC runs always, expensive DL runs only on anomaly → 90% fewer inferences, fewer false alarms.</li>
 <li><b>Dual dashboard (v2.0):</b> Custom Panel = judges/mobile demo; Grafana = engineer depth/KPIs. Same JSON, both flip together.</li>
-<li><b>Budget-proof:</b> 8240 EGP hardware locked + 0 EGP cloud (Spark + Grafana free + local).</li>
+<li><b>Cloud-proof:</b> 0 EGP cloud locked in (Spark + Grafana free + local). Hardware is 8888.25 in real quotes against our own 8240 target — gap and closure plan in §8.</li>
 </ul>
 </div>
 
@@ -122,7 +122,7 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <tr><td>Sensor calibration documented</td><td>10</td><td>6-face + ice/boil + tone, cal.json</td><td>§9 sheets + photos</td></tr>
 <tr><td>Logbooks + poster + Q&A / teamwork</td><td>15</td><td>per-member logbook hard copy + QR poster</td><td>logbooks + video_prompt</td></tr>
 <tr><td colspan="1" style="text-align:right"><b>Total</b></td><td><b>100</b></td><td colspan="2"><b>Score = Σ (earned_i × W_i / max_i).</b> Example: 22+13+14+18+9+13 = <b>89/100</b>. Fail-risk if M1&lt;80% or no cal sheets (−30 combined).</td></tr></table>
-<p style="font-size:13px;color:var(--muted)">Grade guardrails: M1&lt;80% caps AI block at 50%; no offline demo caps prototype at 50%; spend &gt;8240 or Arduino = disqualify per constraints. Keep receipts + 0-EGP cloud proof.</p>
+<p style="font-size:13px;color:var(--muted)">Grade guardrails: M1&lt;80% caps AI block at 50%; no offline demo caps prototype at 50%; Arduino = disqualify per constraints; a budget overrun is a project risk we must close in §8, not a rule breach. Keep receipts + 0-EGP cloud proof.</p>
 </div>
 
 <div class="card" id="vision">
@@ -168,7 +168,7 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <div class="callout good"><b>Offline-first + 0-EGP cloud mirror:</b> Full workflow runs on Pi with zero internet (hotspot + Flask + SD). Firebase Spark + Grafana Cloud free mirror the same JSON every 15s only to satisfy <i>wireless to cloud</i> grading. If venue WiFi dies, demo continues; on reconnect it backfills.</div>
 <div class="arch">
 <div class="node"><b>🧲 SENSORS</b>ADXL345 (I2C)<br>K-type+MAX6675 (SPI)<br>INMP441 (I2S)</div><div class="arrow">→</div>
-<div class="node"><b>🖥 EDGE Pi 4 8GB</b>cal + SPC coarse<br>RF fine + SD buffer<br>Mosquitto local</div><div class="arrow">→</div>
+<div class="node"><b>🖥 EDGE Pi 4 4GB</b>cal + SPC coarse<br>RF fine + SD buffer<br>Mosquitto local</div><div class="arrow">→</div>
 <div class="node"><b>📱 CUSTOM PANEL</b>Flask :5000 live<br>QR offline primary<br>AR/EN + beep</div><div class="arrow">→</div>
 <div class="node"><b>🔥 FIREBASE 0EGP</b>RTDB REST 1/15s<br>Hosting mirror<br>quota guard</div><div class="arrow">→</div>
 <div class="node"><b>📊 GRAFANA</b>X-bar/R + KPIs<br>TBA/Th_DB/QL_M<br>annotations</div>
@@ -217,7 +217,7 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <div class="kpi">
 <div><b>0</b><span>ERC errors</span></div>
 <div><b>4</b><span>documented trade-offs</span></div>
-<div><b>53</b><span>checks run (44 design + 9 BOM)</span></div>
+<div><b>52</b><span>checks run (44 design + 8 BOM)</span></div>
 </div>
 <table>
 <tr><th>Derived number</th><th>Value</th><th>Why it matters</th></tr>
@@ -378,42 +378,43 @@ X,y,G = df.drop(columns=[<span class="s">'label'</span>,<span class="s">'event_i
 <p class="callout">Only windows in pink trigger DL. Healthy 90% of time → 10× fewer inferences → Pi stays cool, false alarms drop. Log TBA (time-between-alerts): shrinking TBA = degrading bearing.</p>
 <div class="grid2">
 <div><h3>Target confusion matrix (≥80%)</h3><img class="chart" src="book_assets/confusion.png" alt="confusion"></div>
-<div><h3>Budget 8240 lock</h3><img class="chart" src="book_assets/budget.png" alt="budget"><p style="font-size:13px">Pi dominates. No room for re-buy — protect sensors with 3.3V discipline + heat-shrink.</p></div>
+<div><h3>Budget reality check</h3><img class="chart" src="book_assets/budget.png" alt="budget"><p style="font-size:13px">The Pi is 77% of the spend. Protect the sensors with 3.3 V discipline; there is no room for a re-buy.</p></div>
 </div>
 <h3>Acoustic spectrogram (what INMP441 sees)</h3>
 <img class="chart" src="book_assets/audio_spec.png" alt="audio">
 </div>
 
 <div class="card" id="bom">
-<h2 class="sec">8 — BOM & Budget Control (8240 + 0 cloud = ceiling)</h2>
+<h2 class="sec">8 — BOM &amp; Budget Control (real quotes vs the 8240 target)</h2>
+<p style="font-size:13px;color:var(--muted)">These are the supplier quotes of <b>2026-10-25</b>, identical to the spreadsheet on disk. Only the MAX6675 is unquoted, so it is listed at zero and treated as a risk — not as free.</p>
 <table><tr><th>#</th><th>Item</th><th>Function (physics role)</th><th>Store</th><th>Qty</th><th>Unit</th><th>Total</th></tr>
-<tr><td>1</td><td>ADXL345 Module</td><td>vibration: F=ma capacitive</td><td>Makers</td><td>1</td><td>170</td><td>170</td></tr>
+<tr><td>1</td><td>ADXL345 Module</td><td>vibration (I2C 0x53)</td><td>Makers</td><td>1</td><td>170</td><td>170</td></tr>
 <tr><td>2</td><td>K-type Probe M6 (class 1)</td><td>heat: Seebeck EMF</td><td>micro ohm</td><td>1</td><td>250</td><td>250</td></tr>
-<tr><td>3</td><td>MAX6675 Module</td><td>12-bit TC ADC + cold-junction comp.</td><td>micro ohm</td><td>1</td><td>200</td><td>200</td></tr>
-<tr><td>4</td><td>INMP441 Mic</td><td>sound: MEMS + I2S</td><td>Future</td><td>1</td><td>180</td><td>180</td></tr>
-<tr><td>5</td><td>Magnetic Base</td><td>coupling vibration</td><td>Future</td><td>1</td><td>120</td><td>120</td></tr>
-<tr><td>6</td><td>Shielded M-F</td><td>EMI drain</td><td>Future</td><td>1</td><td>45</td><td>45</td></tr>
-<tr><td>7</td><td>M-M jumpers</td><td>breadboard</td><td>Future</td><td>1</td><td>35</td><td>35</td></tr>
-<tr><td>8</td><td>Pin headers 40p</td><td>solder interface</td><td>Future</td><td>2</td><td>5</td><td>10</td></tr>
-<tr><td>9</td><td>M3 screws/nuts</td><td>clamp stack</td><td>local</td><td>1</td><td>10</td><td>10</td></tr>
-<tr><td>10</td><td>Nylon spacers M3</td><td>ground-loop break</td><td>Future</td><td>1</td><td>10</td><td>10</td></tr>
-<tr><td>11</td><td>Pi PSU 5V/3A</td><td>clean power</td><td>Makers</td><td>1</td><td>320</td><td>320</td></tr>
-<tr><td>12</td><td>Raspberry Pi 4 8GB</td><td>edge AI + IoT</td><td>Makers</td><td>1</td><td>5800</td><td>5800</td></tr>
-<tr><td>13</td><td>MicroSD 32GB</td><td>OS + buffer</td><td>Future</td><td>1</td><td>190</td><td>190</td></tr>
-<tr><td>14</td><td>Breadboard 840</td><td>testable wiring</td><td>Future</td><td>1</td><td>65</td><td>65</td></tr>
-<tr><td>15</td><td>100nF ×3</td><td>HF decoupling</td><td>Future</td><td>3</td><td>5</td><td>15</td></tr>
-<tr><td>16</td><td>10k ×2</td><td>pull-up stability</td><td>Future</td><td>2</td><td>5</td><td>10</td></tr>
-<tr><td>17</td><td>10uF</td><td>bulk hold-up</td><td>Future</td><td>1</td><td>5</td><td>5</td></tr>
-<tr><td>18</td><td>Case & Fan</td><td>anti-throttle</td><td>Makers</td><td>1</td><td>240</td><td>240</td></tr>
-<tr><td>19</td><td>Thermal paste</td><td>conduction</td><td>Future</td><td>1</td><td>35</td><td>35</td></tr>
-<tr><td>20</td><td>IP65 box</td><td>field proof</td><td>Future</td><td>1</td><td>140</td><td>140</td></tr>
-<tr><td>21</td><td>PG7 glands ×2</td><td>seal + strain</td><td>Future</td><td>2</td><td>15</td><td>30</td></tr>
-<tr><td>22</td><td>Heat-shrink 1m</td><td>insulation</td><td>Future</td><td>1</td><td>10</td><td>10</td></tr>
-<tr><td>23–25</td><td>Shipping ×3 stores</td><td>logistics</td><td>—</td><td>3</td><td>—</td><td>200</td></tr>
-<tr><td>26</td><td>Reserve</td><td>re-quote + breakage</td><td>—</td><td>1</td><td>150</td><td>150</td></tr>
-<tr><td colspan="6" style="text-align:right"><b>TOTAL (hard cap)</b></td><td><b>8240</b></td></tr></table>
-<div class="callout warn"><b>Price re-shop (2026-10-25) — action required.</b> A newer supplier sheet totals <b>8888.25 EGP</b> for 23 lines and is <b>not buildable</b>: Pi 4 <b>4GB @6850</b> (the 8GB was quoted at 5800 — worse and dearer), 32GB SD at 449, M-M jumpers at 220, and it <b>drops the case, fan, glands and heat-shrink</b> while leaving the MAX6675 <b>unpriced</b>. The fan is not optional: a Pi 4 in a sealed IP65 box throttles. The table above is the build target; <b>re-confirm the Pi price first</b>, it is 70% of the budget. Reconciliation: <code>circuit/BOM_reconciliation.md</code>.</div>
-<div class="callout danger"><b>Rule:</b> spend ≤8240 hardware + 0 cloud. If a part dies, downgrade improvements first (paste→borrow, shrink→tape). Never cut ضروري (1–17). Paid cloud proposals rejected. Photo every receipt.</div>
+<tr><td>3</td><td>MAX6675 Module</td><td>12-bit TC ADC + cold-junction comp</td><td>micro ohm</td><td>1</td><td>—</td><td><b>TBD</b></td></tr>
+<tr><td>4</td><td>INMP441 Mic Module</td><td>sound (I2S)</td><td>Future</td><td>1</td><td>180</td><td>180</td></tr>
+<tr><td>5</td><td>Sensor Magnetic Base</td><td>couples vibration</td><td>Makers</td><td>1</td><td>85</td><td>85</td></tr>
+<tr><td>6</td><td>Shielded Jumper Wires (M-F)</td><td>EMI drain + TC pair</td><td>Makers</td><td>30</td><td>0.70</td><td>21</td></tr>
+<tr><td>7</td><td>Jumper Wires (Male to Male)</td><td>breadboard</td><td>Makers</td><td>1</td><td>220</td><td>220</td></tr>
+<tr><td>8</td><td>Male Pin Headers 2.54mm</td><td>header strip</td><td>Makers</td><td>2</td><td>7</td><td>14</td></tr>
+<tr><td>9</td><td>M3 Screws & Nuts Pack</td><td>clamp stack</td><td>Makers</td><td>3</td><td>8.50</td><td>25.50</td></tr>
+<tr><td>10</td><td>Nylon Spacers / Washers M3</td><td>ground-loop break</td><td>Makers</td><td>10</td><td>1.50</td><td>15</td></tr>
+<tr><td>11</td><td>Raspberry Pi Power Supply 5V/3A</td><td>clean power</td><td>Makers</td><td>1</td><td>200</td><td>200</td></tr>
+<tr><td>12</td><td>Raspberry Pi 4 4GB RAM</td><td>edge compute</td><td>Makers</td><td>1</td><td>6850</td><td>6850</td></tr>
+<tr><td>13</td><td>MicroSD Card 32GB Class 10</td><td>OS + buffer</td><td>Amazon</td><td>1</td><td>449</td><td>449</td></tr>
+<tr><td>14</td><td>Breadboard 840 Pin</td><td>testable wiring</td><td>Makers</td><td>2</td><td>35</td><td>70</td></tr>
+<tr><td>15</td><td>Ceramic Capacitors 100nF</td><td>HF decoupling</td><td>Future</td><td>5</td><td>3</td><td>15</td></tr>
+<tr><td>16</td><td>Resistors 10k Ohm</td><td>pull-ups</td><td>Future</td><td>5</td><td>0.50</td><td>2.50</td></tr>
+<tr><td>17</td><td>Electrolytic Capacitor 10uF</td><td>bulk hold-up</td><td>Makers</td><td>3</td><td>3.75</td><td>11.25</td></tr>
+<tr><td>18</td><td>Thermal Paste</td><td>conduction</td><td>Makers</td><td>1</td><td>35</td><td>35</td></tr>
+<tr><td>19</td><td>IP65 Enclosure Box</td><td>field proof</td><td>Makers</td><td>1</td><td>55</td><td>55</td></tr>
+<tr><td>20</td><td>Shipping (4 stores)</td><td>logistics</td><td>—</td><td>1</td><td>220</td><td>220</td></tr>
+<tr><td colspan="6" style="text-align:right"><b>TOTAL (priced lines, 2026-10-25)</b></td><td><b>8888.25</b></td></tr></table>
+<div class="callout danger"><b>Real prices, real gap: 8888.25 EGP priced, plus an unpriced MAX6675 — already 648.25 EGP over the 8240 target.</b> The priced lines have <b>zero headroom</b>, so no MAX6675 price can close it: the build has to change. Note also that the challenge paper sets <b>no budget of its own</b> — 8240 is our self-set ceiling, so restating it is allowed; overspending is a project risk, not a rule violation.</div>
+<div class="callout warn"><b>Three ways to close it</b> (full arithmetic in <code>circuit/BOM_reconciliation.md</code>):<br>
+<b>A — restate the ceiling</b> to <b>9,090 EGP</b> (8,888.25 + a 200 MAX6675; +280 more if the box is sealed and needs the fan and glands). No scope change, every price real.<br>
+<b>B — change the compute board.</b> The Pi 4 is 6,850 of the 8,888 — 77%. A lighter board (Pi Zero 2 W / Pi 4 2 GB) is the only lever big enough, and it would also remove the fan and the throttling risk. Needs a real quote before it can be booked.<br>
+<b>C — cut scope.</b> Every qty cut available on this sheet (self-pickup −220, one breadboard −35, jumper/header/cap trims ≈ −40) frees at most <b>~350</b>, and still leaves ≈300 over before the MAX6675. Cutting scope alone cannot reach 8240 while keeping all three sensor modalities.</div>
+<div class="callout"><b>Rule:</b> 0 EGP cloud is absolute. Hardware must stay inside whichever ceiling is signed off in writing; every purchase needs a photographed receipt. If a part dies, downgrade improvements first (paste → borrow, shrink → tape). Never cut a sensing modality to make the number fit.</div>
 </div>
 
 <div class="card" id="cal">
@@ -444,7 +445,7 @@ X,y,G = df.drop(columns=[<span class="s">'label'</span>,<span class="s">'event_i
 <tr><td>3</td><td>Warm K-type probe (hand/dryer 30cm)</td><td>temp slope alarm on Panel + Grafana</td></tr>
 <tr><td>4</td><td>Clap/tone at mic</td><td>acoustic flag both</td></tr>
 <tr><td>5</td><td>Pull WiFi 10s → restore</td><td>Panel-local keeps live, SD buffers → Firebase backfill, Grafana gap filled</td></tr>
-<tr><td>6</td><td>Show papers</td><td>confusion matrix + cal sheets + rubric + logbooks + 8240 receipts + 0-EGP cloud proof</td></tr></table>
+<tr><td>6</td><td>Show papers</td><td>confusion matrix + cal sheets + rubric + logbooks + every receipt + 0-EGP cloud proof</td></tr></table>
 <div class="kpi"><div><b>M1 ≥80%</b><span>accuracy</span></div><div><b>M2 ≤5s</b><span>response</span></div><div><b>M3 ±0.1g</b><span>vib error</span></div><div><b>M4 ±2°C</b><span>temp error</span></div><div><b>M5 ≥60min</b><span>uptime</span></div><div><b>M6 ≤2%</b><span>packet loss</span></div></div>
 <p style="font-size:13px;color:var(--muted)">Extra Cinar KPIs on dashboard: TBA/TB_VA/TB_CA, Th_DB, MQTT_QM, QL_M, reconnect interval.</p>
 </div>
@@ -457,7 +458,7 @@ X,y,G = df.drop(columns=[<span class="s">'label'</span>,<span class="s">'event_i
 <p style="font-size:13px;color:var(--muted)">Refs: Mourtzis et al. Front. Mech. Eng. 2020.578379 • Cinar et al. Machines 2022.10.1006 • Deloitte PdM 2017 • NGSI-LD/FIWARE • NIST ITS-90 type-K tables • Shewhart SPC. BOM: DOC-20261014-WA0055.xlsx. Rules: G12_27 Capstone.pdf.</p>
 </div>
 
-<div class="footer">Project Book v2.0 • 2026-10-14 • Total ≤8240 EGP + 0 EGP cloud (Firebase + Grafana + Flask) • Offline-first • No Arduino • PRD.md v2.0 synced 🛠</div>
+<div class="footer">Project Book v2.0 • 2026-10-25 • Hardware 8888.25 EGP in real quotes (8240 target, plan in §8) + 0 EGP cloud (Firebase + Grafana + Flask) • Offline-first • No Arduino • PRD.md v2.0 synced 🛠</div>
 </div>
 <button class="print-btn" onclick="window.print()">🖨 Print / PDF</button>
 </body>

@@ -533,7 +533,7 @@ def wiring_a3(path):
     svg.line(60 + 900, ty, 60 + 900, ty + 100, LINE, 1)
     svg.text(80, ty + 30, "Intelligent Predictive Maintenance Rig", 13, NAVY, weight="bold")
     svg.text(80, ty + 52, "G12 Capstone 2026/27 — Industrial pathway", 9.5, MUTED)
-    svg.text(80, ty + 72, "Raspberry Pi 4 8GB · ADXL345 · K-type/MAX6675 · INMP441", 9.5, MUTED)
+    svg.text(80, ty + 72, "Raspberry Pi 4 4GB · ADXL345 · K-type/MAX6675 · INMP441", 9.5, MUTED)
     svg.text(500, ty + 30, "SHEET 3 of 3", 11, NAVY, weight="bold")
     svg.text(500, ty + 52, "NTS  ·  A3  ·  print at 100%, do not fit to page", 9.5, MUTED)
     svg.text(500, ty + 72, "Print at 100% — do not fit-to-page", 9.5, MUTED)

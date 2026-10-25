@@ -232,40 +232,58 @@ def physics():
 
 # ------------------------------------------------------------------- BOM
 def bom():
-    """Two documents, deliberately: the build target we control, and the supplier draft."""
+    """Can this build be paid for at the quotes that actually exist?
+
+    Two documents, one question. `bom_target.csv` is the priced reality we buy
+    from; the supplier xlsx is cross-checked against it.
+    """
     global BOM_FILE
     import csv as _csv
     import os
-    r = []
 
-    # ---- 1. build target: circuit/bom_target.csv (what we actually order)
+    CAP = 8240.0
+    r = []
     tpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "bom_target.csv")
     try:
         rows = list(_csv.DictReader(open(tpath, encoding="utf-8")))
     except Exception as e:  # pragma: no cover
         return [Result("BOM", "target csv readable", FAIL, f"{e}")]
+
     total = sum(float(x["total_egp"]) for x in rows)
-    est = [x["name"] for x in rows if x["source"].upper().startswith("ESTIMATE")]
-    ok = total <= 8240.01
-    r.append(Result("BOM", "build target total", PASS if ok else FAIL,
-                    f"{total:.2f} EGP across {len(rows)} lines (cap 8240)"
-                    + ("" if ok else f" -> {total - 8240:+.2f} EGP")))
+    unquoted = [x["name"] for x in rows if "TO QUOTE" in x["source"].upper()]
+    ok = total <= CAP
+    r.append(Result("BOM", f"priced total vs the {CAP:.0f} target",
+                    PASS if ok else FAIL,
+                    f"{total:.2f} EGP across {len(rows)} lines"
+                    + ("" if ok else
+                       f" -> {total - CAP:+.2f} EGP over, and {len(unquoted)} part(s) still unpriced")))
+    r.append(Result("BOM", "every line has a price", PASS if not unquoted else FAIL,
+                    "all priced" if not unquoted else
+                    "still unpriced: " + ", ".join(unquoted)
+                    + " - the real total is unknown and the priced lines are already over"))
+    head = CAP - total
+    r.append(Result("BOM", "headroom for the unpriced part",
+                    PASS if head > 0 else FAIL,
+                    f"{head:+.2f} EGP" + ("" if head > 0 else
+                    " - no price for the MAX6675 can make this legal; the BOM must change, "
+                    "not the quote")))
+
     names = " | ".join(x["name"] for x in rows).lower()
     for want, key, why in [
-            ("K-type probe", "k-type", "the front end is a K-type junction"),
-            ("MAX6675 front end", "max6675", "12-bit SPI converter with cold-junction compensation"),
-            ("Raspberry Pi 4", "raspberry pi 4", "edge compute for SPC + RF + Flask + Mosquitto"),
-            ("fan + heatsink", "case & fan", "a Pi 4 in a sealed IP65 box throttles without it"),
-            ("cable glands", "glands", "IP65 sealing + strain relief")]:
+            ("K-type probe", "k-type", "the temperature front end"),
+            ("MAX6675 converter", "max6675", "12-bit SPI + cold-junction compensation"),
+            ("Raspberry Pi 4", "raspberry pi 4", "edge compute for SPC + RF + Flask + Mosquitto")]:
         present = key in names
         r.append(Result("BOM", f"{want} in the target", PASS if present else FAIL,
                         "included" if present else f"MISSING - {why}"))
-    r.append(Result("BOM", "estimate still to be quoted",
-                    WARN if est else PASS,
-                    ("priced from an estimate: " + ", ".join(est) + " - the 150 EGP reserve absorbs +/-50")
-                    if est else "every line has a real quote"))
 
-    # ---- 2. supplier draft: the xlsx on disk (prices, not the build list)
+    sealed = "fan" in names or "gland" in names
+    r.append(Result("BOM", "sealed-enclosure hardware", PASS if sealed else WARN,
+                    "fan and glands included" if sealed else
+                    "no fan and no glands in this sheet: +280 EGP (240 + 30 + 10) if the box "
+                    "is sealed; otherwise the build must be a vented frame and the IP65 claim goes"))
+
+    # the supplier sheet must agree with the priced target
     try:
         draft = bom_rows()
         BOM_FILE = os.path.basename(os.environ.get("PDM_BOM", "DOC-20261014-WA0055.xlsx"))
@@ -283,15 +301,11 @@ def bom():
             continue
         items.append((name, t))
         dtotal += t
-    unpriced = [n for n, t in items if t <= 0]
-    if unpriced:
-        r.append(Result("BOM", "supplier sheet is fully priced", FAIL,
-                        "no price for: " + ", ".join(unpriced[:3])))
-    r.append(Result("BOM", "supplier sheet matches the target",
-                    PASS if abs(dtotal - total) < 1 else WARN,
-                    f"{dtotal:.2f} EGP across {len(items)} lines; target is {total:.2f}. "
-                    f"See BOM_reconciliation.md - the difference is the Pi quote and the "
-                    f"missing cooling hardware, not the sensors."))
+    r.append(Result("BOM", "supplier sheet agrees with the target",
+                    PASS if abs(dtotal - total) < 0.01 else WARN,
+                    f"{dtotal:.2f} EGP across {len(items)} lines vs {total:.2f} priced in the "
+                    f"target" + ("" if abs(dtotal - total) < 0.01 else
+                                 " - re-run the sheet export")))
     return r
 
 

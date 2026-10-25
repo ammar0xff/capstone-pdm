@@ -61,35 +61,43 @@ def tc_curve():
 
 
 def budget():
+    """Real 2026-10-25 quotes against the self-set 8240 target."""
     rows = [
-        ("Compute (Pi 4 8GB + SD + PSU)", 6310, NAVY),
-        ("Sensors (ADXL + K-type + MAX6675 + mic)", 800, AMBER),
-        ("Enclosure + cooling", 420, TEAL),
-        ("Shipping (3 stores)", 200, MUTED),
-        ("Wiring + decoupling", 185, BLUE),
-        ("Coupling + mounting", 175, "#8e44ad"),
-        ("Reserve (re-quote + breakage)", 150, "#d5dbdb"),
+        ("Compute (Pi 4 4GB + SD + PSU)", 7499.00, NAVY),
+        ("Sensors (ADXL + K-type + mic)", 600.00, AMBER),
+        ("Wiring + decoupling", 353.75, BLUE),
+        ("Shipping (4 stores)", 220.00, MUTED),
+        ("Enclosure + mounting", 215.50, TEAL),
     ]
     labels = [r[0] for r in rows]
     vals = [r[1] for r in rows]
     cols = [r[2] for r in rows]
+    total = sum(vals)
 
-    fig, ax = plt.subplots(figsize=(11.4, 4.8), dpi=170)
+    fig, ax = plt.subplots(figsize=(11.4, 4.9), dpi=170)
     y = np.arange(len(rows))[::-1]
-    ax.barh(y, vals, color=cols, height=0.62)
+    ax.barh(y, vals, color=cols, height=0.60)
     for yy, v in zip(y, vals):
-        ax.text(v + 60, yy, f"{v:,} EGP  ({v / 8240 * 100:.0f}%)", va="center", fontsize=9, color=NAVY)
+        ax.text(v + 70, yy, f"{v:,.0f} EGP ({v / total * 100:.0f}%)", va="center",
+                fontsize=9, color=NAVY)
     ax.set_yticks(y)
     ax.set_yticklabels(labels, fontsize=9.5)
     ax.axvline(8240, color=RED, lw=2)
-    ax.text(8240, -0.9, " hard cap 8240", color=RED, fontsize=10, weight="bold", va="center")
-    ax.set_xlim(0, 9400)
-    ax.set_xlabel("EGP")
-    ax.set_title("Hardware 8240 EGP - 0 EGP cloud: the Pi is 70% of the budget",
-                 color=NAVY, fontsize=12.5, weight="bold")
-    ax.grid(axis="x", alpha=0.25)
-    ax.text(100, -0.9, "reserve is deliberate: the MAX6675 and the Pi quotes still need confirming",
+    ax.text(8240, len(rows) - 0.35, " self-set target 8240", color=RED,
+            fontsize=9.5, weight="bold", va="center")
+    ax.axvspan(8240, total, color=RED, alpha=0.07)
+    ax.annotate(f"+{total - 8240:,.2f} EGP over\nbefore the MAX6675",
+                xy=(total, 0.02), xytext=(total - 1500, 0.55),
+                fontsize=9.5, color=RED, weight="bold",
+                arrowprops=dict(arrowstyle="->", color=RED, lw=1.2))
+    ax.text(120, -0.62, "MAX6675 has no quote yet - the real gap is larger than shown",
             fontsize=8.5, color=MUTED, va="center")
+    ax.set_xlim(0, 9800)
+    ax.set_ylim(-1.0, len(rows) - 0.2)
+    ax.set_xlabel("EGP")
+    ax.set_title(f"Real quotes {total:,.2f} EGP vs the 8240 target - the Pi is 77% of the spend",
+                 color=NAVY, fontsize=12.2, weight="bold")
+    ax.grid(axis="x", alpha=0.25)
     fig.tight_layout()
     fig.savefig(os.path.join(HERE, "budget.png"), facecolor="white")
     plt.close(fig)
