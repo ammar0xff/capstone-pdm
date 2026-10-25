@@ -2,7 +2,9 @@
 
 Generated from `circuit/design.py` (single source of truth).
 
-**35 PASS · 5 WARN · 4 FAIL**
+BOM source: `DOC-20261014-WA0055.xlsx`
+
+**40 PASS · 4 WARN · 0 FAIL**
 
 A WARN is a documented engineering trade-off, not a broken rule.
 
@@ -84,8 +86,8 @@ A WARN is a documented engineering trade-off, not a broken rule.
 
 | Check | Status | Detail |
 |---|---|---|
-| locked total | **FAIL** | 8888.25 EGP across 23 lines (hard cap 8240) -> +648.25 EGP |
-| PT100 3-wire probe present | **FAIL** | MISSING from the working xlsx - M4 (+/-1 C) needs a 3-wire RTD. The book, code, charts and calibration plan all assume this part. |
-| MAX31865 front end present | **FAIL** | MISSING from the working xlsx - 15-bit ratiometric conversion, 0.034 C/LSB. The book, code, charts and calibration plan all assume this part. |
-| Raspberry Pi 4 8GB present | **FAIL** | MISSING from the working xlsx - headroom for SPC + RF + Flask + Mosquitto. The book, code, charts and calibration plan all assume this part. |
-| every BOM line mapped | **WARN** | review: حساس Type-K |
+| locked total | **PASS** | 8240.00 EGP across 25 lines (hard cap 8240) |
+| PT100 3-wire probe present | **PASS** | found in the BOM |
+| MAX31865 front end present | **PASS** | found in the BOM |
+| Raspberry Pi 4 8GB present | **PASS** | found in the BOM |
+| every BOM line mapped | **PASS** | all lines traced to a net or enclosure task |

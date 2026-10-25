@@ -51,4 +51,4 @@ The **working copy on disk has been changed** and now totals **8888.25 EGP** wit
 2. MAX6675 is ±2 °C / 0.25 °C steps, so M4 (±1.0 °C) can no longer be met by the stated calibration method;
 3. the book, code, charts, error budget and calibration plan are all PT100/MAX31865-based.
 
-`circuit/build.py` therefore reports the BOM gate as FAIL (design sheets are still produced). Revert the xlsx to the committed version, or re-approve a new BOM and the design will be re-derived to match.
+`circuit/build.py` therefore reports the BOM gate as FAIL (design sheets are still produced). The committed `erc_report.md` is generated from the committed 8240 BOM; running the build against the modified working copy flips the four BOM rows to FAIL. Revert the xlsx to the committed version, or re-approve a new BOM and the design will be re-derived to match.

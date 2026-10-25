@@ -9,6 +9,7 @@ import math
 from design import COMPS, NETS, DESIGN, bom_rows
 
 PASS, WARN, FAIL = "PASS", "WARN", "FAIL"
+BOM_FILE = None
 
 
 class Result:
@@ -225,9 +226,12 @@ def physics():
 
 # ------------------------------------------------------------------- BOM
 def bom():
+    global BOM_FILE
     r = []
     try:
         rows = bom_rows()
+        import os
+        BOM_FILE = os.path.basename(os.environ.get("PDM_BOM", "DOC-20261014-WA0055.xlsx"))
     except Exception as e:  # pragma: no cover
         return [Result("BOM", "xlsx readable", FAIL, f"{e}")]
     items, total = [], 0.0
@@ -286,6 +290,8 @@ def report_md(results):
         "# ERC + Physics Report — PdM Rig",
         "",
         "Generated from `circuit/design.py` (single source of truth).",
+        "",
+        f"BOM source: `{BOM_FILE}`" if BOM_FILE else "",
         "",
         f"**{counts[PASS]} PASS · {counts[WARN]} WARN · {counts[FAIL]} FAIL**",
         "",

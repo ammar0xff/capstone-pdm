@@ -150,9 +150,12 @@ DESIGN = {
 }
 
 # --------------------------------------------------------------- BOM (xlsx)
-def bom_rows(path="../DOC-20261014-WA0055.xlsx"):
+def bom_rows(path=None):
     """Parse the locked BOM xlsx with stdlib only (zip + xml)."""
-    import zipfile, xml.etree.ElementTree as ET
+    import os, zipfile, xml.etree.ElementTree as ET
+    if path is None:
+        path = os.environ.get("PDM_BOM", os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), "..", "DOC-20261014-WA0055.xlsx"))
     ns = {"m": "http://schemas.openxmlformats.org/spreadsheetml/2006/main"}
     with zipfile.ZipFile(path) as z:
         sst = ET.fromstring(z.read("xl/sharedStrings.xml"))
