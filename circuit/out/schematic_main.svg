@@ -1,0 +1,360 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1680" height="1188" viewBox="0 0 1680 1188" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif">
+<rect width="1680" height="1188" fill="#f7f9fb"/>
+<rect x="0.0" y="0.0" width="1680.0" height="96.0" rx="0" fill="#0f2a44" stroke="none" stroke-width="1" opacity="1"/>
+<rect x="0.0" y="90.0" width="1680.0" height="6.0" rx="0" fill="#c9a227" stroke="none" stroke-width="1" opacity="1"/>
+<text x="40.0" y="42.0" font-size="26" fill="#ffffff" text-anchor="start" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">PdM Rig — System Wiring</text>
+<text x="40.0" y="70.0" font-size="13" fill="#b9cfe0" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">Raspberry Pi 4 · ADXL345 (I2C) · MAX31865 + PT100 (SPI) · INMP441 (I2S) · net labels = same net</text>
+<text x="1640.0" y="42.0" font-size="13" fill="#b9cfe0" text-anchor="end" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">Sheet 1</text>
+<text x="1640.0" y="66.0" font-size="12" fill="#8fb0c6" text-anchor="end" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">PdM Rig · Rev C · 8240 EGP</text>
+<rect x="40.0" y="150.0" width="310.0" height="210.0" rx="10" fill="#ffffff" stroke="#2471a3" stroke-width="1.6" opacity="1"/>
+<rect x="40.0" y="150.0" width="310.0" height="38.0" rx="10" fill="#2471a3" stroke="none" stroke-width="1" opacity="1"/>
+<rect x="40.0" y="174.0" width="310.0" height="14.0" rx="0" fill="#2471a3" stroke="none" stroke-width="1" opacity="1"/>
+<text x="54.0" y="174.0" font-size="13" fill="#ffffff" text-anchor="start" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">U2</text>
+<text x="338.0" y="174.0" font-size="9.5" fill="#eaf2f8" text-anchor="end" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">ADXL345 3-axis accelerometer modul</text>
+<text x="52.0" y="216.0" font-size="10" fill="#12212f" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">VCC</text>
+<text x="52.0" y="227.0" font-size="8.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">VCC 3.3V</text>
+<line x1="350.0" y1="212.0" x2="366.0" y2="212.0" stroke="#c0392b" stroke-width="2.4" stroke-linecap="round" opacity="1"/>
+<text x="52.0" y="242.0" font-size="10" fill="#12212f" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">GND</text>
+<text x="52.0" y="253.0" font-size="8.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">GND</text>
+<line x1="350.0" y1="238.0" x2="366.0" y2="238.0" stroke="#34495e" stroke-width="2.4" stroke-linecap="round" opacity="1"/>
+<text x="52.0" y="268.0" font-size="10" fill="#12212f" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">CS</text>
+<text x="52.0" y="279.0" font-size="8.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">CS -&gt; 3V3 = I2C mode</text>
+<line x1="350.0" y1="264.0" x2="366.0" y2="264.0" stroke="#c0392b" stroke-width="2.4" stroke-linecap="round" opacity="1"/>
+<text x="52.0" y="294.0" font-size="10" fill="#12212f" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">SDO</text>
+<text x="52.0" y="305.0" font-size="8.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">SDO -&gt; GND = addr 0x53</text>
+<line x1="350.0" y1="290.0" x2="366.0" y2="290.0" stroke="#34495e" stroke-width="2.4" stroke-linecap="round" opacity="1"/>
+<text x="52.0" y="320.0" font-size="10" fill="#12212f" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">SDA</text>
+<text x="52.0" y="331.0" font-size="8.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">SDA</text>
+<line x1="350.0" y1="316.0" x2="366.0" y2="316.0" stroke="#2471a3" stroke-width="2.4" stroke-linecap="round" opacity="1"/>
+<text x="52.0" y="346.0" font-size="10" fill="#12212f" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">SCL</text>
+<text x="52.0" y="357.0" font-size="8.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">SCL</text>
+<line x1="350.0" y1="342.0" x2="366.0" y2="342.0" stroke="#2471a3" stroke-width="2.4" stroke-linecap="round" opacity="1"/>
+<rect x="40.0" y="380.0" width="310.0" height="320.0" rx="10" fill="#ffffff" stroke="#b9770e" stroke-width="1.6" opacity="1"/>
+<rect x="40.0" y="380.0" width="310.0" height="38.0" rx="10" fill="#b9770e" stroke="none" stroke-width="1" opacity="1"/>
+<rect x="40.0" y="404.0" width="310.0" height="14.0" rx="0" fill="#b9770e" stroke="none" stroke-width="1" opacity="1"/>
+<text x="54.0" y="404.0" font-size="13" fill="#ffffff" text-anchor="start" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">U3</text>
+<text x="338.0" y="404.0" font-size="9.5" fill="#eaf2f8" text-anchor="end" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">MAX31865 RTD front-end module</text>
+<text x="52.0" y="446.0" font-size="10" fill="#12212f" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">VIN</text>
+<text x="52.0" y="457.0" font-size="8.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">VIN 3.3V</text>
+<line x1="350.0" y1="442.0" x2="366.0" y2="442.0" stroke="#c0392b" stroke-width="2.4" stroke-linecap="round" opacity="1"/>
+<text x="52.0" y="472.0" font-size="10" fill="#12212f" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">GND</text>
+<text x="52.0" y="483.0" font-size="8.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">GND</text>
+<line x1="350.0" y1="468.0" x2="366.0" y2="468.0" stroke="#34495e" stroke-width="2.4" stroke-linecap="round" opacity="1"/>
+<text x="52.0" y="498.0" font-size="10" fill="#12212f" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">SCLK</text>
+<text x="52.0" y="509.0" font-size="8.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">SCLK</text>
+<line x1="350.0" y1="494.0" x2="366.0" y2="494.0" stroke="#b9770e" stroke-width="2.4" stroke-linecap="round" opacity="1"/>
+<text x="52.0" y="524.0" font-size="10" fill="#12212f" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">SDI</text>
+<text x="52.0" y="535.0" font-size="8.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">SDI (MOSI)</text>
+<line x1="350.0" y1="520.0" x2="366.0" y2="520.0" stroke="#b9770e" stroke-width="2.4" stroke-linecap="round" opacity="1"/>
+<text x="52.0" y="550.0" font-size="10" fill="#12212f" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">SDO</text>
+<text x="52.0" y="561.0" font-size="8.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">SDO (MISO)</text>
+<line x1="350.0" y1="546.0" x2="366.0" y2="546.0" stroke="#b9770e" stroke-width="2.4" stroke-linecap="round" opacity="1"/>
+<text x="52.0" y="576.0" font-size="10" fill="#12212f" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">CS</text>
+<text x="52.0" y="587.0" font-size="8.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">CS</text>
+<line x1="350.0" y1="572.0" x2="366.0" y2="572.0" stroke="#b9770e" stroke-width="2.4" stroke-linecap="round" opacity="1"/>
+<text x="52.0" y="602.0" font-size="10" fill="#12212f" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">F+</text>
+<text x="52.0" y="613.0" font-size="8.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">F+ force</text>
+<line x1="350.0" y1="598.0" x2="366.0" y2="598.0" stroke="#8e44ad" stroke-width="2.4" stroke-linecap="round" opacity="1"/>
+<text x="52.0" y="628.0" font-size="10" fill="#12212f" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">F-</text>
+<text x="52.0" y="639.0" font-size="8.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">F- force</text>
+<line x1="350.0" y1="624.0" x2="366.0" y2="624.0" stroke="#8e44ad" stroke-width="2.4" stroke-linecap="round" opacity="1"/>
+<text x="52.0" y="654.0" font-size="10" fill="#12212f" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">RTD+</text>
+<text x="52.0" y="665.0" font-size="8.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">RTD+ sense</text>
+<line x1="350.0" y1="650.0" x2="366.0" y2="650.0" stroke="#8e44ad" stroke-width="2.4" stroke-linecap="round" opacity="1"/>
+<text x="52.0" y="680.0" font-size="10" fill="#12212f" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">RTD-</text>
+<text x="52.0" y="691.0" font-size="8.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">RTD- sense</text>
+<line x1="350.0" y1="676.0" x2="366.0" y2="676.0" stroke="#8e44ad" stroke-width="2.4" stroke-linecap="round" opacity="1"/>
+<rect x="40.0" y="730.0" width="310.0" height="200.0" rx="10" fill="#ffffff" stroke="#117a65" stroke-width="1.6" opacity="1"/>
+<rect x="40.0" y="730.0" width="310.0" height="38.0" rx="10" fill="#117a65" stroke="none" stroke-width="1" opacity="1"/>
+<rect x="40.0" y="754.0" width="310.0" height="14.0" rx="0" fill="#117a65" stroke="none" stroke-width="1" opacity="1"/>
+<text x="54.0" y="754.0" font-size="13" fill="#ffffff" text-anchor="start" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">U4</text>
+<text x="338.0" y="754.0" font-size="9.5" fill="#eaf2f8" text-anchor="end" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">INMP441 I2S MEMS microphone</text>
+<text x="52.0" y="796.0" font-size="10" fill="#12212f" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">VDD</text>
+<text x="52.0" y="807.0" font-size="8.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">VDD 3.3V</text>
+<line x1="350.0" y1="792.0" x2="366.0" y2="792.0" stroke="#c0392b" stroke-width="2.4" stroke-linecap="round" opacity="1"/>
+<text x="52.0" y="822.0" font-size="10" fill="#12212f" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">GND</text>
+<text x="52.0" y="833.0" font-size="8.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">GND</text>
+<line x1="350.0" y1="818.0" x2="366.0" y2="818.0" stroke="#34495e" stroke-width="2.4" stroke-linecap="round" opacity="1"/>
+<text x="52.0" y="848.0" font-size="10" fill="#12212f" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">L/R</text>
+<text x="52.0" y="859.0" font-size="8.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">L/R -&gt; GND = left</text>
+<line x1="350.0" y1="844.0" x2="366.0" y2="844.0" stroke="#34495e" stroke-width="2.4" stroke-linecap="round" opacity="1"/>
+<text x="52.0" y="874.0" font-size="10" fill="#12212f" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">BCLK</text>
+<text x="52.0" y="885.0" font-size="8.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">BCLK</text>
+<line x1="350.0" y1="870.0" x2="366.0" y2="870.0" stroke="#117a65" stroke-width="2.4" stroke-linecap="round" opacity="1"/>
+<text x="52.0" y="900.0" font-size="10" fill="#12212f" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">WS</text>
+<text x="52.0" y="911.0" font-size="8.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">WS / LRCLK</text>
+<line x1="350.0" y1="896.0" x2="366.0" y2="896.0" stroke="#117a65" stroke-width="2.4" stroke-linecap="round" opacity="1"/>
+<text x="52.0" y="926.0" font-size="10" fill="#12212f" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">SD</text>
+<text x="52.0" y="937.0" font-size="8.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">SD data out</text>
+<line x1="350.0" y1="922.0" x2="366.0" y2="922.0" stroke="#117a65" stroke-width="2.4" stroke-linecap="round" opacity="1"/>
+<rect x="600.0" y="150.0" width="340.0" height="850.0" rx="10" fill="#ffffff" stroke="#2471a3" stroke-width="1.6" opacity="1"/>
+<rect x="600.0" y="150.0" width="340.0" height="38.0" rx="10" fill="#2471a3" stroke="none" stroke-width="1" opacity="1"/>
+<rect x="600.0" y="174.0" width="340.0" height="14.0" rx="0" fill="#2471a3" stroke="none" stroke-width="1" opacity="1"/>
+<text x="614.0" y="174.0" font-size="13" fill="#fff" text-anchor="start" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">U1</text>
+<text x="928.0" y="174.0" font-size="9.5" fill="#eaf2f8" text-anchor="end" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">Raspberry Pi 4 — J8 header</text>
+<text x="618.0" y="204.0" font-size="8.8" fill="#5d6d7e" text-anchor="start" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="1.4" opacity="1">POWER</text>
+<line x1="618.0" y1="210.0" x2="922.0" y2="210.0" stroke="#e6eef4" stroke-width="1" stroke-linecap="round" opacity="1"/>
+<rect x="618.0" y="210.0" width="34.0" height="22.0" rx="5" fill="#eef4f9" stroke="#d5e2ec" stroke-width="1" opacity="1"/>
+<text x="635.0" y="226.0" font-size="10" fill="#2471a3" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">1</text>
+<text x="662.0" y="226.0" font-size="10.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">3V3</text>
+<rect x="618.0" y="246.0" width="34.0" height="22.0" rx="5" fill="#eef4f9" stroke="#d5e2ec" stroke-width="1" opacity="1"/>
+<text x="635.0" y="262.0" font-size="10" fill="#2471a3" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">17</text>
+<text x="662.0" y="262.0" font-size="10.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">3V3</text>
+<rect x="618.0" y="282.0" width="34.0" height="22.0" rx="5" fill="#eef4f9" stroke="#d5e2ec" stroke-width="1" opacity="1"/>
+<text x="635.0" y="298.0" font-size="10" fill="#2471a3" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">4</text>
+<text x="662.0" y="298.0" font-size="10.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">5V</text>
+<rect x="618.0" y="318.0" width="34.0" height="22.0" rx="5" fill="#eef4f9" stroke="#d5e2ec" stroke-width="1" opacity="1"/>
+<text x="635.0" y="334.0" font-size="10" fill="#2471a3" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">6</text>
+<text x="662.0" y="334.0" font-size="10.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">GND</text>
+<rect x="618.0" y="354.0" width="34.0" height="22.0" rx="5" fill="#eef4f9" stroke="#d5e2ec" stroke-width="1" opacity="1"/>
+<text x="635.0" y="370.0" font-size="10" fill="#2471a3" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">9</text>
+<text x="662.0" y="370.0" font-size="10.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">GND</text>
+<rect x="618.0" y="390.0" width="34.0" height="22.0" rx="5" fill="#eef4f9" stroke="#d5e2ec" stroke-width="1" opacity="1"/>
+<text x="635.0" y="406.0" font-size="10" fill="#2471a3" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">14</text>
+<text x="662.0" y="406.0" font-size="10.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">GND</text>
+<rect x="618.0" y="426.0" width="34.0" height="22.0" rx="5" fill="#eef4f9" stroke="#d5e2ec" stroke-width="1" opacity="1"/>
+<text x="635.0" y="442.0" font-size="10" fill="#2471a3" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">25</text>
+<text x="662.0" y="442.0" font-size="10.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">GND</text>
+<rect x="618.0" y="462.0" width="34.0" height="22.0" rx="5" fill="#eef4f9" stroke="#d5e2ec" stroke-width="1" opacity="1"/>
+<text x="635.0" y="478.0" font-size="10" fill="#2471a3" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">39</text>
+<text x="662.0" y="478.0" font-size="10.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">GND</text>
+<text x="618.0" y="518.0" font-size="8.8" fill="#5d6d7e" text-anchor="start" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="1.4" opacity="1">I2C</text>
+<line x1="618.0" y1="524.0" x2="922.0" y2="524.0" stroke="#e6eef4" stroke-width="1" stroke-linecap="round" opacity="1"/>
+<rect x="618.0" y="524.0" width="34.0" height="22.0" rx="5" fill="#eef4f9" stroke="#d5e2ec" stroke-width="1" opacity="1"/>
+<text x="635.0" y="540.0" font-size="10" fill="#2471a3" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">3</text>
+<text x="662.0" y="540.0" font-size="10.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">SDA1</text>
+<rect x="618.0" y="560.0" width="34.0" height="22.0" rx="5" fill="#eef4f9" stroke="#d5e2ec" stroke-width="1" opacity="1"/>
+<text x="635.0" y="576.0" font-size="10" fill="#2471a3" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">5</text>
+<text x="662.0" y="576.0" font-size="10.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">SCL1</text>
+<text x="618.0" y="616.0" font-size="8.8" fill="#5d6d7e" text-anchor="start" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="1.4" opacity="1">SPI0</text>
+<line x1="618.0" y1="622.0" x2="922.0" y2="622.0" stroke="#e6eef4" stroke-width="1" stroke-linecap="round" opacity="1"/>
+<rect x="618.0" y="622.0" width="34.0" height="22.0" rx="5" fill="#eef4f9" stroke="#d5e2ec" stroke-width="1" opacity="1"/>
+<text x="635.0" y="638.0" font-size="10" fill="#2471a3" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">23</text>
+<text x="662.0" y="638.0" font-size="10.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">SCLK</text>
+<rect x="618.0" y="658.0" width="34.0" height="22.0" rx="5" fill="#eef4f9" stroke="#d5e2ec" stroke-width="1" opacity="1"/>
+<text x="635.0" y="674.0" font-size="10" fill="#2471a3" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">19</text>
+<text x="662.0" y="674.0" font-size="10.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">MOSI</text>
+<rect x="618.0" y="694.0" width="34.0" height="22.0" rx="5" fill="#eef4f9" stroke="#d5e2ec" stroke-width="1" opacity="1"/>
+<text x="635.0" y="710.0" font-size="10" fill="#2471a3" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">21</text>
+<text x="662.0" y="710.0" font-size="10.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">MISO</text>
+<rect x="618.0" y="730.0" width="34.0" height="22.0" rx="5" fill="#eef4f9" stroke="#d5e2ec" stroke-width="1" opacity="1"/>
+<text x="635.0" y="746.0" font-size="10" fill="#2471a3" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">24</text>
+<text x="662.0" y="746.0" font-size="10.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">CE0</text>
+<text x="618.0" y="786.0" font-size="8.8" fill="#5d6d7e" text-anchor="start" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="1.4" opacity="1">I2S</text>
+<line x1="618.0" y1="792.0" x2="922.0" y2="792.0" stroke="#e6eef4" stroke-width="1" stroke-linecap="round" opacity="1"/>
+<rect x="618.0" y="792.0" width="34.0" height="22.0" rx="5" fill="#eef4f9" stroke="#d5e2ec" stroke-width="1" opacity="1"/>
+<text x="635.0" y="808.0" font-size="10" fill="#2471a3" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">12</text>
+<text x="662.0" y="808.0" font-size="10.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">PCM_CLK</text>
+<rect x="618.0" y="828.0" width="34.0" height="22.0" rx="5" fill="#eef4f9" stroke="#d5e2ec" stroke-width="1" opacity="1"/>
+<text x="635.0" y="844.0" font-size="10" fill="#2471a3" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">35</text>
+<text x="662.0" y="844.0" font-size="10.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">PCM_FS</text>
+<rect x="618.0" y="864.0" width="34.0" height="22.0" rx="5" fill="#eef4f9" stroke="#d5e2ec" stroke-width="1" opacity="1"/>
+<text x="635.0" y="880.0" font-size="10" fill="#2471a3" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">38</text>
+<text x="662.0" y="880.0" font-size="10.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">PCM_DIN</text>
+<text x="618.0" y="920.0" font-size="8.8" fill="#5d6d7e" text-anchor="start" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="1.4" opacity="1">GPIO</text>
+<line x1="618.0" y1="926.0" x2="922.0" y2="926.0" stroke="#e6eef4" stroke-width="1" stroke-linecap="round" opacity="1"/>
+<rect x="618.0" y="926.0" width="34.0" height="22.0" rx="5" fill="#eef4f9" stroke="#d5e2ec" stroke-width="1" opacity="1"/>
+<text x="635.0" y="942.0" font-size="10" fill="#2471a3" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">36</text>
+<text x="662.0" y="942.0" font-size="10.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">GPIO16</text>
+<line x1="430.0" y1="150.0" x2="430.0" y2="1000.0" stroke="#2471a3" stroke-width="0.6" stroke-linecap="round" opacity="0.35" stroke-dasharray="2 6"/>
+<line x1="447.0" y1="150.0" x2="447.0" y2="1000.0" stroke="#2471a3" stroke-width="0.6" stroke-linecap="round" opacity="0.35" stroke-dasharray="2 6"/>
+<line x1="464.0" y1="150.0" x2="464.0" y2="1000.0" stroke="#b9770e" stroke-width="0.6" stroke-linecap="round" opacity="0.35" stroke-dasharray="2 6"/>
+<line x1="481.0" y1="150.0" x2="481.0" y2="1000.0" stroke="#b9770e" stroke-width="0.6" stroke-linecap="round" opacity="0.35" stroke-dasharray="2 6"/>
+<line x1="498.0" y1="150.0" x2="498.0" y2="1000.0" stroke="#b9770e" stroke-width="0.6" stroke-linecap="round" opacity="0.35" stroke-dasharray="2 6"/>
+<line x1="515.0" y1="150.0" x2="515.0" y2="1000.0" stroke="#b9770e" stroke-width="0.6" stroke-linecap="round" opacity="0.35" stroke-dasharray="2 6"/>
+<line x1="532.0" y1="150.0" x2="532.0" y2="1000.0" stroke="#117a65" stroke-width="0.6" stroke-linecap="round" opacity="0.35" stroke-dasharray="2 6"/>
+<line x1="549.0" y1="150.0" x2="549.0" y2="1000.0" stroke="#117a65" stroke-width="0.6" stroke-linecap="round" opacity="0.35" stroke-dasharray="2 6"/>
+<line x1="566.0" y1="150.0" x2="566.0" y2="1000.0" stroke="#117a65" stroke-width="0.6" stroke-linecap="round" opacity="0.35" stroke-dasharray="2 6"/>
+<polyline points="366.0,316.0 430.0,316.0 430.0,536.0 600.0,536.0" fill="none" stroke="#2471a3" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="597.0" cy="536.0" r="3.2" fill="#2471a3" stroke="none" stroke-width="1" opacity="1"/>
+<text x="425.0" y="426.0" font-size="8.6" fill="#2471a3" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1" transform="rotate(-90 425.0 426.0)" paint-order="stroke" stroke="#ffffff" stroke-width="3.2" stroke-linejoin="round">I2C SDA</text>
+<polyline points="366.0,342.0 447.0,342.0 447.0,572.0 600.0,572.0" fill="none" stroke="#2471a3" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="597.0" cy="572.0" r="3.2" fill="#2471a3" stroke="none" stroke-width="1" opacity="1"/>
+<text x="442.0" y="457.0" font-size="8.6" fill="#2471a3" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1" transform="rotate(-90 442.0 457.0)" paint-order="stroke" stroke="#ffffff" stroke-width="3.2" stroke-linejoin="round">I2C SCL</text>
+<polyline points="366.0,494.0 464.0,494.0 464.0,634.0 600.0,634.0" fill="none" stroke="#b9770e" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="597.0" cy="634.0" r="3.2" fill="#b9770e" stroke="none" stroke-width="1" opacity="1"/>
+<text x="459.0" y="564.0" font-size="8.6" fill="#b9770e" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1" transform="rotate(-90 459.0 564.0)" paint-order="stroke" stroke="#ffffff" stroke-width="3.2" stroke-linejoin="round">SPI SCLK</text>
+<polyline points="366.0,520.0 481.0,520.0 481.0,670.0 600.0,670.0" fill="none" stroke="#b9770e" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="597.0" cy="670.0" r="3.2" fill="#b9770e" stroke="none" stroke-width="1" opacity="1"/>
+<text x="476.0" y="595.0" font-size="8.6" fill="#b9770e" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1" transform="rotate(-90 476.0 595.0)" paint-order="stroke" stroke="#ffffff" stroke-width="3.2" stroke-linejoin="round">SPI MOSI</text>
+<polyline points="366.0,546.0 498.0,546.0 498.0,706.0 600.0,706.0" fill="none" stroke="#b9770e" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="597.0" cy="706.0" r="3.2" fill="#b9770e" stroke="none" stroke-width="1" opacity="1"/>
+<text x="493.0" y="626.0" font-size="8.6" fill="#b9770e" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1" transform="rotate(-90 493.0 626.0)" paint-order="stroke" stroke="#ffffff" stroke-width="3.2" stroke-linejoin="round">SPI MISO</text>
+<polyline points="366.0,572.0 515.0,572.0 515.0,742.0 600.0,742.0" fill="none" stroke="#b9770e" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="597.0" cy="742.0" r="3.2" fill="#b9770e" stroke="none" stroke-width="1" opacity="1"/>
+<text x="510.0" y="657.0" font-size="8.6" fill="#b9770e" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1" transform="rotate(-90 510.0 657.0)" paint-order="stroke" stroke="#ffffff" stroke-width="3.2" stroke-linejoin="round">SPI CS0</text>
+<polyline points="366.0,870.0 532.0,870.0 532.0,804.0 600.0,804.0" fill="none" stroke="#117a65" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="597.0" cy="804.0" r="3.2" fill="#117a65" stroke="none" stroke-width="1" opacity="1"/>
+<text x="527.0" y="837.0" font-size="8.6" fill="#117a65" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1" transform="rotate(-90 527.0 837.0)" paint-order="stroke" stroke="#ffffff" stroke-width="3.2" stroke-linejoin="round">I2S BCLK</text>
+<polyline points="366.0,896.0 549.0,896.0 549.0,840.0 600.0,840.0" fill="none" stroke="#117a65" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="597.0" cy="840.0" r="3.2" fill="#117a65" stroke="none" stroke-width="1" opacity="1"/>
+<text x="544.0" y="868.0" font-size="8.6" fill="#117a65" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1" transform="rotate(-90 544.0 868.0)" paint-order="stroke" stroke="#ffffff" stroke-width="3.2" stroke-linejoin="round">I2S WS</text>
+<polyline points="366.0,922.0 566.0,922.0 566.0,876.0 600.0,876.0" fill="none" stroke="#117a65" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" opacity="1"/>
+<circle cx="597.0" cy="876.0" r="3.2" fill="#117a65" stroke="none" stroke-width="1" opacity="1"/>
+<text x="561.0" y="899.0" font-size="8.6" fill="#117a65" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1" transform="rotate(-90 561.0 899.0)" paint-order="stroke" stroke="#ffffff" stroke-width="3.2" stroke-linejoin="round">I2S SD</text>
+<rect x="356.0" y="201.0" width="54.0" height="22.0" rx="4" fill="#ffffff" stroke="#c0392b" stroke-width="1.2" opacity="1"/>
+<text x="383.0" y="215.5" font-size="9.5" fill="#c0392b" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">3V3</text>
+<rect x="356.0" y="227.0" width="54.0" height="22.0" rx="4" fill="#ffffff" stroke="#34495e" stroke-width="1.2" opacity="1"/>
+<text x="383.0" y="241.5" font-size="9.5" fill="#34495e" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">GND</text>
+<rect x="356.0" y="253.0" width="54.0" height="22.0" rx="4" fill="#ffffff" stroke="#c0392b" stroke-width="1.2" opacity="1"/>
+<text x="383.0" y="267.5" font-size="9.5" fill="#c0392b" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">3V3</text>
+<rect x="356.0" y="279.0" width="54.0" height="22.0" rx="4" fill="#ffffff" stroke="#34495e" stroke-width="1.2" opacity="1"/>
+<text x="383.0" y="293.5" font-size="9.5" fill="#34495e" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">GND</text>
+<rect x="356.0" y="431.0" width="54.0" height="22.0" rx="4" fill="#ffffff" stroke="#c0392b" stroke-width="1.2" opacity="1"/>
+<text x="383.0" y="445.5" font-size="9.5" fill="#c0392b" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">3V3</text>
+<rect x="356.0" y="457.0" width="54.0" height="22.0" rx="4" fill="#ffffff" stroke="#34495e" stroke-width="1.2" opacity="1"/>
+<text x="383.0" y="471.5" font-size="9.5" fill="#34495e" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">GND</text>
+<rect x="354.0" y="587.0" width="58.0" height="22.0" rx="4" fill="#ffffff" stroke="#8e44ad" stroke-width="1.2" opacity="1"/>
+<text x="383.0" y="601.5" font-size="9.5" fill="#8e44ad" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">RTD+</text>
+<rect x="354.0" y="613.0" width="58.0" height="22.0" rx="4" fill="#ffffff" stroke="#8e44ad" stroke-width="1.2" opacity="1"/>
+<text x="383.0" y="627.5" font-size="9.5" fill="#8e44ad" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">F-</text>
+<rect x="354.0" y="639.0" width="58.0" height="22.0" rx="4" fill="#ffffff" stroke="#8e44ad" stroke-width="1.2" opacity="1"/>
+<text x="383.0" y="653.5" font-size="9.5" fill="#8e44ad" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">RTD+</text>
+<rect x="354.0" y="665.0" width="58.0" height="22.0" rx="4" fill="#ffffff" stroke="#8e44ad" stroke-width="1.2" opacity="1"/>
+<text x="383.0" y="679.5" font-size="9.5" fill="#8e44ad" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">RTD-</text>
+<rect x="356.0" y="781.0" width="54.0" height="22.0" rx="4" fill="#ffffff" stroke="#c0392b" stroke-width="1.2" opacity="1"/>
+<text x="383.0" y="795.5" font-size="9.5" fill="#c0392b" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">3V3</text>
+<rect x="356.0" y="807.0" width="54.0" height="22.0" rx="4" fill="#ffffff" stroke="#34495e" stroke-width="1.2" opacity="1"/>
+<text x="383.0" y="821.5" font-size="9.5" fill="#34495e" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">GND</text>
+<rect x="356.0" y="833.0" width="54.0" height="22.0" rx="4" fill="#ffffff" stroke="#34495e" stroke-width="1.2" opacity="1"/>
+<text x="383.0" y="847.5" font-size="9.5" fill="#34495e" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">GND</text>
+<circle cx="948.0" cy="222.0" r="3" fill="#c0392b" stroke="none" stroke-width="1" opacity="1"/>
+<circle cx="948.0" cy="258.0" r="3" fill="#c0392b" stroke="none" stroke-width="1" opacity="1"/>
+<rect x="950.0" y="283.0" width="38.0" height="22.0" rx="4" fill="#ffffff" stroke="#e67e22" stroke-width="1.2" opacity="1"/>
+<text x="969.0" y="297.5" font-size="9.5" fill="#e67e22" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">FAN</text>
+<circle cx="948.0" cy="330.0" r="3" fill="#34495e" stroke="none" stroke-width="1" opacity="1"/>
+<circle cx="948.0" cy="366.0" r="3" fill="#34495e" stroke="none" stroke-width="1" opacity="1"/>
+<circle cx="948.0" cy="402.0" r="3" fill="#34495e" stroke="none" stroke-width="1" opacity="1"/>
+<circle cx="948.0" cy="438.0" r="3" fill="#34495e" stroke="none" stroke-width="1" opacity="1"/>
+<circle cx="948.0" cy="474.0" r="3" fill="#34495e" stroke="none" stroke-width="1" opacity="1"/>
+<rect x="950.0" y="927.0" width="38.0" height="22.0" rx="4" fill="#ffffff" stroke="#7f8c8d" stroke-width="1.2" opacity="1"/>
+<text x="969.0" y="941.5" font-size="9.5" fill="#7f8c8d" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">LED</text>
+<rect x="990.0" y="150.0" width="650.0" height="300.0" rx="10" fill="#ffffff" stroke="#c8d2da" stroke-width="1" opacity="1"/>
+<rect x="990.0" y="150.0" width="4.0" height="300.0" rx="2" fill="#0f2a44" stroke="none" stroke-width="1" opacity="1"/>
+<text x="1008.0" y="176.0" font-size="12" fill="#0f2a44" text-anchor="start" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="1.2" opacity="1">DECOUPLING — one 100 nF per sensor, at the module</text>
+<line x1="1030.0" y1="210.0" x2="1030.0" y2="246.0" stroke="#c0392b" stroke-width="2" stroke-linecap="round" opacity="1"/>
+<line x1="1014.0" y1="246.0" x2="1046.0" y2="246.0" stroke="#c0392b" stroke-width="3" stroke-linecap="round" opacity="1"/>
+<line x1="1014.0" y1="256.0" x2="1046.0" y2="256.0" stroke="#34495e" stroke-width="3" stroke-linecap="round" opacity="1"/>
+<line x1="1030.0" y1="256.0" x2="1030.0" y2="292.0" stroke="#34495e" stroke-width="2" stroke-linecap="round" opacity="1"/>
+<text x="1030.0" y="318.0" font-size="12" fill="#12212f" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">C1</text>
+<text x="1030.0" y="336.0" font-size="9" fill="#5d6d7e" text-anchor="middle" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">U2 ADXL345</text>
+<text x="1030.0" y="352.0" font-size="8" fill="#5d6d7e" text-anchor="middle" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">3.3 V rail, 4.7 uF equivalent</text>
+<line x1="1185.0" y1="210.0" x2="1185.0" y2="246.0" stroke="#c0392b" stroke-width="2" stroke-linecap="round" opacity="1"/>
+<line x1="1169.0" y1="246.0" x2="1201.0" y2="246.0" stroke="#c0392b" stroke-width="3" stroke-linecap="round" opacity="1"/>
+<line x1="1169.0" y1="256.0" x2="1201.0" y2="256.0" stroke="#34495e" stroke-width="3" stroke-linecap="round" opacity="1"/>
+<line x1="1185.0" y1="256.0" x2="1185.0" y2="292.0" stroke="#34495e" stroke-width="2" stroke-linecap="round" opacity="1"/>
+<text x="1185.0" y="318.0" font-size="12" fill="#12212f" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">C2</text>
+<text x="1185.0" y="336.0" font-size="9" fill="#5d6d7e" text-anchor="middle" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">U3 MAX31865</text>
+<text x="1185.0" y="352.0" font-size="8" fill="#5d6d7e" text-anchor="middle" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">kills SPI burst dip</text>
+<line x1="1340.0" y1="210.0" x2="1340.0" y2="246.0" stroke="#c0392b" stroke-width="2" stroke-linecap="round" opacity="1"/>
+<line x1="1324.0" y1="246.0" x2="1356.0" y2="246.0" stroke="#c0392b" stroke-width="3" stroke-linecap="round" opacity="1"/>
+<line x1="1324.0" y1="256.0" x2="1356.0" y2="256.0" stroke="#34495e" stroke-width="3" stroke-linecap="round" opacity="1"/>
+<line x1="1340.0" y1="256.0" x2="1340.0" y2="292.0" stroke="#34495e" stroke-width="2" stroke-linecap="round" opacity="1"/>
+<text x="1340.0" y="318.0" font-size="12" fill="#12212f" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">C3</text>
+<text x="1340.0" y="336.0" font-size="9" fill="#5d6d7e" text-anchor="middle" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">U4 INMP441</text>
+<text x="1340.0" y="352.0" font-size="8" fill="#5d6d7e" text-anchor="middle" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">keeps mic bias clean</text>
+<line x1="1495.0" y1="210.0" x2="1495.0" y2="246.0" stroke="#c0392b" stroke-width="2" stroke-linecap="round" opacity="1"/>
+<line x1="1479.0" y1="246.0" x2="1511.0" y2="246.0" stroke="#c0392b" stroke-width="3" stroke-linecap="round" opacity="1"/>
+<line x1="1479.0" y1="256.0" x2="1511.0" y2="256.0" stroke="#34495e" stroke-width="3" stroke-linecap="round" opacity="1"/>
+<line x1="1495.0" y1="256.0" x2="1495.0" y2="292.0" stroke="#34495e" stroke-width="2" stroke-linecap="round" opacity="1"/>
+<text x="1495.0" y="318.0" font-size="12" fill="#12212f" text-anchor="middle" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">C4</text>
+<text x="1495.0" y="336.0" font-size="9" fill="#5d6d7e" text-anchor="middle" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">bulk 10 uF</text>
+<text x="1495.0" y="352.0" font-size="8" fill="#5d6d7e" text-anchor="middle" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">holds rail during WiFi TX</text>
+<text x="1010.0" y="382.0" font-size="9" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">Place the cap across VCC/GND at the sensor, not at the Pi. ADXL345 without it: +/-0.1 g hash.</text>
+<line x1="1010.0" y1="396.0" x2="1620.0" y2="396.0" stroke="#c8d2da" stroke-width="1" stroke-linecap="round" opacity="1"/>
+<text x="1010.0" y="416.0" font-size="9" fill="#5d6d7e" text-anchor="start" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="1.2" opacity="1">AUX</text>
+<text x="1060.0" y="416.0" font-size="9.5" fill="#e67e22" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">F1 fan  5V pin 4 -&gt; GND pin 6  (never 3V3)</text>
+<text x="1060.0" y="436.0" font-size="9.5" fill="#7f8c8d" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">D1 + R4  GPIO16 pin 36 -&gt; 330R -&gt; LED -&gt; GND  (3.9 mA)</text>
+<rect x="990.0" y="470.0" width="650.0" height="320.0" rx="10" fill="#ffffff" stroke="#c8d2da" stroke-width="1" opacity="1"/>
+<rect x="990.0" y="470.0" width="4.0" height="320.0" rx="2" fill="#0f2a44" stroke="none" stroke-width="1" opacity="1"/>
+<text x="1008.0" y="496.0" font-size="12" fill="#0f2a44" text-anchor="start" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="1.2" opacity="1">CABLE SCHEDULE — 9 signal nets + rails</text>
+<text x="1010.0" y="526.0" font-size="9" fill="#5d6d7e" text-anchor="start" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">#</text>
+<text x="1042.0" y="526.0" font-size="9" fill="#5d6d7e" text-anchor="start" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">NET</text>
+<text x="1220.0" y="526.0" font-size="9" fill="#5d6d7e" text-anchor="start" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">PI PIN (GPIO)</text>
+<text x="1420.0" y="526.0" font-size="9" fill="#5d6d7e" text-anchor="start" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">SENSOR PIN</text>
+<text x="1550.0" y="526.0" font-size="9" fill="#5d6d7e" text-anchor="start" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">TYPE</text>
+<line x1="1010.0" y1="534.0" x2="1620.0" y2="534.0" stroke="#c8d2da" stroke-width="1" stroke-linecap="round" opacity="1"/>
+<text x="1010.0" y="554.0" font-size="9.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">1</text>
+<circle cx="1030.0" cy="550.0" r="4" fill="#2471a3" stroke="none" stroke-width="1" opacity="1"/>
+<text x="1042.0" y="554.0" font-size="9.5" fill="#2471a3" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">I2C_SDA</text>
+<text x="1220.0" y="554.0" font-size="9.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">3 (GPIO2)</text>
+<text x="1420.0" y="554.0" font-size="9.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">U2.SDA</text>
+<text x="1550.0" y="554.0" font-size="9" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">open-drain</text>
+<text x="1010.0" y="579.0" font-size="9.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">2</text>
+<circle cx="1030.0" cy="575.0" r="4" fill="#2471a3" stroke="none" stroke-width="1" opacity="1"/>
+<text x="1042.0" y="579.0" font-size="9.5" fill="#2471a3" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">I2C_SCL</text>
+<text x="1220.0" y="579.0" font-size="9.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">5 (GPIO3)</text>
+<text x="1420.0" y="579.0" font-size="9.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">U2.SCL</text>
+<text x="1550.0" y="579.0" font-size="9" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">open-drain</text>
+<text x="1010.0" y="604.0" font-size="9.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">3</text>
+<circle cx="1030.0" cy="600.0" r="4" fill="#b9770e" stroke="none" stroke-width="1" opacity="1"/>
+<text x="1042.0" y="604.0" font-size="9.5" fill="#b9770e" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">SPI_SCLK</text>
+<text x="1220.0" y="604.0" font-size="9.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">23 (GPIO11)</text>
+<text x="1420.0" y="604.0" font-size="9.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">U3.SCLK</text>
+<text x="1550.0" y="604.0" font-size="9" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">push-pull</text>
+<text x="1010.0" y="629.0" font-size="9.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">4</text>
+<circle cx="1030.0" cy="625.0" r="4" fill="#b9770e" stroke="none" stroke-width="1" opacity="1"/>
+<text x="1042.0" y="629.0" font-size="9.5" fill="#b9770e" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">SPI_MOSI</text>
+<text x="1220.0" y="629.0" font-size="9.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">19 (GPIO10)</text>
+<text x="1420.0" y="629.0" font-size="9.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">U3.SDI</text>
+<text x="1550.0" y="629.0" font-size="9" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">push-pull</text>
+<text x="1010.0" y="654.0" font-size="9.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">5</text>
+<circle cx="1030.0" cy="650.0" r="4" fill="#b9770e" stroke="none" stroke-width="1" opacity="1"/>
+<text x="1042.0" y="654.0" font-size="9.5" fill="#b9770e" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">SPI_MISO</text>
+<text x="1220.0" y="654.0" font-size="9.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">21 (GPIO9)</text>
+<text x="1420.0" y="654.0" font-size="9.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">U3.SDO</text>
+<text x="1550.0" y="654.0" font-size="9" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">push-pull</text>
+<text x="1010.0" y="679.0" font-size="9.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">6</text>
+<circle cx="1030.0" cy="675.0" r="4" fill="#b9770e" stroke="none" stroke-width="1" opacity="1"/>
+<text x="1042.0" y="679.0" font-size="9.5" fill="#b9770e" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">SPI_CS0</text>
+<text x="1220.0" y="679.0" font-size="9.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">24 (GPIO8)</text>
+<text x="1420.0" y="679.0" font-size="9.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">U3.CS</text>
+<text x="1550.0" y="679.0" font-size="9" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">push-pull</text>
+<text x="1010.0" y="704.0" font-size="9.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">7</text>
+<circle cx="1030.0" cy="700.0" r="4" fill="#117a65" stroke="none" stroke-width="1" opacity="1"/>
+<text x="1042.0" y="704.0" font-size="9.5" fill="#117a65" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">I2S_BCLK</text>
+<text x="1220.0" y="704.0" font-size="9.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">12 (GPIO18)</text>
+<text x="1420.0" y="704.0" font-size="9.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">U4.BCLK</text>
+<text x="1550.0" y="704.0" font-size="9" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">clock</text>
+<text x="1010.0" y="729.0" font-size="9.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">8</text>
+<circle cx="1030.0" cy="725.0" r="4" fill="#117a65" stroke="none" stroke-width="1" opacity="1"/>
+<text x="1042.0" y="729.0" font-size="9.5" fill="#117a65" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">I2S_WS</text>
+<text x="1220.0" y="729.0" font-size="9.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">35 (GPIO19)</text>
+<text x="1420.0" y="729.0" font-size="9.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">U4.WS</text>
+<text x="1550.0" y="729.0" font-size="9" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">clock</text>
+<text x="1010.0" y="754.0" font-size="9.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">9</text>
+<circle cx="1030.0" cy="750.0" r="4" fill="#117a65" stroke="none" stroke-width="1" opacity="1"/>
+<text x="1042.0" y="754.0" font-size="9.5" fill="#117a65" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">I2S_SD</text>
+<text x="1220.0" y="754.0" font-size="9.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">38 (GPIO20)</text>
+<text x="1420.0" y="754.0" font-size="9.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">U4.SD</text>
+<text x="1550.0" y="754.0" font-size="9" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">data in</text>
+<line x1="1010.0" y1="766.0" x2="1620.0" y2="766.0" stroke="#c8d2da" stroke-width="1" stroke-linecap="round" opacity="1"/>
+<text x="1010.0" y="782.0" font-size="8.5" fill="#5d6d7e" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">Power: 3V3 = pins 1 + 17 · 5V = pin 4 (fan only) · GND = 6/9/14/25/39 (star point at pin 39)</text>
+<rect x="990.0" y="810.0" width="650.0" height="280.0" rx="10" fill="#ffffff" stroke="#c8d2da" stroke-width="1" opacity="1"/>
+<rect x="990.0" y="810.0" width="4.0" height="280.0" rx="2" fill="#117a65" stroke="none" stroke-width="1" opacity="1"/>
+<text x="1008.0" y="836.0" font-size="12" fill="#117a65" text-anchor="start" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="1.2" opacity="1">WHY IT WORKS — derived numbers</text>
+<text x="1012.0" y="866.0" font-size="9.5" fill="#117a65" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">Nyquist</text>
+<text x="1110.0" y="866.0" font-size="9.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">fs 800 Hz -&gt; 400 Hz, covers BPFO/BPFI to 300 Hz</text>
+<text x="1012.0" y="895.0" font-size="9.5" fill="#117a65" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">FFT</text>
+<text x="1110.0" y="895.0" font-size="9.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">800/4096 = 0.195 Hz/bin, 5.12 s window</text>
+<text x="1012.0" y="924.0" font-size="9.5" fill="#117a65" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">ADXL range</text>
+<text x="1110.0" y="924.0" font-size="9.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">+/-4 g, FULL_RES 3.9 mg/LSB vs 100 mg budget</text>
+<text x="1012.0" y="953.0" font-size="9.5" fill="#117a65" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">RTD</text>
+<text x="1110.0" y="953.0" font-size="9.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">15-bit -&gt; 0.034 C/LSB, self-heat 0.003 C average</text>
+<text x="1012.0" y="982.0" font-size="9.5" fill="#117a65" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">Rref</text>
+<text x="1110.0" y="982.0" font-size="9.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">430 ohm on board — 400 in code = -17.9 C error</text>
+<text x="1012.0" y="1011.0" font-size="9.5" fill="#117a65" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">I2C</text>
+<text x="1110.0" y="1011.0" font-size="9.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">1.8k pull-up + 60 pF -&gt; 238 ns rise &lt; 300 ns at 400 kHz</text>
+<text x="1012.0" y="1040.0" font-size="9.5" fill="#117a65" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">Power</text>
+<text x="1110.0" y="1040.0" font-size="9.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">7.4 W peak = 1.48 A of 3 A (49% load), 2x margin</text>
+<text x="1012.0" y="1069.0" font-size="9.5" fill="#117a65" text-anchor="start" font-weight="bold" font-family="DejaVu Sans Mono, Consolas, monospace" letter-spacing="0" opacity="1">AI</text>
+<text x="1110.0" y="1069.0" font-size="9.5" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">1 RF inference ~2 ms on Pi 4, runs only when SPC fires</text>
+<rect x="40.0" y="1005.0" width="900.0" height="135.0" rx="10" fill="#ffffff" stroke="#c8d2da" stroke-width="1" opacity="1"/>
+<rect x="40.0" y="1005.0" width="4.0" height="135.0" rx="2" fill="#c9a227" stroke="none" stroke-width="1" opacity="1"/>
+<text x="58.0" y="1031.0" font-size="12" fill="#c9a227" text-anchor="start" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="1.2" opacity="1">READING THIS SHEET</text>
+<text x="60.0" y="1061.0" font-size="10" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">1. One net label / colour = one electrical node. The same name at both ends means wired together.</text>
+<text x="60.0" y="1083.0" font-size="10" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">2. Signal names are printed along the routing rails; the schedule on the right is the authoritative pin list.</text>
+<text x="60.0" y="1105.0" font-size="10" fill="#12212f" text-anchor="start" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">3. GND is a star: every return meets at pin 39. Never daisy-chain sensor grounds.</text>
+<text x="60.0" y="1127.0" font-size="10" fill="#922b21" text-anchor="start" font-weight="bold" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">4. Never apply 5 V to a sensor pin. Power the Pi from the official 5 V / 3 A supply only.</text>
+<text x="1640.0" y="1170.0" font-size="9" fill="#5d6d7e" text-anchor="end" font-weight="normal" font-family="DejaVu Sans, Segoe UI, Arial, sans-serif" letter-spacing="0" opacity="1">Generated by circuit/render.py from circuit/design.py — do not edit by hand</text>
+</svg>

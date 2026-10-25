@@ -1,0 +1,10 @@
+stateDiagram-v2
+  [*] --> Booting
+  Booting --> Healthy: cal.json + baseline loaded
+  Healthy --> Warning: RMS > mu+2s OR T > 60 C
+  Warning --> Healthy: 3 windows in limits
+  Warning --> Fault: RMS > mu+3s OR kurtosis > 6 OR T > 75 C
+  Fault --> Warning: 3 clean windows
+  Fault --> OfflineBuffering: WiFi lost
+  OfflineBuffering --> Fault: backfill complete
+  Healthy --> OfflineBuffering: WiFi lost

@@ -174,7 +174,7 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <div class="node"><b>📊 GRAFANA</b>X-bar/R + KPIs<br>TBA/Th_DB/QL_M<br>annotations</div>
 </div>
 <svg class="schem" viewBox="0 0 900 260" xmlns="http://www.w3.org/2000/svg">
-<rect x="10" y="20" width="170" height="220" rx="12" fill="#eaf2f8" stroke="#2471a3" stroke-width="2"/><text x="95" y="45" text-anchor="middle" font-weight="bold" fill="#0f2a44">DAQ 50Hz/0.2Hz/10Hz</text><text x="95" y="70" text-anchor="middle" font-size="12">ADXL→RMS/kurt/FFT</text><text x="95" y="90" text-anchor="middle" font-size="12">PT100→T+slope</text><text x="95" y="110" text-anchor="middle" font-size="12">MIC→ZCR/MFCC</text><text x="95" y="140" text-anchor="middle" font-size="12">100nF+10uF+10k</text><text x="95" y="160" text-anchor="middle" font-size="12">magnet+nylon</text><text x="95" y="200" text-anchor="middle" font-size="12" fill="#117a65">◉ calibrated</text>
+<rect x="10" y="20" width="170" height="220" rx="12" fill="#eaf2f8" stroke="#2471a3" stroke-width="2"/><text x="95" y="45" text-anchor="middle" font-weight="bold" fill="#0f2a44">DAQ 800Hz / 0.2Hz / 16kHz</text><text x="95" y="70" text-anchor="middle" font-size="12">ADXL→RMS/kurt/FFT</text><text x="95" y="90" text-anchor="middle" font-size="12">PT100→T+slope</text><text x="95" y="110" text-anchor="middle" font-size="12">MIC→ZCR/MFCC</text><text x="95" y="140" text-anchor="middle" font-size="12">100nF+10uF+10k</text><text x="95" y="160" text-anchor="middle" font-size="12">magnet+nylon</text><text x="95" y="200" text-anchor="middle" font-size="12" fill="#117a65">◉ calibrated</text>
 <rect x="200" y="20" width="170" height="220" rx="12" fill="#fef9e7" stroke="#b9770e" stroke-width="2"/><text x="285" y="45" text-anchor="middle" font-weight="bold">COARSE (SPC)</text><text x="285" y="70" text-anchor="middle" font-size="12">X-bar/R μ±2σ/±3σ</text><text x="285" y="95" text-anchor="middle" font-size="12">in-limits? → log</text><text x="285" y="120" text-anchor="middle" font-size="12" font-weight="bold" fill="#922b21">out? → TRIGGER DL</text><text x="285" y="150" text-anchor="middle" font-size="12">TBA/TB_VA timers</text><text x="285" y="200" text-anchor="middle" font-size="12">saves 90% compute</text>
 <rect x="390" y="20" width="170" height="220" rx="12" fill="#eafaf1" stroke="#117a65" stroke-width="2"/><text x="475" y="45" text-anchor="middle" font-weight="bold">FINE (DL)</text><text x="475" y="70" text-anchor="middle" font-size="12">RF / 1D-CNN</text><text x="475" y="90" text-anchor="middle" font-size="12">4-class + proba</text><text x="475" y="110" text-anchor="middle" font-size="12">acc ≥80% req.</text><text x="475" y="150" text-anchor="middle" font-size="12">maint. recommendation</text><text x="475" y="200" text-anchor="middle" font-size="12">retrain if drift</text>
 <rect x="580" y="20" width="150" height="220" rx="12" fill="#f4ecf7" stroke="#8e44ad" stroke-width="2"/><text x="655" y="45" text-anchor="middle" font-weight="bold">PANEL+FIREBASE</text><text x="655" y="70" text-anchor="middle" font-size="12">Flask :5000 offline</text><text x="655" y="90" text-anchor="middle" font-size="12">RTDB 1/15s 0EGP</text><text x="655" y="110" text-anchor="middle" font-size="12">QR x2 + AR/EN</text><text x="655" y="150" text-anchor="middle" font-size="12">hot SD / cold CSV</text>
@@ -192,8 +192,8 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <tr><td>ADXL345 VCC / GND</td><td>3V3 pin1 / GND pin9</td><td>red/black + 100nF across</td><td>shielded M-F; CS→3V3, SDO→GND (0x53)</td></tr>
 <tr><td>ADXL345 SDA / SCL</td><td>GPIO2 pin3 / GPIO3 pin5</td><td>shielded pair</td><td>I2C 400kHz, 10k pull-ups already on Pi</td></tr>
 <tr><td>MAX31865 VIN/GND</td><td>3V3 pin17 / GND pin25</td><td>+100nF</td><td>separate 100nF from ADXL (star ground)</td></tr>
-<tr><td>MAX31865 SCLK/MOSI/MISO/CS</td><td>GPIO11/10/9/8 (pins 23/19/21/24)</td><td>short M-M &lt;10cm</td><td>SPI0, 10k on CS to 3V3</td></tr>
-<tr><td>PT100 3-wire</td><td>to MAX F+, S+, F− terminals</td><td>screw terminals</td><td>jumper: 2/3-wire closed for 3-wire mode</td></tr>
+<tr><td>MAX31865 SCLK/MOSI/MISO/CS</td><td>GPIO11/10/9/8 (pins 23/19/21/24)</td><td>short M-M &lt;10cm</td><td>SPI0 1MHz, 10k pull-up on CS keeps it deselected at boot</td></tr>
+<tr><td>PT100 3-wire</td><td>single lead → F+ (jumpered to RTD+); matched pair → RTD− and F−</td><td>screw terminals</td><td>solder/enable the 3-wire jumper; 2-wire mode adds ≈+0.5°C per metre of lead</td></tr>
 <tr><td>INMP441 VDD/GND</td><td>3V3 pin1(shared ok)/GND pin14</td><td>+100nF</td><td>L/R→GND (left channel)</td></tr>
 <tr><td>INMP441 BCLK/WS/SD</td><td>GPIO18/19/20 (pins 12/35/38)</td><td>short, away from SPI</td><td>I2S, 16kHz, DMA</td></tr>
 <tr><td>Status LED</td><td>GPIO16 via 330Ω (not in BOM—salvage)</td><td>or onboard</td><td>green=Healthy red=Fault (or screen only if no LED)</td></tr></table>
@@ -202,7 +202,7 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <text x="20" y="25" font-weight="bold" fill="#0f2a44">RPi 4 (center) — I2C top, SPI middle, I2S bottom. Star GND. 100nF at each VCC.</text>
 <rect x="350" y="40" width="200" height="260" rx="12" fill="#0f2a44"/><text x="450" y="65" text-anchor="middle" fill="#f1c40f" font-weight="bold">RASPBERRY Pi 4</text><text x="450" y="85" text-anchor="middle" fill="#fff" font-size="11">3V3 ● ● 5V (fan)</text><text x="450" y="105" text-anchor="middle" fill="#aed6f1" font-size="11">GPIO2 SDA ──→ ADXL</text><text x="450" y="125" text-anchor="middle" fill="#aed6f1" font-size="11">GPIO3 SCL ──→ ADXL</text><text x="450" y="150" text-anchor="middle" fill="#f5cba7" font-size="11">SPI0: 8/9/10/11 → MAX</text><text x="450" y="175" text-anchor="middle" fill="#a9dfbf" font-size="11">I2S: 18/19/20 → MIC</text><text x="450" y="200" text-anchor="middle" fill="#fff" font-size="11">GND ★ star point</text><text x="450" y="230" text-anchor="middle" fill="#f1c40f" font-size="11">Type-C 5V/3A + fan</text><text x="450" y="260" text-anchor="middle" fill="#fff" font-size="11">SD 32GB + WiFi</text>
 <rect x="20" y="60" width="280" height="120" rx="10" fill="#eaf2f8" stroke="#2471a3" stroke-width="2"/><text x="160" y="85" text-anchor="middle" font-weight="bold">ADXL345 (I2C 0x53)</text><text x="160" y="105" text-anchor="middle" font-size="12">VCC─100nF─GND | CS─3V3</text><text x="160" y="125" text-anchor="middle" font-size="12">SDO─GND | SDA/SCL 10k↑</text><text x="160" y="150" text-anchor="middle" font-size="12" fill="#117a65">🧲 magnet + nylon + M3</text>
-<rect x="20" y="190" width="280" height="110" rx="10" fill="#fef9e7" stroke="#b9770e" stroke-width="2"/><text x="160" y="215" text-anchor="middle" font-weight="bold">MAX31865 + PT100 M6</text><text x="160" y="235" text-anchor="middle" font-size="12">F+/S+ red pair | F− white</text><text x="160" y="255" text-anchor="middle" font-size="12">Rref 400Ω | 3-wire jumper</text><text x="160" y="275" text-anchor="middle" font-size="12">screw probe → motor skin</text>
+<rect x="20" y="190" width="280" height="110" rx="10" fill="#fef9e7" stroke="#b9770e" stroke-width="2"/><text x="160" y="215" text-anchor="middle" font-weight="bold">MAX31865 + PT100 M6</text><text x="160" y="235" text-anchor="middle" font-size="12">lead A → F+ = RTD+ | pair → RTD−, F−</text><text x="160" y="255" text-anchor="middle" font-size="12">Rref 430Ω 0.1% | 3-wire jumper</text><text x="160" y="275" text-anchor="middle" font-size="12">screw probe → motor skin</text>
 <rect x="600" y="60" width="280" height="120" rx="10" fill="#eafaf1" stroke="#117a65" stroke-width="2"/><text x="740" y="85" text-anchor="middle" font-weight="bold">INMP441 (I2S)</text><text x="740" y="105" text-anchor="middle" font-size="12">VDD─100nF─GND | L/R─GND</text><text x="740" y="125" text-anchor="middle" font-size="12">BCLK/WS/SD → 18/19/20</text><text x="740" y="150" text-anchor="middle" font-size="12">faces motor 10–20cm</text>
 <rect x="600" y="190" width="280" height="110" rx="10" fill="#f4ecf7" stroke="#8e44ad" stroke-width="2"/><text x="740" y="215" text-anchor="middle" font-weight="bold">POWER & BOX</text><text x="740" y="235" text-anchor="middle" font-size="12">IP65 + 2×PG7 glands</text><text x="740" y="255" text-anchor="middle" font-size="12">10uF bulk + heat-shrink</text><text x="740" y="275" text-anchor="middle" font-size="12">breadboard 840 inside lid</text>
 <line x1="300" y1="105" x2="350" y2="105" stroke="#2471a3" stroke-width="2"/><line x1="300" y1="245" x2="350" y2="150" stroke="#b9770e" stroke-width="2"/><line x1="600" y1="125" x2="550" y2="175" stroke="#117a65" stroke-width="2"/>
@@ -211,6 +211,46 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <div class="callout"><b>Mechanical stack (prevents 50Hz hum + heat short):</b> motor → magnet (steel) → M3 screw → nylon washer → ADXL PCB → nylon standoff → nut. PT100 M6 screwed to flat spot with thermal paste, torqued finger-tight. Mic on standoff, port facing bearing, foam windscreen if dusty.</div>
 <div class="callout warn"><b>Common kills:</b> 5V into sensor (dead), SDA/SCL swapped (no ACK), SPI mode 0 vs 1 (MAX reads 0Ω), I2S WS wrong pin (silence), shield tied both ends (loop). Check each with <code>i2cdetect -y 1</code> → 0x53 must appear.</div>
 </div>
+
+<h3>4.3 Generated design package — one source of truth</h3>
+<p>Every component, pin and net in §4.1–4.2 is defined <b>once</b>, in <code>circuit/design.py</code>. One build regenerates the KiCad-format netlist, a SKiDL script, the ERC + physics report and the three vector sheets below. If a rule fails, the build exits and no drawing is produced — so a sheet can never drift away from the netlist, and a wrong wire cannot reach the bench.</p>
+<div class="kpi">
+<div><b>0</b><span>ERC errors</span></div>
+<div><b>4</b><span>documented trade-offs</span></div>
+<div><b>39</b><span>design checks run</span></div>
+</div>
+<table>
+<tr><th>Derived number</th><th>Value</th><th>Why it matters</th></tr>
+<tr><td>Sampling / Nyquist</td><td>800 Hz → 400 Hz</td><td>covers BPFO ≈160 Hz and BPFI ≈240 Hz; the chip's own filter sits exactly at Nyquist</td></tr>
+<tr><td>FFT resolution</td><td>0.195 Hz/bin, 5.12 s window</td><td>separates bearing tones from shaft harmonics and 50 Hz mains</td></tr>
+<tr><td>Accelerometer LSB</td><td>3.9 mg</td><td>25× finer than the 0.1 g requirement; ±4 g range leaves overload headroom</td></tr>
+<tr><td>RTD quantisation</td><td>0.034 °C/LSB</td><td>15-bit ratiometric conversion, negligible against ±1 °C</td></tr>
+<tr><td>RTD error budget</td><td>0.40 °C RSS</td><td>2.5× margin to M4; dominated by probe contact (0.30 °C), not electronics</td></tr>
+<tr><td>Self-heating</td><td>0.003 °C average</td><td>bias is on only 66 ms out of every 5 s</td></tr>
+<tr><td>I²C rise time</td><td>238 ns &lt; 300 ns</td><td>1.8 kΩ on-board pull-ups + 60 pF cable → 400 kHz is legal, &lt;10 cm cable rule</td></tr>
+<tr><td>Power</td><td>1.48 A of 3 A</td><td>7.4 W peak (Pi 6.4 + fan 1.0 + sensors 0.03), 2× margin, no brown-out</td></tr>
+</table>
+
+<img class="chart" src="circuit/out/schematic_main.svg" alt="System wiring schematic with cable schedule">
+<p style="font-size:13px;color:#5d6d7e"><b>Sheet 1 — system wiring.</b> Nine signal nets are routed on labelled rails; power and ground use net tags so the drawing stays readable. The schedule on the right is the authoritative pin list — build from it, not from the picture.</p>
+
+<img class="chart" src="circuit/out/rtd_frontend.svg" alt="PT100 3-wire front end and error budget">
+<p style="font-size:13px;color:#5d6d7e"><b>Sheet 2 — why three leads.</b> The third lead lets the MAX31865 cancel the lead resistance; the error budget on the right is computed, not typed, and lands at 0.40 °C against a 1.0 °C requirement.</p>
+
+<img class="chart" src="circuit/out/wiring_a3.svg" alt="A3 assembly and cable drawing">
+<p style="font-size:13px;color:#5d6d7e"><b>Sheet 3 — assembly.</b> A3, not to scale. Cable schedule, build order and the power-on checklist that has to pass before any data is trusted.</p>
+
+<h4>Defects the pipeline caught — and what changed</h4>
+<table>
+<tr><th>Caught by</th><th>Field symptom if shipped</th><th>Fix now in this book</th></tr>
+<tr><td>Rref 430 Ω on the board vs 400 Ω in code</td><td>ice point reads <b>−18 °C</b>; every temperature wrong by the same ratio</td><td><code>ref_resistor=430.0</code> + ice-point gate in §9</td></tr>
+<tr><td>50 Hz sampling vs a 250 Hz BPFI claim</td><td>aliasing: a 240 Hz tone appears at 10 Hz and looks like imbalance</td><td>ODR 800 Hz, 4096-sample windows, timestamp resampling</td></tr>
+<tr><td>Kurtosis divided by σ² instead of σ⁴</td><td>inflated kurtosis → false “impact” alarms on clean data</td><td><code>w.var()**2</code> — the real fourth moment</td></tr>
+<tr><td>RMS of |a| including gravity</td><td>constant 1 g offset hides small faults</td><td>per-axis mean removal before RMS / FFT</td></tr>
+<tr><td>IP65 box + internal fan</td><td>sealed box recirculates its own heat; Pi throttles in summer</td><td>aluminium plate bolted to the lid as heat spreader (WARN, measured in §11)</td></tr>
+<tr><td>Single 3σ SPC point</td><td>one false alarm every ~31 min at 5 s windows</td><td>2-of-3 rule at 2σ warning / 3σ alarm (WARN, tuned in §10)</td></tr>
+</table>
+<div class="callout good"><b>Files in the repo:</b> <a href="circuit/out/erc_report.md">erc_report.md</a> · <a href="circuit/out/pdm.net">pdm.net</a> (KiCad) · <a href="circuit/out/pdm_skidl.py">pdm_skidl.py</a> · <a href="circuit/out/block.mmd">block.mmd</a> · <a href="circuit/out/sequence.mmd">sequence.mmd</a> · <a href="circuit/out/state.mmd">state.mmd</a>. Rebuild with <code>python3 circuit/build.py</code> — stdlib only, runs on the Pi.</div>
 </div>
 
 <div class="card" id="code">
@@ -228,27 +268,44 @@ FB_URL = os.getenv(<span class="s">'FB_URL'</span>,<span class="s">'https://&lt;
 FB_KEY = os.getenv(<span class="s">'FB_KEY'</span>,<span class="s">'DEMO_KEY'</span>)
 i2c = busio.I2C(board.SCL, board.SDA)
 acc = adafruit_adxl34x.ADXL345(i2c); acc.range = adafruit_adxl34x.Range.RANGE_4_G
+acc.data_rate = adafruit_adxl34x.DataRate.RATE_800_HZ  <span class="c"># chip anti-alias = fs/2</span>
 spi = busio.SPI(board.SCK, board.MOSI, board.MISO)
 cs = digitalio.DigitalInOut(board.D8)
-rtd = adafruit_max31865.Adafruit_MAX31865(spi, cs, wires=3, rtd_nominal=100, ref_resistor=400.0)
+rtd = adafruit_max31865.Adafruit_MAX31865(spi, cs, wires=3, rtd_nominal=100,
+                                            ref_resistor=430.0)  <span class="c"># board = 430Ω, not 400</span>
 mq = mqtt.Client(); <span class="k">try</span>: mq.connect(<span class="s">'localhost'</span>,1883,60); mq.loop_start()  <span class="k">except</span>: <span class="k">pass</span>  <span class="c"># local Mosquitto, works offline</span>
-buf = collections.deque(maxlen=1000); win = collections.deque(maxlen=250)
+buf = collections.deque(maxlen=1000)
+ts  = collections.deque(maxlen=8192)      <span class="c"># sample timestamps</span>
+raw = collections.deque(maxlen=8192)      <span class="c"># (x,y,z) in g</span>
 mu,sg = 0.35,0.04; last_fb = 0; writes = 0
 logf = open(<span class="s">'hot_backup.csv'</span>,<span class="s">'a'</span>,newline=<span class="s">''</span>); wr=csv.writer(logf)
+<span class="k">def</span> <span class="f">uniform</span>(ts, raw, n=4096):
+    <span class="c"># resample on real timestamps: OS jitter must not invent or hide a tone</span>
+    t = np.asarray(ts,<span class="f">float</span>); t -= t[0]
+    a = np.asarray(raw,<span class="f">float</span>) - np.mean(raw,axis=0)  <span class="c"># g, gravity removed</span>
+    u = np.linspace(0,t[-1],n)
+    <span class="k">return</span> np.sqrt(<span class="f">sum</span>(np.interp(u,t,a[:,i])**2 <span class="k">for</span> i <span class="k">in</span> range(3)))
 <span class="k">def</span> <span class="f">features</span>(w):
-    a=np.array(w); rms=<span class="f">float</span>(np.sqrt((a**2).mean()))
-    kurt=<span class="f">float</span>(((a-a.mean())**4).mean()/(a.std()**2+1e-9))
-    return rms,kurt
+    rms = <span class="f">float</span>(np.sqrt((w**2).mean()))
+    <span class="k">return</span> rms, <span class="f">float</span>(((w-w.mean())**4).mean()/(w.var()**2+1e-12))  <span class="c"># true kurtosis</span>
 <span class="k">while True</span>:
+    t0 = time.perf_counter()
     x,y,z = acc.acceleration
-    g = np.sqrt(x**2+y**2+z**2)/9.81 - CAL[<span class="s">'g_bias'</span>]
+    ts.append(t0); raw.append((x,y,z))
+    time.sleep(max(0,1/800-(time.perf_counter()-t0)))   <span class="c"># 800 Hz target</span>
+    <span class="k">if</span> len(raw) &lt; 4096: <span class="k">continue</span>          <span class="c"># 4096/800 = 5.12 s window</span>
+    w = uniform(ts,raw); rms,kurt = features(w)
+    g = <span class="f">float</span>(np.sqrt(x*x+y*y+z*z))
     t = <span class="f">float</span>(rtd.temperature)*CAL[<span class="s">'t_a'</span>]+CAL[<span class="s">'t_b'</span>]
-    win.append(g); rms,kurt = features(win) <span class="k">if</span> len(win)==250 <span class="k">else</span> (g,3.0)
+    fs = <span class="k">round</span>(<span class="f">len</span>(ts)/(ts[-1]-ts[0]),1)            <span class="c"># prove the achieved rate</span>
+    flat = <span class="k">round</span>(<span class="f">float</span>(np.linalg.norm(np.mean(raw,axis=0))),3)  <span class="c"># ~1.0 g = still bolted flat</span>
     state=<span class="s">'Healthy'</span>
     <span class="k">if</span> rms&gt;mu+3*sg <span class="k">or</span> kurt&gt;6 <span class="k">or</span> t&gt;75: state=<span class="s">'Fault'</span>
     <span class="k">elif</span> rms&gt;mu+2*sg <span class="k">or</span> t&gt;60: state=<span class="s">'Warning'</span>
     pkt={<span class="s">'g'</span>:round(g,3),<span class="s">'rms'</span>:round(rms,3),<span class="s">'kurt'</span>:round(kurt,2),
-         <span class="s">'temp'</span>:round(t,2),<span class="s">'state'</span>:state,<span class="s">'ts'</span>:time.time(),<span class="s">'seq'</span>:writes}
+         <span class="s">'flat'</span>:flat,<span class="s">'fs'</span>:fs,<span class="s">'temp'</span>:round(t,2),<span class="s">'state'</span>:state,
+         <span class="s">'ts'</span>:time.time(),<span class="s">'seq'</span>:writes}
+    ts.clear(); raw.clear()                            <span class="c"># next window starts fresh</span>
     <span class="k">try</span>: mq.publish(<span class="s">'factory/motor1'</span>,json.dumps(pkt),qos=1)  <span class="k">except</span>: buf.append(pkt)
     wr.writerow(pkt.values()); logf.flush()
     <span class="c"># Firebase mirror throttled: 1/15s normal, 1/60s if &gt;15k writes/day</span>
@@ -256,7 +313,7 @@ logf = open(<span class="s">'hot_backup.csv'</span>,<span class="s">'a'</span>,n
     <span class="k">if</span> time.time()-last_fb &gt; interval:
         <span class="k">try</span>: requests.put(FB_URL, params={<span class="s">'auth'</span>:FB_KEY}, json=pkt, timeout=5); last_fb=time.time()
         <span class="k">except</span>: buf.append(pkt)  <span class="c"># offline → backfill later</span>
-    writes+=1; time.sleep(0.02)</pre>
+    writes+=1</pre>
 <h4>5.2 Flask Custom Panel (offline primary: http://192.168.4.1:5000 + Firebase mirror fallback)</h4>
 <pre><span class="k">from</span> flask <span class="k">import</span> Flask, jsonify, render_template_string
 <span class="k">import</span> csv

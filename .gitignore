@@ -4,3 +4,5 @@ __pycache__/
 hot_backup.csv
 *.log
 .DS_Store
+circuit/out/*.png
+circuit/__pycache__/

@@ -1,0 +1,21 @@
+sequenceDiagram
+  autonumber
+  participant S as Sensors
+  participant P as Pi edge
+  participant F as Flask Panel
+  participant B as Firebase RTDB
+  participant G as Grafana
+
+  S->>P: g, temperature, audio RMS (timestamped)
+  P->>P: calibrate -> window -> RMS / kurtosis / FFT
+  alt SPC inside limits
+    P->>F: state=Healthy (1 s SSE)
+    P->>B: PUT /motor1.json (15 s)
+    B-->>G: JSON datasource
+  else SPC out of control
+    P->>P: RF infer (~2 ms) -> fault + probability
+    P->>F: state=Fault + advice (<= 5 s)
+    P->>B: PUT + seq
+    B-->>G: annotation on the time series
+  end
+  Note over P,B: WiFi down -> SD buffer, replay on reconnect

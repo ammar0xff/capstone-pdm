@@ -1,0 +1,174 @@
+"""
+design.py — single source of truth for the PdM rig circuit.
+
+Everything downstream (ERC, physics checks, KiCad netlist, SKiDL, SVG) is
+generated from the tables below, so the schematic can never drift from the
+netlist. Pure stdlib: runs on the Pi, no KiCad install required.
+
+Refs: Raspberry Pi 4 J8 header, ADXL345 (I2C 0x53), MAX31865 (SPI0),
+INMP441 (I2S left channel), PT100 3-wire, 5V/3A PSU.
+"""
+
+# ---------------------------------------------------------------- components
+# pin tuple: (physical pin / pad, signal name, electrical type, human label)
+#   etype: pwr gnd in out io od passive
+COMPS = {
+    "U1": {
+        "value": "Raspberry Pi 4 Model B 8GB",
+        "mpn": "RPi4-8GB",
+        "fp": "Connector_PinHeader_2.54mm:PinHeader_1x40_P2.54mm_Vertical",
+        "pins": {
+            "3V3_A":   ("1",  "3V3",      "pwr",     "3V3 (pin 1)"),
+            "SDA":     ("3",  "SDA1",     "od",      "GPIO2 / SDA1 (pin 3)"),
+            "SCL":     ("5",  "SCL1",     "od",      "GPIO3 / SCL1 (pin 5)"),
+            "GND_9":   ("9",  "GND",      "gnd",     "GND (pin 9)"),
+            "BCLK":    ("12", "PCM_CLK",  "out",     "GPIO18 / PCM_CLK (pin 12)"),
+            "GND_14":  ("14", "GND",      "gnd",     "GND (pin 14)"),
+            "3V3_B":   ("17", "3V3",      "pwr",     "3V3 (pin 17)"),
+            "MOSI":    ("19", "MOSI",     "out",     "GPIO10 / MOSI (pin 19)"),
+            "MISO":    ("21", "MISO",     "in",      "GPIO9 / MISO (pin 21)"),
+            "SCLK":    ("23", "SCLK",     "out",     "GPIO11 / SCLK (pin 23)"),
+            "CE0":     ("24", "CE0",      "out",     "GPIO8 / CE0 (pin 24)"),
+            "GND_25":  ("25", "GND",      "gnd",     "GND (pin 25)"),
+            "WS":      ("35", "PCM_FS",   "out",     "GPIO19 / PCM_FS (pin 35)"),
+            "LED":     ("36", "GPIO16",   "out",     "GPIO16 (pin 36)"),
+            "DIN":     ("38", "PCM_DIN",  "in",      "GPIO20 / PCM_DIN (pin 38)"),
+            "GND_39":  ("39", "GND",      "gnd",     "GND (pin 39)"),
+            "5V":      ("4",  "5V",       "pwr",     "5V (pin 4, fan)"),
+            "GND_6":   ("6",  "GND",      "gnd",     "GND (pin 6, fan)"),
+        },
+    },
+    "U2": {
+        "value": "ADXL345 3-axis accelerometer module",
+        "mpn": "ADXL345",
+        "fp": "Module:ADXL345",
+        "pins": {
+            "VCC": ("1", "VCC",  "pwr",     "VCC 3.3V"),
+            "GND": ("2", "GND",  "gnd",     "GND"),
+            "CS":  ("3", "CS",   "in",      "CS -> 3V3 = I2C mode"),
+            "SDO": ("4", "SDO",  "in",      "SDO -> GND = addr 0x53"),
+            "SDA": ("5", "SDA",  "od",      "SDA"),
+            "SCL": ("6", "SCL",  "in",      "SCL"),
+        },
+    },
+    "U3": {
+        "value": "MAX31865 RTD front-end module (Rref 430R)",
+        "mpn": "MAX31865",
+        "fp": "Module:MAX31865",
+        "pins": {
+            "VIN":  ("1", "VIN",   "pwr",     "VIN 3.3V"),
+            "GND":  ("2", "GND",   "gnd",     "GND"),
+            "SCLK": ("3", "SCLK",  "in",      "SCLK"),
+            "SDI":  ("4", "SDI",   "in",      "SDI (MOSI)"),
+            "SDO":  ("5", "SDO",   "out",     "SDO (MISO)"),
+            "CS":   ("6", "CS",    "in",      "CS"),
+            "FP":   ("7", "F+",    "passive", "F+ force"),
+            "FN":   ("8", "F-",    "passive", "F- force"),
+            "RP":   ("9", "RTD+",  "passive", "RTD+ sense"),
+            "RN":   ("10", "RTD-", "passive", "RTD- sense"),
+        },
+    },
+    "U4": {
+        "value": "INMP441 I2S MEMS microphone",
+        "mpn": "INMP441",
+        "fp": "Module:INMP441",
+        "pins": {
+            "VDD": ("1", "VDD",   "pwr",     "VDD 3.3V"),
+            "GND": ("2", "GND",   "gnd",     "GND"),
+            "LR":  ("3", "L/R",   "in",      "L/R -> GND = left"),
+            "BCLK":("4", "BCLK",  "in",      "BCLK"),
+            "WS":  ("5", "WS",    "in",      "WS / LRCLK"),
+            "SD":  ("6", "SD",    "out",     "SD data out"),
+        },
+    },
+    "R1": {"value": "PT100 3-wire probe M6", "mpn": "PT100-M6", "fp": "Module:PT100_M6",
+           "pins": {"A": ("1", "A", "passive", "single lead"),
+                    "B": ("2", "B", "passive", "matched lead 1"),
+                    "C": ("3", "C", "passive", "matched lead 2 (compensation)")}},
+    "C1": {"value": "100nF X7R", "mpn": "100nF", "fp": "Capacitor_SMD:C_0402_1005Metric",
+           "pins": {"1": ("1", "1", "passive", "1"), "2": ("2", "2", "passive", "2")}},
+    "C2": {"value": "100nF X7R", "mpn": "100nF", "fp": "Capacitor_SMD:C_0402_1005Metric",
+           "pins": {"1": ("1", "1", "passive", "1"), "2": ("2", "2", "passive", "2")}},
+    "C3": {"value": "100nF X7R", "mpn": "100nF", "fp": "Capacitor_SMD:C_0402_1005Metric",
+           "pins": {"1": ("1", "1", "passive", "1"), "2": ("2", "2", "passive", "2")}},
+    "C4": {"value": "10uF electrolytic", "mpn": "10uF", "fp": "Capacitor_SMD:CP_Elec_4x5.4",
+           "pins": {"1": ("1", "1", "passive", "1"), "2": ("2", "2", "passive", "2")}},
+    "R2": {"value": "10k pull-up (CS idle high)", "mpn": "10k", "fp": "Resistor_SMD:R_0402_1005Metric",
+           "pins": {"1": ("1", "1", "passive", "1"), "2": ("2", "2", "passive", "2")}},
+    "R4": {"value": "330R LED series (salvaged)", "mpn": "330R", "fp": "Resistor_SMD:R_0402_1005Metric",
+           "pins": {"1": ("1", "1", "passive", "1"), "2": ("2", "2", "passive", "2")}},
+    "D1": {"value": "Status LED (salvaged)", "mpn": "LED", "fp": "LED_SMD:LED_0603_1608Metric",
+           "pins": {"A": ("1", "A", "passive", "anode"), "K": ("2", "K", "passive", "cathode")}},
+    "F1": {"value": "5V cooling fan", "mpn": "FAN-5V", "fp": "Module:Fan_5V",
+           "pins": {"P": ("1", "P", "pwr", "+5V"), "N": ("2", "N", "gnd", "GND")}},
+}
+
+# --------------------------------------------------------------------- nets
+# kind: signal | power | gnd | analog
+NETS = {
+    "3V3":        {"color": "#c0392b", "kind": "power",  "nodes": [
+        ("U1", "3V3_A"), ("U1", "3V3_B"), ("U2", "VCC"), ("U2", "CS"), ("U3", "VIN"),
+        ("U4", "VDD"), ("C1", "1"), ("C2", "1"), ("C3", "1"), ("C4", "1"), ("R2", "1")]},
+    "GND":        {"color": "#34495e", "kind": "gnd",    "nodes": [
+        ("U1", "GND_9"), ("U1", "GND_14"), ("U1", "GND_25"), ("U1", "GND_39"),
+        ("U1", "GND_6"), ("U2", "GND"), ("U2", "SDO"), ("U3", "GND"), ("U4", "GND"),
+        ("U4", "LR"), ("C1", "2"), ("C2", "2"), ("C3", "2"), ("C4", "2"),
+        ("D1", "K"), ("F1", "N")]},
+    "5V":         {"color": "#e67e22", "kind": "power",  "nodes": [("U1", "5V"), ("F1", "P")]},
+    "I2C_SDA":    {"color": "#2471a3", "kind": "signal", "nodes": [("U1", "SDA"), ("U2", "SDA")]},
+    "I2C_SCL":    {"color": "#2471a3", "kind": "signal", "nodes": [("U1", "SCL"), ("U2", "SCL")]},
+    "SPI_SCLK":   {"color": "#b9770e", "kind": "signal", "nodes": [("U1", "SCLK"), ("U3", "SCLK")]},
+    "SPI_MOSI":   {"color": "#b9770e", "kind": "signal", "nodes": [("U1", "MOSI"), ("U3", "SDI")]},
+    "SPI_MISO":   {"color": "#b9770e", "kind": "signal", "nodes": [("U3", "SDO"), ("U1", "MISO")]},
+    "SPI_CS0":    {"color": "#b9770e", "kind": "signal", "nodes": [("U1", "CE0"), ("U3", "CS"), ("R2", "2")]},
+    "I2S_BCLK":   {"color": "#117a65", "kind": "signal", "nodes": [("U1", "BCLK"), ("U4", "BCLK")]},
+    "I2S_WS":     {"color": "#117a65", "kind": "signal", "nodes": [("U1", "WS"), ("U4", "WS")]},
+    "I2S_SD":     {"color": "#117a65", "kind": "signal", "nodes": [("U1", "DIN"), ("U4", "SD")]},
+    "RTD_SENSE_P":{"color": "#8e44ad", "kind": "analog", "nodes": [("R1", "A"), ("U3", "FP"), ("U3", "RP")]},
+    "RTD_SENSE_N":{"color": "#8e44ad", "kind": "analog", "nodes": [("R1", "B"), ("U3", "RN")]},
+    "RTD_FORCE_N":{"color": "#8e44ad", "kind": "analog", "nodes": [("R1", "C"), ("U3", "FN")]},
+    "LED_A":      {"color": "#7f8c8d", "kind": "signal", "nodes": [("U1", "LED"), ("R4", "1")]},
+    "LED_K":      {"color": "#7f8c8d", "kind": "signal", "nodes": [("R4", "2"), ("D1", "A")]},
+}
+
+# ------------------------------------------------------------------ settings
+DESIGN = {
+    "fs_hz": 800,            # ADXL345 ODR = 800 Hz, FIFO burst read
+    "window": 4096,          # 5.12 s at 800 Hz
+    "g_range": 4,            # +/-4 g
+    "rref_ohm": 430.0,       # Adafruit-compatible MAX31865 board
+    "r0_ohm": 100.0,         # PT100 nominal
+    "i2c_rp_ohm": 1800.0,    # Pi 4 onboard pull-ups on GPIO2/3
+    "i2c_cb_pf": 60.0,       # ~10 cm shielded pair
+    "vdd": 3.3,
+    "psu_a": 3.0,
+    "pi_idle_w": 2.7,
+    "pi_peak_w": 6.4,
+    "fan_w": 1.0,
+    "audio_fs": 16000,
+    "temp_tau_s": 8.0,
+}
+
+# --------------------------------------------------------------- BOM (xlsx)
+def bom_rows(path="../DOC-20261014-WA0055.xlsx"):
+    """Parse the locked BOM xlsx with stdlib only (zip + xml)."""
+    import zipfile, xml.etree.ElementTree as ET
+    ns = {"m": "http://schemas.openxmlformats.org/spreadsheetml/2006/main"}
+    with zipfile.ZipFile(path) as z:
+        sst = ET.fromstring(z.read("xl/sharedStrings.xml"))
+        strings = ["".join(t.text or "" for t in si.findall(".//m:t", ns))
+                   for si in sst.findall("m:si", ns)]
+        sheet = ET.fromstring(z.read("xl/worksheets/sheet1.xml"))
+    rows = []
+    for row in sheet.findall(".//m:row", ns):
+        cells = {}
+        for c in row.findall("m:c", ns):
+            ref = c.get("r")
+            col = "".join(ch for ch in ref if ch.isalpha())
+            v = c.find("m:v", ns)
+            val = v.text if v is not None else ""
+            if c.get("t") == "s" and val != "":
+                val = strings[int(val)]
+            cells[col] = val
+        rows.append(cells)
+    return rows

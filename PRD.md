@@ -113,7 +113,7 @@ Why this fits:
 
 ## 4. Scope
 **In:**
-- Edge DAQ: ADXL345 I2C 50-200Hz, MAX31865+PT100 SPI 0.2Hz, INMP441 I2S 16kHz (RMS 10Hz + 1s clip on trigger).
+- Edge DAQ: ADXL345 I2C at ODR 800 Hz into 4096-sample windows (5.12 s, Nyquist 400 Hz covers BPFO/BPFI), MAX31865+PT100 SPI 0.2 Hz, INMP441 I2S 16 kHz (RMS 10 Hz + 1 s clip on trigger).
 - Conditioning: 100nF per sensor, 10uF bulk, 10k pull-ups, shielded M-F, magnet+M3+nylon stack.
 - Edge software: Python collector, cal.json offsets, SPC X-bar/R, RF/1D-CNN inference, Mosquitto local + SD CSV buffer, Firebase RTDB mirror, Flask Custom Panel hosted on Pi.
 - Cloud 0-EGP: Firebase Spark RTDB (mirror) + Firebase Hosting (Custom Panel public mirror) + Grafana Cloud free (analytics). No card.
@@ -122,6 +122,15 @@ Why this fits:
 - Docs: dataset, rubric, cal sheets, logbooks, poster, QR codes.
 
 **Out:** Paid cloud, vibration shaker/chamber purchase (hand shake + dryer at 30cm + phone tone), RUL regression, CMMS auto-orders (manual text advice only).
+
+### 4.1 Design artifacts (generated, not hand-drawn)
+`circuit/design.py` is the single source of truth for every component, pin and net. `python3 circuit/build.py` regenerates:
+- `circuit/out/pdm.net` — KiCad-format netlist; `pdm_skidl.py` — SKiDL source for a machine with KiCad libraries.
+- `circuit/out/erc_report.md` — 39 design checks (ERC + physics) plus BOM traceability: **0 ERC errors, 4 documented WARN**. The BOM gate also fails loudly if the working xlsx stops matching the design or the 8240 cap.
+- `circuit/out/schematic_main.svg`, `rtd_frontend.svg`, `wiring_a3.svg` — A3 vector sheets embedded in Project Book §4.3.
+- `circuit/out/block.mmd`, `sequence.mmd`, `state.mmd` — Mermaid diagrams for GitHub rendering.
+
+The build exits non-zero on any FAIL, so a broken netlist cannot produce a drawing. Enforced invariants: no 5V pin on a 3.3V net, one push-pull driver per net, every IC decoupled by 100 nF on its own supply net, dedicated SPI CS with pull-up, unique I2C address, no pin used twice. WARNs are documented trade-offs (I2C cable length, sealed-box heat, single-point SPC false-alarm rate, Rref-code mismatch guard).
 
 ## 5. System Architecture v2.0 (offline-first + dual dashboard)
 
@@ -204,7 +213,7 @@ Quota guard: Pi counts writes/day; if >15k, auto-throttle to 1/60s + SD-only + G
 ### 9.2 Protocols & sampling
 - Local primary: MQTT `factory/motor1` QoS1 to Mosquitto on Pi; Flask SSE to browser. Works on `pi-hotspot` with zero internet.
 - Mirror: HTTPS REST `PUT https://<proj>.firebaseio.com/motor1.json?auth=KEY` every 15s (5s in demo burst ≤10min to stay under quota); JSON NGSI-like `urn:ngsi-ld:Motor:*`.
-- Sampling: accel 50Hz burst 1s/5s, temp 0.2Hz, audio RMS 10Hz + 1s clip on trigger only.
+- Sampling: accel 800 Hz continuous, ODR = fs so the chip filter sits at Nyquist, timestamp-resampled to 4096 samples (5.12 s); temp 0.2 Hz; audio RMS 10 Hz + 1 s clip on trigger only.
 - Security: TLS only, RTDB rules read-open/write-keyed for demo + locked after; key in `.env`, never git.
 
 ### 9.3 Shared data model (both UIs must render this)
