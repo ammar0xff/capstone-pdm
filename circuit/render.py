@@ -565,262 +565,396 @@ def _rounded(pts, r=9.0):
     d += f" L {pts[-1][0]:.1f} {pts[-1][1]:.1f}"
     return d
 
-
 def breadboard(path):
-    W, H = 1680, 1188
+    W, H = 1680, 1188          # A3 landscape @ 4 px/mm  ->  1:1 on paper
     svg = SVG(W, H)
-    header(svg, "Breadboard View — how it is actually plugged",
-           "Fritzing-style build drawing, generated from the same netlist · 15 nets · 13 parts",
+    header(svg, "Breadboard View — the real parts, true scale",
+           "1:1 on A3 · Fritzing-style build drawing generated from the same netlist · 15 nets · 13 parts",
            "4 of 4")
 
-    BBX, BBY, BBW, BBH = 300, 640, 945, 320
-    COL0, DSP = 320.0, 14.3
-    RTP, RTN, RBP, RBN = 665.0, 680.0, 905.0, 920.0
-    ROWY = {"A": 705, "B": 722, "C": 739, "D": 756, "E": 773,
-            "F": 805, "G": 822, "H": 839, "I": 856, "J": 873}
-    C3V3 = NETS["3V3"]["color"]
-    CGND = NETS["GND"]["color"]
-    C5V = NETS["5V"]["color"]
+    # ---------------------------------------------------------------- scale
+    DSP = 10.16                                   # 2.54 mm pin pitch
+    BBX, BBY, BBW, BBH = 470.0, 560.0, 660.0, 212.0
+    COL0 = 485.0
+    RTP, RTN, RBP, RBN = 582.0, 592.16, 716.0, 726.16
+    ROWY = {"A": 606.0, "B": 616.16, "C": 626.32, "D": 636.48, "E": 646.64,
+            "F": 662.0, "G": 672.16, "H": 682.32, "I": 692.48, "J": 702.64}
+    RA = ROWY["A"]
+    C3V3, CGND, C5V = NETS["3V3"]["color"], NETS["GND"]["color"], NETS["5V"]["color"]
 
     def cx(col):
         return COL0 + col * DSP
 
-    def wire(pts, color, w=2.6):
+    def wire(pts, color, w=2.2):
         d = _rounded(pts)
-        svg.add(f'<path d="{d}" fill="none" stroke="#ffffff" stroke-width="{w + 2.4:.1f}" '
-                f'stroke-linecap="round" stroke-linejoin="round" opacity="0.92"/>')
+        svg.add(f'<path d="{d}" fill="none" stroke="#ffffff" stroke-width="{w + 2.0:.1f}" '
+                f'stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>')
         svg.add(f'<path d="{d}" fill="none" stroke="{color}" stroke-width="{w:.1f}" '
                 f'stroke-linecap="round" stroke-linejoin="round"/>')
 
-    # ---------------------------------------------------------- right column
-    # probe card
-    card(svg, 1250, 640, 370, 122, "K-TYPE PROBE  (R1)", accent="#8e44ad")
-    svg.text(1268, 742, "Screw terminals = cold junction (on the MAX6675 die).", 7, INK)
-    svg.text(1268, 754, "Keep the module >= 15 cm from the Pi and the fan.", 7, INK)
+    # ================================================================ PI 4
+    PX, PY, PW, PH = 60.0, 190.0, 340.0, 224.0
+    HX0, HY_ODD, HY_EVEN = 84.0, 402.0, 392.0
 
-    # wire key
-    card(svg, 1250, 772, 370, 112, "WIRE COLOUR KEY")
-    key = [("3V3 / +", C3V3), ("GND / -", CGND), ("5V (fan)", C5V),
-           ("I2C SDA", NETS["I2C_SDA"]["color"]), ("I2C SCL", NETS["I2C_SCL"]["color"]),
-           ("SPI SCK", NETS["SPI_SCLK"]["color"]), ("SPI MISO", NETS["SPI_MISO"]["color"]),
-           ("SPI CS", NETS["SPI_CS0"]["color"]), ("I2S  (3 wires)", NETS["I2S_BCLK"]["color"]),
-           ("K-type P/N", NETS["TC_P"]["color"]), ("LED", NETS["LED_A"]["color"])]
-    for i, (label, colc) in enumerate(key):
-        colx = 1268 if i < 6 else 1442
-        yy = 811 + (i % 6) * 12.4
-        svg.line(colx, yy - 2.5, colx + 18, yy - 2.5, colc, 3.2)
-        svg.text(colx + 25, yy + 0.5, label, 7.2, INK)
+    svg.rect(PX + 3, PY + 5, PW, PH, fill="#0b1b14", op=0.14, rx=9)
+    svg.rect(PX, PY, PW, PH, fill="#2f7d5c", stroke="#17503a", rx=7, sw=1.4)
+    for hx, hy in ((PX + 10, PY + 10), (PX + PW - 10, PY + 10),
+                   (PX + 10, PY + PH - 10), (PX + PW - 10, PY + PH - 10)):
+        svg.circle(hx, hy, 4.6, "#e8eff0", stroke="#9fb3ad", sw=0.7)
+        svg.circle(hx, hy, 2.2, "#4a6b5e")
 
-    # pi header table
-    card(svg, 1250, 894, 370, 148, "PI 40-PIN HEADER — WIRED PINS")
-    rows = [(1, "3V3", "rail +"), (3, "SDA", "U2"), (5, "SCL", "U2"),
-            (9, "GND", "rail -"), (12, "BCLK", "U4"), (21, "MISO", "U3"), (23, "SCLK", "U3"),
-            (24, "CE0", "U3"), (35, "WS", "U4"), (36, "GPIO16", "D1"),
-            (38, "DIN", "U4"), (4, "5V", "fan"), (6, "GND", "fan")]
-    for i, (pin, sig, to) in enumerate(rows):
-        colx = 1268 if i < 7 else 1440
-        yy = 934 + (i % 7) * 14
-        svg.text(colx, yy, f"{pin:>2}", 7.2, MUTED, family=MONO)
-        svg.text(colx + 26, yy, sig, 7.2, INK, family=MONO)
-        svg.text(colx + 92, yy, to, 7, MUTED, anchor="end")
-    svg.text(1268, 1030, "spare: 2, 14, 17, 19 (no MOSI), 25, 39", 6.4, MUTED, family=MONO)
-    svg.text(1268, 1040, "header silk: pin 1 = 3V3, nearest the microSD end", 6.4, MUTED)
+    # usb-a: two towers of two ports, along the top long edge
+    for tx in (88.0, 148.0):
+        svg.rect(tx, 198, 56, 52, fill="#d5dbdb", stroke="#8d9a9b", rx=2, sw=0.9)
+        for oy in (203.0, 227.0):
+            svg.rect(tx + 6, oy, 44, 18, fill="#6e7b7d", rx=1)
+            svg.rect(tx + 8, oy + 5.5, 40, 7, fill="#2f3a3c", rx=0.6)
+    # ethernet
+    svg.rect(212, 198, 68, 56, fill="#d5dbdb", stroke="#8d9a9b", rx=1.5, sw=0.9)
+    svg.rect(219, 205, 54, 36, fill="#546e7a", rx=1)
+    svg.rect(226, 211, 40, 22, fill="#22313a", rx=1)
+    svg.circle(276, 246, 1.8, "#27ae60")
+    svg.circle(269, 246, 1.8, "#f1c40f")
+    # right short edge: usb-c, audio, 2x micro-hdmi
+    svg.rect(368, 200, 26, 16, fill="#cfd8dc", stroke="#8d9a9b", rx=3, sw=0.8)
+    svg.text(366, 196, "USB-C", 4.2, "#c8e6d5", anchor="end")
+    svg.rect(360, 226, 34, 18, fill="#b0b8b9", stroke="#8d9a9b", rx=2, sw=0.8)
+    svg.circle(377, 235, 5.2, "#4b5658", stroke="#8d9a9b", sw=0.6)
+    for oy in (252.0, 272.0):
+        svg.rect(366, oy, 28, 14, fill="#c3cbcc", stroke="#8d9a9b", rx=1.5, sw=0.8)
+        svg.rect(369, oy + 3, 22, 8, fill="#586365", rx=0.8)
+    # microsd on the left short edge
+    svg.rect(60, 296, 16, 40, fill="#c3cbcc", stroke="#8d9a9b", rx=1.5, sw=0.8)
+    svg.rect(63, 300, 10, 32, fill="#6e7b7d", rx=0.8)
 
-    # ---------------------------------------------------------------- pi pcb
-    px, py, pw, ph = 60, 150, 500, 280
-    svg.rect(px + 3, py + 4, pw, ph, fill="#0b1b14", op=0.16, rx=12)
-    svg.rect(px, py, pw, ph, fill="#2d7a58", stroke="#17503a", rx=10, sw=1.6)
-    for hx, hy in [(px + 16, py + 16), (px + pw - 16, py + 16),
-                   (px + 16, py + ph - 16), (px + pw - 16, py + ph - 16)]:
-        svg.circle(hx, hy, 7, "#d9e2e6", stroke="#8fa6a0", sw=1)
-        svg.circle(hx, hy, 3.2, "#3f5d52")
-    # usb / ethernet / jacks
-    for yy in (160, 214):
-        svg.rect(86, yy, 94, 50, fill="#d5dbdb", stroke="#95a5a6", rx=2, sw=1)
-        svg.rect(94, yy + 14, 78, 22, fill="#7f8c8d", rx=1)
-    svg.rect(198, 160, 98, 78, fill="#cfd8dc", stroke="#90a4ae", rx=2, sw=1)
-    svg.rect(208, 172, 78, 54, fill="#546e7a", rx=1)
-    svg.rect(326, 160, 46, 30, fill="#d5dbdb", stroke="#95a5a6", rx=3)   # hdmi 1
-    svg.rect(382, 160, 46, 30, fill="#d5dbdb", stroke="#95a5a6", rx=3)   # hdmi 2
-    svg.rect(438, 160, 60, 30, fill="#bdc3c7", stroke="#95a5a6", rx=3)   # audio
-    svg.rect(516, 250, 30, 74, fill="#cfd8dc", stroke="#90a4ae", rx=2)   # microSD
-    svg.rect(60, 300, 22, 30, fill="#d5dbdb", stroke="#95a5a6", rx=3)    # usb-c
-    svg.rect(320, 300, 58, 58, fill="#1c2833", rx=2)                     # soc
-    svg.text(349, 334, "BCM2711", 6, "#8fa6a0", anchor="middle")
-    svg.rect(390, 306, 46, 46, fill="#1c2833", rx=2)                     # ram
-    svg.text(413, 333, "4GB", 6, "#8fa6a0", anchor="middle")
-    svg.text(310, 254, "Raspberry Pi 4 Model B", 15, "#eafaf1", anchor="middle", weight="bold")
-    svg.text(310, 270, "4 GB  ·  40-pin GPIO  ·  5 V / 3 A", 8.5, "#b7e4cc", anchor="middle")
-    svg.text(310, 284, "heatsink + fan on pins 4 / 6", 7, "#9fd3b6", anchor="middle")
+    # raspberry mark (simplified)
+    for dx, dy in ((0, 0), (-5, 4), (5, 4), (-3, 8), (3, 8)):
+        svg.circle(326 + dx, 238 + dy, 3.0, "#e8465f")
+    svg.add('<path d="M320 228 q6 -6 12 0 q-6 -2 -12 0z" fill="#7ed09a"/>')
 
-    # 40-pin header
-    HX0, HP, HY0, HY1 = 130.0, 18.0, 400.0, 412.0
-    svg.rect(116, 386, 372, 40, fill="#1c2833", rx=3)
-    svg.text(112, 382, "GPIO", 6.5, "#9fd3b6", anchor="end", weight="bold")
+    svg.text(230, 292, "Raspberry Pi 4 Model B", 8, "#eafaf1", weight="bold")
+    svg.text(230, 303, "4 GB  ·  40-pin GPIO  ·  5 V / 3 A", 5.6, "#b7e4cc")
+    # main silicon
+    svg.rect(250, 318, 54, 54, fill="#1c2833", stroke="#0d151b", rx=1.5, sw=0.8)
+    svg.text(277, 348, "BCM2711", 4.6, "#8fa6a0", anchor="middle", family=MONO)
+    svg.rect(310, 324, 40, 40, fill="#1c2833", stroke="#0d151b", rx=1.5, sw=0.8)
+    svg.text(330, 347, "4GB", 5, "#8fa6a0", anchor="middle", family=MONO)
+    svg.rect(196, 320, 44, 44, fill="#b9c3c4", stroke="#8d9a9b", rx=1.5, sw=0.8)
+    svg.rect(201, 325, 34, 34, fill="#aab4b5", rx=1)
+    svg.text(218, 345, "WiFi", 4.4, "#3c4a4b", anchor="middle")
+    svg.rect(152, 362, 34, 18, fill="#1c2833", rx=1)
+    svg.text(169, 374, "PMIC", 4.2, "#8fa6a0", anchor="middle")
+    for i in range(5):
+        svg.rect(240 + i * 22, 378, 9, 5, fill="#c9a227", rx=0.8)
+        svg.rect(240 + i * 22, 310, 9, 4, fill="#c9a227", rx=0.8)
+
+    # 40-pin header (pin 1 bottom-left, odd row nearest the board edge)
+    svg.rect(79, 387, 203, 20, fill="#1b2631", rx=2)
     for n in range(1, 41):
-        c = (n - 1) // 2
-        r = (n - 1) % 2
-        x = HX0 + c * HP
-        y = HY0 if r == 0 else HY1
-        svg.circle(x, y, 3.0, "#c9a227")
-        svg.circle(x, y, 1.3, "#17202a")
-
-    # ------------------------------------------------------------ breadboard
-    svg.rect(BBX + 2, BBY + 4, BBW, BBH, fill="#0b1b14", op=0.10, rx=10)
-    svg.rect(BBX, BBY, BBW, BBH, fill="#fcfdfd", stroke="#aebec4", rx=8, sw=1.6)
-    svg.rect(BBX + 7, BBY + 7, BBW - 14, BBH - 14, fill="#f5f8f9", stroke="#e2eaec", rx=5, sw=1)
-    # rails (printed, not wires)
+        c, r = (n - 1) // 2, (n - 1) % 2
+        svg.circle(HX0 + c * DSP, HY_ODD if r == 0 else HY_EVEN, 2.0, "#d4af37")
+        svg.circle(HX0 + c * DSP, HY_ODD if r == 0 else HY_EVEN, 0.8, "#4a3a12")
+    svg.text(286, 404, "GPIO 40-pin", 5.4, "#c8e6d5")
+    svg.text(286, 396, "pin 1 = 3V3", 4.4, "#9fd3b6")
+    # =========================================================== BREADBOARD
+    svg.rect(BBX + 2, BBY + 5, BBW, BBH, fill="#0b1b14", op=0.10, rx=8)
+    svg.rect(BBX, BBY, BBW, BBH, fill="#fcfdfd", stroke="#aebec4", rx=7, sw=1.4)
+    svg.rect(BBX + 6, BBY + 6, BBW - 12, BBH - 12, fill="#f7fafb", stroke="#e2eaec",
+             rx=4, sw=0.8)
+    # printed rail lines (not wires)
     for yy, cc in ((RTP, C3V3), (RTN, CGND), (RBP, C5V), (RBN, CGND)):
-        svg.line(330, yy, 1200, yy, cc, 1.8, op=0.55)
+        svg.line(480, yy, 1120, yy, cc, 1.6, op=0.40)
     # centre channel
-    svg.rect(330, 782, 870, 16, fill="#e9eff1", rx=2)
-    svg.line(330, 790, 1200, 790, "#d3dee2", 1, dash="10 6")
-    # holes
+    svg.rect(BBX + 10, 651.5, BBW - 20, 11, fill="#e8eef0", rx=1.5)
+    svg.line(BBX + 10, 651.5, BBX + BBW - 10, 651.5, "#d0dbe0", 1)
+    svg.line(BBX + 10, 662.5, BBX + BBW - 10, 662.5, "#d0dbe0", 1)
+    # tie points
     for col in range(63):
         x = cx(col)
         for yy in (RTP, RTN, RBP, RBN):
-            svg.circle(x, yy, 1.45, "#ffffff", stroke="#b9c6cc", sw=0.7)
+            svg.circle(x, yy, 1.55, "#ffffff", stroke="#b2c0c7", sw=0.62)
         for k in "ABCDEFGHIJ":
-            svg.circle(x, ROWY[k], 1.8, "#ffffff", stroke="#9fb0b8", sw=0.8)
-    # row letters / column numbers / rail labels
+            svg.circle(x, ROWY[k], 1.75, "#ffffff", stroke="#93a5ae", sw=0.72)
+    # row letters (both ends) and column numbers
     for k, yy in ROWY.items():
-        svg.text(310, yy + 2.5, k, 6.5, "#7f8c8d", anchor="end", family=MONO)
+        svg.text(477, yy + 1.9, k, 5.4, "#7f8c8d", anchor="end", family=MONO)
+        svg.text(1122, yy + 1.9, k, 5.4, "#7f8c8d", family=MONO)
     for col in range(0, 63, 5):
-        svg.text(cx(col), 946, str(col + 1), 6, "#8fa0a8", anchor="middle", family=MONO)
-    for yy, label, cc in ((RTP, "3V3", C3V3), (RTN, "GND", CGND),
-                          (RBP, "5V", C5V), (RBN, "GND", CGND)):
-        svg.text(1206, yy + 2.4, label, 6.2, cc, family=MONO, weight="bold", op=0.9)
+        svg.text(cx(col), 738, str(col + 1), 4.8, "#8fa0a8", anchor="middle", family=MONO)
+    svg.text(480, 750, "Top rails: 3V3 (+) / GND (−) — sensors only", 5.6, C3V3)
+    svg.text(480, 762, "Bottom rails: 5V (+) / GND (−) — fan only", 5.6, C5V)
+    svg.text(1118, 762, "830 tie points · 165 × 53 mm · 2.54 mm pitch", 5.6,
+             "#8fa0a8", anchor="end")
+    # ============================================================== MODULES
+    def pin_strip(cols, y=606.0):
+        x0, x1 = cx(cols[0]), cx(cols[-1])
+        svg.rect(x0 - 5, y - 5, x1 - x0 + 10, 10, fill="#1b2631", rx=1.2)
+        for c in cols:
+            svg.rect(cx(c) - 2.3, y - 2.3, 4.6, 4.6, fill="#d4af37", rx=0.7)
 
-    # --------------------------------------------------------------- modules
-    def module(x0, w, ref, title, sub, note, fill, keys, col0):
-        yy = 712
-        svg.rect(x0 + 2, yy + 3, w, 78, fill="#0b1b14", op=0.16, rx=5)
-        svg.rect(x0, yy, w, 78, fill=fill, stroke="#0b1b14", rx=5, sw=1)
-        svg.rect(x0 + 5, yy + 5, w - 10, 68, fill="none", stroke="#ffffff", rx=3, sw=0.6, op=0.16)
-        n = len(keys)
-        svg.rect(cx(col0) - 5, 699, (n - 1) * DSP + 10, 13, fill="#1c2833", rx=2)
-        for i in range(n):
-            svg.rect(cx(col0 + i) - 2.6, 702.5, 5.2, 5.2, fill="#c9a227", rx=1)
-        svg.text(x0 + 9, yy + 16, f"{ref}  {title}", 9, "#ffffff", weight="bold")
-        svg.text(x0 + 9, yy + 27, sub, 6.2, "#dbe7f3")
-        svg.text(x0 + 9, yy + 40, note, 5.4, "#b9cfe0")
-        for i, k in enumerate(keys):
-            svg.text(cx(col0 + i), 781, COMPS[ref]["pins"][k][1], 5.8, "#ffffff",
-                     anchor="middle", family=MONO)
+    def pcb(x, y, w, h, fill, stroke):
+        svg.rect(x + 1.5, y + 2.5, w, h, fill="#0b1b14", op=0.16, rx=2.5)
+        svg.rect(x, y, w, h, fill=fill, stroke=stroke, rx=2.5, sw=0.9)
+        svg.rect(x + 3, y + 3, w - 6, h - 6, fill="none", stroke="#ffffff", rx=1.5,
+                 sw=0.4, op=0.14)
 
-    module(396, 92, "U2", "ADXL345", "I2C 0x53 · +/-16 g · Z up",
-           "C1 100nF at VCC/GND", "#1f3a68",
-           ["VCC", "GND", "CS", "SDO", "SDA", "SCL"], 6)
-    module(596, 92, "U4", "INMP441", "I2S · left channel",
-           "C3 100nF at VDD/GND", "#173f5f",
-           ["VDD", "GND", "LR", "BCLK", "WS", "SD"], 20)
-    module(924, 124, "U3", "MAX6675", "K-type -> digital · SPI mode 0",
-           "C2 100nF · R2 10k", "#14532d",
-           ["VIN", "GND", "SCLK", "CS", "SO"], 43)
-    # K-type screw terminal on U3 + probe cable
-    svg.rect(1008, 716, 40, 46, fill="#1e8449", stroke="#0e5c31", rx=3, sw=1)
-    svg.text(1028, 712, "K-type", 5.6, "#1e8449", anchor="middle", weight="bold")
+    def label_row(xs, y, names, size=3.9, col="#dfe9f5"):
+        for x, s in zip(xs, names):
+            svg.text(x, y, s, size, col, anchor="middle", family=MONO)
 
-    # ------------------------------------------------------- support parts
-    # R4 + D1 on row A (LED chain), C4 + F1 at the bottom right
-    svg.rect(725, 700, 18, 9, fill="#d5b895", stroke="#9c7a55", rx=2, sw=0.8)
-    svg.rect(729, 700, 3, 9, fill="#7f4f24")
-    svg.rect(736, 700, 3, 9, fill="#c0392b")
-    svg.line(cx(28), 705, 725, 705, "#b0a090", 1.6)
-    svg.line(743, 705, cx(30), 705, "#b0a090", 1.6)
-    svg.text(734, 718, "R4 330R", 5.4, MUTED, anchor="middle", halo=True)
-    svg.circle(cx(31) + 6.5, 698, 5.6, "#e74c3c", stroke="#a93226", sw=0.8)
-    svg.rect(cx(31) + 1.0, 700, 11, 4.4, fill="#e74c3c", stroke="#a93226", sw=0.8)
-    svg.line(cx(31) + 1.2, 705, cx(31), 705, "#b0a090", 1.4)
-    svg.line(cx(31) + 12.0, 705, cx(33), 705, "#b0a090", 1.4)
-    svg.text(cx(31) + 6.5, 718, "D1", 5.4, MUTED, anchor="middle", halo=True)
-    # C4
-    svg.circle(cx(51) + 7, 830, 8.5, "#2c3e50", stroke="#1b2631", sw=0.8)
-    svg.circle(cx(51) + 7, 830, 6.0, "#34495e")
-    svg.text(cx(51) + 7, 833, "+", 6.5, "#ecf0f1", anchor="middle", family=MONO)
-    svg.text(cx(51) + 7, 801, "C4 10uF", 5.4, MUTED, anchor="middle", halo=True)
-    # F1 screw terminal
-    svg.rect(1094, 810, 56, 28, fill="#1e8449", stroke="#0e5c31", rx=3, sw=1)
-    for fx in (cx(55), cx(57)):
-        svg.circle(fx, 824, 4.4, "#c9a227", stroke="#8a6d1a", sw=0.8)
-        svg.line(fx - 3.4, 824, fx + 3.4, 824, "#6e5715", 1.1)
-        svg.line(fx, 828.4, fx, 839, "#b0a090", 1.4)
-    svg.text(1122, 801, "F1 5V fan", 6, "#14532d", anchor="middle", weight="bold", halo=True)
+    # ---- U2  ADXL345 (GY-291), 20 x 16 mm
+    u2x, u2y, u2w, u2h = 531.0, 614.0, 80.0, 64.0
+    pcb(u2x, u2y, u2w, u2h, "#22375f", "#101c33")
+    for hx, hy in ((537, 620), (605, 620), (537, 672), (605, 672)):
+        svg.circle(hx, hy, 2.6, "#dfe4ee", stroke="#8a93a8", sw=0.5)
+        svg.circle(hx, hy, 1.1, "#22375f")
+    svg.text(571, 634, "ADXL345", 5.0, "#e8eefb", anchor="middle", weight="bold")
+    svg.rect(561, 640, 20, 20, fill="#141a21", rx=0.8)
+    svg.circle(563.5, 642.5, 0.9, "#5d6d7e")
+    svg.text(571, 654, "LGA", 3.4, "#5d6d7e", anchor="middle")
+    svg.rect(538, 642, 9, 7, fill="#141a21", rx=0.5)
+    svg.text(542.5, 651.5, "3V3", 3.0, "#9fb3d1", anchor="middle")
+    for dx in (538, 549):
+        svg.rect(dx, 655, 5, 6, fill="#c9a227", rx=0.5)
+    svg.text(604, 674, "GY-291", 3.6, "#8fa6c8", anchor="end")
+    label_row([cx(6 + i) for i in range(6)], 624,
+              ["VCC", "GND", "CS", "SDO", "SDA", "SCL"])
 
-    # ----------------------------------------------------------- pi wiring
+    # ---- U4  INMP441, 16 x 12 mm
+    u4x, u4y, u4w, u4h = 682.0, 614.0, 62.0, 48.0
+    pcb(u4x, u4y, u4w, u4h, "#3b2052", "#1d0f2b")
+    for hx in (686.0, 740.0):
+        svg.circle(hx, 657, 2.2, "#dfe4ee", stroke="#8a93a8", sw=0.5)
+        svg.circle(hx, 657, 1.0, "#3b2052")
+    svg.text(713, 634, "INMP441", 4.8, "#f0e6fa", anchor="middle", weight="bold")
+    svg.rect(694, 641, 12, 12, fill="#141a21", rx=0.6)
+    svg.circle(733, 648, 6.4, "#b8c2c8", stroke="#7f8b91", sw=0.8)
+    svg.circle(733, 648, 4.4, "#9aa5ab")
+    svg.circle(733, 648, 1.5, "#3d484d")
+    svg.text(694, 660, "MEMS", 3.0, "#b9a6cc", anchor="start")
+    label_row([cx(20 + i) for i in range(6)], 624,
+              ["VDD", "GND", "L/R", "BCLK", "WS", "SD"], size=3.7, col="#f0e6fa")
+
+    # ---- U3  MAX6675 + screw terminal, 30 x 20 mm
+    u3x, u3y, u3w, u3h = 916.0, 614.0, 120.0, 80.0
+    pcb(u3x, u3y, u3w, u3h, "#1d3a5f", "#0d1f33")
+    for hx in (922.0, 1030.0):
+        svg.circle(hx, 688, 2.4, "#dfe4ee", stroke="#8a93a8", sw=0.5)
+        svg.circle(hx, 688, 1.0, "#1d3a5f")
+    svg.text(930, 634, "MAX6675", 5.0, "#e8eefb", weight="bold")
+    for i in range(4):
+        svg.rect(944 + i * 6, 637, 2.4, 3, fill="#c9a227")
+        svg.rect(944 + i * 6, 658, 2.4, 3, fill="#c9a227")
+    svg.rect(946, 640, 22, 18, fill="#141a21", rx=0.8)
+    svg.circle(948.5, 642.5, 0.9, "#5d6d7e")
+    svg.text(957, 651, "SOIC", 3.2, "#5d6d7e", anchor="middle")
+    # cold-junction copper island under the terminal
+    svg.rect(994, 620, 38, 34, fill="#7a5c1e", op=0.30, rx=1)
+    svg.rect(992, 620, 42, 36, fill="#1e8449", stroke="#0e5c31", rx=2, sw=1)
+    for sy in (630.0, 646.0):
+        svg.circle(1013, sy, 5.6, "#c9a227", stroke="#8a6d1a", sw=0.7)
+        svg.line(1009.5, sy, 1016.5, sy, "#6e5715", 1.0)
+    svg.text(1013, 668, "cold junction", 3.4, "#a9c8ff", anchor="middle")
+    svg.rect(978, 672, 11, 5, fill="#d5b895", stroke="#9c7a55", rx=1, sw=0.4)
+    svg.rect(980, 672, 2.4, 5, fill="#7f4f24")
+    svg.text(984, 684, "R2 10k", 3.4, "#a9c8ff", anchor="middle")
+    svg.text(930, 684, "K → SPI", 3.8, "#a9c8ff")
+    label_row([cx(44 + i) for i in range(5)], 622,
+              ["VIN", "GND", "SCLK", "CS", "SO"], size=3.7)
+    pin_strip(list(range(6, 12)))
+    pin_strip(list(range(20, 26)))
+    pin_strip(list(range(44, 49)))
+
+    # ========================================================= SUPPORT PARTS
+    # R4 330R across cols 28..31, body under the pin row
+    svg.rect(772, 610, 25, 9, fill="#d5b895", stroke="#9c7a55", rx=2, sw=0.6)
+    svg.rect(777, 610, 2.6, 9, fill="#7f4f24")
+    svg.rect(783, 610, 2.6, 9, fill="#7f4f24")
+    svg.rect(789, 610, 2.6, 9, fill="#c0392b")
+    svg.line(cx(28), 606, 772, 610, "#b0a090", 1.2)
+    svg.line(797, 610, cx(31), 606, "#b0a090", 1.2)
+    svg.text(784, 642, "R4 330Ω", 3.8, "#5d6d7e", anchor="middle")
+    # D1 5 mm red LED across cols 33/34, hanging below the row
+    svg.circle(825.4, 619, 7.5, "#e74c3c", stroke="#a93226", sw=0.7)
+    svg.circle(825.4, 619, 5.4, "#ec7063", op=0.55)
+    svg.rect(818.4, 621, 14, 2.4, fill="#c0392b")
+    svg.line(cx(33), 606, cx(33), 612, "#b0a090", 1.2)
+    svg.line(cx(34), 606, cx(34), 612, "#b0a090", 1.2)
+    svg.text(825.4, 638, "D1", 3.8, "#5d6d7e", anchor="middle")
+    # C4 10 uF across the bottom rails, cols 52/53
+    svg.circle(1018.4, 706, 7.5, "#2c3e50", stroke="#1b2631", sw=0.7)
+    svg.circle(1018.4, 706, 5.4, "#34495e")
+    svg.text(1018.4, 709, "+", 4.6, "#ecf0f1", anchor="middle", family=MONO)
+    svg.text(997, 699, "C4", 3.8, "#5d6d7e", anchor="end")
+    svg.text(997, 707, "10µF", 3.8, "#5d6d7e", anchor="end")
+    # F1 fan connector in row H, cols 56/57
+    svg.rect(1048, 664, 23, 15, fill="#d5dbdb", stroke="#8a959b", rx=1.5, sw=0.8)
+    svg.rect(1051.5, 667, 16, 6, fill="#6e7b7d", rx=1)
+    svg.line(cx(56), 679, cx(56), 682.32, "#b0a090", 1.0)
+    svg.line(cx(57), 679, cx(57), 682.32, "#b0a090", 1.0)
+    svg.text(1059.5, 659, "F1 5V fan", 3.9, "#1e8449", anchor="middle", weight="bold")
+    # ================================================================ WIRES
     def pin_xy(n):
-        c = (n - 1) // 2
-        r = (n - 1) % 2
-        return HX0 + c * HP, (HY0 if r == 0 else HY1)
+        c, r = (n - 1) // 2, (n - 1) % 2
+        return HX0 + c * DSP, (HY_ODD if r == 0 else HY_EVEN)
 
-    # power feeds (rail ends)
-    wire([(130, 400), (125, 408), (125, 652), (334.3, 652), (334.3, RTP)], C3V3)
-    wire([(202, 400), (197, 408), (197, 644), (348.6, 644), (353.6, 650),
-          (353.6, 675), (348.6, RTN)], CGND)
-    wire([(148, 412), (153, 420), (153, 440), (96, 440), (96, RBP), (334.3, RBP)], C5V)
-    wire([(166, 412), (171, 420), (171, 446), (104, 446), (104, RBN), (334.3, RBN)], CGND)
+    # power: rail feeds, dropped in the gap between the Pi and the board
+    wire([(84, 402), (84, 536), (466, 536), (466, RTP), (485, RTP)], C3V3)
+    wire([(124.64, 402), (124.64, 542), (460, 542), (460, RTN), (485, RTN)], CGND)
+    wire([(94.16, 392), (99.16, 399), (99.16, 548), (454, 548), (454, RBP),
+          (485, RBP)], C5V)
+    wire([(104.32, 392), (109.32, 399), (109.32, 554), (448, 554), (448, RBN),
+          (485, RBN)], CGND)
 
-    # signal wires, fanned so the longest target sits highest
+    # signals, fanned so the right-most target sits on the top lane
     sig = [(3, "I2C_SDA", cx(10)), (5, "I2C_SCL", cx(11)),
            (12, "I2S_BCLK", cx(23)), (35, "I2S_WS", cx(24)), (38, "I2S_SD", cx(25)),
-           (36, "LED_A", cx(28)), (23, "SPI_SCLK", cx(45)), (24, "SPI_CS0", cx(46)),
-           (21, "SPI_MISO", cx(47))]
+           (36, "LED_A", cx(28)), (23, "SPI_SCLK", cx(46)), (24, "SPI_CS0", cx(47)),
+           (21, "SPI_MISO", cx(48))]
     order = sorted(range(len(sig)), key=lambda i: sig[i][2])
-    lane = {i: 632 - 8 * rank for rank, i in enumerate(order)}
+    lane = {i: 510 - 10 * rank for rank, i in enumerate(order)}
     for i, (pin, net, xt) in enumerate(sig):
         x, y = pin_xy(pin)
-        dx = -5 if (pin - 1) % 2 == 0 else 5
-        wire([(x, y), (x + dx, y + 7), (x + dx, lane[i]),
-              (xt + 5, lane[i]), (xt + 5, 698), (xt, 705)], NETS[net]["color"])
+        dx = 0 if (pin - 1) % 2 == 0 else 5
+        e = y + 7 if dx else 0
+        pts = [(x, y)] + ([(x + 5, e)] if dx else []) + \
+              [(x + dx, lane[i]), (xt + 5, lane[i]), (xt + 5, 600), (xt, RA)]
+        wire(pts, NETS[net]["color"])
 
-    # module power drops (bow between the rail holes)
-    def drop(colx, rail_y, color):
-        wire([(colx, rail_y), (colx + 5, rail_y + 6), (colx + 5, 698), (colx, 705)], color)
+    # module power drops, bowing between rail holes
+    def drop(col, rail, color):
+        x = cx(col)
+        wire([(x, rail), (x + 5, rail + 6), (x + 5, 601), (x, RA)], color)
 
     for col, rail, cc in [(6, RTP, C3V3), (7, RTN, CGND), (8, RTP, C3V3), (9, RTN, CGND),
                           (20, RTP, C3V3), (21, RTN, CGND), (22, RTN, CGND),
-                          (43, RTP, C3V3), (44, RTN, CGND)]:
-        drop(cx(col), rail, cc)
+                          (44, RTP, C3V3), (45, RTN, CGND)]:
+        drop(col, rail, cc)
 
-    # R4 -> D1 -> GND rail
-    wire([(cx(30), 705), (cx(31), 705)], "#7f8c8d", 2.2)
-    wire([(cx(33), 705), (cx(33) + 5, 698), (cx(33) + 5, 686), (cx(33), RTN)], CGND)
+    # R4 -> D1, D1 -> GND rail
+    wire([(cx(31), RA), (cx(31), 600), (cx(33), 600), (cx(33), RA)],
+         NETS["LED_A"]["color"])
+    wire([(cx(34), RA), (cx(34) + 5, 600), (cx(34) + 5, 594), (cx(34), RTN)], CGND)
 
-    # K-type pair to the probe card
-    wire([(1048, 728), (1160, 728), (1160, 700), (1276, 700)], NETS["TC_P"]["color"], 2.2)
-    wire([(1048, 750), (1175, 750), (1175, 716), (1276, 716)], NETS["TC_N"]["color"], 2.2)
+    # C4 bulk cap across the bottom rails
+    wire([(1013.3, 713), (1013.3, RBP)], C5V, 1.8)
+    wire([(1023.5, 713), (1028.5, 719), (1028.5, 723), (1023.5, RBN)], CGND, 1.8)
+    # F1 fan leads
+    wire([(cx(56), 682.32), (cx(56) + 5, 688), (cx(56) + 5, 710), (cx(56), RBP)], C5V)
+    wire([(cx(57), 682.32), (cx(57) + 5, 688), (cx(57) + 5, 720), (cx(57), RBN)], CGND)
+    # K-type pair -> probe
+    wire([(1034, 630), (1180, 630)], NETS["TC_P"]["color"], 2.4)
+    wire([(1034, 646), (1180, 646)], NETS["TC_N"]["color"], 2.4)
 
-    # fan + bulk cap to the 5 V rail
-    wire([(cx(51), 839), (cx(51) + 6, 846), (cx(51) + 6, 899), (cx(51), RBP)], C5V, 2.2)
-    wire([(cx(52), 839), (cx(52) + 6, 846), (cx(52) + 6, 914), (cx(52), RBN)], CGND, 2.2)
-    wire([(cx(55), 839), (cx(55) + 6, 846), (cx(55) + 6, 899), (cx(55), RBP)], C5V, 2.2)
-    wire([(cx(57), 839), (cx(57) + 6, 846), (cx(57) + 6, 914), (cx(57), RBN)], CGND, 2.2)
+    # =============================================================== CARDS
+    # ---- parts, all 1:1
+    card(svg, 1150, 110, 470, 286, "WHAT IS ON THE BOARD — DRAWN 1:1", accent="#14532d")
+    parts = [("U1", "Raspberry Pi 4 Model B, 4 GB", "85 × 56 mm"),
+             ("U2", "ADXL345 breakout (GY-291)", "20 × 16 mm"),
+             ("U3", "MAX6675 + screw terminal", "30 × 20 mm"),
+             ("U4", "INMP441 I2S microphone", "16 × 12 mm"),
+             ("BB1", "Breadboard, 840 tie points", "165 × 53 mm"),
+             ("C1–C3", "100 nF ceramic, at the pins", "—"),
+             ("C4", "10 µF electrolytic", "Ø 5 mm"),
+             ("R2", "10 kΩ, soldered at U3 CS", "¼ W"),
+             ("R4", "330 Ω, LED series", "¼ W"),
+             ("D1", "LED 5 mm, red", "Ø 5 mm"),
+             ("F1", "5 V fan, 2-pin", "—")]
+    for i, (ref, name, size) in enumerate(parts):
+        y = 160 + i * 21
+        svg.text(1168, y, ref, 8.2, NAVY, family=MONO, weight="bold")
+        svg.text(1210, y, name, 8.2, INK)
+        svg.text(1602, y, size, 7.6, MUTED, anchor="end")
+    svg.text(1168, 388, "real footprints: 2.54 mm (0.1 in) pin pitch, 0.9 mm holes", 6.4,
+             MUTED, family=MONO)
 
-    # ------------------------------------------------------ probe + screws
-    for sy in (728, 750):
-        svg.circle(1028, sy, 4.6, "#c9a227", stroke="#8a6d1a", sw=0.8)
-        svg.line(1024, sy, 1032, sy, "#6e5715", 1.2)
-    svg.rect(1262, 690, 28, 36, fill="#1e8449", stroke="#0e5c31", rx=3)
-    for sy in (700, 716):
-        svg.circle(1276, sy, 4.2, "#c9a227", stroke="#8a6d1a", sw=0.8)
-        svg.line(1272, sy, 1280, sy, "#6e5715", 1.1)
-    svg.rect(1292, 690, 24, 26, fill="#95a5a6", stroke="#7f8c8d", rx=2)
-    svg.rect(1316, 696, 42, 14, fill="#bdc3c7", stroke="#95a5a6", rx=3)
-    svg.add('<path d="M1358 699 L1374 703 L1358 707 Z" fill="#bdc3c7" stroke="#95a5a6" stroke-width="0.8"/>')
-    svg.text(1304, 683, "class 1, +/-1.5 C", 6, MUTED, anchor="middle")
+    # ---- wire key
+    card(svg, 1150, 408, 470, 138, "WIRE COLOUR KEY")
+    key = [("3V3 / +", C3V3), ("GND / −", CGND), ("5V (fan)", C5V),
+           ("I2C SDA", NETS["I2C_SDA"]["color"]), ("I2C SCL", NETS["I2C_SCL"]["color"]),
+           ("SPI SCK", NETS["SPI_SCLK"]["color"]), ("SPI MISO", NETS["SPI_MISO"]["color"]),
+           ("SPI CS", NETS["SPI_CS0"]["color"]), ("I2S (3 wires)", NETS["I2S_BCLK"]["color"]),
+           ("K-type P/N", NETS["TC_P"]["color"]), ("LED", NETS["LED_A"]["color"])]
+    for i, (label, cc) in enumerate(key):
+        colx = 1168 if i < 6 else 1332
+        yy = 452 + (i % 6) * 15.6
+        svg.line(colx, yy - 2.6, colx + 20, yy - 2.6, cc, 3.4)
+        svg.text(colx + 27, yy, label, 7.8, INK)
 
-    # --------------------------------------------------------------- notes
+    # ---- K-type probe
+    card(svg, 1150, 558, 470, 202, "K-TYPE PROBE (R1) — REAL PART", accent="#8e44ad")
+    svg.rect(1180, 620, 26, 36, fill="#1e8449", stroke="#0e5c31", rx=2.5, sw=0.9)
+    for sy in (630.0, 646.0):
+        svg.circle(1193, sy, 5.0, "#c9a227", stroke="#8a6d1a", sw=0.7)
+        svg.line(1189.6, sy, 1196.4, sy, "#6e5715", 0.9)
+    svg.add('<path d="M1206 634 q18 -3 36 0" fill="none" stroke="#2c3e50" '
+            'stroke-width="3.4" stroke-linecap="round"/>')
+    svg.rect(1242, 626, 34, 18, fill="#2c3e50", stroke="#17202a", rx=2.5, sw=0.8)
+    for i in range(4):
+        svg.line(1247 + i * 7, 628, 1247 + i * 7, 642, "#566573", 0.9)
+    svg.rect(1276, 630, 58, 10, fill="#b8c2c8", stroke="#7f8b91", rx=2, sw=0.7)
+    svg.rect(1276, 633, 58, 2, fill="#d5dbdb", op=0.7)
+    svg.add('<path d="M1334 630 L1346 634 L1346 636 L1334 640 Z" fill="#9aa5ab" '
+            'stroke="#7f8b91" stroke-width="0.6"/>')
+    svg.text(1346, 622, "→ bearing housing", 6.2, MUTED, anchor="end")
+    svg.text(1180, 676, "Class 1: ±1.5 °C or 0.004|t|  ·  1 m stainless sheath, 3 mm", 7,
+             INK)
+    svg.text(1180, 692, "The green screw terminal is the cold junction — it sits on the", 7, INK)
+    svg.text(1180, 704, "MAX6675 die. Keep it ≥ 15 cm from the Pi and the fan; 5-min warm-up.", 7, INK)
+    svg.text(1180, 724, "Ice-point check: 0.0 ±2.0 °C, and open-TC must read a fault, not 0 °C.", 7, INK)
+    svg.text(1180, 744, "Plug: + to + , − to − . Do not earth the sheath at both ends.", 7, INK)
+
+    # ---- header table
+    card(svg, 1150, 772, 470, 238, "PI 40-PIN HEADER — THE 13 WIRES")
+    rows = [(1, "3V3", "3V3", "top rail +"), (3, "SDA", "I2C_SDA", "U2 SDA"),
+            (5, "SCL", "I2C_SCL", "U2 SCL"), (9, "GND", "GND", "top rail −"),
+            (12, "BCLK", "I2S_BCLK", "U4 BCLK"), (21, "MISO", "SPI_MISO", "U3 SO"),
+            (23, "SCLK", "SPI_SCLK", "U3 SCLK"), (24, "CE0", "SPI_CS0", "U3 CS"),
+            (35, "WS", "I2S_WS", "U4 WS"), (36, "GPIO16", "LED_A", "R4 → D1"),
+            (38, "DIN", "I2S_SD", "U4 SD"), (4, "5V", "5V", "bottom rail +"),
+            (6, "GND", "GND", "bottom rail −")]
+    for i, (pin, sig_, netkey, to) in enumerate(rows):
+        yy = 812 + i * 14.6
+        svg.line(1168, yy - 2.4, 1178, yy - 2.4, NETS[netkey]["color"], 3.2)
+        svg.text(1200, yy, f"{pin:>2}", 7.6, MUTED, anchor="end", family=MONO)
+        svg.text(1210, yy, sig_, 7.6, INK, family=MONO, weight="bold")
+        svg.text(1330, yy, to, 7.4, MUTED)
+    svg.text(1168, 1000, "spare: 2, 14, 17, 19 (no MOSI), 25, 39  ·  pin 1 = 3V3, microSD end",
+             6.2, MUTED, family=MONO)
+
+    # ---- scale check
+    card(svg, 60, 560, 380, 208, "SCALE CHECK — THIS SHEET IS 1:1", accent="#b9770e")
+    svg.text(78, 612, "4 px = 1 mm, so A3 at 100 % is the real physical size.", 7.4, INK)
+    svg.text(78, 630, "The parts below are drawn at their true dimensions.", 7.4, INK)
+    svg.line(80, 656, 280, 656, INK, 1.6)
+    for i in range(6):
+        x = 80 + i * 40
+        svg.line(x, 650, x, 662, INK, 1.2)
+        svg.text(x, 674, str(i * 10), 6.4, MUTED, anchor="middle", family=MONO)
+    svg.text(296, 674, "mm", 6.4, MUTED)
+    svg.text(78, 700, "Measure the bar: it must read 50 mm end to end.", 7.4, INK)
+    svg.text(78, 718, "Print A3 · 100 % · never 'fit to page'.", 7.4, INK)
+    svg.text(78, 736, "Lay the real modules on the sheet to check the footprints.", 7.4, INK)
+    svg.text(78, 754, "Wire lengths are indicative: 15–20 cm dupont jumpers.", 7.4, MUTED)
+
+    # ---- notes
+    card(svg, 60, 790, 430, 200, "HOW TO READ THIS DRAWING", accent="#922b21")
     notes = [
-        "Read this as a build drawing, not a schematic: every coloured line is a physical jumper.",
-        "Top rails = 3V3 (red) and GND (blue) for the sensors. Bottom rails = 5V (orange) and GND for the fan only.",
-        "A wire connects only where it ends in a hole. Crossings are not connections; they are drawn with a white halo.",
-        "C1-C3 (100 nF) and R2 (10 k) are soldered at the module pins, so they are silkscreen here, not jumpers.",
-        "K-type: T+ -> T+, T- -> T-. The module's screw terminal is the cold junction; keep it >= 15 cm from the Pi.",
+        "Every coloured line is one physical jumper.",
+        "A wire connects only where it ends in a hole;",
+        "crossings carry a white halo and are not joints.",
+        "Top rails 3V3 / GND feed the sensors. Bottom",
+        "rails 5V / GND feed the fan only. Never 5 V",
+        "on a sensor pin.",
+        "C1–C3 and R2 are soldered at the module pins;",
+        "they are silkscreen here, not jumpers.",
+        "Build order: rails → I2C → I2S → SPI → fan,",
+        "so the short jumpers end up on top.",
     ]
     for i, s in enumerate(notes):
-        svg.text(62, 990 + i * 14, s, 7.8, INK if i else NAVY, weight="bold" if i == 0 else "normal")
+        svg.text(78, 840 + i * 13.4, s, 7.4, INK)
 
-    # ----------------------------------------------------------- title block
+    # ---- title block
     ty = 1050
     svg.rect(60, ty, W - 120, 100, fill="#fff", stroke=LINE, rx=8)
     svg.line(480, ty, 480, ty + 100, LINE, 1)
@@ -829,7 +963,7 @@ def breadboard(path):
     svg.text(80, ty + 52, "G12 Capstone 2026/27 — Industrial pathway", 9.5, MUTED)
     svg.text(80, ty + 72, "Raspberry Pi 4 4GB · ADXL345 · K-type/MAX6675 · INMP441", 9.5, MUTED)
     svg.text(500, ty + 30, "SHEET 4 of 4", 11, NAVY, weight="bold")
-    svg.text(500, ty + 52, "Breadboard view · NTS · A3 · print at 100%", 9.5, MUTED)
+    svg.text(500, ty + 52, "Breadboard view · 1:1 on A3 · print at 100%", 9.5, MUTED)
     svg.text(500, ty + 72, "Generated from circuit/design.py — no manual redraw", 9.5, MUTED)
     svg.text(1100, ty + 30, "REV C", 11, NAVY, weight="bold")
     svg.text(1100, ty + 52, "Hardware 9,370 EGP · cloud 0 EGP", 9.5, MUTED)
