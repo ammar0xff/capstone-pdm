@@ -683,7 +683,7 @@ def breadboard(path):
         svg.text(cx(col), 738, str(col + 1), 4.8, "#8fa0a8", anchor="middle", family=MONO)
     svg.text(480, 750, "Top rails: 3V3 (+) / GND (−) — sensors only", 5.6, C3V3)
     svg.text(480, 762, "Bottom rails: 5V (+) / GND (−) — fan only", 5.6, C5V)
-    svg.text(1118, 762, "830 tie points · 165 × 53 mm · 2.54 mm pitch", 5.6,
+    svg.text(1118, 762, "840 tie points · 165 × 53 mm · 2.54 mm pitch", 5.6,
              "#8fa0a8", anchor="end")
     # ============================================================== MODULES
     def pin_strip(cols, y=606.0):
@@ -854,6 +854,7 @@ def breadboard(path):
              ("U3", "MAX6675 + screw terminal", "30 × 20 mm"),
              ("U4", "INMP441 I2S microphone", "16 × 12 mm"),
              ("BB1", "Breadboard, 840 tie points", "165 × 53 mm"),
+             ("R1", "K-type probe, class 1", "Ø 3 × 100 mm"),
              ("C1–C3", "100 nF ceramic, at the pins", "—"),
              ("C4", "10 µF electrolytic", "Ø 5 mm"),
              ("R2", "10 kΩ, soldered at U3 CS", "¼ W"),
@@ -861,11 +862,11 @@ def breadboard(path):
              ("D1", "LED 5 mm, red", "Ø 5 mm"),
              ("F1", "5 V fan, 2-pin", "—")]
     for i, (ref, name, size) in enumerate(parts):
-        y = 160 + i * 21
+        y = 156 + i * 18
         svg.text(1168, y, ref, 8.2, NAVY, family=MONO, weight="bold")
         svg.text(1210, y, name, 8.2, INK)
         svg.text(1602, y, size, 7.6, MUTED, anchor="end")
-    svg.text(1168, 388, "real footprints: 2.54 mm (0.1 in) pin pitch, 0.9 mm holes", 6.4,
+    svg.text(1168, 386, "real footprints: 2.54 mm (0.1 in) pin pitch, 0.9 mm holes", 6.4,
              MUTED, family=MONO)
 
     # ---- wire key
