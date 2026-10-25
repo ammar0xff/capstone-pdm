@@ -6,7 +6,7 @@ build.py — run the whole pipeline.
 1. ERC + physics + BOM traceability  -> out/erc_report.md
 2. KiCad netlist                     -> out/pdm.net
 3. SKiDL source                      -> out/pdm_skidl.py
-4. Vector schematics                 -> out/schematic_main.svg, rtd_frontend.svg, wiring_a3.svg
+4. Vector schematics                 -> out/schematic_main.svg, tc_frontend.svg, wiring_a3.svg, breadboard.svg
 5. Mermaid diagrams                  -> out/block.mmd, out/sequence.mmd, out/state.mmd
 """
 import os
@@ -171,6 +171,7 @@ def main():
     render.schematic_main(os.path.join(OUT, "schematic_main.svg"))
     render.tc_frontend(os.path.join(OUT, "tc_frontend.svg"))
     render.wiring_a3(os.path.join(OUT, "wiring_a3.svg"))
+    render.breadboard(os.path.join(OUT, "breadboard.svg"))
 
     counts = {s: sum(1 for x in results if x.status == s) for s in ("PASS", "WARN", "FAIL")}
     electrical = sum(1 for x in results if x.group != "BOM" and x.status == checks.FAIL)
@@ -184,7 +185,7 @@ def main():
         if electrical:
             print("BLOCKER: electrical rule violation - do not build this netlist.")
         else:
-            print("BLOCKER: BOM does not match the design/8240 cap - reconcile the xlsx "
+            print("BLOCKER: BOM does not match the design/9,370 cap - reconcile the xlsx "
                   "(see out/erc_report.md) before ordering parts.")
         sys.exit(1)
 

@@ -2,7 +2,7 @@
 
 Generated from `circuit/design.py` (single source of truth).
 
-BOM: build target `circuit/bom_target.csv` (cap 8240) · supplier sheet `DOC-20261014-WA0055.xlsx`
+BOM: build target `circuit/bom_target.csv` (cap 9370) · supplier sheet `DOC-20261014-WA0055.xlsx`
 
 **44 PASS · 8 WARN · 0 FAIL**
 

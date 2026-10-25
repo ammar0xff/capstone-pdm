@@ -26,11 +26,13 @@ python3 circuit/build.py     # stdlib only — runs on the Pi, no KiCad needed
 | `circuit/out/schematic_main.svg` | Sheet 1: system wiring + cable schedule (A3) |
 | `circuit/out/tc_frontend.svg` | Sheet 2: K-type/MAX6675 theory, cold junction + computed error budget |
 | `circuit/out/wiring_a3.svg` | Sheet 3: assembly, glands, cable lengths, power-on checklist |
+| `circuit/out/breadboard.svg` | Sheet 4: Fritzing-style breadboard view — hole-by-hole build drawing |
+| `book_assets/breadboard.png` | Raster preview of Sheet 4 (for slides/print; the SVG is the source of truth) |
 | `circuit/out/pdm.net` | KiCad-format netlist (15 nets, 13 components) |
 | `circuit/out/pdm_skidl.py` | SKiDL source for a machine with KiCad libraries |
 | `circuit/out/block.mmd`, `sequence.mmd`, `state.mmd` | Mermaid diagrams (render on GitHub) |
 
-The build **fails** on any ERC error, so a wrong wire cannot produce a drawing. Sheets are embedded in Project Book §4.3.
+The build **fails** on any ERC error, so a wrong wire cannot produce a drawing. Sheets are embedded in Project Book §4.3–4.4 — §4.4 is the Fritzing-style breadboard view (preview: `book_assets/breadboard.png`).
 
 Engineering corrections found by the checks and already applied to the book and code:
 

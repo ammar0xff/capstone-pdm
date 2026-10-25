@@ -213,10 +213,10 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 </div>
 
 <h3>4.3 Generated design package — one source of truth</h3>
-<p>Every component, pin and net in §4.1–4.2 is defined <b>once</b>, in <code>circuit/design.py</code>. One build regenerates the KiCad-format netlist, a SKiDL script, the ERC + physics report and the three vector sheets below. If a rule fails, the build exits and no drawing is produced — so a sheet can never drift away from the netlist, and a wrong wire cannot reach the bench.</p>
+<p>Every component, pin and net in §4.1–4.2 is defined <b>once</b>, in <code>circuit/design.py</code>. One build regenerates the KiCad-format netlist, a SKiDL script, the ERC + physics report and the four vector sheets below. If a rule fails, the build exits and no drawing is produced — so a sheet can never drift away from the netlist, and a wrong wire cannot reach the bench.</p>
 <div class="kpi">
 <div><b>0</b><span>ERC errors</span></div>
-<div><b>4</b><span>documented trade-offs</span></div>
+<div><b>6</b><span>documented trade-offs</span></div>
 <div><b>52</b><span>checks run (44 design + 8 BOM)</span></div>
 </div>
 <table>
@@ -240,6 +240,12 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <img class="chart" src="circuit/out/wiring_a3.svg" alt="A3 assembly and cable drawing">
 <p style="font-size:13px;color:#5d6d7e"><b>Sheet 3 — assembly.</b> A3, not to scale. Cable schedule, build order and the power-on checklist that has to pass before any data is trusted.</p>
 
+<h3>4.4 Breadboard view — the sheet you actually build from</h3>
+<p>A schematic answers “what connects to what”; this sheet answers “where do I plug it”. It is generated from the same netlist, so it cannot invent a wire: every coloured line ends in a numbered breadboard hole, and the pin table on the right maps each used Pi pin to its module. The top rails carry <b>3V3 and GND</b> for the three sensor modules; the bottom rails carry <b>5 V and GND</b> for the fan only. A wire connects only where it ends in a hole — crossings are drawn with a white halo and are <i>not</i> connections.</p>
+<img class="chart" src="circuit/out/breadboard.svg" alt="Fritzing-style breadboard view of the whole rig">
+<p style="font-size:13px;color:#5d6d7e"><b>Sheet 4 — breadboard view.</b> C1–C3 (100 nF) and R2 (10 k) are soldered directly at the module pins, so they appear as silkscreen rather than as jumpers. The K-type pair lands on the MAX6675 screw terminal, which <i>is</i> the cold junction: keep that module ≥15 cm from the Pi and clear of the fan exhaust.</p>
+<div class="callout good"><b>Bench order — do not skip ahead:</b> ① rails first, meter-check 3.3 V and 5 V before anything is plugged in · ② U2 only, <code>i2cdetect -y 1</code> must show <code>0x53</code> · ③ U3 only, ice-point reads 0 ±2 °C and the open-TC flag is 0 · ④ U4 only, <code>arecord -l</code> shows the mic. If a step fails, stop there — adding the next module hides which one is wrong.</div>
+
 <h4>Defects the pipeline caught — and what changed</h4>
 <table>
 <tr><th>Caught by</th><th>Field symptom if shipped</th><th>Fix now in this book</th></tr>
@@ -250,7 +256,7 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <tr><td>IP65 box + internal fan</td><td>sealed box recirculates its own heat; Pi throttles in summer</td><td>aluminium plate bolted to the lid as heat spreader (WARN, measured in §11)</td></tr>
 <tr><td>Single 3σ SPC point</td><td>one false alarm every ~31 min at 5 s windows</td><td>2-of-3 rule at 2σ warning / 3σ alarm (WARN, tuned in §10)</td></tr>
 </table>
-<div class="callout good"><b>Files in the repo:</b> <a href="circuit/out/erc_report.md">erc_report.md</a> · <a href="circuit/out/tc_frontend.svg">tc_frontend.svg</a> · <a href="circuit/BOM_reconciliation.md">BOM_reconciliation.md</a> · <a href="circuit/out/pdm.net">pdm.net</a> (KiCad) · <a href="circuit/out/pdm_skidl.py">pdm_skidl.py</a> · <a href="circuit/out/block.mmd">block.mmd</a> · <a href="circuit/out/sequence.mmd">sequence.mmd</a> · <a href="circuit/out/state.mmd">state.mmd</a>. Rebuild with <code>python3 circuit/build.py</code> — stdlib only, runs on the Pi.</div>
+<div class="callout good"><b>Files in the repo:</b> <a href="circuit/out/erc_report.md">erc_report.md</a> · <a href="circuit/out/tc_frontend.svg">tc_frontend.svg</a> · <a href="circuit/out/breadboard.svg">breadboard.svg</a> · <a href="circuit/BOM_reconciliation.md">BOM_reconciliation.md</a> · <a href="circuit/out/pdm.net">pdm.net</a> (KiCad) · <a href="circuit/out/pdm_skidl.py">pdm_skidl.py</a> · <a href="circuit/out/block.mmd">block.mmd</a> · <a href="circuit/out/sequence.mmd">sequence.mmd</a> · <a href="circuit/out/state.mmd">state.mmd</a>. Rebuild with <code>python3 circuit/build.py</code> — stdlib only, runs on the Pi.</div>
 </div>
 
 <div class="card" id="code">

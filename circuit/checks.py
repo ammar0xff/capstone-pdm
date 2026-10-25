@@ -330,7 +330,7 @@ def report_md(results):
         "",
         "Generated from `circuit/design.py` (single source of truth).",
         "",
-        "BOM: build target `circuit/bom_target.csv` (cap 8240)"
+        "BOM: build target `circuit/bom_target.csv` (cap 9370)"
         + (f" · supplier sheet `{BOM_FILE}`" if BOM_FILE else ""),
         "",
         f"**{counts[PASS]} PASS · {counts[WARN]} WARN · {counts[FAIL]} FAIL**",
