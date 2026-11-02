@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#FFF8F3">
+<title>✨ Wire the Robot-Doctor Rig — Interactive Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="backdrop" aria-hidden="true"></div>
+  <canvas id="fx" width="1500" height="900" aria-hidden="true"></canvas>
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <!-- ===== CELEBRATION ===== -->
+  <div class="celebrate" id="celebrate">
+    <div class="celebrate-card">
+      <div class="big">🎉</div>
+      <h2 id="celebrate-title">Level Complete!</h2>
+      <p id="celebrate-msg">You nailed it, cutie 💖</p>
+      <div class="xp-gain" id="celebrate-xp"><span class="em">✨</span><b id="celebrate-xp-text">+0 XP</b></div>
+      <button class="btn rose wide" onclick="closeCelebration()">Next Level ➜</button>
+    </div>
+  </div>
+
+  <!-- ===== MODAL ===== -->
+  <div class="modal-backdrop" id="modal">
+    <div class="modal">
+      <h3 id="modal-title">Title</h3>
+      <p id="modal-body">Body</p>
+      <button class="btn rose wide" id="btn-modal-ok">Got it ✨</button>
+    </div>
+  </div>
+
+  <div id="app">
+    <div class="app">
+      <!-- ===== TOPBAR ===== -->
+      <div class="topbar">
+        <div class="brand">
+          <div class="brand-mark"><svg viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="%23FF5C8A"/><path d="M12 36h12l7-16 9 30 8-24 6 6h9" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div>
+            <div class="brand-name">Wire the Rig <span style="font-weight:700">✨</span></div>
+            <div class="brand-sub">Edge Predictive-Maintenance Breadboard • G12 Capstone</div>
+          </div>
+        </div>
+        <div class="top-stats">
+          <div class="chip rose"><span class="em">💖</span><b id="stat-hearts">❤❤❤</b></div>
+          <div class="chip violet"><span class="em">✨</span><b id="stat-xp">0</b> XP</div>
+          <div class="chip green"><span class="em">🔥</span><b id="stat-streak">0</b> day streak</div>
+          <div class="chip amber" id="btn-achievements" onclick="showAchievementsModal()"><span class="em">🏆</span>Achievements</div>
+        </div>
+        <button class="icon-btn" onclick="showScreen('dashboard')" title="Dashboard">🏠</button>
+      </div>
+
+      <div class="content">
+        <!-- ===== DASHBOARD ===== -->
+        <section id="screen-dashboard" class="screen active">
+          <section class="hero">
+            <div class="hero-content">
+              <div class="eyebrow"><span class="em">🩺</span> G12 Capstone • Predictive Maintenance</div>
+              <h1>Build the <span class="hl">Robot-Doctor Rig</span> 🤖</h1>
+              <p>Wire the Raspberry Pi, vibration sensor, heat sensor, microphone, LED and fan — step by step.
+              Every wire ends in a numbered hole. Test each piece before adding the next.</p>
+              <button class="btn primary wide" id="btn-start">Start Wiring ✨</button>
+            </div>
+            <div class="mascot-wrap">
+              <img class="mascot" src="https://cdn-icons-png.flaticon.com/512/2976/2976652.png" alt="robot mascot" onerror="this.style.display='none'">
+              <div class="mascot-bubble">Tap <b>Start Wiring</b> to begin!</div>
+            </div>
+          </section>
+
+          <div class="path-wrap">
+            <div class="path-title">Your Wiring Journey</div>
+            <div class="path">
+              <div class="path-steps" id="path"></div>
+            </div>
+          </div>
+
+          <div class="love-note amber">
+            <div class="k"><span class="em">📖</span>About This Guide</div>
+            <p>This interactive guide walks you through wiring the PdM predictive-maintenance breadboard rig.
+            Each level matches a real section of the Fritzing sketch <code>PDM_Predictive_Maintenance.fzz</code>.
+            Complete lessons, earn XP, unlock achievements, and test your circuit in the simulator.</p>
+          </div>
+        </section>
+
+        <!-- ===== LEVEL SCREEN ===== -->
+        <section id="screen-level" class="screen">
+          <button class="btn ghost" id="btn-back-dash" style="margin-bottom:18px">← Back to Dashboard</button>
+          <div class="path-wrap" style="margin-bottom:10px">
+            <div class="path-title">Level <span id="lv-num">1</span></div>
+            <div class="path" style="padding:0">
+              <div class="path-steps" style="justify-content:flex-start;max-width:none"></div>
+            </div>
+          </div>
+          <div class="level-head" style="background:linear-gradient(135deg,var(--uc),var(--ucd))">
+            <div class="level-head-top">
+              <div class="level-num" id="lv-num">1</div>
+              <div>
+                <h2 id="lv-title">Level Title</h2>
+                <p id="lv-sub">Level subtitle</p>
+              </div>
+              <div class="level-prog" id="lv-prog-text">0 / 0</div>
+            </div>
+            <div class="level-bar"><i id="lv-prog-bar" style="width:0%"></i></div>
+          </div>
+          <div class="level-body">
+            <div>
+              <div class="love-note" style="border-color:var(--uc);background:linear-gradient(135deg,color-mix(in srgb,var(--uc) 12%,#fff),#fff)">
+                <div class="k"><span class="em" id="lv-icon">🔌</span><span id="lv-mascot">🔌</span> <span id="lv-title-inline">Level Title</span></div>
+                <p id="lv-desc">Level description goes here.</p>
+                <div class="chip-row" style="margin-top:10px">
+                  <span class="pill rose">✨ <b id="lv-xp">40</b> XP</span>
+                  <span class="pill violet">⏱ <b id="lv-est">10 min</b></span>
+                </div>
+              </div>
+              <h3 style="margin:22px 0 10px;font-size:17px;font-weight:800;color:var(--ink-soft)">📚 Lessons</h3>
+              <div id="lv-lessons"></div>
+            </div>
+            <div>
+              <div class="photo-card">
+                <div class="photo-media">
+                  <img id="lv-part-photo" src="" alt="Level part" onerror="this.style.display='none';this.parentElement.querySelector('.photo-fallback').style.display='flex'">
+                  <div class="photo-fallback"><div class="em" id="lv-part-emoji">🔧</div>Level artwork</div>
+                </div>
+                <div class="photo-cap" id="lv-part-cap">Level part</div>
+                <div class="photo-desc" id="lv-part-desc">Wire this part in the lessons below.</div>
+              </div>
+              <div class="love-note green" style="margin-top:18px">
+                <div class="k"><span class="em">🎯</span>Level Goal</div>
+                <p>Complete all lessons in this level to unlock the next one and earn <b id="lv-goal-xp">40 XP</b>.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== LESSON SCREEN ===== -->
+        <section id="screen-lesson" class="screen">
+          <button class="btn ghost" id="btn-back-level" style="margin-bottom:18px">← Back to Level</button>
+          <div class="hero" style="margin-bottom:0">
+            <div class="hero-content">
+              <div class="eyebrow"><span class="em">📖</span>Lesson</div>
+              <h1 id="les-title">Lesson Title</h1>
+              <p id="les-goal">Lesson goal</p>
+              <div class="chip-row" style="margin-bottom:10px">
+                <span class="pill" id="les-emoji" style="background:var(--rose-soft);color:var(--rose-dark)">📖 Lesson</span>
+                <span class="pill green">✅ Checklist to finish</span>
+              </div>
+            </div>
+          </div>
+          <div class="level-body">
+            <div>
+              <div id="les-content"></div>
+              <table class="wire">
+                <thead>
+                  <tr><th style="width:26%">From (Pin)</th><th style="width:24%">Net</th><th style="width:34%">Connects To</th><th style="width:16%">Wire Colour</th></tr>
+                </thead>
+                <tbody id="les-wires"></tbody>
+              </table>
+              <div id="les-tips" class="love-note rose" style="margin-top:18px"></div>
+              <div class="checklist">
+                <h4>✅ Lesson Checklist</h4>
+                <div id="les-checklist"></div>
+              </div>
+              <div style="margin-top:18px">
+                <button class="btn primary wide" onclick="markLessonComplete()">Finish Lesson ✨</button>
+              </div>
+            </div>
+            <div>
+              <div class="photo-card">
+                <div class="photo-media">
+                  <img id="les-part-photo" src="" alt="Part" onerror="this.style.display='none';this.parentElement.querySelector('.photo-fallback').style.display='flex'">
+                  <div class="photo-fallback"><div class="em">🔧</div>Part artwork</div>
+                </div>
+                <div class="photo-cap" id="les-part-cap">Part</div>
+                <div class="photo-desc" id="les-part-desc">Wire this part carefully.</div>
+              </div>
+              <div id="les-quiz" class="quiz-item" style="margin-top:20px"></div>
+              <div id="les-simulator" class="sim-visual" style="margin-top:20px"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== SIMULATOR SCREEN ===== -->
+        <section id="screen-simulator" class="screen">
+          <button class="btn ghost" id="btn-back-sim" style="margin-bottom:18px">← Back to Lesson</button>
+          <div id="sim-content"></div>
+        </section>
+
+        <!-- ===== CELEBRATION SCREEN ===== -->
+        <section id="screen-celebration" class="screen">
+          <div class="celebrate-card" style="position:relative">
+            <div class="big">🏆</div>
+            <h2>All Levels Complete!</h2>
+            <p>You've wired the entire Robot-Doctor Rig. Congratulations, engineer 💖</p>
+            <div class="xp-gain"><span class="em">🏆</span><b>Rig Master</b> badge unlocked</div>
+            <button class="btn green wide" onclick="showScreen('dashboard')">Back to Dashboard</button>
+          </div>
+        </section>
+
+        <div class="foot">
+          Source of truth: <code>circuit/design.py</code> → <code>circuit/fzz/routes.py</code> → <code>circuit/fzz/build_fzz.py</code>.<br>
+          Verified Fritzing sketch: <b>PDM_Predictive_Maintenance.fzz</b> (14 parts • 15 nets • 166 wires • 0 geometry problems).<br>
+          Built with ❤️ for the G12 capstone — 0 EGP cloud.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="content.js"></script>
+  <script src="app.js"></script>
+  <script src="app2.js"></script>
+</body>
+</html>
