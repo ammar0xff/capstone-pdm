@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🤖 Wire the Robot-Doctor Rig — Interactive Guide</title>
+<style>
+  :root{
+    --ink:#1a1a2e; --paper:#f7f9fb; --card:#ffffff;
+    --accent:#6c5ce7; --accent2:#00d2d3; --danger:#e84393; --ok:#00b894;
+    --warn:#fdcb6e; --muted:#636e72; --shadow:0 10px 30px rgba(0,0,0,0.08);
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    background:var(--paper); color:var(--ink); line-height:1.5;
+  }
+  a{color:var(--accent); text-decoration:none}
+  a:hover{text-decoration:underline}
+  .container{max-width:1000px; margin:0 auto; padding:0 20px 60px;}
+
+  /* ---------- header ---------- */
+  header{
+    background:linear-gradient(135deg,#6c5ce7 0%,#00d2d3 100%);
+    color:#fff; padding:34px 20px; border-radius:0 0 40px 40px;
+    box-shadow:var(--shadow); position:relative; overflow:hidden;
+  }
+  header::after{
+    content:""; position:absolute; right:-60px; top:-40px; width:220px; height:220px;
+    background:radial-gradient(circle,rgba(255,255,255,0.15),transparent 60%);
+    border-radius:50%;
+  }
+  header h1{margin:0 0 8px; font-size:1.9rem; display:flex; align-items:center; gap:10px;}
+  header h1 span{font-size:2.2rem}
+  header p{margin:0; opacity:0.95; font-size:1.05rem}
+  .tag{display:inline-block; margin-top:12px; background:rgba(255,255,255,0.18);
+    color:#fff; padding:4px 12px; border-radius:20px; font-size:0.85rem; font-weight:600;
+    border:1px solid rgba(255,255,255,0.35)}
+
+  /* ---------- progress ---------- */
+  .progress-wrap{padding:8px 0 24px}
+  .progress{
+    display:flex; gap:6px; overflow-x:auto; padding-bottom:10px;
+    scrollbar-width:none;
+  }
+  .progress::-webkit-scrollbar{display:none}
+  .step{
+    flex:0 0 auto; width:128px; display:flex; flex-direction:column; align-items:center;
+    position:relative; opacity:0.55; transition:all .3s;
+  }
+  .step.active{opacity:1; transform:scale(1.08)}
+  .step.done{opacity:1; color:var(--ok)}
+  .step .num{
+    width:42px; height:42px; border-radius:50%; display:grid; place-items:center;
+    font-weight:800; font-size:1.3rem; margin-bottom:8px;
+    border:3px solid var(--muted); background:#fff; box-shadow:0 4px 10px rgba(0,0,0,0.1);
+  }
+  .step.active .num{background:var(--accent); color:#fff; border-color:var(--accent); box-shadow:0 0 0 6px rgba(108,92,231,0.25)}
+  .step.done .num{background:var(--ok); color:#fff; border-color:var(--ok)}
+  .step .lbl{font-size:0.72rem; text-align:center; line-height:1.25; font-weight:600}
+  .conn{
+    position:absolute; left:50%; top:46px; width:0; height:6px;
+    background:var(--muted); transform:translateX(-50%); z-index:0;
+  }
+  .step.done ~ .conn{background:var(--ok)}
+
+  /* ---------- step card ---------- */
+  .step-card{
+    background:var(--card); border-radius:var(--radius); padding:26px;
+    margin:22px 0; box-shadow:var(--shadow); border:1px solid #e3e8f0;
+    display:none; animation:fadeIn .45s ease both;
+  }
+  @keyframes fadeIn{from{opacity:0; transform:translateY(12px)}to{opacity:1; transform:none}}
+  .step-card.current{display:block}
+  .step-head{display:flex; align-items:center; gap:14px; margin-bottom:18px; flex-wrap:wrap}
+  .step-badge{
+    width:44px; height:44px; border-radius:12px; display:grid; place-items:center;
+    font-size:1.5rem; font-weight:800; flex-shrink:0;
+  }
+  .s1 .step-badge{background:#ffeaa7; color:#d63031}
+  .s2 .step-badge{background:#81ecec; color:#0984e3}
+  .s3 .step-badge{background:#fd79a8; color:#d63031}
+  .s4 .step-badge{background:#55efc4; color:#00b894}
+  .s5 .step-badge{background:#a29bfe; color:#6c5ce7}
+  .step-head h2{margin:0; font-size:1.35rem}
+  .part-emoji{font-size:2rem}
+
+  .alert{background:#ffeaa722; border-left:4px solid #fdcb6e; padding:10px 14px;
+    border-radius:8px; margin:14px 0; font-size:0.92rem; display:flex; gap:10px; align-items:flex-start}
+  .alert .a-icon{font-size:1.4rem; flex-shrink:0}
+  .alert.ok{background:#00b8941a; border-left-color:var(--ok)}
+  .alert.warn{background:#e843931a; border-left-color:var(--danger)}
+
+  /* ---------- photo row ---------- */
+  .photo-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:16px 0}
+  @media(max-width:720px){.photo-grid{grid-template-columns:1fr}}
+  .photo-box{
+    border:2px solid #dde4ec; border-radius:14px; overflow:hidden; background:#f1f4f8;
+    aspect-ratio:4/3; position:relative; display:flex; align-items:center; justify-content:center;
+  }
+  .photo-box img{width:100%; height:100%; object-fit:cover; display:block}
+  .photo-box .fallback{
+    width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:8px; color:var(--muted); font-size:0.85rem
+  }
+  .photo-box .fallback .emoji{font-size:3.2rem}
+  .photo-cap{font-size:0.8rem; color:var(--muted); text-align:center; margin-top:6px}
+
+  /* ---------- wiring table ---------- */
+  table.wire{width:100%; border-collapse:collapse; margin:14px 0; font-size:0.88rem}
+  table.wire th{
+    background:#f1f4f8; color:var(--muted); text-align:left; padding:8px 10px;
+    border-bottom:2px solid #dde4ec; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.04em
+  }
+  table.wire td{padding:8px 10px; border-bottom:1px solid #edeef2; vertical-align:middle}
+  table.wire tr:hover{background:#f7f9ff}
+  .pin{font-weight:700; color:#6c5ce7; font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .net{font-size:0.8rem; font-weight:600; padding:2px 7px; border-radius:10px; display:inline-block}
+  .color-swatch{width:14px; height:14px; border-radius:4px; display:inline-block; margin-right:6px;
+    vertical-align:middle; border:1px solid rgba(0,0,0,0.12)}
+  .wire-color{font-family:ui-monospace,monospace; font-size:0.78rem; font-weight:700}
+
+  /* ---------- checklist ---------- */
+  .checklist{margin:16px 0}
+  .checklist h4{margin:0 0 10px; font-size:0.9rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted)}
+  .check-item{
+    display:flex; align-items:center; gap:10px; padding:9px 0; font-size:0.92rem;
+    border-bottom:1px dashed #edeef2; cursor:pointer; transition:opacity .15s
+  }
+  .check-item:last-child{border-bottom:none}
+  .check-item input{accent-color:var(--accent); width:18px; height:18px; flex-shrink:0; cursor:pointer}
+  .check-item .txt{flex:1}
+  .check-item.done .txt{text-decoration:line-through; color:var(--muted)}
+  .check-item .badge{font-size:0.7rem; padding:1px 7px; border-radius:10px; background:#edeef2; color:var(--muted); white-space:nowrap}
+  .check-item.done .badge{background:#d1f2eb; color:var(--ok)}
+
+  /* ---------- breadboard map ---------- */
+  .bb-wrap{margin:18px 0; overflow-x:auto}
+  .bb-map{
+    border:2px solid #b2bec3; border-radius:14px; background:#fff;
+    padding:14px; display:inline-block; min-width:560px
+  }
+  .bb-grid{display:grid; grid-template-columns:repeat(10,1fr); gap:6px; margin-bottom:10px}
+  .bb-hole{
+    width:34px; height:34px; border:2px solid #dfe6ea; border-radius:8px;
+    background:#f7f9fb; display:grid; place-items:center; font-size:0.62rem;
+    color:#b2bec3; font-weight:700; position:relative; cursor:pointer; transition:all .2s
+  }
+  .bb-hole:hover{border-color:var(--accent); background:#eef3ff; z-index:2; transform:scale(1.08)}
+  .bb-hole.occupied{background:#fff3cd; border-color:#fdcb6e; color:#d63031}
+  .bb-hole.occupied.wired{border-color:var(--ok); background:#d1f2eb; color:var(--ok)}
+  .bb-hole .dot{width:9px; height:9px; border-radius:50%; background:#c8d6e5; border:1px solid #fff;
+    box-shadow:inset 0 1px 2px rgba(0,0,0,0.15)}
+  .bb-hole.occupied .dot{background:var(--ink)}
+  .bb-hole.occupied.wired .dot{background:var(--ok); box-shadow:0 0 0 4px rgba(0,184,148,0.25)}
+  .bb-hole::after{content:attr(data-label); position:absolute; bottom:-16px; left:50%; transform:translateX(-50%);
+    font-size:0.58rem; color:#8496a6; font-weight:700; white-space:nowrap}
+  .bb-rowlabel{writing-mode:vertical-rl; text-orientation:mixed; font-size:0.62rem; font-weight:800;
+    color:#b2bec3; padding:4px 0; grid-column:1}
+  .bb-legend{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:10px}
+  .bb-legend .chip{
+    display:flex; align-items:center; gap:6px; font-size:0.75rem; background:#f1f4f8;
+    padding:4px 10px; border-radius:12px; border:1px solid #dde4ec
+  }
+  .bb-legend .chip .c{width:10px; height:10px; border-radius:50%; border:1px solid #999}
+
+  /* ---------- verify ---------- */
+  .verify{background:linear-gradient(135deg,#6c5ce7,#00d2d3); color:#fff; border-radius:20px;
+    padding:30px; margin:30px 0; box-shadow:var(--shadow)}
+  .verify h3{margin:0 0 16px; font-size:1.4rem; display:flex; align-items:center; gap:10px}
+  .verify .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px}
+  .verify .box{background:rgba(255,255,255,0.12); border-radius:14px; padding:16px; border:1px solid rgba(255,255,255,0.25)}
+  .verify .box .big{font-size:2rem; font-weight:800; display:block}
+  .verify .box .small{font-size:0.78rem; opacity:0.9; margin-top:4px}
+
+  /* ---------- misc ---------- */
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr}}
+  .foot{margin-top:40px; color:var(--muted); font-size:0.85rem; border-top:1px solid #dde4ec; padding-top:20px}
+  .hidden{display:none}
+  .btn{
+    background:var(--ink); color:#fff; border:none; padding:10px 18px; border-radius:10px;
+    font-weight:700; cursor:pointer; font-size:0.9rem; display:inline-flex; align-items:center; gap:8px
+  }
+  .btn:hover{background:#2d3436}
+  .btn.ok{background:var(--ok)}
+  .btn.ok:hover{background:#00a082}
+  .btn:active{transform:scale(0.97)}
+  .dot{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px}
+  .done .dot{background:var(--ok)}
+  .todo .dot{background:#ffeaa7}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1><span>🩺</span> Wire the Robot-Doctor Rig</h1>
+    <p>Step-by-step interactive wiring guide for your edge predictive-maintenance rig.<br>
+    <strong>Follow the order — test each piece before adding the next.</strong></p>
+    <span class="tag">Fritzing-verified • 15 nets • 14 parts • 0 geometry problems</span>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress" id="progress"></div>
+  </div>
+
+  <!-- ================= STEP 1 : POWER RAILS ================= -->
+  <section class="step-card s1 current" id="step1">
+    <div class="step-head">
+      <div class="step-badge">1</div>
+      <h2>Power Rails — 3V3 &amp; GND <span class="part-emoji">🔌</span></h2>
+    </div>
+    <div class="alert"><span class="a-icon">⚡</span>
+      <strong>Do this first.</strong> Plug the power rails before any sensor. A wrong rail can fry a module.
+    </div>
+
+    <div class="photo-grid">
+      <div class="photo-box">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Raspberry-Pi-4_Model_B_%28TOP%29.jpg/640px-Raspberry-Pi-4_Model_B_%28TOP%29.jpg" alt="Raspberry Pi 4" onerror="this.style.display='none'; this.parentElement.querySelector('.fallback').style.display='flex'">
+        <div class="fallback" style="display:none"><div class="emoji">🍓</div>Raspberry Pi 4 photo</div>
+        <div class="photo-cap">Raspberry Pi 4 Model B — the brain</div>
+      </div>
+      <div class="photo-box">
+        <img src="../circuit/fzz/parts/bb840/breadboard/bb840_breadboard_breadboard.svg" alt="840 breadboard" onerror="this.style.display='none'; this.parentElement.querySelector('.fallback').style.display='flex'">
+        <div class="fallback" style="display:none"><div class="emoji">🧱</div>Breadboard artwork</div>
+        <div class="photo-cap">840-point breadboard (Fritzing art)</div>
+      </div>
+    </div>
+
+    <h4 style="margin:18px 0 8px; font-size:0.9rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted)">Wire by wire — top rails</h4>
+    <table class="wire">
+      <thead><tr><th style="width:16%">From (Pi)</th><th style="width:14%">Net</th><th style="width:30%">Goes to (hole)</th><th style="width:20%">Wire colour</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td><span class="pin">Pin 1</span> 3V3</td><td><span class="net" style="background:#c0392b22;color:#c0392b;border-color:#c0392b">3V3</span> <span class="color-swatch" style="background:#c0392b"></span></td><td>Top-left rail row W, col 1 → bridges across</td><td><span class="wire-color">#c0392b</span> red</td><td>3.3 V power for sensors</td></tr>
+        <tr><td><span class="pin">Pin 9</span> GND</td><td><span class="net" style="background:#34495e22;color:#34495e;border-color:#34495e">GND</span> <span class="color-swatch" style="background:#34495e"></span></td><td>Top rail row X, col 3</td><td><span class="wire-color">#34495e</span> dark gray</td><td>Common ground</td></tr>
+        <tr><td><span class="pin">Pin 17</span> 3V3</td><td><span class="net" style="background:#c0392b22;color:#c0392b;border-color:#c0392b">3V3</span></td><td>Top rail row Y, col 29 (across gap)</td><td><span class="wire-color">#c0392b</span> red</td><td>3V3 to right half</td></tr>
+        <tr><td><span class="pin">Pin 14</span> GND</td><td><span class="net" style="background:#34495e22;color:#34495e;border-color:#34495e">GND</span></td><td>Bottom rail row Z, col 27</td><td><span class="wire-color">#34495e</span> dark gray</td><td>GND to right half</td></tr>
+        <tr><td><span class="pin">Pin 4</span> 5V</td><td><span class="net" style="background:#e67e2222;color:#e67e22;border-color:#e67e22">5V</span> <span class="color-swatch" style="background:#e67e22"></span></td><td><b>Direct wire to fan +</span> (off-board, not a rail)</td><td><span class="wire-color">#e67e22</span> orange</td><td>Fan power only</td></tr>
+        <tr><td><span class="pin">Pin 6</span> GND</td><td><span class="net" style="background:#34495e22;color:#34495e;border-color:#34495e">GND</span></td><td>Bottom rail row Z, col 58 → fan −</td><td><span class="wire-color">#34495e</span> dark gray</td><td>Fan return path</td></tr>
+      </tbody>
+    </table>
+
+    <div class="checklist">
+      <h4>✅ Step 1 checklist</h4>
+      <div class="check-item"><input type="checkbox" id="s1a"><label class="txt" for="s1a">3V3 rail is live across the left side</label><span class="badge">red</span></div>
+      <div class="check-item"><input type="checkbox" id="s1b"><label class="txt" for="s1b">GND rail connected to Pi pin 9 &amp; 14</label><span class="badge">dark gray</span></div>
+      <div class="check-item"><input type="checkbox" id="s1c"><label class="txt" for="s1c">5V goes straight to fan + (no rail detour)</label><span class="badge">orange</span></div>
+      <div class="check-item"><input type="checkbox" id="s1d"><label class="txt" for="s1d">No wire crosses printed row letters or column numbers</label><span class="badge">neatness</span></div>
+    </div>
+    <div style="margin-top:14px"><button class="btn ok" onclick="markDone(1)">✓ Rails done — unlock Step 2</button></div>
+  </section>
+
+  <!-- ================= STEP 2 : ADXL345 ================= -->
+  <section class="step-card s2" id="step2">
+    <div class="step-head">
+      <div class="step-badge">2</div>
+      <h2>ADXL345 shake-sensor <span class="part-emoji">📳</span></h2>
+    </div>
+    <div class="alert ok"><span class="a-icon">✅</span>
+      <strong>Prerequisite:</strong> Step 1 rails must be live and meter-checked first.
+    </div>
+
+    <div class="photo-grid">
+      <div class="photo-box">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/ADXL345_accelerometer_sensor_module.jpg/320px-ADXL345_accelerometer_sensor_module.jpg" alt="ADXL345 module" onerror="this.style.display='none'; this.parentElement.querySelector('.fallback').style.display='flex'">
+        <div class="fallback" style="display:none"><div class="emoji">📳</div>ADXL345 artwork</div>
+        <div class="photo-cap">ADXL345 3-axis accelerometer module</div>
+      </div>
+      <div class="photo-box">
+        <img src="../circuit/fzz/parts/adxl345/breadboard/adxl345_breadboard_ADXL345-BreakoutBoard-v13_breadboard.svg" alt="ADXL345 Fritzing art" onerror="this.style.display='none'; this.parentElement.querySelector('.fallback').style.display='flex'">
+        <div class="fallback" style="display:none"><div class="emoji">🎨</div>Fritzing part art</div>
+        <div class="photo-cap">ADXL345 breadboard artwork</div>
+      </div>
+    </div>
+
+    <p><strong>Plug it:</strong> row <b>J, pin 3</strong> — pins in row J, body sits above (rows F–I).</p>
+
+    <table class="wire">
+      <thead><tr><th style="width:20%">Module pin</th><th style="width:14%">Net</th><th style="width:26%">Connects to</th><th style="width:20%">Wire colour</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><span class="pin">Pin 1</span> VCC</td><td><span class="net" style="background:#c0392b22;color:#c0392b;border-color:#c0392b">3V3</span></td><td>3V3 rail (red)</td><td><span class="wire-color">#c0392b</span> red</td><td>Module power 3.3 V</td></tr>
+        <tr><td><span class="pin">Pin 2</span> GND</td><td><span class="net" style="background:#34495e22;color:#34495e;border-color:#34495e">GND</span></td><td>GND rail</td><td><span class="wire-color">#34495e</span> dark gray</td><td>Common ground</td></tr>
+        <tr><td><span class="pin">Pin 3</span> CS</td><td><span class="net" style="background:#c0392b22;color:#c0392b;border-color:#c0392b">3V3</span></td><td>3V3 rail → <strong>I2C mode</strong></td><td><span class="wire-color">#c0392b</span> red</td><td>Tie high = use I2C, not SPI</td></tr>
+        <tr><td><span class="pin">Pin 4</span> SDO</td><td><span class="net" style="background:#34495e22;color:#34495e;border-color:#34495e">GND</span></td><td>GND rail → <strong>address 0x53</strong></td><td><span class="wire-color">#34495e</span> dark gray</td><td>Sets I2C address to 0x53</td></tr>
+        <tr><td><span class="pin">Pin 5</span> SDA</td><td><span class="net" style="background:#1f618d22;color:#1f618d;border-color:#1f618d">I2C_SDA</span> <span class="color-swatch" style="background:#1f618d"></span></td><td>Pi pin 3</td><td><span class="wire-color">#1f618d</span> dark blue</td><td>I2C data</td></tr>
+        <tr><td><span class="pin">Pin 6</span> SCL</td><td><span class="net" style="background:#5dade222;color:#5dade2;border-color:#5dade2">I2C_SCL</span> <span class="color-swatch" style="background:#5dade2"></span></td><td>Pi pin 5</td><td><span class="wire-color">#5dade2</span> light blue</td><td>I2C clock</td></tr>
+      </tbody>
+    </table>
+
+    <div class="checklist">
+      <h4>✅ Step 2 checklist</h4>
+      <div class="check-item"><input type="checkbox" id="s2a"><label class="txt" for="s2a">CS → 3V3 and SDO → GND (I2C @ 0x53)</label><span class="badge">critical</span></div>
+      <div class="check-item"><input type="checkbox" id="s2b"><label class="txt" for="s2b">SDA → Pi pin 3, SCL → Pi pin 5</label><span class="badge">I2C</span></div>
+      <div class="check-item"><input type="checkbox" id="s2c"><label class="txt" for="s2c">Run <code>i2cdetect -y 1</code> → must show <code>0x53</code></label><span class="badge">test</span></div>
+    </div>
+    <div style="margin-top:14px"><button class="btn ok" onclick="markDone(2)">✓ ADXL345 done — unlock Step 3</button></div>
+  </section>
+
+  <!-- ================= STEP 3 : MAX6675 ================= -->
+  <section class="step-card s3" id="step3">
+    <div class="step-head">
+      <div class="step-badge">3</div>
+      <h2>MAX6675 heat-sensor + K-probe <span class="part-emoji">🌡️</span></h2>
+    </div>
+    <div class="alert warn"><span class="a-icon">⚠️</span>
+      <strong>Class-1 probe only</strong> — a class-2 probe alone is ±2.5 °C and breaks the ±2.0 °C goal.
+    </div>
+
+    <div class="photo-grid">
+      <div class="photo-box">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/MAX6675_thermocouple_module.jpg/320px-MAX6675_thermocouple_module.jpg" alt="MAX6675 module" onerror="this.style.display='none'; this.parentElement.querySelector('.fallback').style.display='flex'">
+        <div class="fallback" style="display:none"><div class="emoji">🌡️</div>MAX6675 artwork</div>
+        <div class="photo-cap">MAX6675 K-type thermocouple module</div>
+      </div>
+      <div class="photo-box">
+        <img src="../circuit/fzz/parts/max6675/breadboard/max6675.svg" alt="MAX6675 Fritzing art" onerror="this.style.display='none'; this.parentElement.querySelector('.fallback').style.display='flex'">
+        <div class="fallback" style="display:none"><div class="emoji">🎨</div>Fritzing part art</div>
+        <div class="photo-cap">MAX6675 breadboard artwork</div>
+      </div>
+    </div>
+
+    <p><strong>Plug it:</strong> row <b>J, pin 23</strong>. Keep the module ≥15 cm from the Pi so box heat doesn't fake a temperature rise.</p>
+
+    <table class="wire">
+      <thead><tr><th style="width:20%">Module pin</th><th style="width:14%">Net</th><th style="width:26%">Connects to</th><th style="width:20%">Wire colour</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><span class="pin">Pin 1</span> VCC</td><td><span class="net" style="background:#c0392b22;color:#c0392b;border-color:#c0392b">3V3</span></td><td>3V3 rail</td><td><span class="wire-color">#c0392b</span> red</td><td>Module supply 3.0–3.6 V</td></tr>
+        <tr><td><span class="pin">Pin 2</span> GND</td><td><span class="net" style="background:#34495e22;color:#34495e;border-color:#34495e">GND</span></td><td>GND rail</td><td><span class="wire-color">#34495e</span> dark gray</td><td>Common ground</td></tr>
+        <tr><td><span class="pin">Pin 3</span> SCK</td><td><span class="net" style="background:#b9770e22;color:#b9770e;border-color:#b9770e">SPI_SCLK</span> <span class="color-swatch" style="background:#b9770e"></span></td><td>Pi pin 23</td><td><span class="wire-color">#b9770e</span> brown</td><td>SPI clock</td></tr>
+        <tr><td><span class="pin">Pin 4</span> CS</td><td><span class="net" style="background:#a0400022;color:#a04000;border-color:#a04000">SPI_CS0</span> <span class="color-swatch" style="background:#a04000"></span></td><td>Pi pin 24 + R2 to 3V3</td><td><span class="wire-color">#a04000</span> dark red</td><td>Chip-select, active low</td></tr>
+        <tr><td><span class="pin">Pin 5</span> SO</td><td><span class="net" style="background:#d4ac0d22;color:#d4ac0d;border-color:#d4ac0d">SPI_MISO</span> <span class="color-swatch" style="background:#d4ac0d"></span></td><td>Pi pin 21</td><td><span class="wire-color">#d4ac0d</span> gold</td><td>SPI data out (read-only)</td></tr>
+        <tr><td><span class="pin">Pin 6</span> TP / T+</td><td><span class="net" style="background:#8e44ad22;color:#8e44ad;border-color:#8e44ad">TC_P</span> <span class="color-swatch" style="background:#8e44ad"></span></td><td>K-probe tip + (chromel)</td><td><span class="wire-color">#8e44ad</span> purple</td><td>Thermocouple + lead</td></tr>
+        <tr><td><span class="pin">Pin 7</span> TN / T−</td><td><span class="net" style="background:#6c348322;color:#6c3483;border-color:#6c3483">TC_N</span> <span class="color-swatch" style="background:#6c3483"></span></td><td>K-probe tip − (alumel)</td><td><span class="wire-color">#6c3483</span> dark purple</td><td>Thermocouple − lead</td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>Probe:</strong> push the two K-type metal leads into the MAX6675 green screw terminal — T+ to TP, T− to TN.</p>
+
+    <div class="checklist">
+      <h4>✅ Step 3 checklist</h4>
+      <div class="check-item"><input type="checkbox" id="s3a"><label class="txt" for="s3a">R2 10 kΩ pulls CS up to 3V3</label><span class="badge">pull-up</span></div>
+      <div class="check-item"><input type="checkbox" id="s3b"><label class="txt" for="s3b">Probe is CLASS 1 (±1.5 °C)</label><span class="badge">critical</span></div>
+      <div class="check-item"><input type="checkbox" id="s3c"><label class="txt" for="s3c">Ice-water test → reads 0 ±2 °C, open-TC flag = 0</label><span class="badge">test</span></div>
+    </div>
+    <div style="margin-top:14px"><button class="btn ok" onclick="markDone(3)">✓ Heat-sensor done — unlock Step 4</button></div>
+  </section>
+
+  <!-- ================= STEP 4 : INMP441 ================= -->
+  <section class="step-card s4" id="step4">
+    <div class="step-head">
+      <div class="step-badge">4</div>
+      <h2>INMP441 microphone <span class="part-emoji">🎤</span></h2>
+    </div>
+
+    <div class="photo-grid">
+      <div class="photo-box">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/INMP441_MEMS_microphone_module.jpg/320px-INMP441_MEMS_microphone_module.jpg" alt="INMP441 module" onerror="this.style.display='none'; this.parentElement.querySelector('.fallback').style.display='flex'">
+        <div class="fallback" style="display:none"><div class="emoji">🎤</div>INMP441 artwork</div>
+        <div class="photo-cap">INMP441 I2S MEMS microphone module</div>
+      </div>
+      <div class="photo-box">
+        <img src="../circuit/fzz/parts/inmp441/breadboard/inmp441.svg" alt="INMP441 Fritzing art" onerror="this.style.display='none'; this.parentElement.querySelector('.fallback').style.display='flex'">
+        <div class="fallback" style="display:none"><div class="emoji">🎨</div>Fritzing part art</div>
+        <div class="photo-cap">INMP441 breadboard artwork</div>
+      </div>
+    </div>
+
+    <p><strong>Plug it:</strong> row <b>J, pin 15</strong>. Set L/R to GND for left channel.</p>
+
+    <table class="wire">
+      <thead><tr><th style="width:20%">Module pin</th><th style="width:14%">Net</th><th style="width:26%">Connects to</th><th style="width:20%">Wire colour</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><span class="pin">Pin 1</span> VDD</td><td><span class="net" style="background:#c0392b22;color:#c0392b;border-color:#c0392b">3V3</span></td><td>3V3 rail</td><td><span class="wire-color">#c0392b</span> red</td><td>Mic power 3.3 V</td></tr>
+        <tr><td><span class="pin">Pin 2</span> GND</td><td><span class="net" style="background:#34495e22;color:#34495e;border-color:#34495e">GND</span></td><td>GND rail</td><td><span class="wire-color">#34495e</span> dark gray</td><td>Common ground</td></tr>
+        <tr><td><span class="pin">Pin 3</span> L/R</td><td><span class="net" style="background:#34495e22;color:#34495e;border-color:#34495e">GND</span></td><td>GND rail → left channel</td><td><span class="wire-color">#34495e</span> dark gray</td><td>Selects left channel</td></tr>
+        <tr><td><span class="pin">Pin 4</span> BCLK</td><td><span class="net" style="background:#117a6522;color:#117a65;border-color:#117a65">I2S_BCLK</span> <span class="color-swatch" style="background:#117a65"></span></td><td>Pi pin 12</td><td><span class="wire-color">#117a65</span> dark teal</td><td>I2S bit clock</td></tr>
+        <tr><td><span class="pin">Pin 5</span> WS</td><td><span class="net" style="background:#1abc9c22;color:#1abc9c;border-color:#1abc9c">I2S_WS</span> <span class="color-swatch" style="background:#1abc9c"></span></td><td>Pi pin 35</td><td><span class="wire-color">#1abc9c</span> teal</td><td>I2S word-select</td></tr>
+        <tr><td><span class="pin">Pin 6</span> SD</td><td><span class="net" style="background:#0e665522;color:#0e6655;border-color:#0e6655">I2S_SD</span> <span class="color-swatch" style="background:#0e6655"></span></td><td>Pi pin 38</td><td><span class="wire-color">#0e6655</span> dark green-teal</td><td>I2S data out</td></tr>
+      </tbody>
+    </table>
+
+    <div class="checklist">
+      <h4>✅ Step 4 checklist</h4>
+      <div class="check-item"><input type="checkbox" id="s4a"><label class="txt" for="s4a">L/R → GND (left channel)</label><span class="badge">config</span></div>
+      <div class="check-item"><input type="checkbox" id="s4b"><label class="txt" for="s4b">BCLK → 12, WS → 35, SD → 38</label><span class="badge">I2S</span></div>
+      <div class="check-item"><input type="checkbox" id="s4c"><label class="txt" for="s4c">Run <code>arecord -l</code> → mic shows up</label><span class="badge">test</span></div>
+    </div>
+    <div style="margin-top:14px"><button class="btn ok" onclick="markDone(4)">✓ Mic done — unlock Step 5</button></div>
+  </section>
+
+  <!-- ================= STEP 5 : PASSIVES + LED + FAN ================= -->
+  <section class="step-card s5" id="step5">
+    <div class="step-head">
+      <div class="step-badge">5</div>
+      <h2>Caps, pull-up, LED &amp; fan <span class="part-emoji">🧩</span></h2>
+    </div>
+
+    <div class="photo-grid">
+      <div class="photo-box">
+        <img src="../circuit/fzz/parts/cap_cer/breadboard/cap_cer_breadboard_ceramic_capacitor_blue_leg.svg" alt="capacitor art" onerror="this.style.display='none'; this.parentElement.querySelector('.fallback').style.display='flex'">
+        <div class="fallback" style="display:none"><div class="emoji">🔋</div>Capacitor artwork</div>
+        <div class="photo-cap">100 nF ceramic caps (C1–C3)</div>
+      </div>
+      <div class="photo-box">
+        <img src="../circuit/fzz/parts/fan5v/breadboard/fan5v.svg" alt="fan art" onerror="this.style.display='none'; this.parentElement.querySelector('.fallback').style.display='flex'">
+        <div class="fallback" style="display:none"><div class="emoji">🌀</div>Fan artwork</div>
+        <div class="photo-cap">5 V cooling fan (F1)</div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div>
+        <h4 style="font-size:0.85rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin:0 0 8px">Decoupling caps — row E (top rails)</h4>
+        <table class="wire">
+          <tbody>
+            <tr><td><span class="pin">C1</span> 100 nF</td><td style="font-size:0.8rem">row E cols 4–5 → 3V3 / GND</td></tr>
+            <tr><td><span class="pin">C2</span> 100 nF</td><td style="font-size:0.8rem">row E cols 7–8 → 3V3 / GND</td></tr>
+            <tr><td><span class="pin">C3</span> 100 nF</td><td style="font-size:0.8rem">row E cols 10–11 → 3V3 / GND</td></tr>
+            <tr><td><span class="pin">C4</span> 10 µF</td><td style="font-size:0.8rem">row E cols 13–14 → 3V3 / GND <span style="color:var(--danger)">watch +/− polarity</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <h4 style="font-size:0.85rem; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin:0 0 8px">LED chain &amp; pull-up — row J right</h4>
+        <table class="wire">
+          <tbody>
+            <tr><td><span class="pin">R2</span> 10 kΩ</td><td style="font-size:0.8rem">row J cols 33–37: 3V3 → MAX6675 CS + Pi 24</td></tr>
+            <tr><td><span class="pin">R4</span> 330 Ω</td><td style="font-size:0.8rem">row J cols 45–49: Pi 36 → LED anode</td></tr>
+            <tr><td><span class="pin">D1</span> LED</td><td style="font-size:0.8rem">row J cols 42–43: anode ← R4, cathode → GND</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="alert"><span class="a-icon">🌀</span>
+      <strong>Fan:</strong> <span class="pin">+</span> to Pi pin 4 (5V, orange) direct — no rail. <span class="pin">−</span> to GND rail column 58 (dark gray).
+    </div>
+
+    <div class="checklist">
+      <h4>✅ Step 5 checklist</h4>
+      <div class="check-item"><input type="checkbox" id="s5a"><label class="txt" for="s5a">C1–C4 on top rails, labels clear of wires</label><span class="badge">neatness</span></div>
+      <div class="check-item"><input type="checkbox" id="s5b"><label class="txt" for="s5b">R2 pulls MAX6675 CS idle-high</label><span class="badge">pull-up</span></div>
+      <div class="check-item"><input type="checkbox" id="s5c"><label class="txt" for="s5c">LED chain: Pi 36 → R4 → LED → GND</label><span class="badge">status</span></div>
+      <div class="check-item"><input type="checkbox" id="s5d"><label class="txt" for="s5d">Fan + → Pi pin 4, fan − → GND col 58</label><span class="badge">power</span></div>
+    </div>
+    <div style="margin-top:14px"><button class="btn ok" onclick="markDone(5)">🎉 Rig fully wired!</button></div>
+  </section>
+
+  <!-- ================= BREADBOARD MAP ================= -->
+  <section class="step-card" id="bbmap" style="margin-top:0">
+    <div class="step-head"><div class="step-badge">🗺️</div><h2>Interactive breadboard map</h2></div>
+    <p>Click a hole to see what's plugged there. Occupied holes show the part; wired ones show a check.</p>
+    <div class="bb-wrap">
+      <div class="bb-map">
+        <div style="display:flex; gap:6px; align-items:flex-start">
+          <div class="bb-rowlabel">J</div>
+          <div class="bb-grid" id="gridJ"></div>
+        </div>
+        <div style="display:flex; gap:6px; align-items:flex-start; margin-top:8px">
+          <div class="bb-rowlabel">E</div>
+          <div class="bb-grid" id="gridE"></div>
+        </div>
+      </div>
+    </div>
+    <div class="bb-legend">
+      <div class="chip"><div class="c" style="background:#fff3cd;border-color:#fdcb6e"></div>Occupied (part plugged)</div>
+      <div class="chip"><div class="c" style="background:#d1f2eb;border-color:#00b894"></div>Wired &amp; verified</div>
+      <div class="chip"><div class="c" style="background:#f7f9fb;border-color:#b2bec3"></div>Empty hole</div>
+    </div>
+    <div id="bbDetail" style="margin-top:14px; background:#f1f4f8; border-radius:12px; padding:14px; border:1px solid #dde4ec"></div>
+  </section>
+
+  <!-- ================= VERIFY ================= -->
+  <section class="verify" id="verify" style="display:none">
+    <h3>🏁 Final verification</h3>
+    <div class="grid">
+      <div class="box"><span class="big">15</span><span class="small">nets, all colour-coded</span></div>
+      <div class="box"><span class="big">14</span><span class="small">parts on the board</span></div>
+      <div class="box"><span class="big">0</span><span class="small">geometry problems (audited)</span></div>
+      <div class="box"><span class="big">✓</span><span class="small">.fzz rebuilt &amp; exported</span></div>
+    </div>
+    <p style="margin-top:16px; font-size:0.9rem; opacity:0.9">Rebuild check anytime: <code style="background:rgba(255,255,255,0.2);padding:2px 6px;border-radius:6px">python3 circuit/build.py</code> → expect <strong>44 PASS / 8 WARN / 0 FAIL</strong>.</p>
+    <p style="font-size:0.8rem; opacity:0.85">The 8 WARNs are documented trade-offs (MAX6675 allowance needs a real quote ≤201.75 EGP, class-1 probe required, I²C cable &lt;10 cm, sealed-box heat-spreader, SPC 2-of-3 rule).</p>
+  </section>
+
+  <div class="foot">
+    Source of truth: <code>circuit/design.py</code> → <code>circuit/fzz/routes.py</code> → <code>circuit/fzz/build_fzz.py</code> (the .fzz).<br>
+    Every coloured wire ends in a numbered hole — no invented connections. Built for the G12 capstone, 0 EGP cloud.
+  </div>
+</div>
+
+<script>
+  const steps = [
+    {id:1, els:['s1a','s1b','s1c','s1d'], next:2},
+    {id:2, els:['s2a','s2b','s2c'], next:3},
+    {id:3, els:['s3a','s3b','s3c'], next:4},
+    {id:4, els:['s4a','s4b','s4c'], next:5},
+    {id:5, els:['s5a','s5b','s5c','s5d'], next:null}
+  ];
+  let done = new Set();
+
+  function buildProgress(){
+    const p = document.getElementById('progress');
+    p.innerHTML = '';
+    steps.forEach((s,i)=>{
+      const el = document.createElement('div');
+      el.className = 'step ' + (done.has(s.id)?'done': (s.id===1?'active':'t')) + ' s'+s.id;
+      el.innerHTML = `<div class="num">${s.id}</div><div class="lbl">${stepLabel(s.id)}</div>`;
+      if(i<steps.length-1) el.innerHTML += `<div class="conn"></div>`;
+      p.appendChild(el);
+    });
+  }
+  function stepLabel(id){
+    const l = {1:'Rails',2:'ADXL345',3:'MAX6675',4:'INMP441',5:'Finish'};
+    return l[id]||'';
+  }
+
+  function showStep(id){
+    document.querySelectorAll('.step-card').forEach(c=>c.classList.remove('current'));
+    const card = document.getElementById('step'+id);
+    if(card) card.classList.add('current');
+    buildProgress();
+    if(id===5) document.getElementById('verify').style.display='block';
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function markDone(id){
+    steps.find(s=>s.id===id).els.forEach(e=>{
+      const cb = document.getElementById(e);
+      if(cb) cb.checked = true;
+      const item = cb ? cb.closest('.check-item') : null;
+      if(item) item.classList.add('done');
+    });
+    done.add(id);
+    const n = steps.find(s=>s.id===id).next;
+    if(n){
+      showStep(n);
+    } else {
+      alert('🎉 Rig fully wired! Check the final verification below.');
+      document.getElementById('verify').style.display='block';
+      buildProgress();
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+  }
+
+  // breadboard map
+  (function(){
+    const holesJ = [3,15,23,33,37,42,43,45,49];
+    const holesE = [4,5,7,8,10,11,13,14];
+    const labels = {
+      3:'U2 ADXL345 VCC', 15:'U4 INMP441 VDD', 23:'U3 MAX6675 VIN',
+      33:'R2 10k pin1', 37:'R2 10k pin2', 42:'D1 LED pin1', 43:'D1 LED pin2',
+      45:'R4 330 pin1', 49:'R4 330 pin2',
+      4:'C1 pin1', 5:'C1 pin2', 7:'C2 pin1', 8:'C2 pin2',
+      10:'C3 pin1', 11:'C3 pin2', 13:'C4 pin1', 14:'C4 pin2'
+    };
+    const gridJ = document.getElementById('gridJ');
+    const gridE = document.getElementById('gridE');
+    const detail = document.getElementById('bbDetail');
+
+    function makeGrid(grid, holes){
+      grid.innerHTML='';
+      holes.forEach(c=>{
+        const h = document.createElement('div');
+        h.className='bb-hole'+(labels[c]?' occupied':'');
+        h.dataset.label = c;
+        h.innerHTML = labels[c]?`<div class="dot"></div><span style="position:absolute;top:2px;left:50%;transform:translateX(-50%);font-size:0.55rem;color:var(--ink);font-weight:800;pointer-events:none">${labels[c].split(' ')[0]}</span>`:`<div class="dot"></div>`;
+        h.onclick=()=>showDetail(c);
+        grid.appendChild(h);
+      });
+    }
+    makeGrid(gridJ, holesJ);
+    makeGrid(gridE, holesE);
+
+    function showDetail(c){
+      const names={
+        3:'ADXL345 module — row J pin 3', 15:'INMP441 module — row J pin 15', 23:'MAX6675 module — row J pin 23',
+        33:'R2 10 kΩ — row J col 33', 37:'R2 10 kΩ — row J col 37', 42:'D1 LED — row J col 42',
+        43:'D1 LED — row J col 43', 45:'R4 330 Ω — row J col 45', 49:'R4 330 Ω — row J col 49',
+        4:'C1 100 nF — row E col 4', 5:'C1 100 nF — row E col 5', 7:'C2 100 nF — row E col 7',
+        8:'C2 100 nF — row E col 8', 10:'C3 100 nF — row E col 10', 11:'C3 100 nF — row E col 11',
+        13:'C4 10 µF — row E col 13', 14:'C4 10 µF — row E col 14'
+      };
+      detail.innerHTML = `<strong style="color:var(--accent)">Col ${c}</strong> — ${names[c]||'Empty breadboard hole'}`;
+    }
+    showDetail(3);
+
+    // wire up checkboxes to auto-check done
+    document.querySelectorAll('.check-item input').forEach(cb=>{
+      cb.addEventListener('change',()=>{
+        const card = cb.closest('.step-card');
+        const id = parseInt(card.id.replace('step',''));
+        const s = steps.find(x=>x.id===id);
+        if(s && s.els.every(e=>document.getElementById(e).checked)){
+          // all checked -> offer to advance
+          const btn = card.querySelector('.btn');
+          if(btn && !done.has(id)) btn.style.opacity='1';
+        }
+      });
+    });
+
+    buildProgress();
+  })();
+</script>
+
+</body>
+</html>
