@@ -644,7 +644,7 @@ function renderPath(){
     step.className='path-step'+(done?' done':'')+(current?' current':'');
     const t=THEMES[l.id];
     step.innerHTML=`
-      <div class="node${done?' done':''}${current?' current':''}"${!done&&!current?` onclick="startLevel(${l.id})"`:''}>${l.mascot}<span class="badge-done">${done?'✓':''}</span></div>
+      <div class="node${done?' done':''}${current?' current':''}"${!done?` onclick="startLevel(${l.id})"`:''}>${l.mascot}<span class="badge-done">${done?'✓':''}</span></div>
       <div class="node-info">
         <strong>${l.title}</strong>
         <span>${l.sub}</span>
@@ -670,7 +670,7 @@ function renderLevels(){
     const done=isDone(l.id);
     const locked = l.id!==1 && !prevAllDone(l.id);
     const card=document.createElement('section');
-    card.className='level-card'+(done?' done':'')+( (!locked && !done)?' current':'')+(locked?' hidden':'');
+    card.className='level-card'+(done?' done':'')+' hidden';
     card.id='level-'+l.id;
     const t=THEMES[l.id];
     document.documentElement.style.setProperty('--uc', t.uc);
