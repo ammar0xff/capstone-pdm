@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.8888888889in" height="0.8888888889in" viewBox="0 0 80 80">
+<g id="breadboard">
+<rect x="1" y="1" width="78" height="78" rx="9" fill="#1c1c1c" stroke="#000" stroke-width="1"/>
+<circle cx="40" cy="40" r="32" fill="#0c0c0c" stroke="#2a2a2a" stroke-width="1"/>
+<path d="M40,40 Q30,22 44,14 Q54,24 46,38 Z" fill="#3a3a3a" stroke="#555" stroke-width="0.4" transform="rotate(0 40 40)"/>
+<path d="M40,40 Q30,22 44,14 Q54,24 46,38 Z" fill="#3a3a3a" stroke="#555" stroke-width="0.4" transform="rotate(72 40 40)"/>
+<path d="M40,40 Q30,22 44,14 Q54,24 46,38 Z" fill="#3a3a3a" stroke="#555" stroke-width="0.4" transform="rotate(144 40 40)"/>
+<path d="M40,40 Q30,22 44,14 Q54,24 46,38 Z" fill="#3a3a3a" stroke="#555" stroke-width="0.4" transform="rotate(216 40 40)"/>
+<path d="M40,40 Q30,22 44,14 Q54,24 46,38 Z" fill="#3a3a3a" stroke="#555" stroke-width="0.4" transform="rotate(288 40 40)"/>
+<circle cx="40" cy="40" r="9" fill="#2b2b2b" stroke="#555" stroke-width="0.6"/>
+<circle cx="40" cy="40" r="3" fill="#111"/>
+<circle cx="7" cy="7" r="2.4" fill="#0c0c0c" stroke="#444" stroke-width="0.6"/>
+<circle cx="73" cy="7" r="2.4" fill="#0c0c0c" stroke="#444" stroke-width="0.6"/>
+<circle cx="7" cy="73" r="2.4" fill="#0c0c0c" stroke="#444" stroke-width="0.6"/>
+<circle cx="73" cy="73" r="2.4" fill="#0c0c0c" stroke="#444" stroke-width="0.6"/>
+<path d="M0,20 L12,20" stroke="#c0392b" stroke-width="2.2"/>
+<path d="M0,60 L12,60" stroke="#1a1a1a" stroke-width="2.2"/>
+<text x="62" y="78" font-family="DejaVu Sans, sans-serif" font-size="3.4" fill="#dddddd" text-anchor="end" font-weight="normal">5V</text>
+<circle id="connector0pin" cx="0" cy="20" r="1.6" fill="none" stroke="#c0392b" stroke-width="0.8"/>
+<circle id="connector1pin" cx="0" cy="60" r="1.6" fill="none" stroke="#1a1a1a" stroke-width="0.8"/>
+</g>
+<g id="icon">
+<rect x="1" y="1" width="78" height="78" rx="9" fill="#1c1c1c" stroke="#000" stroke-width="1"/>
+<circle cx="40" cy="40" r="32" fill="#0c0c0c" stroke="#2a2a2a" stroke-width="1"/>
+<path d="M40,40 Q30,22 44,14 Q54,24 46,38 Z" fill="#3a3a3a" stroke="#555" stroke-width="0.4" transform="rotate(0 40 40)"/>
+<path d="M40,40 Q30,22 44,14 Q54,24 46,38 Z" fill="#3a3a3a" stroke="#555" stroke-width="0.4" transform="rotate(72 40 40)"/>
+<path d="M40,40 Q30,22 44,14 Q54,24 46,38 Z" fill="#3a3a3a" stroke="#555" stroke-width="0.4" transform="rotate(144 40 40)"/>
+<path d="M40,40 Q30,22 44,14 Q54,24 46,38 Z" fill="#3a3a3a" stroke="#555" stroke-width="0.4" transform="rotate(216 40 40)"/>
+<path d="M40,40 Q30,22 44,14 Q54,24 46,38 Z" fill="#3a3a3a" stroke="#555" stroke-width="0.4" transform="rotate(288 40 40)"/>
+<circle cx="40" cy="40" r="9" fill="#2b2b2b" stroke="#555" stroke-width="0.6"/>
+<circle cx="40" cy="40" r="3" fill="#111"/>
+<circle cx="7" cy="7" r="2.4" fill="#0c0c0c" stroke="#444" stroke-width="0.6"/>
+<circle cx="73" cy="7" r="2.4" fill="#0c0c0c" stroke="#444" stroke-width="0.6"/>
+<circle cx="7" cy="73" r="2.4" fill="#0c0c0c" stroke="#444" stroke-width="0.6"/>
+<circle cx="73" cy="73" r="2.4" fill="#0c0c0c" stroke="#444" stroke-width="0.6"/>
+<path d="M0,20 L12,20" stroke="#c0392b" stroke-width="2.2"/>
+<path d="M0,60 L12,60" stroke="#1a1a1a" stroke-width="2.2"/>
+<text x="62" y="78" font-family="DejaVu Sans, sans-serif" font-size="3.4" fill="#dddddd" text-anchor="end" font-weight="normal">5V</text>
+<circle id="connector0pin" cx="0" cy="20" r="1.6" fill="none" stroke="#c0392b" stroke-width="0.8"/>
+<circle id="connector1pin" cx="0" cy="60" r="1.6" fill="none" stroke="#1a1a1a" stroke-width="0.8"/>
+</g>
+</svg>

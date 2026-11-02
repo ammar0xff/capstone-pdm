@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.5777777778in" height="0.2444444444in" viewBox="0 0 52 22">
+<g id="copper0">
+<rect x="0" y="0" width="52" height="22" fill="#333" opacity="0.25"/>
+<circle id="connector0pad" cx="4" cy="10" r="4.5" fill="#c9a227" stroke="#8a6d1f" stroke-width="0.6"/>
+<circle cx="4" cy="10" r="2" fill="#333"/>
+<circle id="connector1pad" cx="12" cy="10" r="4.5" fill="#c9a227" stroke="#8a6d1f" stroke-width="0.6"/>
+<circle cx="12" cy="10" r="2" fill="#333"/>
+<circle id="connector2pad" cx="20" cy="10" r="4.5" fill="#c9a227" stroke="#8a6d1f" stroke-width="0.6"/>
+<circle cx="20" cy="10" r="2" fill="#333"/>
+<circle id="connector3pad" cx="28" cy="10" r="4.5" fill="#c9a227" stroke="#8a6d1f" stroke-width="0.6"/>
+<circle cx="28" cy="10" r="2" fill="#333"/>
+<circle id="connector4pad" cx="36" cy="10" r="4.5" fill="#c9a227" stroke="#8a6d1f" stroke-width="0.6"/>
+<circle cx="36" cy="10" r="2" fill="#333"/>
+<circle id="connector5pad" cx="44" cy="10" r="4.5" fill="#c9a227" stroke="#8a6d1f" stroke-width="0.6"/>
+<circle cx="44" cy="10" r="2" fill="#333"/>
+</g>
+<g id="copper1">
+<rect x="0" y="0" width="52" height="22" fill="#333" opacity="0.25"/>
+<circle id="connector0pad" cx="4" cy="10" r="4.5" fill="#c9a227" stroke="#8a6d1f" stroke-width="0.6"/>
+<circle cx="4" cy="10" r="2" fill="#333"/>
+<circle id="connector1pad" cx="12" cy="10" r="4.5" fill="#c9a227" stroke="#8a6d1f" stroke-width="0.6"/>
+<circle cx="12" cy="10" r="2" fill="#333"/>
+<circle id="connector2pad" cx="20" cy="10" r="4.5" fill="#c9a227" stroke="#8a6d1f" stroke-width="0.6"/>
+<circle cx="20" cy="10" r="2" fill="#333"/>
+<circle id="connector3pad" cx="28" cy="10" r="4.5" fill="#c9a227" stroke="#8a6d1f" stroke-width="0.6"/>
+<circle cx="28" cy="10" r="2" fill="#333"/>
+<circle id="connector4pad" cx="36" cy="10" r="4.5" fill="#c9a227" stroke="#8a6d1f" stroke-width="0.6"/>
+<circle cx="36" cy="10" r="2" fill="#333"/>
+<circle id="connector5pad" cx="44" cy="10" r="4.5" fill="#c9a227" stroke="#8a6d1f" stroke-width="0.6"/>
+<circle cx="44" cy="10" r="2" fill="#333"/>
+</g>
+<g id="silkscreen">
+<text x="26" y="19" font-family="DejaVu Sans, sans-serif" font-size="4" fill="#ffffff" text-anchor="middle" font-weight="normal">INMP441</text>
+</g>
+</svg>

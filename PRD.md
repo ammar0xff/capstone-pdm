@@ -130,6 +130,7 @@ Why this fits:
 - `circuit/out/pdm.net` — KiCad-format netlist; `pdm_skidl.py` — SKiDL source for a machine with KiCad libraries.
 - `circuit/out/erc_report.md` — 52 checks: 44 design (ERC + physics) + 8 BOM traceability: **0 ERC errors, 8 documented WARN, 0 FAIL**. The BOM gate covers the signed 9,370 ceiling, the 201.75 converter allowance, part identity and the supplier-sheet reconciliation; it fails if any of them drifts.
 - `circuit/out/schematic_main.svg`, `tc_frontend.svg`, `wiring_a3.svg`, `breadboard.svg` — A3 vector sheets embedded in Project Book §4.3–4.4 (the last one is the 1:1 breadboard build view with real part artwork and a 50 mm scale bar).
+- `circuit/out/PDM_Predictive_Maintenance.fzz` — verified Fritzing breadboard sketch (all `PDM_*` module IDs; 14 instances, 15 nets, 166 wires; union-find connectivity checked; exported and geometry-audited with `circuit/fzz/check_export.py`, 0 problems); preview at `circuit/out/fritzing_breadboard.svg` / `.png`.
 - `circuit/out/block.mmd`, `sequence.mmd`, `state.mmd` — Mermaid diagrams for GitHub rendering.
 
 The build exits non-zero on any FAIL, so a broken netlist cannot produce a drawing. Enforced invariants: no 5V pin on a 3.3V net, one push-pull driver per net, every IC decoupled by 100 nF on its own supply net, dedicated SPI CS with pull-up, unique I2C address, no pin used twice. WARNs are documented trade-offs (I2C cable length, sealed-box heat, single-point SPC false-alarm rate, cold-junction placement, thermocouple EMI at 41 uV/C).

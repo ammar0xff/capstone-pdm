@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.6300000000in" height="0.5511111111in" viewBox="0 0 56.7 49.6">
+<g id="breadboard">
+<rect x="0.6" y="0.6" width="55.5" height="48.4" rx="3" fill="#3d2b56" stroke="#221735" stroke-width="1"/>
+<rect x="4.4" y="44" width="3" height="5.6" rx="0.8" fill="#d4af37" stroke="#8a6d1f" stroke-width="0.4"/>
+<text x="5.9" y="40.5" font-family="DejaVu Sans, sans-serif" font-size="2.6" fill="#ffffff" text-anchor="middle" font-weight="normal">VDD</text>
+<rect x="13.4" y="44" width="3" height="5.6" rx="0.8" fill="#d4af37" stroke="#8a6d1f" stroke-width="0.4"/>
+<text x="14.9" y="40.5" font-family="DejaVu Sans, sans-serif" font-size="2.6" fill="#ffffff" text-anchor="middle" font-weight="normal">GND</text>
+<rect x="22.4" y="44" width="3" height="5.6" rx="0.8" fill="#d4af37" stroke="#8a6d1f" stroke-width="0.4"/>
+<text x="23.9" y="40.5" font-family="DejaVu Sans, sans-serif" font-size="2.6" fill="#ffffff" text-anchor="middle" font-weight="normal">LR</text>
+<rect x="31.4" y="44" width="3" height="5.6" rx="0.8" fill="#d4af37" stroke="#8a6d1f" stroke-width="0.4"/>
+<text x="32.9" y="40.5" font-family="DejaVu Sans, sans-serif" font-size="2.6" fill="#ffffff" text-anchor="middle" font-weight="normal">BCLK</text>
+<rect x="40.4" y="44" width="3" height="5.6" rx="0.8" fill="#d4af37" stroke="#8a6d1f" stroke-width="0.4"/>
+<text x="41.9" y="40.5" font-family="DejaVu Sans, sans-serif" font-size="2.6" fill="#ffffff" text-anchor="middle" font-weight="normal">WS</text>
+<rect x="49.4" y="44" width="3" height="5.6" rx="0.8" fill="#d4af37" stroke="#8a6d1f" stroke-width="0.4"/>
+<text x="50.9" y="40.5" font-family="DejaVu Sans, sans-serif" font-size="2.6" fill="#ffffff" text-anchor="middle" font-weight="normal">SD</text>
+<circle cx="28.35" cy="18" r="8.4" fill="#c9ced6" stroke="#7c838d" stroke-width="0.8"/>
+<circle cx="28.35" cy="18" r="5.2" fill="#8f959e"/>
+<circle cx="28.35" cy="18" r="1.5" fill="#1a1a1a"/>
+<circle cx="24.9" cy="20" r="0.8" fill="#e8e8e8"/>
+<text x="6" y="8" font-family="DejaVu Sans, sans-serif" font-size="5" fill="#ffffff" text-anchor="start" font-weight="bold">INMP441</text>
+<text x="6" y="12.6" font-family="DejaVu Sans, sans-serif" font-size="2.6" fill="#d9c9f0" text-anchor="start" font-weight="normal">I2S MEMS MIC</text>
+<circle id="connector0pin" cx="5.9" cy="49.6" r="2.2" fill="none" stroke="#d4af37" stroke-width="0.8"/>
+<circle id="connector1pin" cx="14.9" cy="49.6" r="2.2" fill="none" stroke="#d4af37" stroke-width="0.8"/>
+<circle id="connector2pin" cx="23.9" cy="49.6" r="2.2" fill="none" stroke="#d4af37" stroke-width="0.8"/>
+<circle id="connector3pin" cx="32.9" cy="49.6" r="2.2" fill="none" stroke="#d4af37" stroke-width="0.8"/>
+<circle id="connector4pin" cx="41.9" cy="49.6" r="2.2" fill="none" stroke="#d4af37" stroke-width="0.8"/>
+<circle id="connector5pin" cx="50.9" cy="49.6" r="2.2" fill="none" stroke="#d4af37" stroke-width="0.8"/>
+</g>
+<g id="icon">
+<rect x="0.6" y="0.6" width="55.5" height="48.4" rx="3" fill="#3d2b56" stroke="#221735" stroke-width="1"/>
+<rect x="4.4" y="44" width="3" height="5.6" rx="0.8" fill="#d4af37" stroke="#8a6d1f" stroke-width="0.4"/>
+<text x="5.9" y="40.5" font-family="DejaVu Sans, sans-serif" font-size="2.6" fill="#ffffff" text-anchor="middle" font-weight="normal">VDD</text>
+<rect x="13.4" y="44" width="3" height="5.6" rx="0.8" fill="#d4af37" stroke="#8a6d1f" stroke-width="0.4"/>
+<text x="14.9" y="40.5" font-family="DejaVu Sans, sans-serif" font-size="2.6" fill="#ffffff" text-anchor="middle" font-weight="normal">GND</text>
+<rect x="22.4" y="44" width="3" height="5.6" rx="0.8" fill="#d4af37" stroke="#8a6d1f" stroke-width="0.4"/>
+<text x="23.9" y="40.5" font-family="DejaVu Sans, sans-serif" font-size="2.6" fill="#ffffff" text-anchor="middle" font-weight="normal">LR</text>
+<rect x="31.4" y="44" width="3" height="5.6" rx="0.8" fill="#d4af37" stroke="#8a6d1f" stroke-width="0.4"/>
+<text x="32.9" y="40.5" font-family="DejaVu Sans, sans-serif" font-size="2.6" fill="#ffffff" text-anchor="middle" font-weight="normal">BCLK</text>
+<rect x="40.4" y="44" width="3" height="5.6" rx="0.8" fill="#d4af37" stroke="#8a6d1f" stroke-width="0.4"/>
+<text x="41.9" y="40.5" font-family="DejaVu Sans, sans-serif" font-size="2.6" fill="#ffffff" text-anchor="middle" font-weight="normal">WS</text>
+<rect x="49.4" y="44" width="3" height="5.6" rx="0.8" fill="#d4af37" stroke="#8a6d1f" stroke-width="0.4"/>
+<text x="50.9" y="40.5" font-family="DejaVu Sans, sans-serif" font-size="2.6" fill="#ffffff" text-anchor="middle" font-weight="normal">SD</text>
+<circle cx="28.35" cy="18" r="8.4" fill="#c9ced6" stroke="#7c838d" stroke-width="0.8"/>
+<circle cx="28.35" cy="18" r="5.2" fill="#8f959e"/>
+<circle cx="28.35" cy="18" r="1.5" fill="#1a1a1a"/>
+<circle cx="24.9" cy="20" r="0.8" fill="#e8e8e8"/>
+<text x="6" y="8" font-family="DejaVu Sans, sans-serif" font-size="5" fill="#ffffff" text-anchor="start" font-weight="bold">INMP441</text>
+<text x="6" y="12.6" font-family="DejaVu Sans, sans-serif" font-size="2.6" fill="#d9c9f0" text-anchor="start" font-weight="normal">I2S MEMS MIC</text>
+<circle id="connector0pin" cx="5.9" cy="49.6" r="2.2" fill="none" stroke="#d4af37" stroke-width="0.8"/>
+<circle id="connector1pin" cx="14.9" cy="49.6" r="2.2" fill="none" stroke="#d4af37" stroke-width="0.8"/>
+<circle id="connector2pin" cx="23.9" cy="49.6" r="2.2" fill="none" stroke="#d4af37" stroke-width="0.8"/>
+<circle id="connector3pin" cx="32.9" cy="49.6" r="2.2" fill="none" stroke="#d4af37" stroke-width="0.8"/>
+<circle id="connector4pin" cx="41.9" cy="49.6" r="2.2" fill="none" stroke="#d4af37" stroke-width="0.8"/>
+<circle id="connector5pin" cx="50.9" cy="49.6" r="2.2" fill="none" stroke="#d4af37" stroke-width="0.8"/>
+</g>
+</svg>

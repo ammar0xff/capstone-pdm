@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.9844444444in" height="0.8266666667in" viewBox="0 0 88.6 74.4">
+<g id="breadboard">
+<rect x="0.6" y="0.6" width="87.4" height="73.2" rx="4" fill="#185a94" stroke="#0b3559" stroke-width="1"/>
+<rect x="24.7" y="68" width="3.2" height="7" rx="1" fill="#d4af37" stroke="#8a6d1f" stroke-width="0.4"/>
+<text x="26.3" y="64.5" font-family="DejaVu Sans, sans-serif" font-size="3" fill="#ffffff" text-anchor="middle" font-weight="normal">VIN</text>
+<rect x="33.7" y="68" width="3.2" height="7" rx="1" fill="#d4af37" stroke="#8a6d1f" stroke-width="0.4"/>
+<text x="35.3" y="64.5" font-family="DejaVu Sans, sans-serif" font-size="3" fill="#ffffff" text-anchor="middle" font-weight="normal">GND</text>
+<rect x="42.7" y="68" width="3.2" height="7" rx="1" fill="#d4af37" stroke="#8a6d1f" stroke-width="0.4"/>
+<text x="44.3" y="64.5" font-family="DejaVu Sans, sans-serif" font-size="3" fill="#ffffff" text-anchor="middle" font-weight="normal">SCK</text>
+<rect x="51.7" y="68" width="3.2" height="7" rx="1" fill="#d4af37" stroke="#8a6d1f" stroke-width="0.4"/>
+<text x="53.3" y="64.5" font-family="DejaVu Sans, sans-serif" font-size="3" fill="#ffffff" text-anchor="middle" font-weight="normal">CS</text>
+<rect x="60.7" y="68" width="3.2" height="7" rx="1" fill="#d4af37" stroke="#8a6d1f" stroke-width="0.4"/>
+<text x="62.3" y="64.5" font-family="DejaVu Sans, sans-serif" font-size="3" fill="#ffffff" text-anchor="middle" font-weight="normal">SO</text>
+<rect x="31" y="24" width="20" height="20" rx="1.5" fill="#1b1b1b" stroke="#000" stroke-width="0.6"/>
+<rect x="27.6" y="27" width="3.4" height="2" fill="#cfcfcf"/>
+<rect x="51" y="27" width="3.4" height="2" fill="#cfcfcf"/>
+<rect x="27.6" y="31.6" width="3.4" height="2" fill="#cfcfcf"/>
+<rect x="51" y="31.6" width="3.4" height="2" fill="#cfcfcf"/>
+<rect x="27.6" y="36.2" width="3.4" height="2" fill="#cfcfcf"/>
+<rect x="51" y="36.2" width="3.4" height="2" fill="#cfcfcf"/>
+<rect x="27.6" y="40.8" width="3.4" height="2" fill="#cfcfcf"/>
+<rect x="51" y="40.8" width="3.4" height="2" fill="#cfcfcf"/>
+<text x="41" y="35" font-family="DejaVu Sans, sans-serif" font-size="4.2" fill="#cfcfcf" text-anchor="middle" font-weight="bold">MAX</text>
+<text x="41" y="40" font-family="DejaVu Sans, sans-serif" font-size="4.2" fill="#cfcfcf" text-anchor="middle" font-weight="bold">6675</text>
+<rect x="66" y="20" width="21" height="34" rx="2" fill="#2e7d32" stroke="#1b4d20" stroke-width="0.8"/>
+<text x="76.5" y="17" font-family="DejaVu Sans, sans-serif" font-size="3.2" fill="#ffffff" text-anchor="middle" font-weight="normal">T+  T-</text>
+<circle cx="76.5" cy="32" r="4.2" fill="#a5d6a7" stroke="#1b4d20" stroke-width="0.8"/>
+<rect x="73.6" y="31.3" width="5.8" height="1.4" fill="#1b4d20"/>
+<circle cx="76.5" cy="50" r="4.2" fill="#a5d6a7" stroke="#1b4d20" stroke-width="0.8"/>
+<rect x="73.6" y="49.3" width="5.8" height="1.4" fill="#1b4d20"/>
+<text x="6" y="10" font-family="DejaVu Sans, sans-serif" font-size="6" fill="#ffffff" text-anchor="start" font-weight="bold">MAX6675</text>
+<text x="6" y="16" font-family="DejaVu Sans, sans-serif" font-size="3.2" fill="#cfe6ff" text-anchor="start" font-weight="normal">K-TYPE  SPI</text>
+<circle id="connector0pin" cx="26.3" cy="74.4" r="2.2" fill="none" stroke="#d4af37" stroke-width="0.8"/>
+<circle id="connector1pin" cx="35.3" cy="74.4" r="2.2" fill="none" stroke="#d4af37" stroke-width="0.8"/>
+<circle id="connector2pin" cx="44.3" cy="74.4" r="2.2" fill="none" stroke="#d4af37" stroke-width="0.8"/>
+<circle id="connector3pin" cx="53.3" cy="74.4" r="2.2" fill="none" stroke="#d4af37" stroke-width="0.8"/>
+<circle id="connector4pin" cx="62.3" cy="74.4" r="2.2" fill="none" stroke="#d4af37" stroke-width="0.8"/>
+<circle id="connector5pin" cx="80" cy="32" r="2.2" fill="none" stroke="#d4af37" stroke-width="0.8"/>
+<circle id="connector6pin" cx="80" cy="50" r="2.2" fill="none" stroke="#d4af37" stroke-width="0.8"/>
+</g>
+<g id="icon">
+<rect x="0.6" y="0.6" width="87.4" height="73.2" rx="4" fill="#185a94" stroke="#0b3559" stroke-width="1"/>
+<rect x="24.7" y="68" width="3.2" height="7" rx="1" fill="#d4af37" stroke="#8a6d1f" stroke-width="0.4"/>
+<text x="26.3" y="64.5" font-family="DejaVu Sans, sans-serif" font-size="3" fill="#ffffff" text-anchor="middle" font-weight="normal">VIN</text>
+<rect x="33.7" y="68" width="3.2" height="7" rx="1" fill="#d4af37" stroke="#8a6d1f" stroke-width="0.4"/>
+<text x="35.3" y="64.5" font-family="DejaVu Sans, sans-serif" font-size="3" fill="#ffffff" text-anchor="middle" font-weight="normal">GND</text>
+<rect x="42.7" y="68" width="3.2" height="7" rx="1" fill="#d4af37" stroke="#8a6d1f" stroke-width="0.4"/>
+<text x="44.3" y="64.5" font-family="DejaVu Sans, sans-serif" font-size="3" fill="#ffffff" text-anchor="middle" font-weight="normal">SCK</text>
+<rect x="51.7" y="68" width="3.2" height="7" rx="1" fill="#d4af37" stroke="#8a6d1f" stroke-width="0.4"/>
+<text x="53.3" y="64.5" font-family="DejaVu Sans, sans-serif" font-size="3" fill="#ffffff" text-anchor="middle" font-weight="normal">CS</text>
+<rect x="60.7" y="68" width="3.2" height="7" rx="1" fill="#d4af37" stroke="#8a6d1f" stroke-width="0.4"/>
+<text x="62.3" y="64.5" font-family="DejaVu Sans, sans-serif" font-size="3" fill="#ffffff" text-anchor="middle" font-weight="normal">SO</text>
+<rect x="31" y="24" width="20" height="20" rx="1.5" fill="#1b1b1b" stroke="#000" stroke-width="0.6"/>
+<rect x="27.6" y="27" width="3.4" height="2" fill="#cfcfcf"/>
+<rect x="51" y="27" width="3.4" height="2" fill="#cfcfcf"/>
+<rect x="27.6" y="31.6" width="3.4" height="2" fill="#cfcfcf"/>
+<rect x="51" y="31.6" width="3.4" height="2" fill="#cfcfcf"/>
+<rect x="27.6" y="36.2" width="3.4" height="2" fill="#cfcfcf"/>
+<rect x="51" y="36.2" width="3.4" height="2" fill="#cfcfcf"/>
+<rect x="27.6" y="40.8" width="3.4" height="2" fill="#cfcfcf"/>
+<rect x="51" y="40.8" width="3.4" height="2" fill="#cfcfcf"/>
+<text x="41" y="35" font-family="DejaVu Sans, sans-serif" font-size="4.2" fill="#cfcfcf" text-anchor="middle" font-weight="bold">MAX</text>
+<text x="41" y="40" font-family="DejaVu Sans, sans-serif" font-size="4.2" fill="#cfcfcf" text-anchor="middle" font-weight="bold">6675</text>
+<rect x="66" y="20" width="21" height="34" rx="2" fill="#2e7d32" stroke="#1b4d20" stroke-width="0.8"/>
+<text x="76.5" y="17" font-family="DejaVu Sans, sans-serif" font-size="3.2" fill="#ffffff" text-anchor="middle" font-weight="normal">T+  T-</text>
+<circle cx="76.5" cy="32" r="4.2" fill="#a5d6a7" stroke="#1b4d20" stroke-width="0.8"/>
+<rect x="73.6" y="31.3" width="5.8" height="1.4" fill="#1b4d20"/>
+<circle cx="76.5" cy="50" r="4.2" fill="#a5d6a7" stroke="#1b4d20" stroke-width="0.8"/>
+<rect x="73.6" y="49.3" width="5.8" height="1.4" fill="#1b4d20"/>
+<text x="6" y="10" font-family="DejaVu Sans, sans-serif" font-size="6" fill="#ffffff" text-anchor="start" font-weight="bold">MAX6675</text>
+<text x="6" y="16" font-family="DejaVu Sans, sans-serif" font-size="3.2" fill="#cfe6ff" text-anchor="start" font-weight="normal">K-TYPE  SPI</text>
+<circle id="connector0pin" cx="26.3" cy="74.4" r="2.2" fill="none" stroke="#d4af37" stroke-width="0.8"/>
+<circle id="connector1pin" cx="35.3" cy="74.4" r="2.2" fill="none" stroke="#d4af37" stroke-width="0.8"/>
+<circle id="connector2pin" cx="44.3" cy="74.4" r="2.2" fill="none" stroke="#d4af37" stroke-width="0.8"/>
+<circle id="connector3pin" cx="53.3" cy="74.4" r="2.2" fill="none" stroke="#d4af37" stroke-width="0.8"/>
+<circle id="connector4pin" cx="62.3" cy="74.4" r="2.2" fill="none" stroke="#d4af37" stroke-width="0.8"/>
+<circle id="connector5pin" cx="80" cy="32" r="2.2" fill="none" stroke="#d4af37" stroke-width="0.8"/>
+<circle id="connector6pin" cx="80" cy="50" r="2.2" fill="none" stroke="#d4af37" stroke-width="0.8"/>
+</g>
+</svg>

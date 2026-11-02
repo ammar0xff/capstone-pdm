@@ -1,7 +1,7 @@
 (export (version "E")
   (design
     (source "pdm_rig.kicad_sch")
-    (date "2026-10-25")
+    (date "2026-11-02")
     (tool "pdm-pipeline 1.0"))
   (components
     (comp (ref "U1")

@@ -27,6 +27,8 @@ python3 circuit/build.py     # stdlib only — runs on the Pi, no KiCad needed
 | `circuit/out/tc_frontend.svg` | Sheet 2: K-type/MAX6675 theory, cold junction + computed error budget |
 | `circuit/out/wiring_a3.svg` | Sheet 3: assembly, glands, cable lengths, power-on checklist |
 | `circuit/out/breadboard.svg` | Sheet 4: true-scale (1:1 on A3) breadboard view — real part artwork, hole-by-hole |
+| `circuit/out/fritzing_breadboard.svg` / `.png` | Verified Fritzing breadboard CAD render — real ADXL345/MAX6675/INMP441/Pi 4/5 V fan artwork, net-coloured wires, machine-audited (0 geometry problems) |
+| `circuit/out/PDM_Predictive_Maintenance.fzz` | The Fritzing sketch deliverable — 14 instances, 15 nets, 166 wires, all `PDM_*` module IDs; rebuilt by `circuit/fzz/build_fzz.py` and audited by `circuit/fzz/check_export.py` |
 | `book_assets/breadboard.png` | Raster preview of Sheet 4 (for slides/print; the SVG is the source of truth) |
 | `circuit/out/pdm.net` | KiCad-format netlist (15 nets, 13 components) |
 | `circuit/out/pdm_skidl.py` | SKiDL source for a machine with KiCad libraries |

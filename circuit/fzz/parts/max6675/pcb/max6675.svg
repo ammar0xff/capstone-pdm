@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.6222222222in" height="0.2666666667in" viewBox="0 0 56 24">
+<g id="copper0">
+<rect x="0" y="0" width="56" height="24" fill="#333" opacity="0.25"/>
+<circle id="connector0pad" cx="6" cy="10" r="4.5" fill="#c9a227" stroke="#8a6d1f" stroke-width="0.6"/>
+<circle cx="6" cy="10" r="2" fill="#333"/>
+<circle id="connector1pad" cx="14" cy="10" r="4.5" fill="#c9a227" stroke="#8a6d1f" stroke-width="0.6"/>
+<circle cx="14" cy="10" r="2" fill="#333"/>
+<circle id="connector2pad" cx="22" cy="10" r="4.5" fill="#c9a227" stroke="#8a6d1f" stroke-width="0.6"/>
+<circle cx="22" cy="10" r="2" fill="#333"/>
+<circle id="connector3pad" cx="30" cy="10" r="4.5" fill="#c9a227" stroke="#8a6d1f" stroke-width="0.6"/>
+<circle cx="30" cy="10" r="2" fill="#333"/>
+<circle id="connector4pad" cx="38" cy="10" r="4.5" fill="#c9a227" stroke="#8a6d1f" stroke-width="0.6"/>
+<circle cx="38" cy="10" r="2" fill="#333"/>
+<circle id="connector5pad" cx="48" cy="8" r="4.5" fill="#c9a227" stroke="#8a6d1f" stroke-width="0.6"/>
+<circle cx="48" cy="8" r="2" fill="#333"/>
+<circle id="connector6pad" cx="48" cy="16" r="4.5" fill="#c9a227" stroke="#8a6d1f" stroke-width="0.6"/>
+<circle cx="48" cy="16" r="2" fill="#333"/>
+</g>
+<g id="copper1">
+<rect x="0" y="0" width="56" height="24" fill="#333" opacity="0.25"/>
+<circle id="connector0pad" cx="6" cy="10" r="4.5" fill="#c9a227" stroke="#8a6d1f" stroke-width="0.6"/>
+<circle cx="6" cy="10" r="2" fill="#333"/>
+<circle id="connector1pad" cx="14" cy="10" r="4.5" fill="#c9a227" stroke="#8a6d1f" stroke-width="0.6"/>
+<circle cx="14" cy="10" r="2" fill="#333"/>
+<circle id="connector2pad" cx="22" cy="10" r="4.5" fill="#c9a227" stroke="#8a6d1f" stroke-width="0.6"/>
+<circle cx="22" cy="10" r="2" fill="#333"/>
+<circle id="connector3pad" cx="30" cy="10" r="4.5" fill="#c9a227" stroke="#8a6d1f" stroke-width="0.6"/>
+<circle cx="30" cy="10" r="2" fill="#333"/>
+<circle id="connector4pad" cx="38" cy="10" r="4.5" fill="#c9a227" stroke="#8a6d1f" stroke-width="0.6"/>
+<circle cx="38" cy="10" r="2" fill="#333"/>
+<circle id="connector5pad" cx="48" cy="8" r="4.5" fill="#c9a227" stroke="#8a6d1f" stroke-width="0.6"/>
+<circle cx="48" cy="8" r="2" fill="#333"/>
+<circle id="connector6pad" cx="48" cy="16" r="4.5" fill="#c9a227" stroke="#8a6d1f" stroke-width="0.6"/>
+<circle cx="48" cy="16" r="2" fill="#333"/>
+</g>
+<g id="silkscreen">
+<text x="28" y="21" font-family="DejaVu Sans, sans-serif" font-size="4" fill="#ffffff" text-anchor="middle" font-weight="normal">MAX6675</text>
+</g>
+</svg>
