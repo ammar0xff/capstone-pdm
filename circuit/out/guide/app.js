@@ -1,8 +1,9 @@
 /*
  * ============================================================================
-   PDM RIG WIRING GUIDE — APP MODULE
+   PDM RIG WIRING GUIDE — APP MODULE (EXPANDED EDITION)
    Complete interactive application logic: routing, rendering, gamification,
-   drag-and-drop wiring, breadboard simulator, quizzes, confetti, persistence.
+   drag-and-drop wiring, breadboard simulator, quizzes, confetti, persistence,
+   troubleshooting, parts gallery, net summary, comfort-wiring rules, BOM.
    ============================================================================
 */
 
@@ -39,7 +40,8 @@ const DEFAULT_STATE = {
   wiresPlaced: {},
   simulatorActive: false,
   currentLevel: 1,
-  currentLesson: null
+  currentLesson: null,
+  simChecks: {}
 };
 
 let state = { ...DEFAULT_STATE };
@@ -47,7 +49,18 @@ let state = { ...DEFAULT_STATE };
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) state = { ...DEFAULT_STATE, ...JSON.parse(raw), completedLessons: JSON.parse(raw).completedLessons || {}, completedLevels: JSON.parse(raw).completedLevels || {}, achievements: JSON.parse(raw).achievements || {} };
+    if (raw) {
+      const p = JSON.parse(raw);
+      state = {
+        ...DEFAULT_STATE,
+        ...p,
+        completedLessons: p.completedLessons || {},
+        completedLevels: p.completedLevels || {},
+        achievements: p.achievements || {},
+        wiresPlaced: p.wiresPlaced || {},
+        simChecks: p.simChecks || {}
+      };
+    }
   } catch (e) { console.warn('load failed', e); }
 }
 function saveState() {
@@ -87,7 +100,6 @@ function markLessonDone(levelId, lessonId, xp = 25) {
   if (isLessonDone(lessonId)) return;
   state.completedLessons[lessonId] = true;
   addXP(xp, lessonId);
-  // check if level complete
   const level = CONTENT.LEVELS.find(l => l.id === levelId);
   const allLessonsDone = level.lessons.every(ln => isLessonDone(ln.id));
   if (allLessonsDone && !isLevelDone(levelId)) {
@@ -153,7 +165,6 @@ function renderDashboard() {
     } else {
       node.classList.remove('done');
     }
-    // clickable
     if (!done) {
       step.style.cursor = 'pointer';
       step.onclick = () => {
@@ -190,8 +201,12 @@ const SCREENS = {
   dashboard: '#screen-dashboard',
   level: '#screen-level',
   lesson: '#screen-lesson',
-  quiz: '#screen-quiz',
   simulator: '#screen-simulator',
+  nets: '#screen-nets',
+  troubleshooting: '#screen-troubleshooting',
+  parts: '#screen-parts',
+  comfort: '#screen-comfort',
+  bom: '#screen-bom',
   celebration: '#screen-celebration'
 };
 
@@ -200,15 +215,22 @@ function showScreen(name) {
   const target = $(SCREENS[name]);
   if (target) target.classList.add('active');
   if (name === 'dashboard') renderDashboard();
+  else if (name === 'nets') renderNets();
+  else if (name === 'troubleshooting') renderTroubleshooting();
+  else if (name === 'parts') renderParts();
+  else if (name === 'comfort') renderComfort();
+  else if (name === 'bom') renderBOM();
 }
 
+/* --------------------------------------------------------------------------
+   Level Screen
+   -------------------------------------------------------------------------- */
 function showLevel(levelId) {
   state.currentLevel = levelId;
   saveState();
   const level = CONTENT.LEVELS.find(l => l.id === levelId);
   if (!level) return;
 
-  // Build level header
   const t = level.theme;
   document.documentElement.style.setProperty('--uc', t.uc);
   document.documentElement.style.setProperty('--ucd', t.ucd);
@@ -223,7 +245,6 @@ function showLevel(levelId) {
   $('#lv-est').textContent = level.estimated;
   $('#lv-desc').textContent = level.description;
 
-  // Lessons list
   const list = $('#lv-lessons');
   list.innerHTML = '';
   level.lessons.forEach(ln => {
@@ -239,7 +260,8 @@ function showLevel(levelId) {
       <div class="li-status">${done ? '✓ Done' : 'Start'}</div>
     `;
     item.onclick = () => {
-      if (done || !isLessonDone(getPrevLessonId(level, ln))) {
+      const prev = getPrevLessonId(level, ln);
+      if (!prev || isLessonDone(prev)) {
         showLesson(levelId, ln.id);
       } else {
         toast('Complete the previous lesson first 💖');
@@ -248,7 +270,6 @@ function showLevel(levelId) {
     list.appendChild(item);
   });
 
-  // Progress bar
   const doneCount = level.lessons.filter(ln => isLessonDone(ln.id)).length;
   $('#lv-prog-text').textContent = `${doneCount} / ${level.lessons.length}`;
   $('#lv-prog-bar').style.width = `${(doneCount / level.lessons.length) * 100}%`;
@@ -273,13 +294,11 @@ function showLesson(levelId, lessonId) {
 
   document.title = `${lesson.title} — ${CONTENT.meta.title}`;
 
-  // Lesson header
   $('#les-mascot').textContent = lesson.emoji;
   $('#les-title').textContent = lesson.title;
   $('#les-goal').textContent = lesson.goal;
   $('#les-content').innerHTML = lesson.content;
 
-  // Wiring table
   const tbl = $('#les-wires');
   tbl.innerHTML = '';
   lesson.wires.forEach((w, i) => {
@@ -294,22 +313,18 @@ function showLesson(levelId, lessonId) {
       <td><span class="why">${w.to}</span></td>
       <td><span class="wire-color" style="color:${ci.hex}">${ci.hex}</span></td>
     `;
-    // Interactive: click row to mark wire placed
     tr.onclick = () => toggleWire(lessonId, i, tr);
     tbl.appendChild(tr);
   });
 
-  // Tips card
   $('#les-tips').innerHTML = `
     <div class="k"><span class="em">💡</span>Comfort Wiring</div>
     <p>${lesson.tips}</p>
   `;
 
-  // Checklist
   const cl = $('#les-checklist');
   cl.innerHTML = '';
   lesson.checklist.forEach((c, i) => {
-    const done = state.completedLessons[lessonId] && true; // simplified
     const item = document.createElement('div');
     item.className = 'check-item';
     item.innerHTML = `
@@ -324,7 +339,6 @@ function showLesson(levelId, lessonId) {
     cl.appendChild(item);
   });
 
-  // Quiz
   const qz = $('#les-quiz');
   qz.innerHTML = '';
   if (lesson.quiz && lesson.quiz.length) {
@@ -344,7 +358,6 @@ function showLesson(levelId, lessonId) {
     qz.innerHTML = '<div class="quiz-none">No quiz for this lesson — hands-on wiring only!</div>';
   }
 
-  // Simulator
   const sim = $('#les-simulator');
   const simScen = CONTENT.SIMULATOR.levels[levelId];
   if (simScen) {
@@ -372,7 +385,6 @@ function toggleWire(lessonId, wireIdx, trEl) {
     trEl.classList.add('done');
     toast('Wire placed ✨');
     addXP(5, 'wire placed');
-    // Check if all wires in lesson placed
     const lesson = CONTENT.LEVELS.find(l => l.id === state.currentLevel).lessons.find(ln => ln.id === lessonId);
     const allPlaced = lesson.wires.every((_, i) => state.wiresPlaced[`${lessonId}-${i}`]);
     if (allPlaced) {
@@ -406,6 +418,122 @@ function answerQuiz(lessonId, qIdx, selected, correct) {
 }
 
 /* --------------------------------------------------------------------------
+   Nets Summary Rendering
+   -------------------------------------------------------------------------- */
+function renderNets() {
+  const container = $('#nets-content');
+  container.innerHTML = `
+    <h3 style="margin-bottom:16px;font-size:20px;font-weight:800;color:var(--ink)">🎨 Net Colour Reference</h3>
+    <p style="color:var(--ink-soft);margin-bottom:18px">All 15 nets in the Fritzing sketch, with colours from design.py.</p>
+    <table class="wire">
+      <thead>
+        <tr><th style="width:12%">Net</th><th style="width:10%">Colour</th><th style="width:24%">Name</th><th style="width:14%">Category</th><th style="width:40%">Description</th></tr>
+      </thead>
+      <tbody>
+        ${CONTENT.NETS.map(n => `
+          <tr>
+            <td><span class="pin">${n.name}</span></td>
+            <td><span class="net" style="background:${n.hex}22;color:${n.hex};border-color:${n.hex}">
+              <span class="color-swatch" style="background:${n.hex}"></span>${n.hex}
+            </span></td>
+            <td>${n.name}</td>
+            <td><span class="pill ${n.kind}">${n.kind}</span></td>
+            <td>${n.desc}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+  showScreen('nets');
+}
+
+/* --------------------------------------------------------------------------
+   Troubleshooting Rendering
+   -------------------------------------------------------------------------- */
+function renderTroubleshooting() {
+  const container = $('#troubleshooting-content');
+  container.innerHTML = `
+    <h3 style="margin-bottom:16px;font-size:20px;font-weight:800;color:var(--ink)">🩺 Troubleshooting Guide</h3>
+    <p style="color:var(--ink-soft);margin-bottom:18px">Common issues and how to fix them.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
+      ${CONTENT.TROUBLESHOOTING.map(t => `
+        <div class="photo-card" style="padding:16px">
+          <div style="font-weight:800;color:var(--rose-dark);margin-bottom:6px">${t.symptom}</div>
+          <div style="font-size:13px;color:var(--ink-soft);margin-bottom:6px"><strong>Cause:</strong> ${t.cause}</div>
+          <div style="font-size:13px;color:var(--green-dark);font-weight:700"><strong>Fix:</strong> ${t.fix}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  showScreen('troubleshooting');
+}
+
+/* --------------------------------------------------------------------------
+   Parts Gallery Rendering
+   -------------------------------------------------------------------------- */
+function renderParts() {
+  const container = $('#parts-content');
+  container.innerHTML = `
+    <h3 style="margin-bottom:16px;font-size:20px;font-weight:800;color:var(--ink)">📦 Parts Catalog</h3>
+    <p style="color:var(--ink-soft);margin-bottom:18px">Every part in the rig, with photos, Fritzing artwork, and specs.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px">
+      ${Object.values(CONTENT.PARTS).map(p => `
+        <div class="photo-card">
+          <div class="photo-media">
+            <img src="${p.photo}" alt="${p.name}" onerror="this.style.display='none';this.parentElement.querySelector('.photo-fallback').style.display='flex'">
+            <div class="photo-fallback"><div class="em">${p.emoji}</div>${p.name}</div>
+          </div>
+          <div class="photo-cap">${p.emoji} ${p.name}</div>
+          <div class="photo-desc">${p.description}</div>
+          <div style="padding:0 18px 10px;font-size:12.5px;color:var(--muted)">
+            <div style="font-weight:800;color:var(--ink-soft);margin-bottom:4px">Specs:</div>
+            ${(p.specs ? Object.entries(p.specs).map(([k,v]) => `<div style="font-size:12px">${k}: ${v}</div>`).join('') : '')}
+            ${p.tips ? `<div style="margin-top:8px"><strong>Tip:</strong> ${p.tips}</div>` : ''}
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  showScreen('parts');
+}
+
+/* --------------------------------------------------------------------------
+   Comfort Wiring Rules Rendering
+   -------------------------------------------------------------------------- */
+function renderComfort() {
+  const container = $('#comfort-content');
+  container.innerHTML = `
+    <h3 style="margin-bottom:16px;font-size:20px;font-weight:800;color:var(--ink)">🎨 Comfort-Wiring Rules</h3>
+    <p style="color:var(--ink-soft);margin-bottom:18px">Rules baked into the .fzz file and verified by the geometric auditor (0 problems).</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px">
+      ${CONTENT.COMFORT_RULES.map(r => `
+        <div class="love-note ${r.id === 'c7' ? 'violet' : (r.id === 'c6' ? 'amber' : 'rose')}" style="padding:16px">
+          <div class="k"><span class="em">${r.icon}</span>${r.title}</div>
+          <p>${r.desc}</p>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  showScreen('comfort');
+}
+
+/* --------------------------------------------------------------------------
+   BOM Rendering
+   -------------------------------------------------------------------------- */
+function renderBOM() {
+  const b = CONTENT.BOM;
+  $('#bom-ceiling').textContent = b.ceiling.toLocaleString();
+  $('#bom-planned').textContent = b.planned.toLocaleString();
+  $('#bom-headroom').textContent = b.headroom.toFixed(2);
+  $('#bom-quotes').textContent = b.realQuotes.toLocaleString();
+  $('#bom-fan').textContent = b.fanGlandsShrink.toLocaleString();
+  $('#bom-allowance').textContent = b.max6675Allowance.toLocaleString();
+  $('#bom-maxquote').textContent = b.max6675MaxQuote.toFixed(2);
+  $('#bom-note').textContent = b.note;
+  showScreen('bom');
+}
+
+/* --------------------------------------------------------------------------
    Simulator
    -------------------------------------------------------------------------- */
 function runSimulator(levelId) {
@@ -416,7 +544,6 @@ function runSimulator(levelId) {
   state.simulatorActive = true;
   saveState();
 
-  // Build simulator view
   const container = $('#sim-content');
   container.innerHTML = `
     <div class="sim-header">
@@ -439,21 +566,17 @@ function runSimulator(levelId) {
         <div class="reading"><span class="r-label">Status</span><span class="r-value" id="r-status">--</span></div>
       </div>
     </div>
-    <div class="sim-controls">
+    <div class="sim-checks" style="margin-top:14px">
+      ${scen.checks.map(c => `<span class="sim-chip sim-unchecked">⭕ ${c}</span>`).join('')}
+    </div>
+    <div class="sim-controls" style="margin-top:18px">
       <button class="btn rose wide" onclick="stopSimulator()">Stop Simulation</button>
     </div>
   `;
 
   showScreen('simulator');
 
-  // Animate checks
-  const chips = $$('#les-simulator .sim-chip, #sim-content .sim-chip');
-  // Actually rebuild checks in sim view
-  const simChecksContainer = document.createElement('div');
-  simChecksContainer.className = 'sim-checks';
-  simChecksContainer.innerHTML = scen.checks.map(c => `<span class="sim-chip sim-unchecked">⭕ ${c}</span>`).join('');
-  $('#sim-visual').after(simChecksContainer);
-
+  const checksContainer = container.querySelector('.sim-checks');
   let checkIdx = 0;
   const interval = setInterval(() => {
     if (checkIdx >= scen.checks.length) {
@@ -466,12 +589,11 @@ function runSimulator(levelId) {
       saveState();
       return;
     }
-    const chip = simChecksContainer.children[checkIdx];
+    const chip = checksContainer.children[checkIdx];
     chip.classList.remove('sim-unchecked');
     chip.classList.add('sim-checked');
     chip.textContent = `✅ ${scen.checks[checkIdx]}`;
-    
-    // Update readings
+
     const readings = {
       1: { vib: '0.02', temp: '24.5', sound: '32', status: 'Idle' },
       2: { vib: '0.15', temp: '25.1', sound: '35', status: 'Vibration detected' },
@@ -485,7 +607,6 @@ function runSimulator(levelId) {
     $('#r-sound').textContent = r.sound;
     $('#r-status').textContent = r.status;
 
-    // Flash the relevant part
     const partMap = { 1: 'sim-pi', 2: 'sim-adxl', 3: 'sim-max', 4: 'sim-mic', 5: 'sim-led' };
     const p = document.getElementById(partMap[levelId]);
     if (p) {
@@ -524,6 +645,29 @@ function closeCelebration() {
 function showAchievementsToast(list) {
   const html = list.map(a => `<span class="pill ${a.icon.includes('🔥')?'amber':(a.icon.includes('💯')?'violet':'green'))}">${a.icon} ${a.name}</span>`).join(' ');
   toast(`Achievement unlocked! ${html}`, 4000);
+}
+
+function showAchievementsModal() {
+  const title = $('#modal-title');
+  const body = $('#modal-body');
+  title.textContent = '🏆 Achievements';
+  const achs = CONTENT.ACHIEVEMENTS;
+  const html = achs.map(a => {
+    const done = state.achievements[a.id];
+    return `
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #F0F3F7">
+        <span style="font-size:24px">${a.icon}</span>
+        <div style="flex:1">
+          <div style="font-weight:800;color:var(--ink)">${a.name}</div>
+          <div style="font-size:12px;color:var(--muted)">${a.desc} <span style="color:var(--green-dark)">+${a.xp} XP</span></div>
+        </div>
+        <span style="font-weight:800;color:${done ? 'var(--green-dark)' : 'var(--muted)'}">${done ? '✓ Unlocked' : '🔒 Locked'}</span>
+      </div>
+    `;
+  }).join('');
+  body.innerHTML = `<div style="text-align:left">${html}</div>`;
+  $('#modal').classList.remove('hidden');
+  $('#modal').classList.add('active');
 }
 
 /* --------------------------------------------------------------------------
@@ -571,7 +715,7 @@ function closeModal() {
 }
 
 /* --------------------------------------------------------------------------
-   Global handlers (exposed to HTML onclick)
+   Global handlers
    -------------------------------------------------------------------------- */
 window.answerQuiz = answerQuiz;
 window.runSimulator = runSimulator;
@@ -580,6 +724,8 @@ window.toggleWire = toggleWire;
 window.showLevel = showLevel;
 window.closeCelebration = closeCelebration;
 window.closeModal = closeModal;
+window.markLessonComplete = markLessonComplete;
+window.showAchievementsModal = showAchievementsModal;
 
 /* --------------------------------------------------------------------------
    Init
@@ -589,17 +735,13 @@ function init() {
   renderHeader();
   renderDashboard();
 
-  // Wire up nav buttons
   $('#btn-dashboard').onclick = () => showScreen('dashboard');
   $('#btn-back-dash').onclick = () => showScreen('dashboard');
   $('#btn-celebrate-dash').onclick = closeCelebration;
-
   $('#btn-modal-ok').onclick = closeModal;
 
-  // Close modal on backdrop click
   $('#modal').onclick = (e) => { if (e.target === $('#modal')) closeModal(); };
 
-  // Initial toast
   setTimeout(() => toast('Welcome to the Robot-Doctor Rig wiring guide! 🩺', 3000), 800);
 }
 
