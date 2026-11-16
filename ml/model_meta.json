@@ -1,0 +1,28 @@
+{
+  "model_type": "RandomForestClassifier",
+  "n_estimators": 300,
+  "max_depth": 12,
+  "features": [
+    "rms_dyn",
+    "peak_dyn",
+    "crest_factor",
+    "kurtosis",
+    "temp_c",
+    "temp_slope",
+    "sound_rms",
+    "sound_db",
+    "sound_zcr"
+  ],
+  "classes": [
+    "Healthy",
+    "Mechanical Imbalance",
+    "Bearing Defect",
+    "Thermal Runaway"
+  ],
+  "train_samples": 980,
+  "test_samples": 210,
+  "5fold_cv_accuracy": 1.0,
+  "test_accuracy": 1.0,
+  "inference_latency_ms": 93.959,
+  "timestamp": 1794858106.4241507
+}

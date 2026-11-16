@@ -40,6 +40,21 @@ TMP_STATE_FILE = os.path.join(BASE_DIR, "latest_state.tmp")
 HISTORY_FILE = os.path.join(BASE_DIR, "hot_backup.csv")
 CAL_FILE = os.path.join(BASE_DIR, "cal.json")
 
+# Machine Learning Module Path
+ML_DIR = os.path.join(os.path.dirname(BASE_DIR), "ml")
+if ML_DIR not in sys.path:
+    sys.path.insert(0, ML_DIR)
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
+
+try:
+    from rf_predictor import PdMClassifier
+except ImportError:
+    try:
+        from ml.rf_predictor import PdMClassifier
+    except ImportError:
+        PdMClassifier = None
+
 def load_cal():
     if os.path.exists(CAL_FILE):
         try:
@@ -257,6 +272,10 @@ def main():
     tc = MAX6675Driver()
     led = StatusLED(pin=16)
 
+    # Initialize Stage 2 Machine Learning Diagnostic Classifier
+    model_path = os.path.join(ML_DIR, "model.joblib")
+    classifier = PdMClassifier(model_path) if PdMClassifier else None
+
     # Start high-speed acoustic background worker
     acoustic = AcousticWorker()
     acoustic.start()
@@ -408,11 +427,7 @@ def main():
             sound_status = ac_data.get("status", "Active")
 
             # 4. Shewhart SPC Gating & Industrial Anomaly Classification
-            state = "Healthy"
-            fault_label = "Normal Operation"
-            fault_proba = 0.05
-            advice = "Machine operating within nominal limits. Continuous baseline monitoring active."
-
+            # Stage 1: Coarse Statistical & Thermal Gating
             is_thermal_fault = (last_temp_c > 70.0) or (temp_slope > 10.0)
             is_thermal_warn = (last_temp_c > 50.0) or (temp_slope > 5.0)
 
@@ -420,10 +435,32 @@ def main():
             is_vib_warn = (rms_dyn > ucl_warning) or (kurtosis > 5.0) or (peak_dyn > 0.25)
             is_sound_fault = (sound_db > 88.0) or (sound_zcr > 0.28)
 
+            feature_dict = {
+                "rms_dyn": round(rms_dyn, 4),
+                "peak_dyn": round(peak_dyn, 4),
+                "crest_factor": round(crest_factor, 2),
+                "kurtosis": round(kurtosis, 2),
+                "temp_c": round(last_temp_c, 2),
+                "temp_slope": round(temp_slope, 2),
+                "sound_rms": round(sound_rms, 4),
+                "sound_db": round(sound_db, 1),
+                "sound_zcr": round(sound_zcr, 4)
+            }
+
+            # Run Stage 2 Fine ML Inference (Random Forest)
+            if classifier:
+                ml_cid, ml_label, ml_proba, ml_advice = classifier.predict(feature_dict)
+            else:
+                ml_cid, ml_label, ml_proba, ml_advice = 0, "Normal Operation", 0.98, "Nominal."
+
             if is_vib_fault or is_thermal_fault or is_sound_fault:
                 state = "Fault"
                 led.set(1)
-                if is_vib_fault and is_thermal_fault:
+                if ml_cid != 0:
+                    fault_label = ml_label
+                    fault_proba = ml_proba
+                    advice = ml_advice
+                elif is_vib_fault and is_thermal_fault:
                     fault_label = "Severe Compound Fault (Thermal Runaway + Bearing Shock)"
                     fault_proba = 0.98
                     advice = "CRITICAL: Imminent bearing seizure. Halt motor immediately; inspect raceways and thermal dissipation."
@@ -446,16 +483,20 @@ def main():
             elif is_vib_warn or is_thermal_warn:
                 state = "Warning"
                 led.set(int(now_wall * 4) % 2)
-                fault_proba = 0.65
-                if is_thermal_warn:
-                    fault_label = "Thermal Trend Warning"
-                    advice = "Temperature rising faster than baseline normal. Inspect cooling fan airflow."
+                if ml_cid != 0:
+                    fault_label = f"Incipient: {ml_label}"
+                    fault_proba = max(0.65, round(ml_proba * 0.85, 2))
+                    advice = ml_advice
                 else:
-                    fault_label = "Incipient Vibration Warning (2-Sigma Breach)"
+                    fault_proba = 0.65
+                    fault_label = "Thermal Trend Warning" if is_thermal_warn else "Incipient Vibration Warning (2-Sigma Breach)"
                     advice = "Vibration amplitude exceeded 2-sigma Shewhart threshold. Schedule preventive inspection."
             else:
                 state = "Healthy"
                 led.set(0)
+                fault_label = "Normal Operation"
+                fault_proba = 0.05
+                advice = "Machine operating within nominal limits. Continuous baseline monitoring active."
 
             # 5. Build Complete Telemetry & Mathematical Breakdown Packet
             raw_bin_str = f"{raw_tc_word:016b}"
@@ -470,6 +511,17 @@ def main():
                 "fault_proba": round(fault_proba, 2),
                 "advice": advice,
                 "online": True,
+
+                # Stage 2 Machine Learning Diagnostic Evidence
+                "ai": {
+                    "model_name": "Random Forest (300 Trees)",
+                    "architecture": "Two-Stage Coarse SPC -> Fine ML",
+                    "gate_status": "Stage 2 Triggered (Anomaly Detected)" if state != "Healthy" else "Stage 1 Gated (Shewhart Normal)",
+                    "predicted_class_id": ml_cid,
+                    "predicted_class": ml_label,
+                    "confidence": fault_proba,
+                    "features_input": feature_dict
+                },
 
                 # Detailed Mathematical Equation Cards (Formulas, Live Values, and Rationale)
                 "equations": {

@@ -6,3 +6,5 @@ hot_backup.csv
 .DS_Store
 circuit/out/*.png
 circuit/__pycache__/
+.venv/
+.stitch-mcp/

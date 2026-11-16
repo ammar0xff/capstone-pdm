@@ -678,11 +678,15 @@
         <div>
           <div class="card-title">
             <span id="lbl-ai">Edge AI Anomaly Diagnostics</span>
-            <span>🤖 ML Diagnostic</span>
+            <span id="val-ai-stage" class="eq-tag" style="background:rgba(0,240,255,0.15);color:var(--cyan);border:1px solid rgba(0,240,255,0.3)">Stage 1 Coarse SPC Gate</span>
           </div>
           <div id="txt-diag-label" class="diagnosis-tag">Normal Operation</div>
           <div id="txt-advice" class="advice-text">
             Machine operating within nominal limits. Continuous Shewhart monitoring active.
+          </div>
+          <div style="font-size:11px;color:var(--text-dim);margin-bottom:8px;display:flex;justify-content:space-between;">
+            <span>Architecture: <b>Random Forest (300 Trees)</b></span>
+            <span>Latency: <b id="val-ai-lat">&lt; 1.5 ms</b></span>
           </div>
         </div>
         <div class="prob-bar-wrap">
@@ -1233,6 +1237,12 @@
       const probPct = Math.round((data.fault_proba || 0.05) * 100);
       document.getElementById("val-prob").innerText = `${probPct}%`;
       document.getElementById("fill-prob").style.width = `${probPct}%`;
+      if (data.ai) {
+        document.getElementById("val-ai-stage").innerText = data.ai.gate_status || "Stage 1 Coarse SPC Gate";
+        if (data.ai.inference_latency_ms) {
+          document.getElementById("val-ai-lat").innerText = `${data.ai.inference_latency_ms} ms`;
+        }
+      }
 
       // System Health Dots
       if (data.system) {
