@@ -1,0 +1,16 @@
+[Unit]
+Description=Predictive Maintenance Edge DAQ & SPC Engine
+After=network.target
+
+[Service]
+Type=simple
+User=renad
+WorkingDirectory=/home/renad/pdm/edge
+ExecStart=/usr/bin/python3 /home/renad/pdm/edge/edge_daq.py
+Restart=always
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

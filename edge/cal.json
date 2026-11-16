@@ -1,0 +1,10 @@
+{
+  "t_a": 1.0,
+  "t_b": 0.0,
+  "g_bias_x": 0.0,
+  "g_bias_y": 0.0,
+  "g_bias_z": 0.0,
+  "g_scale": 0.0039,
+  "calibrated_at": "2026-11-16T20:40:00",
+  "notes": "Ambient baseline calibration verified: 25.5C at room temp, ~0.91g static gravity"
+}

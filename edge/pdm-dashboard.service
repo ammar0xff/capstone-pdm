@@ -1,0 +1,16 @@
+[Unit]
+Description=Predictive Maintenance Flask Dashboard
+After=network.target pdm-daq.service
+
+[Service]
+Type=simple
+User=renad
+WorkingDirectory=/home/renad/pdm/edge
+ExecStart=/usr/bin/python3 /home/renad/pdm/edge/dashboard.py
+Restart=always
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intelligent Predictive Maintenance | Industrial Edge Panel</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(18, 26, 43, 0.75);
+      --card-border: rgba(56, 75, 112, 0.35);
+      --text: #e1e7f0;
+      --muted: #8292ab;
+      --cyan: #00f0ff;
+      --green: #00ff88;
+      --amber: #ffb800;
+      --red: #ff2a55;
+      --blue: #2563eb;
+      --glow-green: 0 0 25px rgba(0, 255, 136, 0.45);
+      --glow-amber: 0 0 25px rgba(255, 184, 0, 0.45);
+      --glow-red: 0 0 35px rgba(255, 42, 85, 0.65);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(0, 240, 255, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(37, 99, 235, 0.05) 0%, transparent 40%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 18px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      backdrop-filter: blur(12px);
+      margin-bottom: 20px;
+    }
+
+    .logo-group h1 {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-group p {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .badge-edge {
+      background: rgba(0, 240, 255, 0.12);
+      color: var(--cyan);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .controls-group {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .btn-toggle {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-toggle:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--cyan);
+    }
+
+    /* Main Hero Status Lamp */
+    .hero-banner {
+      background: var(--card-bg);
+      border-radius: 20px;
+      border: 2px solid var(--card-border);
+      padding: 24px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-banner.healthy {
+      border-color: rgba(0, 255, 136, 0.6);
+      box-shadow: var(--glow-green);
+    }
+
+    .hero-banner.warning {
+      border-color: rgba(255, 184, 0, 0.7);
+      box-shadow: var(--glow-amber);
+    }
+
+    .hero-banner.fault {
+      border-color: rgba(255, 42, 85, 0.85);
+      box-shadow: var(--glow-red);
+      animation: pulse-border 1.5s infinite;
+    }
+
+    @keyframes pulse-border {
+      0% { box-shadow: 0 0 20px rgba(255, 42, 85, 0.4); }
+      50% { box-shadow: 0 0 45px rgba(255, 42, 85, 0.85); }
+      100% { box-shadow: 0 0 20px rgba(255, 42, 85, 0.4); }
+    }
+
+    .status-content {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .status-indicator {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 20px var(--green);
+      transition: all 0.3s ease;
+    }
+
+    .hero-banner.warning .status-indicator {
+      background: var(--amber);
+      box-shadow: 0 0 20px var(--amber);
+    }
+
+    .hero-banner.fault .status-indicator {
+      background: var(--red);
+      box-shadow: 0 0 30px var(--red);
+    }
+
+    .status-title {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+
+    .status-subtitle {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .status-metrics {
+      display: flex;
+      gap: 32px;
+      text-align: right;
+    }
+
+    .status-stat-val {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--cyan);
+    }
+
+    .status-stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    /* Grid layout */
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      position: relative;
+    }
+
+    .card-title {
+      font-size: 13px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .card-val {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
+
+    .card-val small {
+      font-size: 16px;
+      color: var(--muted);
+      font-weight: 500;
+      margin-left: 4px;
+    }
+
+    .card-sub {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* 3-axis mini bars */
+    .axis-bars {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .axis-col {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 6px;
+      text-align: center;
+      font-size: 11px;
+    }
+
+    .axis-col b {
+      display: block;
+      color: var(--cyan);
+      font-size: 14px;
+    }
+
+    /* Charts & Diagnostic row */
+    .grid-main {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 260px;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* AI Advice Box */
+    .ai-box {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .diagnosis-tag {
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 12px;
+    }
+
+    .advice-text {
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 4px solid var(--cyan);
+      padding: 12px 14px;
+      border-radius: 0 8px 8px 0;
+      font-size: 13.5px;
+      color: #cbd5e1;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .prob-bar-wrap {
+      margin-top: 8px;
+    }
+
+    .prob-bar {
+      height: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .prob-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--green), var(--amber), var(--red));
+      width: 10%;
+      transition: width 0.3s ease;
+    }
+
+    /* Footer health */
+    .footer-health {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .health-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-right: 18px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .dot.err { background: var(--red); }
+
+    /* RTL Arabic styling */
+    body.rtl {
+      direction: rtl;
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+    }
+    body.rtl .status-metrics { text-align: left; }
+    body.rtl .advice-text { border-left: none; border-right: 4px solid var(--cyan); border-radius: 8px 0 0 8px; }
+    body.rtl .health-pill { margin-right: 0; margin-left: 18px; }
+
+    @media (max-width: 900px) {
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .grid-main { grid-template-columns: 1fr; }
+      .hero-banner { flex-direction: column; text-align: center; gap: 18px; }
+      .status-content { flex-direction: column; }
+      .status-metrics { text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="logo-group">
+        <h1 id="txt-title">⚙️ Predictive Maintenance <span class="badge-edge">Raspberry Pi Edge</span></h1>
+        <p id="txt-sub">Autonomous AI Sensor Fusion • Statistical Process Control • Dual Dashboard Sync</p>
+      </div>
+      <div class="controls-group">
+        <button id="btn-sound" class="btn-toggle" onclick="toggleSound()">🔔 Sound: OFF</button>
+        <button id="btn-lang" class="btn-toggle" onclick="toggleLang()">🌐 العربية</button>
+      </div>
+    </header>
+
+    <!-- Main Status Lamp -->
+    <div id="hero-banner" class="hero-banner healthy">
+      <div class="status-content">
+        <div class="status-indicator"></div>
+        <div>
+          <div id="txt-state" class="status-title">HEALTHY OPERATION</div>
+          <div id="txt-state-desc" class="status-subtitle">All sensors within nominal Shewhart 2-sigma control limits</div>
+        </div>
+      </div>
+      <div class="status-metrics">
+        <div>
+          <div id="stat-latency" class="status-stat-val">&lt; 15 ms</div>
+          <div id="lbl-latency" class="status-stat-label">Response Time (M2)</div>
+        </div>
+        <div>
+          <div id="stat-uptime" class="status-stat-val">00:00:00</div>
+          <div id="lbl-uptime" class="status-stat-label">System Uptime (M5)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 Metrics Row -->
+    <div class="grid-4">
+      <!-- Vibration RMS -->
+      <div class="card">
+        <div class="card-title">
+          <span id="lbl-rms">Vibration RMS (Dynamic)</span>
+          <span>📊 SPC</span>
+        </div>
+        <div class="card-val" id="val-rms">0.000<small>g</small></div>
+        <div class="card-sub">
+          <span>UCL (Fault): <b>0.155 g</b></span>
+          <span>Warn: <b>0.130 g</b></span>
+        </div>
+      </div>
+
+      <!-- Temperature -->
+      <div class="card">
+        <div class="card-title">
+          <span id="lbl-temp">Motor Temperature</span>
+          <span>🌡️ K-Type</span>
+        </div>
+        <div class="card-val" id="val-temp">--.-<small>°C</small></div>
+        <div class="card-sub">
+          <span id="lbl-slope">Slope: <b id="val-slope">0.0 °C/min</b></span>
+          <span>Limit: <b>75.0 °C</b></span>
+        </div>
+      </div>
+
+      <!-- Kurtosis & Peak -->
+      <div class="card">
+        <div class="card-title">
+          <span id="lbl-kurt">Kurtosis & Peak Dynamic</span>
+          <span>💥 Impacts</span>
+        </div>
+        <div class="card-val" id="val-kurt">3.00<small>kurt</small></div>
+        <div class="card-sub">
+          <span>Peak: <b id="val-peak">0.00 g</b></span>
+          <span>Normal: <b>~3.0</b></span>
+        </div>
+      </div>
+
+      <!-- 3-Axis Gravitational Vector -->
+      <div class="card">
+        <div class="card-title">
+          <span id="lbl-axis">3-Axis Vector (Total)</span>
+          <span id="val-gtot">-- g</span>
+        </div>
+        <div class="axis-bars">
+          <div class="axis-col">X: <b id="val-ax">0.00</b></div>
+          <div class="axis-col">Y: <b id="val-ay">0.00</b></div>
+          <div class="axis-col">Z: <b id="val-az">0.00</b></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Chart & AI Diagnosis Row -->
+    <div class="grid-main">
+      <!-- Rolling SPC Chart -->
+      <div class="card">
+        <div class="card-title">
+          <span id="lbl-chart">Live Vibration SPC Trend (Last 60 Seconds)</span>
+          <span id="val-fs">Rate: -- Hz</span>
+        </div>
+        <div class="chart-container">
+          <canvas id="spcChart"></canvas>
+        </div>
+      </div>
+
+      <!-- AI Diagnosis & Prescriptive Advice -->
+      <div class="card ai-box">
+        <div>
+          <div class="card-title">
+            <span id="lbl-ai">Edge AI Anomaly Diagnostics</span>
+            <span>🤖 ML Engine</span>
+          </div>
+          <div id="txt-diag-label" class="diagnosis-tag">Normal Operation</div>
+          <div id="txt-advice" class="advice-text">
+            Machine operating within nominal limits. Continuous Shewhart monitoring active.
+          </div>
+        </div>
+        <div class="prob-bar-wrap">
+          <div class="card-sub">
+            <span id="lbl-prob">Anomaly Probability:</span>
+            <b id="val-prob">5%</b>
+          </div>
+          <div class="prob-bar">
+            <div id="fill-prob" class="prob-fill"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Health Checklist -->
+    <div class="footer-health">
+      <div>
+        <span class="health-pill"><span id="dot-adxl" class="dot"></span> ADXL345 (I2C)</span>
+        <span class="health-pill"><span id="dot-max" class="dot"></span> MAX6675 (SPI)</span>
+        <span class="health-pill"><span id="dot-edge" class="dot"></span> Edge Service</span>
+      </div>
+      <div>
+        <span>G12 Capstone 2026/27 • Offline-First Edge Node • Port 5000</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio Alert Beep (Web Audio API) -->
+  <script>
+    let soundEnabled = false;
+    let isArabic = false;
+    let audioCtx = null;
+    let lastState = "Healthy";
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      const btn = document.getElementById("btn-sound");
+      if (soundEnabled) {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        btn.innerText = isArabic ? "🔔 الصوت: مفعل" : "🔔 Sound: ON";
+        btn.style.borderColor = "var(--green)";
+      } else {
+        btn.innerText = isArabic ? "🔔 الصوت: معطل" : "🔔 Sound: OFF";
+        btn.style.borderColor = "";
+      }
+    }
+
+    function playAlertBeep(freq = 880, duration = 0.25) {
+      if (!soundEnabled || !audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = "sawtooth";
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    // Language Toggle
+    function toggleLang() {
+      isArabic = !isArabic;
+      document.body.classList.toggle("rtl", isArabic);
+      document.getElementById("btn-lang").innerText = isArabic ? "🌐 English" : "🌐 العربية";
+      document.getElementById("btn-sound").innerText = soundEnabled 
+        ? (isArabic ? "🔔 الصوت: مفعل" : "🔔 Sound: ON")
+        : (isArabic ? "🔔 الصوت: معطل" : "🔔 Sound: OFF");
+
+      document.getElementById("txt-title").innerHTML = isArabic 
+        ? "⚙️ نظام الصيانة التنبؤية الذكي <span class='badge-edge'>راسبيري باي Edge</span>"
+        : "⚙️ Predictive Maintenance <span class='badge-edge'>Raspberry Pi Edge</span>";
+
+      document.getElementById("txt-sub").innerText = isArabic
+        ? "دمج ذكاء اصطناعي وحساسات متعددة • مراقبة إحصائية للعمليات (SPC) • تزامن الشاشات"
+        : "Autonomous AI Sensor Fusion • Statistical Process Control • Dual Dashboard Sync";
+
+      document.getElementById("lbl-rms").innerText = isArabic ? "جذر متوسط تربيع الاهتزاز (RMS)" : "Vibration RMS (Dynamic)";
+      document.getElementById("lbl-temp").innerText = isArabic ? "درجة حرارة المحرك" : "Motor Temperature";
+      document.getElementById("lbl-kurt").innerText = isArabic ? "التفرطح وقمة الاهتزاز" : "Kurtosis & Peak Dynamic";
+      document.getElementById("lbl-axis").innerText = isArabic ? "المحصلة الثلاثية للجاذبية" : "3-Axis Vector (Total)";
+      document.getElementById("lbl-chart").innerText = isArabic ? "مخطط الاهتزاز المباشر (آخر 60 ثانية)" : "Live Vibration SPC Trend (Last 60 Seconds)";
+      document.getElementById("lbl-ai").innerText = isArabic ? "تشخيص الأعطال بالذكاء الاصطناعي" : "Edge AI Anomaly Diagnostics";
+      document.getElementById("lbl-latency").innerText = isArabic ? "زمن الاستجابة (M2)" : "Response Time (M2)";
+      document.getElementById("lbl-uptime").innerText = isArabic ? "مدة التشغيل (M5)" : "System Uptime (M5)";
+      document.getElementById("lbl-prob").innerText = isArabic ? "احتمالية العطل:" : "Anomaly Probability:";
+    }
+
+    // Canvas Chart Implementation
+    const canvas = document.getElementById("spcChart");
+    const ctx = canvas.getContext("2d");
+    const historyData = [];
+    const MAX_POINTS = 60;
+
+    function resizeCanvas() {
+      canvas.width = canvas.parentElement.clientWidth * window.devicePixelRatio;
+      canvas.height = canvas.parentElement.clientHeight * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    function drawChart() {
+      const w = canvas.parentElement.clientWidth;
+      const h = canvas.parentElement.clientHeight;
+      ctx.clearRect(0, 0, w, h);
+
+      // Threshold lines
+      const maxVal = 0.25; // max scale 0.25 g
+      const uclFaultY = h - (0.155 / maxVal) * h;
+      const uclWarnY = h - (0.130 / maxVal) * h;
+      const baselineY = h - (0.080 / maxVal) * h;
+
+      // Draw UCL Fault line (Red)
+      ctx.strokeStyle = "rgba(255, 42, 85, 0.45)";
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(0, uclFaultY);
+      ctx.lineTo(w, uclFaultY);
+      ctx.stroke();
+
+      // Draw UCL Warn line (Amber)
+      ctx.strokeStyle = "rgba(255, 184, 0, 0.4)";
+      ctx.beginPath();
+      ctx.moveTo(0, uclWarnY);
+      ctx.lineTo(w, uclWarnY);
+      ctx.stroke();
+
+      // Draw Baseline line (Green)
+      ctx.strokeStyle = "rgba(0, 255, 136, 0.35)";
+      ctx.beginPath();
+      ctx.moveTo(0, baselineY);
+      ctx.lineTo(w, baselineY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Draw data curve
+      if (historyData.length < 2) return;
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = "#00f0ff";
+      ctx.beginPath();
+
+      const dx = w / (MAX_POINTS - 1);
+      for (let i = 0; i < historyData.length; i++) {
+        const x = i * dx;
+        const yVal = Math.min(maxVal, historyData[i]);
+        const y = h - (yVal / maxVal) * h;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Gradient fill below line
+      ctx.lineTo((historyData.length - 1) * dx, h);
+      ctx.lineTo(0, h);
+      const grad = ctx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, "rgba(0, 240, 255, 0.25)");
+      grad.addColorStop(1, "rgba(0, 240, 255, 0.0)");
+      ctx.fillStyle = grad;
+      ctx.fill();
+    }
+
+    function formatTime(seconds) {
+      const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+      const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+      const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+      return `${h}:${m}:${s}`;
+    }
+
+    // Update Dashboard UI with new packet
+    function updateUI(data) {
+      if (!data) return;
+
+      const state = data.state || "Healthy";
+      const banner = document.getElementById("hero-banner");
+      banner.className = "hero-banner " + state.toLowerCase();
+
+      // State texts
+      const txtState = document.getElementById("txt-state");
+      const txtDesc = document.getElementById("txt-state-desc");
+
+      if (state === "Healthy") {
+        txtState.innerText = isArabic ? "تشغيل سليم ومستقر" : "HEALTHY OPERATION";
+        txtDesc.innerText = isArabic 
+          ? "جميع مؤشرات الاهتزاز والحرارة داخل حدود التحكم الإحصائي الطبيعية"
+          : "All sensors within nominal Shewhart 2-sigma control limits";
+      } else if (state === "Warning") {
+        txtState.innerText = isArabic ? "تحذير: تجاوز حد المراقبة" : "WARNING - THRESHOLD EXCEEDED";
+        txtDesc.innerText = isArabic
+          ? "تجاوزت قراءات الاهتزاز أو الحرارة حد الـ 2-sigma"
+          : "Vibration or thermal trend exceeded 2-sigma control warning limit";
+        if (lastState === "Healthy") playAlertBeep(660, 0.2);
+      } else {
+        txtState.innerText = isArabic ? "إنذار: عطل وشيك بالمحرك" : "FAULT DETECTED - FAULT";
+        txtDesc.innerText = isArabic
+          ? "تجاوز حد الـ 3-sigma أو وجود صدمات ميكانيكية شديدة"
+          : "3-sigma Shewhart threshold breached or severe mechanical impact detected";
+        playAlertBeep(980, 0.4);
+      }
+      lastState = state;
+
+      // Stats
+      document.getElementById("stat-uptime").innerText = formatTime(data.uptime_s || 0);
+
+      // Metrics
+      const vib = data.vibration || {};
+      const temp = data.temperature || {};
+
+      document.getElementById("val-rms").innerHTML = `${(vib.rms_dyn || 0).toFixed(4)}<small>g</small>`;
+      document.getElementById("val-temp").innerHTML = `${(temp.temp_c || 0).toFixed(1)}<small>°C</small>`;
+      document.getElementById("val-slope").innerText = `${(temp.slope_c_per_min || 0).toFixed(1)} °C/min`;
+      document.getElementById("val-kurt").innerHTML = `${(vib.kurtosis || 3.0).toFixed(2)}<small>kurt</small>`;
+      document.getElementById("val-peak").innerText = `${(vib.peak_dyn || 0).toFixed(3)} g`;
+
+      document.getElementById("val-gtot").innerText = `${(vib.g_total || 0).toFixed(2)} g`;
+      document.getElementById("val-ax").innerText = (vib.ax || 0).toFixed(2);
+      document.getElementById("val-ay").innerText = (vib.ay || 0).toFixed(2);
+      document.getElementById("val-az").innerText = (vib.az || 0).toFixed(2);
+
+      document.getElementById("val-fs").innerText = `Rate: ${vib.fs_hz || 400} Hz`;
+
+      // AI Diagnosis
+      document.getElementById("txt-diag-label").innerText = data.fault_label || "Normal Operation";
+      document.getElementById("txt-advice").innerText = data.advice || "";
+
+      const prob = Math.round((data.fault_proba || 0.05) * 100);
+      document.getElementById("val-prob").innerText = `${prob}%`;
+      document.getElementById("fill-prob").style.width = `${prob}%`;
+
+      // System Health dots
+      const sys = data.system || {};
+      document.getElementById("dot-adxl").className = "dot" + (sys.adxl_ok ? "" : " err");
+      document.getElementById("dot-max").className = "dot" + (sys.max6675_ok ? "" : " err");
+      document.getElementById("dot-edge").className = "dot" + (data.online ? "" : " err");
+
+      // Update Chart
+      historyData.push(vib.rms_dyn || 0);
+      if (historyData.length > MAX_POINTS) historyData.shift();
+      drawChart();
+    }
+
+    // Real-time EventSource connection (SSE) with AJAX fallback
+    function startRealtime() {
+      if (window.EventSource) {
+        const source = new EventSource('/api/stream');
+        source.onmessage = function(e) {
+          try {
+            const data = JSON.parse(e.data);
+            updateUI(data);
+          } catch(err) {}
+        };
+        source.onerror = function() {
+          source.close();
+          // Fallback to 1-second polling
+          setInterval(pollLatest, 1000);
+        };
+      } else {
+        setInterval(pollLatest, 1000);
+      }
+    }
+
+    function pollLatest() {
+      fetch('/api/latest')
+        .then(r => r.json())
+        .then(data => updateUI(data))
+        .catch(() => {});
+    }
+
+    // Start
+    startRealtime();
+  </script>
+</body>
+</html>
