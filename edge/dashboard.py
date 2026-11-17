@@ -14,8 +14,40 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATE_FILE = os.path.join(BASE_DIR, "latest_state.json")
 HISTORY_FILE = os.path.join(BASE_DIR, "hot_backup.csv")
 CAL_FILE = os.path.join(BASE_DIR, "cal.json")
+CLOUD_CONFIG_FILE = os.path.join(BASE_DIR, "cloud_config.json")
+CLOUD_BACKLOG_FILE = os.path.join(BASE_DIR, "cloud_backlog.json")
 
 app = Flask(__name__, template_folder=os.path.join(BASE_DIR, "templates"))
+
+def get_cloud_status():
+    status = {
+        "enabled": True,
+        "firebase_url": "https://capstone-pdm-2026-default-rtdb.firebaseio.com/motor1.json",
+        "sync_interval_s": 15.0,
+        "daily_writes": 0,
+        "max_daily_writes": 15000,
+        "backlog_count": 0,
+        "last_sync_status": "Ready (Quota Guard Active)"
+    }
+    if os.path.exists(CLOUD_CONFIG_FILE):
+        try:
+            with open(CLOUD_CONFIG_FILE, 'r') as f:
+                cfg = json.load(f)
+                status["enabled"] = cfg.get("enabled", True)
+                status["firebase_url"] = cfg.get("firebase_url", status["firebase_url"])
+                status["daily_writes"] = cfg.get("daily_writes_today", 0)
+                status["max_daily_writes"] = cfg.get("max_daily_writes", 15000)
+                status["last_sync_status"] = cfg.get("last_sync_status", "Active")
+        except Exception:
+            pass
+    if os.path.exists(CLOUD_BACKLOG_FILE):
+        try:
+            with open(CLOUD_BACKLOG_FILE, 'r') as bf:
+                b = json.load(bf)
+                status["backlog_count"] = len(b)
+        except Exception:
+            pass
+    return status
 
 def get_latest_state():
     if os.path.exists(STATE_FILE):
@@ -27,6 +59,7 @@ def get_latest_state():
                     data["online"] = True
                 else:
                     data["online"] = False
+                data["cloud"] = get_cloud_status()
                 return data
         except Exception:
             pass

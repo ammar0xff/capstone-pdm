@@ -17,22 +17,29 @@ STATE_FILE = os.path.join(BASE_DIR, "latest_state.json")
 BACKLOG_FILE = os.path.join(BASE_DIR, "cloud_backlog.json")
 CONFIG_FILE = os.path.join(BASE_DIR, "cloud_config.json")
 
+DEFAULT_CONFIG = {
+    "enabled": True,
+    "firebase_url": "https://capstone-pdm-2026-default-rtdb.firebaseio.com/motor1.json",
+    "sync_interval_s": 15.0,
+    "max_daily_writes": 15000,
+    "daily_writes_today": 0,
+    "last_day": time.strftime("%Y-%m-%d"),
+    "last_sync_status": "Initialized"
+}
+
 def load_cloud_config():
     if os.path.exists(CONFIG_FILE):
         try:
             with open(CONFIG_FILE, 'r') as f:
-                return json.load(f)
+                cfg = json.load(f)
+                # Ensure all keys exist
+                for k, v in DEFAULT_CONFIG.items():
+                    if k not in cfg:
+                        cfg[k] = v
+                return cfg
         except Exception:
             pass
-    # Default free Spark configuration
-    return {
-        "enabled": True,
-        "firebase_url": "https://capstone-pdm-2026-default-rtdb.firebaseio.com/motor1.json",
-        "sync_interval_s": 15.0,
-        "max_daily_writes": 15000,
-        "daily_writes_today": 0,
-        "last_day": time.strftime("%Y-%m-%d")
-    }
+    return dict(DEFAULT_CONFIG)
 
 def save_cloud_config(cfg):
     try:
@@ -56,6 +63,9 @@ def sync_loop():
                 backlog = json.load(f)
         except Exception:
             backlog = []
+
+    print(f"[INFO] Cloud Mirror Target: {config['firebase_url']}")
+    print(f"[INFO] Sync Interval: {config.get('sync_interval_s', 15.0)}s | Daily Quota: {config.get('max_daily_writes', 15000)} writes")
 
     while True:
         time.sleep(config.get("sync_interval_s", 15.0))
@@ -114,7 +124,10 @@ def sync_loop():
             with urllib.request.urlopen(req, timeout=5) as response:
                 if response.status in (200, 204):
                     config["daily_writes_today"] += 1
+                    config["last_sync_status"] = f"OK (HTTP {response.status})"
+                    config["last_sync_time"] = time.time()
                     save_cloud_config(config)
+                    print(f"[FIREBASE] Synced frame seq={payload['seq']} | Writes today: {config['daily_writes_today']}/{config['max_daily_writes']}")
                     # Flushed successfully; clear backlog
                     if backlog:
                         backlog.clear()
@@ -122,6 +135,8 @@ def sync_loop():
                             os.remove(BACKLOG_FILE)
         except urllib.error.URLError as e:
             # Offline Survival (PRD §0.3 F5 / §6.1 F3): Queue locally without crash
+            config["last_sync_status"] = f"Offline Buffering: {str(e)[:30]}"
+            save_cloud_config(config)
             if len(backlog) < 200:
                 backlog.append(payload)
                 try:
@@ -129,8 +144,22 @@ def sync_loop():
                         json.dump(backlog, bf)
                 except Exception:
                     pass
-        except Exception:
-            pass
+            print(f"[FIREBASE OFFLINE] Sync paused ({e}). Queued {len(backlog)} frames locally.")
+        except Exception as e:
+            config["last_sync_status"] = f"Error: {str(e)[:30]}"
+            save_cloud_config(config)
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "--set-url" and len(sys.argv) > 2:
+            new_url = sys.argv[2]
+            cfg = load_cloud_config()
+            cfg["firebase_url"] = new_url
+            save_cloud_config(cfg)
+            print(f"[SUCCESS] Updated Firebase URL to: {new_url}")
+            sys.exit(0)
+        elif sys.argv[1] == "--status":
+            cfg = load_cloud_config()
+            print(json.dumps(cfg, indent=2))
+            sys.exit(0)
     sync_loop()

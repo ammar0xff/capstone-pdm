@@ -1,0 +1,17 @@
+[Unit]
+Description=Predictive Maintenance Firebase RTDB 0-EGP Cloud Mirror
+After=network.target pdm-daq.service
+Wants=pdm-daq.service
+
+[Service]
+Type=simple
+User=renad
+WorkingDirectory=/home/renad/pdm/edge
+ExecStart=/usr/bin/python3 /home/renad/pdm/edge/firebase_mirror.py
+Restart=always
+RestartSec=5s
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
