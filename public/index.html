@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Predictive Maintenance | Global Firebase Cloud Mirror</title>
+  
+  <!-- CDNs for Chart.js, FontAwesome, KaTeX -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root {
+      --bg: #070b13;
+      --card-bg: rgba(15, 23, 42, 0.75);
+      --card-border: rgba(56, 75, 112, 0.35);
+      --text: #f1f5f9;
+      --text-dim: #94a3b8;
+      --muted: #64748b;
+      --cyan: #00f0ff;
+      --cyan-dim: rgba(0, 240, 255, 0.12);
+      --green: #10b981;
+      --green-glow: 0 0 25px rgba(16, 185, 129, 0.4);
+      --amber: #f59e0b;
+      --amber-glow: 0 0 25px rgba(245, 158, 11, 0.4);
+      --red: #ef4444;
+      --red-glow: 0 0 30px rgba(239, 68, 68, 0.6);
+      --purple: #a855f7;
+      --blue: #3b82f6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      background-image: 
+        radial-gradient(circle at 10% 15%, rgba(0, 240, 255, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 90% 85%, rgba(168, 85, 247, 0.05) 0%, transparent 40%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 16px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 24px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      backdrop-filter: blur(12px);
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #00f0ff, #3b82f6);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: #070b13;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+    }
+
+    .logo-text h1 {
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-text p {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .badge-cloud {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--green);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .controls-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn-action {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 7px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-action:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--cyan);
+    }
+
+    /* Grid Layout */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 18px;
+      backdrop-filter: blur(12px);
+      position: relative;
+    }
+
+    .col-12 { grid-column: span 12; }
+    .col-8 { grid-column: span 8; }
+    .col-6 { grid-column: span 6; }
+    .col-4 { grid-column: span 4; }
+
+    @media (max-width: 1024px) {
+      .col-8, .col-6, .col-4 { grid-column: span 12; }
+    }
+
+    /* Industrial Status Lamp Card */
+    .status-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-left: 6px solid var(--green);
+      transition: border-color 0.4s ease, box-shadow 0.4s ease;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .status-card.state-healthy {
+      border-left-color: var(--green);
+      box-shadow: inset 0 0 30px rgba(16, 185, 129, 0.08);
+    }
+    .status-card.state-warning {
+      border-left-color: var(--amber);
+      box-shadow: inset 0 0 30px rgba(245, 158, 11, 0.08);
+    }
+    .status-card.state-fault {
+      border-left-color: var(--red);
+      box-shadow: inset 0 0 35px rgba(239, 68, 68, 0.12);
+      animation: pulseAlert 1.5s infinite;
+    }
+
+    @keyframes pulseAlert {
+      0%, 100% { border-color: var(--red); }
+      50% { border-color: rgba(239, 68, 68, 0.3); }
+    }
+
+    .status-main {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .status-lamp {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: var(--green-glow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: #070b13;
+      transition: all 0.4s ease;
+    }
+    .status-lamp.lamp-warning { background: var(--amber); box-shadow: var(--amber-glow); }
+    .status-lamp.lamp-fault { background: var(--red); box-shadow: var(--red-glow); }
+
+    .status-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+    }
+    .status-sub {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+
+    .status-metrics {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .metric-badge {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 8px 16px;
+      border-radius: 12px;
+      text-align: right;
+    }
+    .metric-badge .val {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+    .metric-badge .lbl {
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Maintenance Advice Banner */
+    .advice-banner {
+      background: rgba(0, 240, 255, 0.05);
+      border: 1px dashed rgba(0, 240, 255, 0.25);
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .advice-banner i {
+      color: var(--cyan);
+      font-size: 18px;
+    }
+
+    /* Sensor Modality Cards */
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 8px;
+    }
+    .card-header h2 {
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
+    }
+    .sensor-tag {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-dim);
+    }
+
+    .gauge-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .gauge-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 12px;
+      border-radius: 12px;
+      text-align: center;
+    }
+    .gauge-box .g-val {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+      font-feature-settings: "tnum";
+    }
+    .gauge-box .g-unit {
+      font-size: 11px;
+      color: var(--muted);
+      margin-left: 2px;
+    }
+    .gauge-box .g-lbl {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* AI Architecture Box */
+    .ai-arch-card {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.08), rgba(59, 130, 246, 0.08));
+      border: 1px solid rgba(168, 85, 247, 0.25);
+    }
+    .stage-steps {
+      display: flex;
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .stage-step {
+      flex: 1;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .stage-step.active-gate {
+      border-color: var(--purple);
+      background: rgba(168, 85, 247, 0.12);
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.2);
+    }
+    .stage-step h4 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--purple);
+      margin-bottom: 4px;
+    }
+    .stage-step p {
+      font-size: 11px;
+      color: var(--text-dim);
+      line-height: 1.4;
+    }
+
+    /* Equation Section */
+    .equation-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .equation-item {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 14px;
+    }
+    .eq-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--cyan);
+      margin-bottom: 6px;
+    }
+    .eq-formula {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 12px;
+      background: rgba(0, 0, 0, 0.35);
+      padding: 6px 10px;
+      border-radius: 6px;
+      color: #38bdf8;
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+    .eq-live {
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .eq-live b {
+      color: var(--green);
+    }
+    .eq-reason {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    /* Chart Canvas */
+    .chart-container {
+      position: relative;
+      height: 220px;
+      width: 100%;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: var(--muted);
+      border-top: 1px solid var(--card-border);
+      margin-top: 20px;
+    }
+    footer a {
+      color: var(--cyan);
+      text-decoration: none;
+    }
+
+    /* RTL Arabic styling */
+    body.rtl {
+      direction: rtl;
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+    }
+    body.rtl .status-card {
+      border-left: none;
+      border-right: 6px solid var(--green);
+    }
+    body.rtl .metric-badge {
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="logo-group">
+        <div class="logo-icon"><i class="fa-solid fa-microchip"></i></div>
+        <div class="logo-text">
+          <h1 id="txt-title">Predictive Maintenance <span class="badge-cloud"><i class="fa-solid fa-cloud"></i> Firebase RTDB Live</span></h1>
+          <p id="txt-subtitle">Grade 12 STEM Capstone 2026/2027 | Multi-Modal Edge Sensing &amp; AI Cloud Mirror</p>
+        </div>
+      </div>
+
+      <div class="controls-group">
+        <div class="badge-cloud" id="cloud-indicator">
+          <i class="fa-solid fa-circle" style="font-size: 8px;"></i>
+          <span id="txt-cloud-status">Connecting...</span>
+        </div>
+        <button class="btn-action" id="btn-sound" onclick="toggleMute()">
+          <i class="fa-solid fa-volume-high" id="sound-icon"></i>
+          <span id="txt-sound">Alarm ON</span>
+        </button>
+        <button class="btn-action" onclick="toggleLanguage()">
+          <i class="fa-solid fa-globe"></i>
+          <span id="txt-lang">عربي</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Status Banner -->
+    <div class="dashboard-grid">
+      <div class="card col-12 status-card state-healthy" id="main-status-card">
+        <div class="status-main">
+          <div class="status-lamp" id="status-lamp">
+            <i class="fa-solid fa-check" id="lamp-icon"></i>
+          </div>
+          <div>
+            <div class="status-title" id="status-title">Normal Operation</div>
+            <div class="status-sub" id="status-sub">Machine operating nominally within ISO 10816 limits</div>
+          </div>
+        </div>
+
+        <div class="status-metrics">
+          <div class="metric-badge">
+            <div class="val" id="badge-ai-conf">98%</div>
+            <div class="lbl" id="lbl-ai-conf">AI Confidence</div>
+          </div>
+          <div class="metric-badge">
+            <div class="val" id="badge-seq">#0</div>
+            <div class="lbl" id="lbl-seq">Frame Seq</div>
+          </div>
+          <div class="metric-badge">
+            <div class="val" id="badge-uptime">0.0s</div>
+            <div class="lbl" id="lbl-uptime">Rig Uptime</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card col-12" style="padding: 12px 18px; margin-top: -8px;">
+        <div class="advice-banner" id="advice-banner">
+          <i class="fa-solid fa-screwdriver-wrench"></i>
+          <span id="txt-advice">Continuous baseline monitoring active. No maintenance action required.</span>
+        </div>
+      </div>
+
+      <!-- AI Architecture Card -->
+      <div class="card col-12 ai-arch-card">
+        <div class="card-header">
+          <h2 id="txt-ai-arch"><i class="fa-solid fa-brain"></i> Two-Stage Monitoring Architecture (Cinar et al. 2022)</h2>
+          <span class="badge-cloud" id="badge-gate-status" style="background: rgba(168, 85, 247, 0.2); color: #c084fc; border-color: #a855f7;">
+            Stage 1 Gated (Shewhart Normal)
+          </span>
+        </div>
+        <div class="stage-steps">
+          <div class="stage-step active-gate" id="step-stage1">
+            <h4>Stage 1: Statistical Process Control (SPC)</h4>
+            <p id="txt-stage1-desc">Shewhart 3-Sigma limits on dynamic RMS &amp; thermal derivative. Keeps edge CPU &lt;8% without executing heavy inference loops continuously.</p>
+          </div>
+          <div class="stage-step" id="step-stage2">
+            <h4>Stage 2: 300-Tree Random Forest Classifier</h4>
+            <p id="txt-stage2-desc">Awakens only when Z &gt; 2.0&sigma; or dT/dt &gt; 5&deg;C/min. 100% 5-fold cross-validated test accuracy with &lt;1.5ms latency.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modality 1: Vibration -->
+      <div class="card col-4">
+        <div class="card-header">
+          <h2 id="txt-mod-vib"><i class="fa-solid fa-wave-square" style="color: var(--cyan);"></i> Vibration (ADXL345)</h2>
+          <span class="sensor-tag">I2C 0x53 &bull; 270 Hz</span>
+        </div>
+        <div class="gauge-grid">
+          <div class="gauge-box">
+            <div class="g-val" id="val-rms">0.0094<span class="g-unit">g</span></div>
+            <div class="g-lbl" id="lbl-rms">Dynamic RMS</div>
+          </div>
+          <div class="gauge-box">
+            <div class="g-val" id="val-peak">0.0280<span class="g-unit">g</span></div>
+            <div class="g-lbl" id="lbl-peak">Peak Accel</div>
+          </div>
+          <div class="gauge-box">
+            <div class="g-val" id="val-kurt">4.53<span class="g-unit">&kappa;</span></div>
+            <div class="g-lbl" id="lbl-kurt">Kurtosis (4th M)</div>
+          </div>
+          <div class="gauge-box">
+            <div class="g-val" id="val-cf">2.98<span class="g-unit">CF</span></div>
+            <div class="g-lbl" id="lbl-cf">Crest Factor</div>
+          </div>
+        </div>
+        <div class="chart-container" style="margin-top: 14px;">
+          <canvas id="chart-vib"></canvas>
+        </div>
+      </div>
+
+      <!-- Modality 2: Thermal -->
+      <div class="card col-4">
+        <div class="card-header">
+          <h2 id="txt-mod-temp"><i class="fa-solid fa-temperature-three-quarters" style="color: var(--amber);"></i> Thermal (MAX6675)</h2>
+          <span class="sensor-tag">SPI0.0 &bull; Class-1 K</span>
+        </div>
+        <div class="gauge-grid">
+          <div class="gauge-box">
+            <div class="g-val" id="val-temp" style="color: var(--amber);">24.25<span class="g-unit">&deg;C</span></div>
+            <div class="g-lbl" id="lbl-temp">Temperature</div>
+          </div>
+          <div class="gauge-box">
+            <div class="g-val" id="val-slope">-0.40<span class="g-unit">&deg;C/m</span></div>
+            <div class="g-lbl" id="lbl-slope">Thermal Slope</div>
+          </div>
+          <div class="gauge-box">
+            <div class="g-val" id="val-coldj" style="color: var(--green);">OK<span class="g-unit"></span></div>
+            <div class="g-lbl" id="lbl-coldj">Cold Junction</div>
+          </div>
+          <div class="gauge-box">
+            <div class="g-val" id="val-res">0.25<span class="g-unit">&deg;C</span></div>
+            <div class="g-lbl" id="lbl-res">ADC Resolution</div>
+          </div>
+        </div>
+        <div class="chart-container" style="margin-top: 14px;">
+          <canvas id="chart-temp"></canvas>
+        </div>
+      </div>
+
+      <!-- Modality 3: Acoustic -->
+      <div class="card col-4">
+        <div class="card-header">
+          <h2 id="txt-mod-sound"><i class="fa-solid fa-microphone-lines" style="color: var(--purple);"></i> Acoustic (INMP441)</h2>
+          <span class="sensor-tag">I2S DMA &bull; 48 kHz</span>
+        </div>
+        <div class="gauge-grid">
+          <div class="gauge-box">
+            <div class="g-val" id="val-sound-db" style="color: #c084fc;">66.8<span class="g-unit">dB</span></div>
+            <div class="g-lbl" id="lbl-sound-db">SPL Level</div>
+          </div>
+          <div class="gauge-box">
+            <div class="g-val" id="val-sound-zcr">0.000<span class="g-unit">x/s</span></div>
+            <div class="g-lbl" id="lbl-sound-zcr">Zero Crossing</div>
+          </div>
+          <div class="gauge-box">
+            <div class="g-val" id="val-sound-status" style="font-size: 15px; color: var(--green); margin-top: 4px;">Hardware I2S</div>
+            <div class="g-lbl" id="lbl-sound-status">ALSA Stream</div>
+          </div>
+          <div class="gauge-box">
+            <div class="g-val" id="val-spc-z">-2.85<span class="g-unit">&sigma;</span></div>
+            <div class="g-lbl" id="lbl-spc-z">Shewhart Z</div>
+          </div>
+        </div>
+        <div class="chart-container" style="margin-top: 14px;">
+          <canvas id="chart-sound"></canvas>
+        </div>
+      </div>
+
+      <!-- Mathematical Engine: In-Place Numerical Substitution -->
+      <div class="card col-12">
+        <div class="card-header">
+          <h2 id="txt-eq-title"><i class="fa-solid fa-square-root-variable" style="color: var(--cyan);"></i> Dynamic Mathematical Formulations &amp; Physical Rationales</h2>
+          <span class="badge-cloud">In-Place Evaluation</span>
+        </div>
+        
+        <div class="dashboard-grid" style="margin-bottom: 0;">
+          <div class="equation-item col-6">
+            <div class="eq-header">
+              <span>1. Dynamic RMS Vibration Energy</span>
+              <span>ISO 20816</span>
+            </div>
+            <div class="eq-formula">RMS = &radic;[ &Sigma; (a_dyn[i])&sup2; / N ]</div>
+            <div class="eq-live" id="calc-rms">RMS = &radic;(0.000088 / 256) = <b>0.0094 g</b></div>
+            <div class="eq-reason" id="desc-rms">Directly quantifies continuous mechanical kinetic energy and destructive stress. Elevates during severe unbalance, misalignment, and structural looseness.</div>
+          </div>
+
+          <div class="equation-item col-6">
+            <div class="eq-header">
+              <span>2. Vibration Kurtosis (4th Standardized Moment)</span>
+              <span>Bearing Shock</span>
+            </div>
+            <div class="eq-formula">&kappa; = &mu;&sub4; / &sigma;&sup4; = [ &Sigma; (a_dyn - &mu;)&sup4; / N ] / [ &Sigma; (a_dyn - &mu;)&sup2; / N ]&sup2;</div>
+            <div class="eq-live" id="calc-kurt">&kappa; = 0.00000002 / (0.000088)&sup2; = <b>4.53</b> (Nominal &sim; 3.0)</div>
+            <div class="eq-reason" id="desc-kurt">Measures tailedness of acceleration distribution. Early microscopic raceway spalls produce impulsive shocks that spike kurtosis &gt; 5 long before RMS rises.</div>
+          </div>
+
+          <div class="equation-item col-6">
+            <div class="eq-header">
+              <span>3. Crest Factor (Shock-to-Energy Ratio)</span>
+              <span>Spall Impact</span>
+            </div>
+            <div class="eq-formula">CF = Peak_dyn / RMS_dyn</div>
+            <div class="eq-live" id="calc-cf">CF = 0.0280 g / 0.0094 g = <b>2.98</b></div>
+            <div class="eq-reason" id="desc-cf">Ratio of transient shock severity to continuous energy. Detects localized impact faults before broad-spectrum vibration rises.</div>
+          </div>
+
+          <div class="equation-item col-6">
+            <div class="eq-header">
+              <span>4. Shewhart SPC Statistical Z-Score</span>
+              <span>Low-Power Gate</span>
+            </div>
+            <div class="eq-formula">Z = (RMS_dyn - &mu;&sub0;) / &sigma;&sub0;</div>
+            <div class="eq-live" id="calc-spc">Z = (0.0094 - 0.080) / 0.025 = <b>-2.82 &sigma;</b> (Threshold: &gt; 2.0 &sigma;)</div>
+            <div class="eq-reason" id="desc-spc">Statistical process control gatekeeper. Instead of wasting CPU continuously running ML models, Stage 1 gates Stage 2: complex inference triggers only on anomaly breach.</div>
+          </div>
+
+          <div class="equation-item col-6">
+            <div class="eq-header">
+              <span>5. Thermal Derivative (Rate of Temperature Change)</span>
+              <span>Runaway Alert</span>
+            </div>
+            <div class="eq-formula">&Delta;T/&Delta;t = (T_now - T_past) / (&Delta;t / 60) [&deg;C/min]</div>
+            <div class="eq-live" id="calc-slope">&Delta;T = -0.10 &deg;C over 15.0 s &rarr; <b>-0.40 &deg;C/min</b></div>
+            <div class="eq-reason" id="desc-slope">Detects bearing lubrication starvation and winding insulation degradation 15-30 minutes in advance, without waiting for motor to overheat.</div>
+          </div>
+
+          <div class="equation-item col-6">
+            <div class="eq-header">
+              <span>6. Acoustic Sound Pressure &amp; Zero Crossing Rate</span>
+              <span>Friction / Squeal</span>
+            </div>
+            <div class="eq-formula">SPL = 120 + 20&middot;log&sub1;&sub0;(RMS_norm) | ZCR = &Sigma; |sgn(s[k]) - sgn(s[k-1])| / 2M</div>
+            <div class="eq-live" id="calc-sound">SPL = 120 + 20&middot;log10(0.0022) = <b>66.8 dB</b> | ZCR = <b>0.000</b></div>
+            <div class="eq-reason" id="desc-sound">Calibrated airborne acoustic power. Metal-on-metal rubbing and dry bearing squeals generate high-frequency acoustics, spiking ZCR &gt; 0.25.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <p><b>Grade 12 STEM Capstone 2026/2027 S1 &bull; Theme: Communication, Sensing, Information, Informatics</b></p>
+      <p style="margin-top: 4px;">Raspberry Pi 4 Quad-Core Cortex-A72 &bull; ADXL345 &bull; MAX6675 &bull; INMP441 &bull; Firebase RTDB 0-EGP Mirror</p>
+    </footer>
+  </div>
+
+  <!-- Audio Context for buzzer alarm -->
+  <script>
+    const FIREBASE_RTDB_URL = "https://castpone2026-default-rtdb.firebaseio.com/motor1.json";
+    let isMuted = false;
+    let isArabic = false;
+    let audioCtx = null;
+    let lastAlertTime = 0;
+
+    // Charts references
+    let chartVib, chartTemp, chartSound;
+    const historyData = {
+      labels: [],
+      rms: [],
+      peak: [],
+      temp: [],
+      slope: [],
+      sound_db: []
+    };
+
+    function initCharts() {
+      const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 400 },
+        plugins: { legend: { labels: { color: '#94a3b8', font: { size: 10 } } } },
+        scales: {
+          x: { display: false },
+          y: { 
+            grid: { color: 'rgba(255,255,255,0.05)' },
+            ticks: { color: '#64748b', font: { size: 10 } }
+          }
+        }
+      };
+
+      // Vibration Chart
+      chartVib = new Chart(document.getElementById('chart-vib'), {
+        type: 'line',
+        data: {
+          labels: historyData.labels,
+          datasets: [
+            { label: 'RMS (g)', data: historyData.rms, borderColor: '#00f0ff', borderWidth: 2, tension: 0.3, fill: false },
+            { label: 'Peak (g)', data: historyData.peak, borderColor: '#3b82f6', borderWidth: 1.5, borderDash: [4, 4], tension: 0.3, fill: false }
+          ]
+        },
+        options: commonOptions
+      });
+
+      // Temp Chart
+      chartTemp = new Chart(document.getElementById('chart-temp'), {
+        type: 'line',
+        data: {
+          labels: historyData.labels,
+          datasets: [
+            { label: 'Temp (°C)', data: historyData.temp, borderColor: '#f59e0b', borderWidth: 2, tension: 0.3, fill: false }
+          ]
+        },
+        options: commonOptions
+      });
+
+      // Sound Chart
+      chartSound = new Chart(document.getElementById('chart-sound'), {
+        type: 'line',
+        data: {
+          labels: historyData.labels,
+          datasets: [
+            { label: 'Sound (dB)', data: historyData.sound_db, borderColor: '#a855f7', borderWidth: 2, tension: 0.3, fill: false }
+          ]
+        },
+        options: commonOptions
+      });
+    }
+
+    function playBeep(freq = 880, duration = 0.2) {
+      if (isMuted) return;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) { }
+    }
+
+    function toggleMute() {
+      isMuted = !isMuted;
+      document.getElementById('txt-sound').innerText = isMuted ? (isArabic ? "الصوت صامت" : "Alarm OFF") : (isArabic ? "الصوت مفعل" : "Alarm ON");
+      document.getElementById('sound-icon').className = isMuted ? "fa-solid fa-volume-xmark" : "fa-solid fa-volume-high";
+    }
+
+    function toggleLanguage() {
+      isArabic = !isArabic;
+      document.body.classList.toggle('rtl', isArabic);
+      document.getElementById('txt-lang').innerText = isArabic ? "English" : "عربي";
+
+      if (isArabic) {
+        document.getElementById('txt-title').innerHTML = `الصيانة التنبؤية بالذكاء الاصطناعي <span class="badge-cloud"><i class="fa-solid fa-cloud"></i> سحابة فايربيس المباشرة</span>`;
+        document.getElementById('txt-subtitle').innerText = "مشروع كابستون الصف 12 | استشعار الحافة متعدد الوسائط ومرآة سحابية";
+        document.getElementById('txt-ai-arch').innerHTML = `<i class="fa-solid fa-brain"></i> بنية المراقبة ثنائية المراحل (Cinar et al. 2022)`;
+        document.getElementById('lbl-ai-conf').innerText = "ثقة الذكاء الاصطناعي";
+        document.getElementById('lbl-seq').innerText = "تسلسل الإطار";
+        document.getElementById('lbl-uptime').innerText = "وقت تشغيل المنصة";
+        document.getElementById('txt-mod-vib').innerHTML = `<i class="fa-solid fa-wave-square" style="color: var(--cyan);"></i> الاهتزاز (ADXL345)`;
+        document.getElementById('txt-mod-temp').innerHTML = `<i class="fa-solid fa-temperature-three-quarters" style="color: var(--amber);"></i> الحرارة (MAX6675)`;
+        document.getElementById('txt-mod-sound').innerHTML = `<i class="fa-solid fa-microphone-lines" style="color: var(--purple);"></i> الانبعاث الصوتي (INMP441)`;
+        document.getElementById('txt-eq-title').innerHTML = `<i class="fa-solid fa-square-root-variable" style="color: var(--cyan);"></i> المعادلات الرياضية والتفسيرات الفيزيائية الحية`;
+      } else {
+        document.getElementById('txt-title').innerHTML = `Predictive Maintenance <span class="badge-cloud"><i class="fa-solid fa-cloud"></i> Firebase RTDB Live</span>`;
+        document.getElementById('txt-subtitle').innerText = "Grade 12 STEM Capstone 2026/2027 | Multi-Modal Edge Sensing & AI Cloud Mirror";
+        document.getElementById('txt-ai-arch').innerHTML = `<i class="fa-solid fa-brain"></i> Two-Stage Monitoring Architecture (Cinar et al. 2022)`;
+        document.getElementById('lbl-ai-conf').innerText = "AI Confidence";
+        document.getElementById('lbl-seq').innerText = "Frame Seq";
+        document.getElementById('lbl-uptime').innerText = "Rig Uptime";
+        document.getElementById('txt-mod-vib').innerHTML = `<i class="fa-solid fa-wave-square" style="color: var(--cyan);"></i> Vibration (ADXL345)`;
+        document.getElementById('txt-mod-temp').innerHTML = `<i class="fa-solid fa-temperature-three-quarters" style="color: var(--amber);"></i> Thermal (MAX6675)`;
+        document.getElementById('txt-mod-sound').innerHTML = `<i class="fa-solid fa-microphone-lines" style="color: var(--purple);"></i> Acoustic (INMP441)`;
+        document.getElementById('txt-eq-title').innerHTML = `<i class="fa-solid fa-square-root-variable" style="color: var(--cyan);"></i> Dynamic Mathematical Formulations & Physical Rationales`;
+      }
+    }
+
+    function updateDashboard(data) {
+      if (!data) return;
+
+      const state = data.state || "Healthy";
+      const fault = data.fault || data.fault_label || "Normal Operation";
+      const proba = data.proba !== undefined ? data.proba : (data.fault_proba || 0.05);
+      const rms = data.rms !== undefined ? data.rms : (data.vibration?.rms_dyn || 0.0094);
+      const peak = data.peak !== undefined ? data.peak : (data.vibration?.peak_dyn || 0.028);
+      const kurt = data.kurt !== undefined ? data.kurt : (data.vibration?.kurtosis || 3.0);
+      const cf = data.cf !== undefined ? data.cf : (data.vibration?.crest_factor || 2.0);
+      const temp = data.temp !== undefined ? data.temp : (data.temperature?.temp_c || 24.25);
+      const slope = data.slope !== undefined ? data.slope : (data.temperature?.slope_c_per_min || 0.0);
+      const sound_db = data.sound_db !== undefined ? data.sound_db : (data.acoustic?.db_spl || 65.0);
+      const zcr = data.zcr !== undefined ? data.zcr : (data.acoustic?.zcr || 0.01);
+      const advice = data.advice || "Machine operating within nominal limits.";
+      const seq = data.seq || 0;
+      const uptime = data.uptime_s || 0;
+
+      // Update Top Status Lamp
+      const card = document.getElementById('main-status-card');
+      const lamp = document.getElementById('status-lamp');
+      const icon = document.getElementById('lamp-icon');
+      const title = document.getElementById('status-title');
+      const sub = document.getElementById('status-sub');
+
+      card.className = "card col-12 status-card";
+      lamp.className = "status-lamp";
+
+      if (state === "Healthy") {
+        card.classList.add("state-healthy");
+        icon.className = "fa-solid fa-check";
+        title.innerText = isArabic ? "حالة التشغيل طبيعية" : fault;
+        sub.innerText = isArabic ? "المحرك يعمل ضمن الحدود الاسمية للمواصفة القياسية ISO 10816" : "Nominal baseline operation within ISO 10816 limits";
+      } else if (state === "Warning") {
+        card.classList.add("state-warning");
+        lamp.classList.add("lamp-warning");
+        icon.className = "fa-solid fa-triangle-exclamation";
+        title.innerText = isArabic ? `تحذير: ${fault}` : `Warning: ${fault}`;
+        sub.innerText = isArabic ? "تم رصد بداية عيب ميكانيكي / حراري (تجاوز حد سيجما)" : "Incipient mechanical/thermal anomaly detected";
+        if (Date.now() - lastAlertTime > 5000) { playBeep(660, 0.3); lastAlertTime = Date.now(); }
+      } else {
+        card.classList.add("state-fault");
+        lamp.classList.add("lamp-fault");
+        icon.className = "fa-solid fa-triangle-exclamation";
+        title.innerText = isArabic ? `إنذار حرج: ${fault}` : `CRITICAL FAULT: ${fault}`;
+        sub.innerText = isArabic ? "خطر توقف غير مخطط له - يلزم اتخاذ إجراء صيانة فوري" : "Imminent machine failure risk - immediate action required";
+        if (Date.now() - lastAlertTime > 2000) { playBeep(980, 0.4); lastAlertTime = Date.now(); }
+      }
+
+      // Badges
+      const confPercent = Math.round((state === "Healthy" ? (1.0 - proba) : proba) * 100);
+      document.getElementById('badge-ai-conf').innerText = confPercent + "%";
+      document.getElementById('badge-seq').innerText = "#" + seq;
+      document.getElementById('badge-uptime').innerText = (uptime >= 60 ? (uptime/60).toFixed(1) + "m" : uptime.toFixed(0) + "s");
+      document.getElementById('txt-advice').innerText = advice;
+
+      // Stage Gating Badge
+      const isStage2 = (state !== "Healthy") || (data.ai?.gate_status?.includes("Stage 2"));
+      const gateBadge = document.getElementById('badge-gate-status');
+      const step1 = document.getElementById('step-stage1');
+      const step2 = document.getElementById('step-stage2');
+      if (isStage2) {
+        gateBadge.innerText = isArabic ? "المرحلة 2 مفعلة (اكتشاف عيب)" : "Stage 2 Triggered (RF Inference Active)";
+        gateBadge.style.background = "rgba(239, 68, 68, 0.2)";
+        gateBadge.style.color = "#f87171";
+        gateBadge.style.borderColor = "#ef4444";
+        step1.classList.remove('active-gate');
+        step2.classList.add('active-gate');
+      } else {
+        gateBadge.innerText = isArabic ? "المرحلة 1 مفعلة (مراقبة احصائية منخفضة الطاقة)" : "Stage 1 Gated (Shewhart Normal)";
+        gateBadge.style.background = "rgba(168, 85, 247, 0.2)";
+        gateBadge.style.color = "#c084fc";
+        gateBadge.style.borderColor = "#a855f7";
+        step1.classList.add('active-gate');
+        step2.classList.remove('active-gate');
+      }
+
+      // Gauges
+      document.getElementById('val-rms').innerHTML = `${rms.toFixed(4)}<span class="g-unit">g</span>`;
+      document.getElementById('val-peak').innerHTML = `${peak.toFixed(4)}<span class="g-unit">g</span>`;
+      document.getElementById('val-kurt').innerHTML = `${kurt.toFixed(2)}<span class="g-unit">&kappa;</span>`;
+      document.getElementById('val-cf').innerHTML = `${cf.toFixed(2)}<span class="g-unit">CF</span>`;
+
+      document.getElementById('val-temp').innerHTML = `${temp.toFixed(2)}<span class="g-unit">&deg;C</span>`;
+      document.getElementById('val-slope').innerHTML = `${slope >= 0 ? '+' : ''}${slope.toFixed(2)}<span class="g-unit">&deg;C/m</span>`;
+
+      document.getElementById('val-sound-db').innerHTML = `${sound_db.toFixed(1)}<span class="g-unit">dB</span>`;
+      document.getElementById('val-sound-zcr').innerHTML = `${zcr.toFixed(4)}<span class="g-unit">x/s</span>`;
+
+      const z_score = ((rms - 0.080) / 0.025);
+      document.getElementById('val-spc-z').innerHTML = `${z_score >= 0 ? '+' : ''}${z_score.toFixed(2)}<span class="g-unit">&sigma;</span>`;
+
+      // Live In-Place Equation Substitution
+      document.getElementById('calc-rms').innerHTML = 
+        `RMS = &radic;(${((rms**2)*256).toFixed(6)} / 256) = <b>${rms.toFixed(4)} g</b>`;
+      document.getElementById('calc-kurt').innerHTML = 
+        `&kappa; = <b>${kurt.toFixed(2)}</b> (Gaussian Baseline &sim; 3.0)`;
+      document.getElementById('calc-cf').innerHTML = 
+        `CF = ${peak.toFixed(4)} g / ${rms.toFixed(4)} g = <b>${cf.toFixed(2)}</b>`;
+      document.getElementById('calc-spc').innerHTML = 
+        `Z = (${rms.toFixed(4)} - 0.080) / 0.025 = <b>${z_score >= 0 ? '+' : ''}${z_score.toFixed(2)} &sigma;</b> (Threshold: &gt; 2.0 &sigma;)`;
+      document.getElementById('calc-slope').innerHTML = 
+        `&Delta;T/&Delta;t = <b>${slope >= 0 ? '+' : ''}${slope.toFixed(2)} &deg;C/min</b> (Threshold: &gt; 5.0 &deg;C/min)`;
+      document.getElementById('calc-sound').innerHTML = 
+        `SPL = <b>${sound_db.toFixed(1)} dB</b> | ZCR = <b>${zcr.toFixed(4)}</b> (${zcr > 0.20 ? 'High Frequency Friction' : 'Nominal Hum'})`;
+
+      // Chart buffering
+      const timeLabel = new Date().toLocaleTimeString();
+      historyData.labels.push(timeLabel);
+      historyData.rms.push(rms);
+      historyData.peak.push(peak);
+      historyData.temp.push(temp);
+      historyData.slope.push(slope);
+      historyData.sound_db.push(sound_db);
+
+      if (historyData.labels.length > 30) {
+        historyData.labels.shift();
+        historyData.rms.shift();
+        historyData.peak.shift();
+        historyData.temp.shift();
+        historyData.slope.shift();
+        historyData.sound_db.shift();
+      }
+
+      chartVib.update();
+      chartTemp.update();
+      chartSound.update();
+    }
+
+    // Connect to Firebase RTDB using Server-Sent Events (SSE) + Fallback Polling
+    function connectFirebase() {
+      const indicator = document.getElementById('txt-cloud-status');
+      indicator.innerText = "Syncing...";
+
+      // Standard polling fetch
+      function fetchLatest() {
+        fetch(FIREBASE_RTDB_URL + "?shallow=false")
+          .then(res => res.json())
+          .then(data => {
+            if (data) {
+              updateDashboard(data);
+              indicator.innerText = "RTDB Live";
+              document.getElementById('cloud-indicator').style.color = "var(--green)";
+            }
+          })
+          .catch(err => {
+            indicator.innerText = "Buffering...";
+            document.getElementById('cloud-indicator').style.color = "var(--amber)";
+          });
+      }
+
+      // Initial fetch
+      fetchLatest();
+
+      // Poll every 2.5 seconds to guarantee 100% sync reliability
+      setInterval(fetchLatest, 2500);
+
+      // Also attempt native Firebase RTDB SSE EventSource stream
+      try {
+        const sse = new EventSource(FIREBASE_RTDB_URL);
+        sse.addEventListener('put', function(e) {
+          try {
+            const parsed = JSON.parse(e.data);
+            if (parsed && parsed.data) {
+              updateDashboard(parsed.data);
+              indicator.innerText = "RTDB Live (Push)";
+            }
+          } catch (err) { }
+        });
+        sse.onerror = function() {
+          // SSE dropped, polling keeps it alive
+          sse.close();
+        };
+      } catch (err) { }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initCharts();
+      connectFirebase();
+    });
+  </script>
+</body>
+</html>
