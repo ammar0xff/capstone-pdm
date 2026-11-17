@@ -270,7 +270,7 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <span class="k">import</span> numpy <span class="k">as</span> np, paho.mqtt.client <span class="k">as</span> mqtt, requests
 <span class="c"># --- config ---</span>
 CAL = json.load(open(<span class="s">'cal.json'</span>))
-FB_URL = os.getenv(<span class="s">'FB_URL'</span>,<span class="s">'https://&lt;proj&gt;.firebaseio.com/motor1.json'</span>)
+FB_URL = os.getenv(<span class="s">'FB_URL'</span>,<span class="s">'https://castpone2026-default-rtdb.firebaseio.com/motor1.json'</span>)
 FB_KEY = os.getenv(<span class="s">'FB_KEY'</span>,<span class="s">'DEMO_KEY'</span>)
 i2c = busio.I2C(board.SCL, board.SDA)
 acc = adafruit_adxl34x.ADXL345(i2c); acc.range = adafruit_adxl34x.Range.RANGE_4_G
@@ -364,7 +364,7 @@ X,y,G = df.drop(columns=[<span class="s">'label'</span>,<span class="s">'event_i
 <tr><td>Grafana Cloud free</td><td>X-bar/R SPC, FFT, TBA/Th_DB/QL_M, annotations</td><td>1 dashboard + CSV/JSON plugin</td><td>0</td></tr>
 <tr><td>Mosquitto + Flask on Pi</td><td>offline primary, hotspot 192.168.4.1:5000</td><td>unlimited</td><td>0</td></tr></table>
 <div class="grid2">
-<div><h4>Custom Panel (judges/mobile)</h4><ul><li>Live cards + big lamp 🟢/🔴 + fault + proba + advice</li><li>Routes: <code>/</code> UI, <code>/api/latest</code> JSON, <code>/api/history</code> CSV</li><li>SSE 1s local / 15s Firebase mirror, AR/EN toggle, beep on Fault</li><li>QR stickers: offline <code>http://192.168.4.1:5000</code> + public <code>https://&lt;proj&gt;.web.app</code></li></ul></div>
+<div><h4>Custom Panel (judges/mobile)</h4><ul><li>Live cards + big lamp 🟢/🔴 + fault + proba + advice</li><li>Routes: <code>/</code> UI, <code>/api/latest</code> JSON, <code>/api/history</code> CSV</li><li>SSE 1s local / 15s Firebase mirror, AR/EN toggle, beep on Fault</li><li>QR stickers: offline <code>http://192.168.4.1:5000</code> + public <code>https://castpone2026.web.app</code></li></ul></div>
 <div><h4>Grafana (engineer/depth)</h4><ul><li>Panels: live rms/temp, SPC X-bar/R with UCL/LCL, event annotations from state flips</li><li>Stat tiles: TBA, TB_VA, Th_DB, MQTT_QM, QL_M</li><li>Source: RTDB JSON API + nightly CSV snapshot upload (fallback if plugin auth fails)</li><li>Quota guard: Pi throttles to 1/60s if &gt;15k writes/day, Grafana replays SD CSV</li></ul></div>
 </div>
 <div class="eq">Shared model: { ts, g, rms, kurt, temp, temp_slope, zcr, state, fault, proba, seq }<small>Both UIs render the same <code>state</code> — prove sync in exhibition Step 3–5.</small></div>
