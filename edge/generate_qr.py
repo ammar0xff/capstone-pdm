@@ -18,7 +18,7 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 URLS = {
     "local_hotspot": "http://192.168.4.1:5000",
     "tailscale_edge": "http://100.126.244.75:5000",
-    "public_mirror": "https://castpone2026-default-rtdb.firebaseio.com/motor1.json"
+    "public_mirror": "https://castpone2026.web.app"
 }
 
 def generate_svg_qr(url, name):
