@@ -431,8 +431,8 @@ def main():
             is_thermal_fault = (last_temp_c > 70.0) or (temp_slope > 10.0)
             is_thermal_warn = (last_temp_c > 50.0) or (temp_slope > 5.0)
 
-            is_vib_fault = (rms_dyn > ucl_fault) or (kurtosis > 7.0) or (peak_dyn > 0.40)
-            is_vib_warn = (rms_dyn > ucl_warning) or (kurtosis > 5.0) or (peak_dyn > 0.25)
+            is_vib_fault = (rms_dyn > ucl_fault) or (kurtosis > 7.0 and rms_dyn > 0.03) or (peak_dyn > 0.40)
+            is_vib_warn = (rms_dyn > ucl_warning) or (kurtosis > 5.0 and rms_dyn > 0.03) or (peak_dyn > 0.25)
             is_sound_fault = (sound_db > 88.0) or (sound_zcr > 0.28)
 
             feature_dict = {

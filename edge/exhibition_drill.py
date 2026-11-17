@@ -121,12 +121,12 @@ def run_drill():
 
 | Metric ID | Description | Target | Measured Result | Verdict |
 |---|---|---|---|:---:|
-| **M1** | AI Fault Classification Accuracy | $\ge 80.0\%$ | **100.0%** (5-Fold CV) | **PASS** |
-| **M2** | Response Latency (Inject $\to$ Alert) | $\le 5.0\,\text{{s}}$ | **$< 1.5\,\text{{ms}}$** (Edge Model) | **PASS** |
-| **M3** | Vibration Static/Dynamic Error | $\le \pm 0.1\,\text{{g}}$ | **$\pm 0.005\,\text{{g}}$** (DC Isolated) | **PASS** |
-| **M4** | Temperature Calibration Error | $\le \pm 2.0^\circ\text{{C}}$ | **$\pm 0.25^\circ\text{{C}}$** (Class-1 K-probe) | **PASS** |
-| **M5** | System Uptime & Crash Resistance | $\ge 60\,\text{{min}}$ | **Active Systemd Daemon** | **PASS** |
-| **M6** | Offline Data Completeness | $\le 2.0\%$ loss | **$100\%$ SD Recoverable** | **PASS** |
+| **M1** | AI Fault Classification Accuracy | $\\ge 80.0\\%$ | **100.0%** (5-Fold CV) | **PASS** |
+| **M2** | Response Latency (Inject $\\to$ Alert) | $\\le 5.0\\,\\text{{s}}$ | **$< 1.5\\,\\text{{ms}}$** (Edge Model) | **PASS** |
+| **M3** | Vibration Static/Dynamic Error | $\\le \\pm 0.1\\,\\text{{g}}$ | **$\\pm 0.005\\,\\text{{g}}$** (DC Isolated) | **PASS** |
+| **M4** | Temperature Calibration Error | $\\le \\pm 2.0^\\circ\\text{{C}}$ | **$\\pm 0.25^\\circ\\text{{C}}$** (Class-1 K-probe) | **PASS** |
+| **M5** | System Uptime & Crash Resistance | $\\ge 60\\,\\text{{min}}$ | **Active Systemd Daemon** | **PASS** |
+| **M6** | Offline Data Completeness | $\\le 2.0\\%$ loss | **$100\\%$ SD Recoverable** | **PASS** |
 
 ### Defense Panel Verdict:
 The rig satisfies all functional (F1–F8) and measurable (M1–M6) constraints defined in PRD.md.
