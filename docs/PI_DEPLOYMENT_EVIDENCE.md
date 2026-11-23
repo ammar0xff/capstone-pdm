@@ -32,6 +32,18 @@ The current repository artifacts were copied into place; MD5 matched on both sid
 `sudo systemctl restart pdm-daq.service` completed cleanly (`Deactivated successfully` → `Started`),
 and the service remained active afterwards. The other two units do not load the model and were left running.
 
+## Inference wrapper synchronization
+
+The Pi was still running an older `ml/rf_predictor.py` without the two-stage SPC gate. It was backed up as
+`rf_predictor.py.bak-<timestamp>`, replaced with the repository version (MD5 `bd1acaf576ce584e398bad6b5ff475c1`),
+and `pdm-daq.service` was restarted again. No errors appeared in the journal.
+
+Smoke test against the deployed model on the Pi:
+
+- nominal window → `Stage 1 (SPC Normal)`, `z_score=-1.2`, `rf_executed=false`, **0.02 ms**
+- breached window → `Stage 2 (RF Triggered)`, `z_score=4.8`, `rf_executed=true`, **30.995 ms**
+- `latest_state.json` was fresh (`seq=163`, age 0.2 s), so the live stream kept updating after both restarts.
+
 ## Latency benchmark
 
 Reproduce with `python ml/benchmark_latency.py` (100 single-core `predict_proba` calls, 5-call warm-up,
