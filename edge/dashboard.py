@@ -19,19 +19,20 @@ CLOUD_BACKLOG_FILE = os.path.join(BASE_DIR, "cloud_backlog.json")
 
 app = Flask(__name__, template_folder=os.path.join(BASE_DIR, "templates"))
 
+
 def get_cloud_status():
     status = {
         "enabled": True,
-        "firebase_url": "https://capstone-pdm-2026-default-rtdb.firebaseio.com/motor1.json",
+        "firebase_url": "https://castpone2026-default-rtdb.firebaseio.com/motor1.json",
         "sync_interval_s": 15.0,
         "daily_writes": 0,
         "max_daily_writes": 15000,
         "backlog_count": 0,
-        "last_sync_status": "Ready (Quota Guard Active)"
+        "last_sync_status": "Ready (Quota Guard Active)",
     }
     if os.path.exists(CLOUD_CONFIG_FILE):
         try:
-            with open(CLOUD_CONFIG_FILE, 'r') as f:
+            with open(CLOUD_CONFIG_FILE, "r") as f:
                 cfg = json.load(f)
                 status["enabled"] = cfg.get("enabled", True)
                 status["firebase_url"] = cfg.get("firebase_url", status["firebase_url"])
@@ -42,17 +43,18 @@ def get_cloud_status():
             pass
     if os.path.exists(CLOUD_BACKLOG_FILE):
         try:
-            with open(CLOUD_BACKLOG_FILE, 'r') as bf:
+            with open(CLOUD_BACKLOG_FILE, "r") as bf:
                 b = json.load(bf)
                 status["backlog_count"] = len(b)
         except Exception:
             pass
     return status
 
+
 def get_latest_state():
     if os.path.exists(STATE_FILE):
         try:
-            with open(STATE_FILE, 'r') as f:
+            with open(STATE_FILE, "r") as f:
                 data = json.load(f)
                 # Check if state is recent (within 5 seconds)
                 if time.time() - data.get("timestamp", 0) < 5.0:
@@ -78,7 +80,7 @@ def get_latest_state():
             "baseline_mu": 0.08,
             "baseline_sigma": 0.025,
             "ucl_warning": 0.13,
-            "ucl_fault": 0.155
+            "ucl_fault": 0.155,
         },
         "vibration": {
             "rms_dyn": 0.0,
@@ -88,54 +90,52 @@ def get_latest_state():
             "ax": 0.0,
             "ay": 0.0,
             "az": 0.0,
-            "fs_hz": 0.0
+            "fs_hz": 0.0,
         },
-        "temperature": {
-            "temp_c": 0.0,
-            "slope_c_per_min": 0.0,
-            "open_tc": 0
-        },
-        "system": {
-            "adxl_ok": False,
-            "max6675_ok": False,
-            "storage_ok": True
-        }
+        "temperature": {"temp_c": 0.0, "slope_c_per_min": 0.0, "open_tc": 0},
+        "system": {"adxl_ok": False, "max6675_ok": False, "storage_ok": True},
     }
 
-@app.route('/')
-def index():
-    return render_template('index.html')
 
-@app.route('/api/latest')
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+
+@app.route("/api/latest")
 def api_latest():
     return jsonify(get_latest_state())
 
-@app.route('/api/history')
+
+@app.route("/api/history")
 def api_history():
     rows = []
     if os.path.exists(HISTORY_FILE):
         try:
-            with open(HISTORY_FILE, 'r') as f:
+            with open(HISTORY_FILE, "r") as f:
                 reader = csv.DictReader(f)
                 all_rows = list(reader)
                 # Return last 100 entries
                 recent = all_rows[-100:]
                 for r in recent:
                     try:
-                        rows.append({
-                            "t": float(r.get("timestamp", 0)),
-                            "rms": float(r.get("rms_dyn", 0)),
-                            "temp": float(r.get("temp_c", 0)),
-                            "kurt": float(r.get("kurtosis", 3.0)),
-                            "state": r.get("state", "Healthy")
-                        })
+                        rows.append(
+                            {
+                                "t": float(r.get("timestamp", 0)),
+                                "rms": float(r.get("rms_dyn", 0)),
+                                "temp": float(r.get("temp_c", 0)),
+                                "kurt": float(r.get("kurtosis", 3.0)),
+                                "state": r.get("state", "Healthy"),
+                            }
+                        )
                     except Exception:
                         pass
         except Exception as e:
             return jsonify({"error": str(e), "data": []})
     return jsonify({"count": len(rows), "data": rows})
 
-@app.route('/api/stream')
+
+@app.route("/api/stream")
 def api_stream():
     def event_stream():
         while True:
@@ -145,22 +145,24 @@ def api_stream():
 
     return Response(event_stream(), mimetype="text/event-stream")
 
-@app.route('/api/cal', methods=['GET', 'POST'])
+
+@app.route("/api/cal", methods=["GET", "POST"])
 def api_cal():
-    if request.method == 'POST':
+    if request.method == "POST":
         try:
             new_cal = request.json
-            with open(CAL_FILE, 'w') as f:
+            with open(CAL_FILE, "w") as f:
                 json.dump(new_cal, f, indent=2)
             return jsonify({"status": "success", "cal": new_cal})
         except Exception as e:
             return jsonify({"status": "error", "message": str(e)}), 400
     else:
         if os.path.exists(CAL_FILE):
-            with open(CAL_FILE, 'r') as f:
+            with open(CAL_FILE, "r") as f:
                 return jsonify(json.load(f))
         return jsonify({})
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     print("[INFO] Starting PdM Flask Dashboard on 0.0.0.0:5000")
-    app.run(host='0.0.0.0', port=5000, debug=False, threaded=True)
+    app.run(host="0.0.0.0", port=5000, debug=False, threaded=True)

@@ -23,6 +23,6 @@
   "test_samples": 210,
   "5fold_cv_accuracy": 1.0,
   "test_accuracy": 1.0,
-  "inference_latency_ms": 40.761,
-  "timestamp": 1795419723.4192142
+  "inference_latency_ms": 37.675,
+  "timestamp": 1795467894.5850382
 }
