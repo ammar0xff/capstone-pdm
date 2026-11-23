@@ -19,10 +19,53 @@
     "Bearing Defect",
     "Thermal Runaway"
   ],
-  "train_samples": 980,
-  "test_samples": 210,
+  "train_samples": 1000,
+  "test_samples": 200,
   "5fold_cv_accuracy": 1.0,
   "test_accuracy": 1.0,
-  "inference_latency_ms": 37.675,
-  "timestamp": 1795467894.5850382
+  "inference_latency_ms": 26.109,
+  "cv_scheme": "StratifiedGroupKFold(n_splits=5, shuffle=True, random_state=42) by run_id",
+  "holdout_scheme": "70/15/15 by whole runs (5 train / 1 val / 1 test per class)",
+  "group_column": "run_id",
+  "n_groups": 28,
+  "train_groups": [
+    "RUN_C0_00",
+    "RUN_C0_01",
+    "RUN_C0_02",
+    "RUN_C0_03",
+    "RUN_C0_04",
+    "RUN_C1_00",
+    "RUN_C1_01",
+    "RUN_C1_02",
+    "RUN_C1_03",
+    "RUN_C1_04",
+    "RUN_C2_00",
+    "RUN_C2_01",
+    "RUN_C2_02",
+    "RUN_C2_03",
+    "RUN_C2_04",
+    "RUN_C3_00",
+    "RUN_C3_01",
+    "RUN_C3_02",
+    "RUN_C3_03",
+    "RUN_C3_04"
+  ],
+  "val_groups": [
+    "RUN_C0_05",
+    "RUN_C1_05",
+    "RUN_C2_05",
+    "RUN_C3_05"
+  ],
+  "test_groups": [
+    "RUN_C0_06",
+    "RUN_C1_06",
+    "RUN_C2_06",
+    "RUN_C3_06"
+  ],
+  "gate_only_features": [
+    "z_score"
+  ],
+  "dataset_kind": "physics-simulated benchmark; no real motor measurements",
+  "latency_measured_on": "training host (not Raspberry Pi)",
+  "timestamp": 1795468851.0823448
 }

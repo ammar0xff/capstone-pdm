@@ -36,13 +36,13 @@ This project implements an **offline-first, edge-computing predictive maintenanc
 
 The edge architecture executes a **two-stage hybrid monitoring framework** based on Cinar et al. (2022):
 - **Stage 1 (Coarse Gate):** Continuous statistical process control (Shewhart SPC 3-sigma monitoring on dynamic RMS vibration and thermal derivative $\Delta T/\Delta t$) operating at ultra-low CPU load (<8%).
-- **Stage 2 (Fine Classification):** Gated machine learning inference using a 300-estimator Random Forest classifier (`max_depth=12`, `n_jobs=1` for deterministic single-window latency <1.5 ms), classifying machine states into:
+- **Stage 2 (Fine Classification):** Gated machine learning inference using a 300-estimator Random Forest classifier (`max_depth=12`, single-core inference), classifying machine states into:
   - `Normal Operation` (Healthy)
   - `Mechanical Imbalance` (1X shaft rotational frequency anomaly)
   - `Bearing Defect` (High-frequency impact impulses, kurtosis spikes)
   - `Thermal Runaway` (Severe friction, cooling blockage, or winding breakdown)
 
-The solution achieves **100% test accuracy** ($F_1 = 1.000$) across 1,400 validated feature windows, responds to incipient anomalies in **$< 1.5\,\text{s}$**, maintains zero cloud spend (**0 EGP**) via a Firebase Spark REST mirror with daily quota guarding, and operates indefinitely without an active internet connection.
+On the **physics-simulated benchmark** the solution achieves **100% test accuracy** ($F_1 = 1.000$) across 1,400 feature windows in 28 independent runs; this is not real-motor accuracy. Measured inference latency is **26.109 ms on the training host** (Pi not measured). The system classifies current faults — it does **not** predict Remaining Useful Life — and maintains zero cloud spend (**0 EGP**) via a Firebase Spark REST mirror with daily quota guarding, operating indefinitely without an active internet connection. See `ml/ai_report.md` §8 for limitations.
 
 ---
 
@@ -199,24 +199,24 @@ For every $1.0\,\text{second}$ sliding window ($N \approx 340$ samples), the pip
 7. `sound_db`: Acoustic envelope equivalent SPL ($\text{dB}$).
 8. `sound_zcr`: Acoustic Zero-Crossing Rate ($\text{crossings/s}$).
 
-### 5.3 Stratified 5-Fold Cross-Validation & Test Results
-Training across 1,400 multi-modal windows yielded the following empirical metrics:
+### 5.3 Run-Disjoint 5-Fold Cross-Validation & Test Results
+Training across 1,400 simulated multi-modal windows in 28 runs yielded the following benchmark metrics (group-disjoint `StratifiedGroupKFold` CV and 70/15/15 whole-run hold-out):
 
 | Metric | Target (PRD) | Measured Result | Status |
 |---|---|---|---|
-| **Stratified 5-Fold CV Accuracy** | $\ge 80.0\%$ | **$100.00\% \pm 0.00\%$** | **PASSED** |
-| **Independent Test Accuracy ($N=210$)** | $\ge 80.0\%$ | **$100.00\%$** | **PASSED** |
+| **Group 5-Fold CV Accuracy** | $\ge 80.0\%$ | **$100.00\%$** (synthetic) | **PASSED** |
+| **Independent Test Accuracy ($N=200$, whole unseen runs)** | $\ge 80.0\%$ | **$100.00\%$** (synthetic) | **PASSED** |
 | **Macro $F_1$-Score** | $\ge 0.80$ | **$1.0000$** | **PASSED** |
-| **Edge Inference Latency** | $< 50\,\text{ms}$ | **$< 1.5\,\text{ms}$** | **PASSED** |
+| **Inference Latency (training host)** | $< 50\,\text{ms}$ | **$26.109\,\text{ms}$** (Pi not measured) | **PASSED** |
 | **Model Binary Size** | $< 50\,\text{MB}$ | **$468\,\text{KB}$** | **PASSED** |
 
 ### 5.4 Feature Importance Ranking
 Empirical feature importance extraction confirmed the physical validity of the model:
-1. **Kurtosis ($32.4\%$):** Dominates detection of early-stage bearing race damage.
-2. **Thermal Slope ($26.8\%$):** Distinguishes thermal runaway from steady-state motor heat.
-3. **RMS Dynamic ($18.5\%$):** Unambiguously identifies gross mechanical unbalance.
-4. **Sound ZCR ($12.1\%$):** Detects high-frequency acoustic squeal before thermal expansion occurs.
-5. **Peak Acceleration ($5.2\%$), Sound Level ($2.8\%$), Temperature ($2.2\%$).**
+1. **RMS Dynamic ($14.8\%$):** Overall vibration energy under ISO 20816.
+2. **Temperature ($13.7\%$) and Sound Level ($13.3\%$):** Thermal state and acoustic load.
+3. **Peak Acceleration ($12.5\%$):** Instantaneous shock load.
+4. **Sound ZCR ($11.8\%$), Sound RMS ($11.4\%$), Kurtosis ($10.2\%$):** Impact and squeal indicators.
+5. **Thermal Slope ($9.3\%$), Crest Factor ($3.0\%$).** `z_score` is a Stage-1 SPC gate metric derived from `rms_dyn`, not an independent RF feature.
 
 ---
 
@@ -346,8 +346,8 @@ The system fulfills and exceeds all quantitative criteria established in the Cap
 
 | Metric | Description | PRD Target | Measured Result | Compliance Evidence |
 |---|---|---|---|---|
-| **M1** | AI Fault Classification Accuracy | $\ge 80.0\%$ | **$100.00\%$** | Stratified 5-Fold CV + 210-sample Test Matrix (`ml/ai_report.md`) |
-| **M2** | End-to-End Anomaly Response Time | $\le 5.0\,\text{s}$ | **$< 1.5\,\text{s}$** | Hard real-time Shewhart gate + $1.42\,\text{ms}$ RF inference |
+| **M1** | AI Fault Classification Accuracy | $\ge 80.0\%$ | **$100.00\%$** on synthetic benchmark | Group 5-Fold CV + 200-sample unseen-run Test Matrix (`ml/ai_report.md`) |
+| **M2** | End-to-End Anomaly Response Time | $\le 5.0\,\text{s}$ | **$26.109\,\text{ms}$ inference (host)** | Shewhart gate + RF inference; on-Pi end-to-end timing not yet measured |
 | **M3** | Dual-Dashboard Latency Sync | $\le 3.0\,\text{s}$ | **$< 1.0\,\text{s}$** | Shared-memory IPC (`/dev/shm/pdm_latest.json`) |
 | **M4** | Multi-Modal Sensor Coverage | $\ge 3$ modalities | **3 Modalities** | Vibration (ADXL345), Temperature (MAX6675), Sound (LM393) |
 | **M5** | Offline Autonomy & Resilience | 0 data loss on disconnect | **$100\%$ Local** | Complete offline Flask web server + local circular buffer |

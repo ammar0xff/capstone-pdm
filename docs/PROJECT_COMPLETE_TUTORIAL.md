@@ -181,11 +181,13 @@ Rather than drawing arbitrary numbers from random distributions, `ml/dataset_gen
 | 8 | `sound_db` | INMP441 | $120.0 + 20\log_{10}(\text{sound\_rms})$ | Calibrated Sound Pressure Level ($\text{dB SPL}$). |
 | 9 | `sound_zcr` | INMP441 | Sign-change frequency | High-frequency friction squeal vs. low hum. |
 
-### 5.2 Model Training & 5-Fold Cross-Validation (`ml/train_rf.py`)
-Trains a 300-estimator Random Forest classifier (`max_depth=12`, `min_samples_split=4`, `class_weight='balanced'`) using stratified 5-fold cross-validation:
-- **Mean Cross-Validation Accuracy**: $100.00\%$
-- **Mean Inference Latency**: $<1.5\,\text{ms}$ per window on Raspberry Pi ARM Cortex-A72
+### 5.2 Model Training & Group-Disjoint Evaluation (`ml/train_rf.py`)
+Trains a 300-estimator Random Forest classifier (`max_depth=12`, `min_samples_split=4`, `class_weight='balanced'`) with 5-fold `StratifiedGroupKFold` cross-validation by `run_id` and a 70/15/15 whole-run hold-out:
+- **Mean Group Cross-Validation Accuracy**: $100.00\%$ on the physics-simulated benchmark (not real-motor accuracy)
+- **Mean Inference Latency**: $26.109\,\text{ms}$ per window measured on the training host; Raspberry Pi latency not measured
+- **Note**: `z_score` is a Stage-1 SPC gate metric derived from `rms_dyn`, not an independent RF feature
 - **Exports**: `ml/model.joblib`, `ml/model_meta.json`, `ml/confusion_matrix.png`, `ml/roc_curves.png`, and `ml/feature_importance.png`.
+- **Check the evidence**: `.venv/bin/python -m unittest discover -s tests -v` (asserts no run leakage and that metadata matches the code).
 
 ---
 
@@ -282,6 +284,25 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+**On the Raspberry Pi** the systemd units in `edge/*.service` currently run `/usr/bin/python3`
+from `/home/renad/pdm/edge`. Install the same dependencies there before starting the services:
+
+```bash
+# On the Pi, as the user named in the service files (currently renad):
+cd ~/pdm                      # must match WorkingDirectory=.../pdm/edge
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+# If the services must use this venv, update ExecStart= in edge/*.service
+# from /usr/bin/python3 to /home/renad/pdm/.venv/bin/python, then daemon-reload.
+```
+
+Verify the Pi user and deployment path before enabling any unit:
+```bash
+whoami                        # must equal User= in edge/*.service
+ls -d ~/pdm/edge              # must equal WorkingDirectory= in edge/*.service
+```
+
 ### Step 2: Generate Physics Dataset & Train AI Model
 ```bash
 python3 ml/dataset_generator.py
@@ -310,11 +331,16 @@ Place the rig flat on a granite surface ($+Z$ up), press ENTER to sample 100 sta
 4. Verify the database URL matches `https://castpone2026-default-rtdb.firebaseio.com/motor1.json`.
 
 ### Step 5: Start Edge Daemons as Systemd Services
+Confirm `User=`, `WorkingDirectory=` and `ExecStart=` in each unit match the real Pi deployment
+(user `renad`, path `~/pdm/edge` at the time of writing) before copying them:
+
 ```bash
-sudo cp edge/pdm-daq.service /etc/systemd/system/pdm-daq.service
+for s in pdm-daq pdm-cloud pdm-dashboard; do
+  sudo cp "edge/$s.service" "/etc/systemd/system/$s.service"
+done
 sudo systemctl daemon-reload
-sudo systemctl enable --now pdm-daq.service
-sudo systemctl status pdm-daq.service
+sudo systemctl enable --now pdm-daq.service pdm-cloud.service pdm-dashboard.service
+sudo systemctl status pdm-daq.service pdm-cloud.service pdm-dashboard.service
 ```
 
 ### Step 6: Deploy Frontend to Firebase Hosting
