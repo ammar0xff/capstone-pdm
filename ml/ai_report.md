@@ -5,7 +5,7 @@
 - **Target Rig:** Raspberry Pi 4 Model B (4GB RAM)
 - **Model Architecture:** Two-Stage Hierarchical (Coarse Shewhart SPC $\to$ Fine 300-Tree Random Forest)
 - **Dataset:** 1,400 physics-simulated windows (350/class, 28 independent `run_id` sessions) · 5-Fold **StratifiedGroupKFold** (run-disjoint) · 70/15/15 group hold-out
-- **Result:** Test accuracy **100.0% on the synthetic benchmark only** · mean inference latency **26.109 ms measured on the training host** (Raspberry Pi latency not yet measured)
+- **Result:** Test accuracy **100.0% on the synthetic benchmark only** · single-window inference **26.19 ms on the training host** and **29.99 ms on the Raspberry Pi 4** (both measured) · full inject→alert timing not measured
 - **Evidence Files:** `ml/confusion_matrix.png`, `ml/roc_curves.png`, `ml/feature_importance.png`, `ml/model.joblib`, `ml/model_meta.json`, `tests/test_evaluation.py`
 
 > **Honesty note — read this before quoting any number.** The dataset is generated from published physics equations, not measured on a real motor. The 100% figure proves the pipeline separates the simulated classes; it is **not** evidence of 100% accuracy on real hardware. This system performs **fault detection and 4-class fault classification**, with rule-based maintenance advice; it does **not** estimate Remaining Useful Life (predict how many days until failure), which would require run-to-failure time-series measurements. `z_score` appears in the CSV but is intentionally **not** a Random Forest input: it is the Stage-1 SPC gate metric computed from `rms_dyn`, and the gate returns it in `gate_info`.
@@ -89,7 +89,7 @@ In accordance with PRD Section 7, the benchmark dataset comprises **1,400 window
 
 ## 4. Model Architecture & Hyperparameters
 Following Cinar et al. (2022), an ensemble of randomized decision trees was chosen over deep convolutional networks for edge execution because:
-- **Low Compute Overhead**: Small tree ensemble with single-core inference; measured **26.109 ms/window on the training host**, not on the Pi (the sub-millisecond figure previously printed here was not measured and has been removed).
+- **Low Compute Overhead**: Small tree ensemble with single-core inference; measured **26.19 ms/window on the training host** and **29.99 ms/window on the Raspberry Pi 4** (the sub-millisecond figure previously printed here was unverified and has been removed).
 - **Explainability**: Direct Gini impurity importance scores for industrial auditing.
 - **Invariant to Monotonic Scaling**: Robust against uncalibrated sensor drift.
 
@@ -131,12 +131,14 @@ Mechanical Imbalance     1.0000    1.0000    1.0000        50
         weighted avg     1.0000    1.0000    1.0000       200
 ```
 
-### 5.3 Inference Latency (Metric M2) — measured, not assumed
-- **Measured single-window inference time**: **$26.109\,\text{ms}$** on the **training host**, from `ml/train_rf.py` (100 single-core predictions, seed 42).
-- **Pi 4 latency**: **not measured** — the Pi was offline during this revision, so no Pi number is claimed. The earlier "$0.94 ms on Pi 4" and "<1.5 ms" figures were unverified and are withdrawn.
-- **Internal target**: $< 5\,\text{ms}$ per window — **not met on the training host**; the Stage-1 SPC gate itself stays sub-millisecond, but Stage-2 RF inference does not.
-- **PRD Metric M2**: $\le 5.0\,\text{s}$ end-to-end response — the 26 ms inference step is far below this at the pipeline level, but full end-to-end timing on the rig remains to be measured.
-- **Reproduce**: `.venv/bin/python ml/train_rf.py`; the value is written to `ml/model_meta.json` under `inference_latency_ms` with `latency_measured_on`.
+### 5.3 Inference Latency (Metric M2) — measured on both hosts
+- **Training host (x86_64, scikit-learn 1.9.1, NumPy 2.5.5)**: **$26.19\,\text{ms}$** per window.
+- **Raspberry Pi 4 (aarch64, scikit-learn 1.4.2, NumPy 2.2.4)**: **$29.99\,\text{ms}$** per window, measured on the device after deploying this revision's model (`md5 3013ae99529c3d15eb5baa1b77094c27`) and restarting `pdm-daq.service`. See `docs/PI_DEPLOYMENT_EVIDENCE.md`.
+- **Same predictions on both hosts**: the 100-window probability digest is `425751ab47968a0367a17040c115ec57` on each, so loading the scikit-learn 1.9.1 model with 1.4.2 on the Pi did not change outputs (it does emit an `InconsistentVersionWarning`; align versions before final sign-off).
+- **Earlier figures withdrawn**: "$0.94 ms on Pi 4", "<1.5 ms" and "1.8 ms" were never measured and are removed from all deliverables.
+- **Internal target**: $< 5\,\text{ms}$ per window — **not met**; the Stage-1 SPC gate itself stays sub-millisecond, but Stage-2 RF inference does not.
+- **PRD Metric M2**: $\le 5.0\,\text{s}$ **end-to-end** response — the ~30 ms inference step leaves ample margin, but inject→alert timing on the rig has not been measured, so M2 remains **unverified end-to-end**.
+- **Reproduce**: `.venv/bin/python ml/benchmark_latency.py` (or run the same script on the Pi with `--model/--meta/--csv`); `ml/train_rf.py` separately records the host figure in `ml/model_meta.json`.
 
 ---
 
@@ -166,5 +168,5 @@ The following publication-grade charts have been generated in `ml/`:
 ## 8. Limitations and Next Step (read before presenting)
 1. **Synthetic data only.** Every number above comes from physics-based simulation. Do not present 100% as real-motor accuracy.
 2. **No RUL.** The output is a current condition class (`Healthy`, `Mechanical Imbalance`, `Bearing Defect`, `Thermal Runaway`) plus a maintenance action, not a time-to-failure prediction.
-3. **Latency honesty.** 26.109 ms is a training-host measurement; Pi timing has not been captured.
+3. **Latency honesty.** 26.19 ms (host) and 29.99 ms (Pi) are single-window inference benchmarks only; full inject→alert timing and real-motor validation remain outstanding.
 4. **Next step to close the gaps:** record labeled windows from the physical rig (healthy + induced imbalance + faulty bearing + thermal fault), keep the same 28-run group protocol, retrain, and re-run `tests/test_evaluation.py` plus an on-Pi latency benchmark.

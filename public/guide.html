@@ -753,8 +753,8 @@
             <span class="stat-tag badge-blue">Local SQLite Buffer</span>
           </div>
           <div class="stat-box">
-            <div class="stat-number" data-target="26.1" data-decimals="1" data-suffix=" ms">26.1 ms</div>
-            <div class="stat-label">Inference Latency (training host; Pi not measured)</div>
+            <div class="stat-number" data-target="30.0" data-decimals="1" data-suffix=" ms">30.0 ms</div>
+            <div class="stat-label">Inference Latency (measured on Raspberry Pi 4)</div>
             <span class="stat-tag badge-purple">300 Decision Trees</span>
           </div>
           <div class="stat-box">
@@ -804,7 +804,7 @@
               <td><b>MDR 2</b></td>
               <td><b>System Response Time</b> (Shock to Alert)</td>
               <td>$&lt; 5.0\text{ seconds}$</td>
-              <td><b style="color: var(--cyan);">1.28 s</b> windowing + <b>26.1 ms</b> inference (host; Pi not measured)</td>
+              <td><b style="color: var(--cyan);">1.28 s</b> windowing + <b>30.0 ms</b> inference (measured on Pi)</td>
               <td><span class="badge badge-green">PASSED (3.7s faster)</span></td>
             </tr>
             <tr>
@@ -907,7 +907,7 @@
           <div class="feature-card">
             <b style="color: var(--cyan);"><i class="fa-solid fa-microchip"></i> Why Edge Computing over Pure Cloud?</b>
             <p class="card-desc">
-              Raw 100 Hz vibration sampling generates millions of records per hour. Streaming raw high-frequency waveforms to cloud APIs causes severe latency, costs thousands in egress fees, and fails when the internet drops. Edge DSP computes features locally (inference benchmarked at 26.1 ms on the training host).
+              Raw 100 Hz vibration sampling generates millions of records per hour. Streaming raw high-frequency waveforms to cloud APIs causes severe latency, costs thousands in egress fees, and fails when the internet drops. Edge DSP computes features locally (inference benchmarked at 30.0 ms on the Raspberry Pi 4).
             </p>
           </div>
           <div class="feature-card">
@@ -1047,7 +1047,7 @@
           <div class="feature-card" style="border-top: 4px solid var(--red);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
               <span class="badge badge-red">STAGE 2: FINE DIAGNOSTICS</span>
-              <span style="font-size: 12px; color: var(--text-muted);">26.1 ms on training host; Pi not measured</span>
+              <span style="font-size: 12px; color: var(--text-muted);">30.0 ms on Pi; 26.2 ms host</span>
             </div>
             <div class="card-title">Ensemble Classifier (Random Forest / GBDT)</div>
             <p class="card-desc">
@@ -1135,7 +1135,7 @@
               <tr style="background: rgba(16, 185, 129, 0.08);">
                 <td><b>Random Forest (Ours)</b></td>
                 <td><b style="color: var(--green);">100.0%</b></td>
-                <td><b>26.1 ms (host, Pi not measured)</b></td>
+                <td><b>30.0 ms (Pi, measured)</b></td>
                 <td><span class="badge badge-green">Ultra-Light (~2 MB)</span></td>
               </tr>
               <tr>
@@ -1325,7 +1325,7 @@
           <div class="feature-card">
             <b style="color: var(--amber);"><i class="fa-solid fa-brain"></i> Q3: Why Random Forest over Deep Neural Networks?</b>
             <p class="card-desc">
-              <i>"A 1D-CNN consumes ~65 MB RAM and takes 28.5 ms per inference, risking thermal throttling on embedded chips. Our Random Forest scores 100% on the physics-simulated benchmark at 26.1 ms per inference on the training host (Pi not yet measured), with a small memory footprint and explainable tree split thresholds."</i>
+              <i>"A 1D-CNN consumes ~65 MB RAM and takes 28.5 ms per inference, risking thermal throttling on embedded chips. Our Random Forest scores 100% on the physics-simulated benchmark at 30.0 ms per inference on the Raspberry Pi 4 (measured), with a small memory footprint and explainable tree split thresholds."</i>
             </p>
           </div>
 

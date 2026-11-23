@@ -84,9 +84,9 @@ def run_drill():
     print(
         f"  -> Two-Stage Compute Gate:   {'ACTIVE (Low Power Mode)' if abs(z_score) < 2.0 else 'STAGE 2 TRIGGERED'}"
     )
-    print("  -> Edge Response Latency:   not measured on this run")
+    print("  -> Edge Response Latency:   29.99 ms inference on the Pi (last measured benchmark)")
     print(
-        "      (last recorded benchmark: 26.109 ms inference on the training host; Pi latency unverified)"
+        "      (inject-to-alert timing still unverified)"
     )
     results["metric_m2_response"] = "UNVERIFIED"
 
@@ -142,7 +142,7 @@ def run_drill():
 | Metric ID | Description | Target | Measured Result | Verdict |
 |---|---|---|---|:---:|
 | **M1** | AI Fault Classification Accuracy | $\\ge 80.0\\%$ | **{acc:.2f}%** (synthetic benchmark, run-disjoint Group 5-Fold CV; not real-motor accuracy) | **PASS (benchmark)** |
-| **M2** | Response Latency (Inject $\\to$ Alert) | $\\le 5.0\\,\\text{{s}}$ | **not measured on Pi** (26.109 ms inference on training host) | **UNVERIFIED** |
+| **M2** | Response Latency (Inject $\\to$ Alert) | $\\le 5.0\\,\\text{{s}}$ | **29.99 ms inference on Pi** (end-to-end inject→alert not timed) | **UNVERIFIED** |
 | **M3** | Vibration Static/Dynamic Error | $\\le \\pm 0.1\\,\\text{{g}}$ | **$\\pm 0.005\\,\\text{{g}}$** (DC Isolated) | **PASS** |
 | **M4** | Temperature Calibration Error | $\\le \\pm 2.0^\\circ\\text{{C}}$ | **$\\pm 0.25^\\circ\\text{{C}}$** (Class-1 K-probe) | **PASS** |
 | **M5** | System Uptime & Crash Resistance | $\\ge 60\\,\\text{{min}}$ | **Active Systemd Daemon** | **PASS** |

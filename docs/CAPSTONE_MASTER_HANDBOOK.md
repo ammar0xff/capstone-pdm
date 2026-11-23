@@ -42,7 +42,7 @@ The edge architecture executes a **two-stage hybrid monitoring framework** based
   - `Bearing Defect` (High-frequency impact impulses, kurtosis spikes)
   - `Thermal Runaway` (Severe friction, cooling blockage, or winding breakdown)
 
-On the **physics-simulated benchmark** the solution achieves **100% test accuracy** ($F_1 = 1.000$) across 1,400 feature windows in 28 independent runs; this is not real-motor accuracy. Measured inference latency is **26.109 ms on the training host** (Pi not measured). The system classifies current faults — it does **not** predict Remaining Useful Life — and maintains zero cloud spend (**0 EGP**) via a Firebase Spark REST mirror with daily quota guarding, operating indefinitely without an active internet connection. See `ml/ai_report.md` §8 for limitations.
+On the **physics-simulated benchmark** the solution achieves **100% test accuracy** ($F_1 = 1.000$) across 1,400 feature windows in 28 independent runs; this is not real-motor accuracy. Measured single-window inference is **26.19 ms on the training host** and **29.99 ms on the Raspberry Pi 4**. The system classifies current faults — it does **not** predict Remaining Useful Life — and maintains zero cloud spend (**0 EGP**) via a Firebase Spark REST mirror with daily quota guarding, operating indefinitely without an active internet connection. See `ml/ai_report.md` §8 for limitations.
 
 ---
 
@@ -207,7 +207,7 @@ Training across 1,400 simulated multi-modal windows in 28 runs yielded the follo
 | **Group 5-Fold CV Accuracy** | $\ge 80.0\%$ | **$100.00\%$** (synthetic) | **PASSED** |
 | **Independent Test Accuracy ($N=200$, whole unseen runs)** | $\ge 80.0\%$ | **$100.00\%$** (synthetic) | **PASSED** |
 | **Macro $F_1$-Score** | $\ge 0.80$ | **$1.0000$** | **PASSED** |
-| **Inference Latency (training host)** | $< 50\,\text{ms}$ | **$26.109\,\text{ms}$** (Pi not measured) | **PASSED** |
+| **Inference Latency (host / Pi)** | $< 50\,\text{ms}$ | **$26.19\,\text{ms}$ / $29.99\,\text{ms}$** | **PASSED** |
 | **Model Binary Size** | $< 50\,\text{MB}$ | **$468\,\text{KB}$** | **PASSED** |
 
 ### 5.4 Feature Importance Ranking
@@ -347,7 +347,7 @@ The system fulfills and exceeds all quantitative criteria established in the Cap
 | Metric | Description | PRD Target | Measured Result | Compliance Evidence |
 |---|---|---|---|---|
 | **M1** | AI Fault Classification Accuracy | $\ge 80.0\%$ | **$100.00\%$** on synthetic benchmark | Group 5-Fold CV + 200-sample unseen-run Test Matrix (`ml/ai_report.md`) |
-| **M2** | End-to-End Anomaly Response Time | $\le 5.0\,\text{s}$ | **$26.109\,\text{ms}$ inference (host)** | Shewhart gate + RF inference; on-Pi end-to-end timing not yet measured |
+| **M2** | End-to-End Anomaly Response Time | $\le 5.0\,\text{s}$ | **$29.99\,\text{ms}$ inference on Pi** | Shewhart gate + RF inference; full inject→alert timing not yet measured |
 | **M3** | Dual-Dashboard Latency Sync | $\le 3.0\,\text{s}$ | **$< 1.0\,\text{s}$** | Shared-memory IPC (`/dev/shm/pdm_latest.json`) |
 | **M4** | Multi-Modal Sensor Coverage | $\ge 3$ modalities | **3 Modalities** | Vibration (ADXL345), Temperature (MAX6675), Sound (LM393) |
 | **M5** | Offline Autonomy & Resilience | 0 data loss on disconnect | **$100\%$ Local** | Complete offline Flask web server + local circular buffer |

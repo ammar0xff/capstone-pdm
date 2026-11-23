@@ -184,10 +184,11 @@ Rather than drawing arbitrary numbers from random distributions, `ml/dataset_gen
 ### 5.2 Model Training & Group-Disjoint Evaluation (`ml/train_rf.py`)
 Trains a 300-estimator Random Forest classifier (`max_depth=12`, `min_samples_split=4`, `class_weight='balanced'`) with 5-fold `StratifiedGroupKFold` cross-validation by `run_id` and a 70/15/15 whole-run hold-out:
 - **Mean Group Cross-Validation Accuracy**: $100.00\%$ on the physics-simulated benchmark (not real-motor accuracy)
-- **Mean Inference Latency**: $26.109\,\text{ms}$ per window measured on the training host; Raspberry Pi latency not measured
+- **Measured Inference Latency**: $26.19\,\text{ms}$/window on the training host and $29.99\,\text{ms}$/window on the Raspberry Pi 4 (`ml/benchmark_latency.py`, 100 windows); full inject→alert timing still unmeasured
 - **Note**: `z_score` is a Stage-1 SPC gate metric derived from `rms_dyn`, not an independent RF feature
 - **Exports**: `ml/model.joblib`, `ml/model_meta.json`, `ml/confusion_matrix.png`, `ml/roc_curves.png`, and `ml/feature_importance.png`.
 - **Check the evidence**: `.venv/bin/python -m unittest discover -s tests -v` (asserts no run leakage and that metadata matches the code).
+- **Reproduce latency**: `.venv/bin/python ml/benchmark_latency.py`; run the same script on the Pi with `--model/--meta/--csv` to compare (see `docs/PI_DEPLOYMENT_EVIDENCE.md`).
 
 ---
 
