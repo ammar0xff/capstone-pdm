@@ -55,10 +55,21 @@ except ImportError:
     except ImportError:
         PdMClassifier = None
 
+# Used only when the ML module cannot be imported on the edge device.
+FALLBACK_RESPONSE_PLAN = {
+    "class": "Normal Operation",
+    "priority": "ROUTINE",
+    "action": "Continue unattended monitoring; no maintenance stop required.",
+    "timeframe": "Next scheduled inspection",
+    "owner": "Operations operator",
+    "rationale": "ML module unavailable; edge gate is still monitoring vibration and thermal limits.",
+}
+
+
 def load_cal():
     if os.path.exists(CAL_FILE):
         try:
-            with open(CAL_FILE, 'r') as f:
+            with open(CAL_FILE, "r") as f:
                 return json.load(f)
         except Exception:
             pass
@@ -68,7 +79,7 @@ def load_cal():
         "g_bias_x": 0.0,
         "g_bias_y": 0.0,
         "g_bias_z": 0.0,
-        "g_scale": 0.0039
+        "g_scale": 0.0039,
     }
 
 
@@ -77,6 +88,7 @@ class ADXL345Driver:
     ADXL345 3-Axis Digital Accelerometer on I2C bus 1 (address 0x53).
     Configured for ±4g range, 400Hz output data rate.
     """
+
     def __init__(self, bus_num=1, address=0x53):
         self.bus_num = bus_num
         self.address = address
@@ -124,6 +136,7 @@ class MAX6675Driver:
     MAX6675 Cold-Junction Compensated K-Thermocouple-to-Digital Converter on SPI0.0.
     12-bit resolution, 0.25°C/LSB, Open thermocouple fault detection.
     """
+
     def __init__(self, bus=0, device=0):
         self.bus_num = bus
         self.dev_num = device
@@ -169,6 +182,7 @@ class AcousticWorker(threading.Thread):
     Samples 32-bit I2S audio at 48kHz in background without blocking DAQ loop.
     Computes RMS, Peak, Crest Factor, dB SPL, and Zero Crossing Rate (ZCR).
     """
+
     def __init__(self, device="plughw:1,0", rate=48000, chunk_samples=2400):
         super().__init__(daemon=True)
         self.device = device
@@ -183,7 +197,7 @@ class AcousticWorker(threading.Thread):
             "zcr": 0.082,
             "crest_factor": 2.80,
             "status": "Initializing",
-            "active": False
+            "active": False,
         }
 
     def run(self):
@@ -191,8 +205,23 @@ class AcousticWorker(threading.Thread):
         while self.running:
             proc = None
             try:
-                cmd = ["arecord", "-D", self.device, "-c", "2", "-r", str(self.rate), "-f", "S32_LE", "-t", "raw", "-q"]
-                proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+                cmd = [
+                    "arecord",
+                    "-D",
+                    self.device,
+                    "-c",
+                    "2",
+                    "-r",
+                    str(self.rate),
+                    "-f",
+                    "S32_LE",
+                    "-t",
+                    "raw",
+                    "-q",
+                ]
+                proc = subprocess.Popen(
+                    cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL
+                )
                 while self.running:
                     raw_bytes = proc.stdout.read(bytes_to_read)
                     if not raw_bytes or len(raw_bytes) < bytes_to_read:
@@ -208,7 +237,9 @@ class AcousticWorker(threading.Thread):
                     rms = float(np.sqrt(np.mean(norm**2)))
                     cf = float(peak / (rms + 1e-9))
                     # Calibrated dB SPL (INMP441 sensitivity -26 dBFS at 94 dB SPL)
-                    db_spl = float(max(30.0, min(120.0, 120.0 + 20.0 * math.log10(rms + 1e-9))))
+                    db_spl = float(
+                        max(30.0, min(120.0, 120.0 + 20.0 * math.log10(rms + 1e-9)))
+                    )
                     # Zero-crossing rate
                     signs = np.signbit(left)
                     zcr = float(np.mean(np.abs(np.diff(signs))))
@@ -221,7 +252,7 @@ class AcousticWorker(threading.Thread):
                             "zcr": round(zcr, 4),
                             "crest_factor": round(cf, 2),
                             "status": "Hardware I2S Stream (INMP441)",
-                            "active": True
+                            "active": True,
                         }
             except Exception as e:
                 with self.lock:
@@ -247,7 +278,8 @@ class StatusLED:
         self.active = False
         try:
             import gpiod
-            chip = gpiod.Chip('gpiochip0')
+
+            chip = gpiod.Chip("gpiochip0")
             self.line = chip.get_line(self.pin)
             self.line.request(consumer="pdm-led", type=gpiod.LINE_REQ_DIR_OUT)
             self.active = True
@@ -295,7 +327,7 @@ def main():
     baseline_mu = 0.080
     baseline_sigma = 0.025
     ucl_warning = baseline_mu + 2 * baseline_sigma  # ~0.130 g
-    ucl_fault = baseline_mu + 3 * baseline_sigma    # ~0.155 g
+    ucl_fault = baseline_mu + 3 * baseline_sigma  # ~0.155 g
 
     # Sliding buffers
     raw_window = collections.deque(maxlen=256)
@@ -317,13 +349,26 @@ def main():
 
     # Ensure CSV header
     if not os.path.exists(HISTORY_FILE):
-        with open(HISTORY_FILE, 'w', newline='') as f:
+        with open(HISTORY_FILE, "w", newline="") as f:
             writer = csv.writer(f)
-            writer.writerow([
-                "timestamp", "seq", "g_mag", "rms_dyn", "kurtosis",
-                "crest_factor", "peak_dyn", "temp_c", "temp_slope",
-                "sound_db", "sound_zcr", "state", "fault_label", "fault_proba"
-            ])
+            writer.writerow(
+                [
+                    "timestamp",
+                    "seq",
+                    "g_mag",
+                    "rms_dyn",
+                    "kurtosis",
+                    "crest_factor",
+                    "peak_dyn",
+                    "temp_c",
+                    "temp_slope",
+                    "sound_db",
+                    "sound_zcr",
+                    "state",
+                    "fault_label",
+                    "fault_proba",
+                ]
+            )
 
     print("[INFO] High-Speed Sensor Ingestion active. Sampling 200-400Hz...")
 
@@ -370,13 +415,21 @@ def main():
 
             # Static DC Gravity Vector (mean over sliding window)
             dc_gravity = np.mean(arr, axis=0)
-            dc_x, dc_y, dc_z = float(dc_gravity[0]), float(dc_gravity[1]), float(dc_gravity[2])
+            dc_x, dc_y, dc_z = (
+                float(dc_gravity[0]),
+                float(dc_gravity[1]),
+                float(dc_gravity[2]),
+            )
             dc_mag = float(np.linalg.norm(dc_gravity))
 
             # Dynamic Vibration Vector (Removing DC Gravity component)
             dyn = arr - dc_gravity
             dyn_mag = np.linalg.norm(dyn, axis=1)
-            dyn_ax, dyn_ay, dyn_az = float(dyn[-1][0]), float(dyn[-1][1]), float(dyn[-1][2])
+            dyn_ax, dyn_ay, dyn_az = (
+                float(dyn[-1][0]),
+                float(dyn[-1][1]),
+                float(dyn[-1][2]),
+            )
             dyn_inst_mag = float(np.linalg.norm(dyn[-1]))
 
             # Dynamic Vibration RMS & Peak
@@ -390,7 +443,7 @@ def main():
             var = float(np.var(dyn_mag))
             std_dyn = float(np.sqrt(var))
             if var > 1e-9:
-                m4 = float(np.mean((dyn_mag - dyn_mean)**4))
+                m4 = float(np.mean((dyn_mag - dyn_mean) ** 4))
                 kurtosis = float(m4 / (var**2))
             else:
                 m4 = 0.0
@@ -431,8 +484,16 @@ def main():
             is_thermal_fault = (last_temp_c > 70.0) or (temp_slope > 10.0)
             is_thermal_warn = (last_temp_c > 50.0) or (temp_slope > 5.0)
 
-            is_vib_fault = (rms_dyn > ucl_fault) or (kurtosis > 7.0 and rms_dyn > 0.03) or (peak_dyn > 0.40)
-            is_vib_warn = (rms_dyn > ucl_warning) or (kurtosis > 5.0 and rms_dyn > 0.03) or (peak_dyn > 0.25)
+            is_vib_fault = (
+                (rms_dyn > ucl_fault)
+                or (kurtosis > 7.0 and rms_dyn > 0.03)
+                or (peak_dyn > 0.40)
+            )
+            is_vib_warn = (
+                (rms_dyn > ucl_warning)
+                or (kurtosis > 5.0 and rms_dyn > 0.03)
+                or (peak_dyn > 0.25)
+            )
             is_sound_fault = (sound_db > 88.0) or (sound_zcr > 0.28)
 
             feature_dict = {
@@ -444,14 +505,27 @@ def main():
                 "temp_slope": round(temp_slope, 2),
                 "sound_rms": round(sound_rms, 4),
                 "sound_db": round(sound_db, 1),
-                "sound_zcr": round(sound_zcr, 4)
+                "sound_zcr": round(sound_zcr, 4),
             }
 
             # Run Stage 2 Fine ML Inference (Random Forest)
             if classifier:
-                ml_cid, ml_label, ml_proba, ml_advice = classifier.predict(feature_dict)
+                (
+                    ml_cid,
+                    ml_label,
+                    ml_proba,
+                    ml_advice,
+                    gate_info,
+                ) = classifier.predict(feature_dict, return_gate_info=True)
+                response_plan = gate_info["response_plan"]
             else:
-                ml_cid, ml_label, ml_proba, ml_advice = 0, "Normal Operation", 0.98, "Nominal."
+                ml_cid, ml_label, ml_proba, ml_advice = (
+                    0,
+                    "Normal Operation",
+                    0.98,
+                    "Nominal.",
+                )
+                response_plan = dict(FALLBACK_RESPONSE_PLAN)
 
             if is_vib_fault or is_thermal_fault or is_sound_fault:
                 state = "Fault"
@@ -461,7 +535,9 @@ def main():
                     fault_proba = ml_proba
                     advice = ml_advice
                 elif is_vib_fault and is_thermal_fault:
-                    fault_label = "Severe Compound Fault (Thermal Runaway + Bearing Shock)"
+                    fault_label = (
+                        "Severe Compound Fault (Thermal Runaway + Bearing Shock)"
+                    )
                     fault_proba = 0.98
                     advice = "CRITICAL: Imminent bearing seizure. Halt motor immediately; inspect raceways and thermal dissipation."
                 elif is_thermal_fault:
@@ -489,7 +565,11 @@ def main():
                     advice = ml_advice
                 else:
                     fault_proba = 0.65
-                    fault_label = "Thermal Trend Warning" if is_thermal_warn else "Incipient Vibration Warning (2-Sigma Breach)"
+                    fault_label = (
+                        "Thermal Trend Warning"
+                        if is_thermal_warn
+                        else "Incipient Vibration Warning (2-Sigma Breach)"
+                    )
                     advice = "Vibration amplitude exceeded 2-sigma Shewhart threshold. Schedule preventive inspection."
             else:
                 state = "Healthy"
@@ -511,18 +591,19 @@ def main():
                 "fault_proba": round(fault_proba, 2),
                 "advice": advice,
                 "online": True,
-
                 # Stage 2 Machine Learning Diagnostic Evidence
                 "ai": {
                     "model_name": "Random Forest (300 Trees)",
                     "architecture": "Two-Stage Coarse SPC -> Fine ML",
-                    "gate_status": "Stage 2 Triggered (Anomaly Detected)" if state != "Healthy" else "Stage 1 Gated (Shewhart Normal)",
+                    "gate_status": "Stage 2 Triggered (Anomaly Detected)"
+                    if state != "Healthy"
+                    else "Stage 1 Gated (Shewhart Normal)",
                     "predicted_class_id": ml_cid,
                     "predicted_class": ml_label,
                     "confidence": fault_proba,
-                    "features_input": feature_dict
+                    "response_plan": response_plan,
+                    "features_input": feature_dict,
                 },
-
                 # Detailed Mathematical Equation Cards (Formulas, Live Values, and Rationale)
                 "equations": {
                     "vibration_rms": {
@@ -534,7 +615,7 @@ def main():
                         "sum_sq": round(sum_sq, 6),
                         "val": round(rms_dyn, 4),
                         "live_calc": f"sqrt({sum_sq:.6f} / {N}) = {rms_dyn:.4f} g",
-                        "reason": "Quantifies total continuous mechanical kinetic energy and destructive stress under ISO 20816. Elevates during severe unbalance, misalignment, and structural looseness."
+                        "reason": "Quantifies total continuous mechanical kinetic energy and destructive stress under ISO 20816. Elevates during severe unbalance, misalignment, and structural looseness.",
                     },
                     "kurtosis": {
                         "name": "Vibration Kurtosis (4th Moment)",
@@ -546,7 +627,7 @@ def main():
                         "sigma": round(std_dyn, 4),
                         "val": round(kurtosis, 2),
                         "live_calc": f"{m4:.8f} / ({var:.6f})^2 = {kurtosis:.2f}",
-                        "reason": "Measures distribution peakedness and tailedness. Healthy Gaussian noise yields ~3.0. Microscopic bearing raceway spalls produce transient impact shocks that spike kurtosis to 6-15 long before RMS rises."
+                        "reason": "Measures distribution peakedness and tailedness. Healthy Gaussian noise yields ~3.0. Microscopic bearing raceway spalls produce transient impact shocks that spike kurtosis to 6-15 long before RMS rises.",
                     },
                     "crest_factor": {
                         "name": "Crest Factor (Impact Ratio)",
@@ -557,7 +638,7 @@ def main():
                         "rms": round(rms_dyn, 4),
                         "val": round(crest_factor, 2),
                         "live_calc": f"{peak_dyn:.4f} g / {rms_dyn:.4f} g = {crest_factor:.2f}",
-                        "reason": "Ratio of peak shock to continuous vibration energy. Detects early spalling (Stage 2 fault, CF > 4.5). In late-stage failure, the noise floor rises and CF collapses back down."
+                        "reason": "Ratio of peak shock to continuous vibration energy. Detects early spalling (Stage 2 fault, CF > 4.5). In late-stage failure, the noise floor rises and CF collapses back down.",
                     },
                     "shewhart_z": {
                         "name": "Shewhart Statistical Z-Score",
@@ -569,7 +650,7 @@ def main():
                         "sigma_0": baseline_sigma,
                         "val": round(z_score, 2),
                         "live_calc": f"({rms_dyn:.4f} - {baseline_mu:.3f}) / {baseline_sigma:.3f} = {z_score:.2f} σ",
-                        "reason": "Statistical process control gatekeeper. Instead of wasting CPU continuously running heavy AI models, Stage 1 gates Stage 2: complex diagnostics awaken only when Z breaches 2.0 (95.4% confidence)."
+                        "reason": "Statistical process control gatekeeper. Instead of wasting CPU continuously running heavy AI models, Stage 1 gates Stage 2: complex diagnostics awaken only when Z breaches 2.0 (95.4% confidence).",
                     },
                     "temp_adc": {
                         "name": "MAX6675 12-Bit Cold-Junction ADC",
@@ -582,7 +663,7 @@ def main():
                         "open_tc": open_tc_flag,
                         "val": round(last_raw_temp, 2),
                         "live_calc": f"{((raw_tc_word >> 3) & 0x0FFF)} counts * 0.25°C = {last_raw_temp:.2f} °C",
-                        "reason": "Converts Seebeck thermoelectric microvoltage into temperature with cold-junction compensation. Bit 2 actively monitors for broken or loose thermocouple wires."
+                        "reason": "Converts Seebeck thermoelectric microvoltage into temperature with cold-junction compensation. Bit 2 actively monitors for broken or loose thermocouple wires.",
                     },
                     "temp_cal": {
                         "name": "Linear Thermal Calibration",
@@ -594,7 +675,7 @@ def main():
                         "raw": round(last_raw_temp, 2),
                         "val": round(last_temp_c, 2),
                         "live_calc": f"{cal.get('t_a', 1.0):.3f} * {last_raw_temp:.2f} + {cal.get('t_b', 0.0):.2f} = {last_temp_c:.2f} °C",
-                        "reason": "Corrects for lead resistance and thermal contact impedance between the thermocouple junction and the motor bearing casing."
+                        "reason": "Corrects for lead resistance and thermal contact impedance between the thermocouple junction and the motor bearing casing.",
                     },
                     "temp_gradient": {
                         "name": "Thermal Derivative (Rate of Change)",
@@ -605,7 +686,7 @@ def main():
                         "delta_time_s": round(dt_temp, 1),
                         "val": round(temp_slope, 2),
                         "live_calc": f"{delta_t:.2f} °C / ({dt_temp:.1f} s / 60) = {temp_slope:.2f} °C/min",
-                        "reason": "Predictive runaway alert. Waiting for an absolute threshold (70°C) is often too late. A steep gradient (>5-10°C/min) detects bearing lubrication starvation and rotor binding 15-30 minutes in advance."
+                        "reason": "Predictive runaway alert. Waiting for an absolute threshold (70°C) is often too late. A steep gradient (>5-10°C/min) detects bearing lubrication starvation and rotor binding 15-30 minutes in advance.",
                     },
                     "acoustic_zcr": {
                         "name": "Acoustic Zero Crossing Rate",
@@ -614,7 +695,7 @@ def main():
                         "unit": "crossings/sample",
                         "val": sound_zcr,
                         "live_calc": f"ZCR = {sound_zcr:.4f} crossings/sample",
-                        "reason": "Efficient time-domain proxy for dominant frequency content. Healthy motor hum has low ZCR; metal-on-metal rubbing and dry bearing squeals generate high-frequency acoustics, spiking ZCR."
+                        "reason": "Efficient time-domain proxy for dominant frequency content. Healthy motor hum has low ZCR; metal-on-metal rubbing and dry bearing squeals generate high-frequency acoustics, spiking ZCR.",
                     },
                     "acoustic_spl": {
                         "name": "Sound Pressure Level (SPL)",
@@ -624,24 +705,26 @@ def main():
                         "rms_norm": sound_rms,
                         "val": sound_db,
                         "live_calc": f"120.0 + 20 * log10({sound_rms:.4f}) = {sound_db:.1f} dB",
-                        "reason": "Calibrated industrial acoustic emission level (INMP441 sensitivity -26 dBFS at 94 dB SPL) measuring airborne sound power radiated by the machinery."
-                    }
+                        "reason": "Calibrated industrial acoustic emission level (INMP441 sensitivity -26 dBFS at 94 dB SPL) measuring airborne sound power radiated by the machinery.",
+                    },
                 },
-
                 # Raw Sensor Registers & Values
                 "raw_sensors": {
                     "adxl_x_lsb": curr_raw_x,
                     "adxl_y_lsb": curr_raw_y,
                     "adxl_z_lsb": curr_raw_z,
                     "adxl_scale": cal.get("g_scale", 0.0039),
-                    "adxl_bias": [cal.get("g_bias_x", 0.0), cal.get("g_bias_y", 0.0), cal.get("g_bias_z", 0.0)],
+                    "adxl_bias": [
+                        cal.get("g_bias_x", 0.0),
+                        cal.get("g_bias_y", 0.0),
+                        cal.get("g_bias_z", 0.0),
+                    ],
                     "max6675_word_hex": f"0x{raw_tc_word:04X}",
                     "max6675_bits": formatted_bin,
                     "open_tc": open_tc_flag,
                     "inmp441_device": "plughw:1,0 (I2S)",
-                    "inmp441_peak": sound_peak
+                    "inmp441_peak": sound_peak,
                 },
-
                 # Processed Vibration Modality
                 "vibration": {
                     "rms_dyn": round(rms_dyn, 4),
@@ -660,17 +743,15 @@ def main():
                     "ay_dyn": round(dyn_ay, 4),
                     "az_dyn": round(dyn_az, 4),
                     "fs_hz": fs,
-                    "window_samples": N
+                    "window_samples": N,
                 },
-
                 # Processed Thermal Modality
                 "temperature": {
                     "temp_c": round(last_temp_c, 2),
                     "raw_temp_c": round(last_raw_temp, 2),
                     "slope_c_per_min": round(temp_slope, 2),
-                    "open_tc": open_tc_flag
+                    "open_tc": open_tc_flag,
                 },
-
                 # Processed Acoustic Modality
                 "acoustic": {
                     "rms": sound_rms,
@@ -678,30 +759,28 @@ def main():
                     "db_spl": sound_db,
                     "zcr": sound_zcr,
                     "crest_factor": sound_cf,
-                    "status": sound_status
+                    "status": sound_status,
                 },
-
                 # Statistical Process Control
                 "spc": {
                     "baseline_mu": baseline_mu,
                     "baseline_sigma": baseline_sigma,
                     "z_score": round(z_score, 2),
                     "ucl_warning": round(ucl_warning, 3),
-                    "ucl_fault": round(ucl_fault, 3)
+                    "ucl_fault": round(ucl_fault, 3),
                 },
-
                 # Hardware Bus Health
                 "system": {
                     "adxl_ok": adxl.connected,
                     "max6675_ok": tc.connected and (open_tc_flag == 0),
                     "acoustic_ok": ac_data.get("active", False),
-                    "storage_ok": True
-                }
+                    "storage_ok": True,
+                },
             }
 
             # 6. Save latest state atomically
             try:
-                with open(TMP_STATE_FILE, 'w') as f:
+                with open(TMP_STATE_FILE, "w") as f:
                     json.dump(packet, f, indent=2)
                 os.replace(TMP_STATE_FILE, STATE_FILE)
             except Exception as e:
@@ -711,21 +790,26 @@ def main():
             if now_wall - last_csv_log >= 1.0:
                 last_csv_log = now_wall
                 try:
-                    with open(HISTORY_FILE, 'a', newline='') as f:
+                    with open(HISTORY_FILE, "a", newline="") as f:
                         writer = csv.writer(f)
-                        writer.writerow([
-                            packet["timestamp"], seq,
-                            packet["vibration"]["g_total"],
-                            packet["vibration"]["rms_dyn"],
-                            packet["vibration"]["kurtosis"],
-                            packet["vibration"]["crest_factor"],
-                            packet["vibration"]["peak_dyn"],
-                            packet["temperature"]["temp_c"],
-                            packet["temperature"]["slope_c_per_min"],
-                            packet["acoustic"]["db_spl"],
-                            packet["acoustic"]["zcr"],
-                            state, fault_label, fault_proba
-                        ])
+                        writer.writerow(
+                            [
+                                packet["timestamp"],
+                                seq,
+                                packet["vibration"]["g_total"],
+                                packet["vibration"]["rms_dyn"],
+                                packet["vibration"]["kurtosis"],
+                                packet["vibration"]["crest_factor"],
+                                packet["vibration"]["peak_dyn"],
+                                packet["temperature"]["temp_c"],
+                                packet["temperature"]["slope_c_per_min"],
+                                packet["acoustic"]["db_spl"],
+                                packet["acoustic"]["zcr"],
+                                state,
+                                fault_label,
+                                fault_proba,
+                            ]
+                        )
                 except Exception:
                     pass
 

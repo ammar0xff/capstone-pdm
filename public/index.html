@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Industrial Predictive Maintenance SCADA | Motor-01 Cloud Mirror</title>
+  <meta name="description" content="Live vibration, thermal and acoustic telemetry from a Raspberry Pi industrial motor monitor, with two-stage SPC and Random Forest fault classification.">
   
   <!-- Font & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,7 +26,7 @@
       
       --text-main: #f8fafc;
       --text-secondary: #94a3b8;
-      --text-muted: #64748b;
+      --text-muted: #7f90a7;
       
       --status-ok: #10b981;
       --status-ok-bg: rgba(16, 185, 129, 0.1);
@@ -150,14 +151,8 @@
 
     .status-indicator-pill.offline {
       background: var(--status-alarm-bg);
-      color: var(--status-alarm);
+      color: #fca5a5;
       border-color: var(--status-alarm-border);
-    }
-
-    .status-indicator-pill.sim {
-      background: rgba(139, 92, 246, 0.12);
-      color: #a78bfa;
-      border-color: rgba(139, 92, 246, 0.35);
     }
 
     .status-dot {
@@ -225,12 +220,6 @@
       color: #fde68a;
     }
 
-    .edge-alert-ribbon.sim {
-      background: rgba(139, 92, 246, 0.1);
-      border-color: rgba(139, 92, 246, 0.3);
-      color: #ddd6fe;
-    }
-
     .ribbon-info {
       display: flex;
       align-items: center;
@@ -241,24 +230,6 @@
       display: flex;
       align-items: center;
       gap: 6px;
-    }
-
-    .sim-tag-btn {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-strong);
-      color: var(--text-secondary);
-      font-size: 11px;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 3px;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .sim-tag-btn:hover, .sim-tag-btn.active {
-      background: #7c3aed;
-      border-color: #8b5cf6;
-      color: #ffffff;
     }
 
     /* Main Grid Structure */
@@ -345,6 +316,61 @@
     .protocol-advice-box i {
       color: var(--accent-blue);
       margin-top: 2px;
+    }
+
+    .decision-meta {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
+      align-items: center;
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .decision-field {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .decision-field small {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .decision-chip {
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      padding: 3px 8px;
+      border-radius: 3px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-strong);
+      color: var(--text-secondary);
+    }
+
+    .decision-chip.schedule {
+      color: #38bdf8;
+      border-color: rgba(56, 189, 248, 0.4);
+      background: rgba(56, 189, 248, 0.1);
+    }
+
+    .decision-chip.urgent {
+      color: var(--status-warn);
+      border-color: var(--status-warn-border);
+      background: var(--status-warn-bg);
+    }
+
+    .decision-chip.critical {
+      color: var(--status-alarm);
+      border-color: var(--status-alarm-border);
+      background: var(--status-alarm-bg);
     }
 
     .telemetry-kpis {
@@ -536,6 +562,23 @@
       padding: 6px 8px;
     }
 
+    .chart-panel-box.no-data canvas {
+      opacity: 0.25;
+    }
+
+    .chart-panel-box.no-data::after {
+      content: attr(data-empty-label);
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
     /* Two-Stage Architecture Section */
     .two-stage-banner {
       background: var(--bg-surface);
@@ -699,11 +742,40 @@
 
     .scada-footer a {
       color: var(--accent-blue);
-      text-decoration: none;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 2px 4px;
     }
 
     .scada-footer a:hover {
-      text-decoration: underline;
+      color: #93c5fd;
+    }
+
+    .scada-footer a:focus-visible {
+      outline: 2px solid var(--accent-blue);
+      outline-offset: 2px;
+    }
+
+    .chart-panel-box.no-data {
+      height: 96px;
+    }
+
+    @media (max-width: 480px) {
+      .system-title-group h1 { font-size: 12px; line-height: 1.2; letter-spacing: 0.02em; }
+      .system-title-group h1 span { white-space: nowrap; }
+      .telemetry-meta {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+        gap: 8px;
+      }
+      .telemetry-meta > .status-indicator-pill { grid-column: 1 / -1; justify-self: start; }
+      .telemetry-meta > div:last-child { justify-content: space-between; }
+      .decision-meta { grid-template-columns: 1fr; gap: 8px; }
+      .decision-chip { justify-self: start; }
     }
   </style>
 </head>
@@ -738,10 +810,6 @@
       </div>
 
       <div class="header-actions">
-        <button class="btn-control" id="btn-sim" onclick="toggleSimulator()" title="Toggle Physics Sensor Simulation">
-          <i class="fa-solid fa-microscope" style="color: #a78bfa;"></i>
-          <span>Physics Simulator</span>
-        </button>
         <a href="guide.html" class="btn-control" title="STEM Exhibition Presentation Deck">
           <i class="fa-solid fa-chalkboard-user"></i>
           <span>Exhibition Deck</span>
@@ -766,11 +834,6 @@
           <span id="banner-desc" style="opacity: 0.9; margin-left: 6px;">No recent telemetry received from edge DAQ. Cached cloud mirror displayed.</span>
         </div>
       </div>
-      <div class="ribbon-actions" id="banner-actions">
-        <button class="btn-control" onclick="toggleSimulator()" style="background: rgba(139, 92, 246, 0.25); color: #fff; border-color: #8b5cf6;">
-          <i class="fa-solid fa-play"></i> Run Physics Simulator
-        </button>
-      </div>
     </div>
 
     <!-- Main Dashboard Layout -->
@@ -793,6 +856,11 @@
           <div>
             <b style="color: var(--text-main); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em;">Operational Protocol:</b>
             <span id="txt-advice" style="margin-left: 4px;">Continuous statistical baseline monitoring active. No operator intervention required.</span>
+            <div class="decision-meta" aria-label="Operator decision from the classified fault">
+              <span class="decision-chip" id="txt-decision-priority">ROUTINE</span>
+              <span class="decision-field"><small>Timeframe</small><span class="font-mono" id="txt-decision-timeframe">Next scheduled inspection</span></span>
+              <span class="decision-field"><small>Owner</small><span id="txt-decision-owner">Operations operator</span></span>
+            </div>
           </div>
         </div>
 
@@ -861,7 +929,7 @@
             </div>
           </div>
 
-          <div class="chart-panel-box">
+          <div class="chart-panel-box no-data" data-empty-label="NO TELEMETRY">
             <canvas id="chart-vib"></canvas>
           </div>
         </article>
@@ -914,7 +982,7 @@
             </div>
           </div>
 
-          <div class="chart-panel-box">
+          <div class="chart-panel-box no-data" data-empty-label="NO TELEMETRY">
             <canvas id="chart-temp"></canvas>
           </div>
         </article>
@@ -968,7 +1036,7 @@
             </div>
           </div>
 
-          <div class="chart-panel-box">
+          <div class="chart-panel-box no-data" data-empty-label="NO TELEMETRY">
             <canvas id="chart-sound"></canvas>
           </div>
         </article>
@@ -1093,13 +1161,7 @@
     let isMuted = false;
     let audioCtx = null;
     let lastAlertTime = 0;
-    let simulationMode = false;
-    let simInterval = null;
-    let simScenario = 'healthy';
     let lastProcessedSeq = null;
-    let simStep = 0;
-    let broadcastToCloud = false;
-    let lastBroadcastTime = 0;
 
     // Charts references
     let chartVib, chartTemp, chartSound;
@@ -1217,8 +1279,14 @@
       const sound_db = data.sound_db !== undefined ? data.sound_db : (data.acoustic?.db_spl || 65.0);
       const zcr = data.zcr !== undefined ? data.zcr : (data.acoustic?.zcr || 0.01);
       const advice = data.advice || "Machine operating within nominal limits.";
+      const responsePlan = data.ai?.response_plan || null;
       const seq = data.seq || 0;
       const uptime = data.uptime_s || 0;
+
+      const nowSec = Date.now() / 1000;
+      const dataTs = typeof data.ts === 'number' ? data.ts : (parseFloat(data.ts) || 0);
+      const ageSec = dataTs > 0 ? Math.max(0, nowSec - dataTs) : 999999;
+      const isStaleTelemetry = ageSec > 20;
 
       // Update Top Status Lamp
       const card = document.getElementById('main-status-card');
@@ -1228,22 +1296,25 @@
 
       card.className = "scada-hero-panel";
 
+      const stalePrefix = isStaleTelemetry ? "Last known: " : "";
       if (state === "Healthy") {
         icon.className = "fa-solid fa-check";
-        title.innerText = fault;
-        sub.innerText = "Nominal baseline operation within ISO 10816 limits";
+        title.innerText = `${stalePrefix}${fault}`;
+        sub.innerText = isStaleTelemetry
+          ? "Historical packet only - verify live Pi telemetry before acting"
+          : "Nominal baseline operation within ISO 10816 limits";
       } else if (state === "Warning") {
         card.classList.add("warning");
         icon.className = "fa-solid fa-triangle-exclamation";
-        title.innerText = `Warning: ${fault}`;
+        title.innerText = `${stalePrefix}Warning: ${fault}`;
         sub.innerText = "Incipient mechanical or thermal anomaly detected (Stage 1 threshold breach)";
-        if (Date.now() - lastAlertTime > 5000) { playBeep(660, 0.3); lastAlertTime = Date.now(); }
+        if (!isStaleTelemetry && Date.now() - lastAlertTime > 5000) { playBeep(660, 0.3); lastAlertTime = Date.now(); }
       } else {
         card.classList.add("fault");
         icon.className = "fa-solid fa-triangle-exclamation";
-        title.innerText = `CRITICAL FAULT: ${fault}`;
+        title.innerText = `${stalePrefix}CRITICAL FAULT: ${fault}`;
         sub.innerText = "Immediate machine maintenance protocol required - trip risk active";
-        if (Date.now() - lastAlertTime > 2000) { playBeep(980, 0.4); lastAlertTime = Date.now(); }
+        if (!isStaleTelemetry && Date.now() - lastAlertTime > 2000) { playBeep(980, 0.4); lastAlertTime = Date.now(); }
       }
 
       // Badges
@@ -1255,6 +1326,24 @@
       document.getElementById('badge-seq').innerText = "#" + seq;
       document.getElementById('badge-uptime').innerText = (uptime >= 60 ? (uptime/60).toFixed(1) + "m" : uptime.toFixed(0) + "s");
       document.getElementById('txt-advice').innerText = advice;
+
+      // Post-classification operator decision from the edge AI packet
+      const priorityEl = document.getElementById('txt-decision-priority');
+      const timeframeEl = document.getElementById('txt-decision-timeframe');
+      const ownerEl = document.getElementById('txt-decision-owner');
+      const allowedPriorities = ["ROUTINE", "SCHEDULE", "URGENT", "CRITICAL"];
+      if (responsePlan && allowedPriorities.includes(responsePlan.priority)) {
+        const priority = responsePlan.priority;
+        priorityEl.innerText = priority;
+        priorityEl.className = `decision-chip ${priority.toLowerCase()}`;
+        timeframeEl.innerText = responsePlan.timeframe || "Timeframe not supplied";
+        ownerEl.innerText = responsePlan.owner || "not assigned";
+      } else {
+        priorityEl.innerText = "NO DECISION PACKET";
+        priorityEl.className = "decision-chip";
+        timeframeEl.innerText = "Awaiting classified telemetry";
+        ownerEl.innerText = "--";
+      }
 
       // Stage Gating Status
       const isStage2 = (state !== "Healthy") || (data.ai?.gate_status?.includes("Stage 2"));
@@ -1351,12 +1440,13 @@
         `SPL = <b>${sound_db.toFixed(1)} dB</b> | ZCR = <b>${zcr.toFixed(4)}</b> (${zcr > 0.20 ? 'High Friction' : 'Nominal Hum'})`;
 
       // Check sequence & freshness to prevent false continuous chart scrolling when Pi is offline
-      const nowSec = Date.now() / 1000;
-      const dataTs = typeof data.ts === 'number' ? data.ts : (parseFloat(data.ts) || 0);
-      const ageSec = dataTs > 0 ? Math.max(0, nowSec - dataTs) : 999999;
-      
       const isFreshHardwareData = (lastProcessedSeq !== seq && ageSec < 60);
-      const shouldPushChart = simulationMode || isFreshHardwareData;
+      const shouldPushChart = isFreshHardwareData;
+
+      document.querySelectorAll('.chart-panel-box').forEach(box => {
+        box.dataset.emptyLabel = lastProcessedSeq === null ? "NO TELEMETRY" : "BUFFER FROZEN";
+        box.classList.toggle('no-data', !isFreshHardwareData);
+      });
 
       if (shouldPushChart) {
         lastProcessedSeq = seq;
@@ -1401,28 +1491,6 @@
       const bannerTitle = document.getElementById('banner-title');
       const bannerDesc = document.getElementById('banner-desc');
       const bannerIcon = document.getElementById('banner-icon');
-      const bannerActions = document.getElementById('banner-actions');
-
-      if (simulationMode) {
-        indicator.className = "status-indicator-pill sim";
-        txtStatus.innerText = "SIMULATOR ACTIVE";
-        banner.style.display = "flex";
-        banner.className = "edge-alert-ribbon sim";
-        bannerIcon.className = "fa-solid fa-microscope";
-        bannerTitle.innerText = "Physics Simulation Mode Active";
-        bannerDesc.innerText = "Synthesizing rotordynamic and kinematic bearing fault harmonics (Randall & Antoni 2011 / ISO 10816).";
-        bannerActions.innerHTML = `
-          <button class="sim-tag-btn ${simScenario==='healthy'?'active':''}" onclick="setSimScenario('healthy')">1. Healthy</button>
-          <button class="sim-tag-btn ${simScenario==='imbalance'?'active':''}" onclick="setSimScenario('imbalance')">2. Imbalance</button>
-          <button class="sim-tag-btn ${simScenario==='bearing'?'active':''}" onclick="setSimScenario('bearing')">3. Bearing BPFO</button>
-          <button class="sim-tag-btn ${simScenario==='thermal'?'active':''}" onclick="setSimScenario('thermal')">4. Thermal Runaway</button>
-          <button class="sim-tag-btn ${broadcastToCloud?'active':''}" id="btn-broadcast" onclick="toggleCloudBroadcast()" style="${broadcastToCloud?'background: #10b981; border-color: #34d399; color: #fff;':''}" title="Broadcast live simulation packets directly to Firebase Cloud RTDB so all remote viewers see live streaming">
-            <i class="fa-solid fa-cloud-arrow-up"></i> Cloud Uplink: ${broadcastToCloud?'ON':'OFF'}
-          </button>
-          <button class="btn-control" onclick="toggleSimulator()" style="margin-left: 6px;"><i class="fa-solid fa-power-off"></i> Exit Sim</button>
-        `;
-        return;
-      }
 
       if (isError || !data) {
         indicator.className = "status-indicator-pill offline";
@@ -1432,11 +1500,6 @@
         bannerIcon.className = "fa-solid fa-triangle-exclamation";
         bannerTitle.innerText = "Edge Rig Disconnected";
         bannerDesc.innerText = "Unable to reach Firebase RTDB or Raspberry Pi telemetry stream. Verify Pi power supply and Tailscale network.";
-        bannerActions.innerHTML = `
-          <button class="btn-control" onclick="toggleSimulator()" style="background: rgba(139, 92, 246, 0.25); color: #fff; border-color: #8b5cf6;">
-            <i class="fa-solid fa-play"></i> Activate Live Sensor Simulator
-          </button>
-        `;
         return;
       }
 
@@ -1446,12 +1509,10 @@
       const timeAgoStr = formatTimeAgo(ageSec);
 
       if (ageSec <= 20) {
-        // ACTIVE STREAMING
         indicator.className = "status-indicator-pill online";
         txtStatus.innerText = `STREAMING (< ${Math.max(1, Math.round(ageSec))}s)`;
         banner.style.display = "none";
       } else if (ageSec < 90) {
-        // STALE TELEMETRY
         indicator.className = "status-indicator-pill stale";
         txtStatus.innerText = `STALE (${timeAgoStr})`;
         banner.style.display = "flex";
@@ -1459,170 +1520,18 @@
         bannerIcon.className = "fa-solid fa-clock-rotate-left";
         bannerTitle.innerText = "Raspberry Pi Telemetry Delayed";
         bannerDesc.innerText = `Last sensor packet received ${timeAgoStr} (Frame #${data.seq || '---'}). Edge daemon sampling or sleeping.`;
-        bannerActions.innerHTML = `
-          <button class="btn-control" onclick="toggleSimulator()" style="background: rgba(139, 92, 246, 0.25); color: #fff; border-color: #8b5cf6;">
-            <i class="fa-solid fa-play"></i> Run Physics Simulator
-          </button>
-        `;
       } else {
-        // OFFLINE / DISCONNECTED
         indicator.className = "status-indicator-pill offline";
         txtStatus.innerText = `OFFLINE (${timeAgoStr})`;
         banner.style.display = "flex";
         banner.className = "edge-alert-ribbon offline";
         bannerIcon.className = "fa-solid fa-plug-circle-xmark";
         bannerTitle.innerText = "Raspberry Pi Edge Rig Offline";
-        bannerDesc.innerText = `No updates received since ${timeAgoStr} (Frame #${data.seq || '---'}). Chart buffer frozen. Use simulator to test live telemetry.`;
-        bannerActions.innerHTML = `
-          <button class="btn-control" onclick="toggleSimulator()" style="background: rgba(139, 92, 246, 0.25); color: #fff; border-color: #8b5cf6;">
-            <i class="fa-solid fa-play"></i> Run Physics Simulator
-          </button>
-        `;
+        bannerDesc.innerText = `No updates received since ${timeAgoStr} (Frame #${data.seq || '---'}). Chart buffer frozen; waiting for real telemetry.`;
       }
-    }
-
-    // Client-Side Physics Simulator (Randall & Antoni 2011 / ISO 10816)
-    function runSimTick() {
-      if (!simulationMode) return;
-      simStep++;
-      let frame = {};
-      
-      if (simScenario === 'healthy') {
-        const rms = 0.0080 + Math.random() * 0.0035;
-        const peak = rms * (1.8 + Math.random() * 0.5);
-        frame = {
-          state: "Healthy",
-          fault: "Normal Operation",
-          proba: 0.03,
-          rms: rms,
-          peak: peak,
-          kurt: 2.95 + Math.random() * 0.3,
-          cf: peak / rms,
-          temp: 24.5 + Math.sin(simStep * 0.1) * 0.4,
-          slope: 0.02 + (Math.random() - 0.5) * 0.1,
-          sound_db: 58.0 + Math.random() * 4.0,
-          zcr: 0.018 + Math.random() * 0.008,
-          advice: "Machine operating within nominal limits. Continuous baseline monitoring active.",
-          seq: 4000 + simStep,
-          uptime_s: simStep * 1.5,
-          ts: Date.now() / 1000
-        };
-      } else if (simScenario === 'imbalance') {
-        const rms = 0.235 + Math.random() * 0.035;
-        const peak = rms * (2.2 + Math.random() * 0.4);
-        frame = {
-          state: "Warning",
-          fault: "Mechanical Imbalance & Looseness",
-          proba: 0.94,
-          rms: rms,
-          peak: peak,
-          kurt: 3.2 + Math.random() * 0.4,
-          cf: peak / rms,
-          temp: 36.5 + Math.sin(simStep * 0.1) * 1.5,
-          slope: 0.85 + Math.random() * 0.3,
-          sound_db: 78.5 + Math.random() * 3.5,
-          zcr: 0.042 + Math.random() * 0.015,
-          advice: "Elevated 1X rotational vibration detected. Inspect rotor balance and mounting bolt torque.",
-          seq: 4000 + simStep,
-          uptime_s: simStep * 1.5,
-          ts: Date.now() / 1000
-        };
-      } else if (simScenario === 'bearing') {
-        const rms = 0.138 + Math.random() * 0.025;
-        const peak = rms * (5.5 + Math.random() * 2.5); // Shock spikes
-        frame = {
-          state: "Fault",
-          fault: "Bearing Raceway Defect (BPFO)",
-          proba: 0.98,
-          rms: rms,
-          peak: peak,
-          kurt: 8.8 + Math.random() * 3.2, // High Kurtosis!
-          cf: peak / rms,
-          temp: 46.0 + Math.sin(simStep * 0.1) * 2.0,
-          slope: 2.4 + Math.random() * 0.6,
-          sound_db: 86.0 + Math.random() * 4.5,
-          zcr: 0.265 + Math.random() * 0.045, // High ZCR clicks!
-          advice: "High-frequency impulse shocks matching BPFO. Schedule bearing replacement immediately.",
-          seq: 4000 + simStep,
-          uptime_s: simStep * 1.5,
-          ts: Date.now() / 1000
-        };
-      } else if (simScenario === 'thermal') {
-        const rms = 0.095 + Math.random() * 0.025;
-        const peak = rms * (2.0 + Math.random() * 0.5);
-        frame = {
-          state: "Fault",
-          fault: "Thermal Runaway & Lubrication Starvation",
-          proba: 0.99,
-          rms: rms,
-          peak: peak,
-          kurt: 3.1 + Math.random() * 0.3,
-          cf: peak / rms,
-          temp: 74.0 + (simStep % 40) * 0.6,
-          slope: 14.5 + Math.random() * 3.0,
-          sound_db: 88.5 + Math.random() * 5.0,
-          zcr: 0.065 + Math.random() * 0.02,
-          advice: "Critical casing temperature rise (dT/dt > 10°C/min). Trip motor to prevent bearing seizure.",
-          seq: 4000 + simStep,
-          uptime_s: simStep * 1.5,
-          ts: Date.now() / 1000
-        };
-      }
-      
-      updateDashboard(frame);
-      updateHardwareStatus(frame);
-
-      // Optional Cloud RTDB Broadcast Uplink
-      if (broadcastToCloud && (Date.now() - lastBroadcastTime > 1800)) {
-        lastBroadcastTime = Date.now();
-        fetch(FIREBASE_RTDB_URL, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(frame)
-        }).catch(err => console.warn("Cloud broadcast error:", err));
-      }
-    }
-
-    function toggleCloudBroadcast() {
-      broadcastToCloud = !broadcastToCloud;
-      const btn = document.getElementById('btn-broadcast');
-      if (btn) {
-        btn.classList.toggle('active', broadcastToCloud);
-        btn.style.background = broadcastToCloud ? '#10b981' : '';
-        btn.style.borderColor = broadcastToCloud ? '#34d399' : '';
-        btn.style.color = broadcastToCloud ? '#fff' : '';
-        btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Cloud Uplink: ${broadcastToCloud ? 'ON' : 'OFF'}`;
-      }
-      if (broadcastToCloud && !simulationMode) {
-        toggleSimulator();
-      }
-    }
-
-    function toggleSimulator() {
-      simulationMode = !simulationMode;
-      const btn = document.getElementById('btn-sim');
-      if (btn) btn.classList.toggle('active', simulationMode);
-      
-      if (simulationMode) {
-        if (simInterval) clearInterval(simInterval);
-        runSimTick();
-        simInterval = setInterval(runSimTick, 1500);
-      } else {
-        if (simInterval) clearInterval(simInterval);
-        simInterval = null;
-        broadcastToCloud = false;
-        fetchLatest();
-      }
-    }
-
-    function setSimScenario(scen) {
-      simScenario = scen;
-      if (!simulationMode) toggleSimulator();
-      else runSimTick();
     }
 
     function fetchLatest() {
-      if (simulationMode) return;
       fetch(FIREBASE_RTDB_URL + "?shallow=false")
         .then(res => res.json())
         .then(data => {
@@ -1631,7 +1540,7 @@
             updateHardwareStatus(data);
           }
         })
-        .catch(err => {
+        .catch(() => {
           updateHardwareStatus(null, true);
         });
     }
@@ -1644,7 +1553,6 @@
         const sse = new EventSource(FIREBASE_RTDB_URL);
         sse.addEventListener('put', function(e) {
           try {
-            if (simulationMode) return;
             const parsed = JSON.parse(e.data);
             if (parsed && parsed.data) {
               updateDashboard(parsed.data);

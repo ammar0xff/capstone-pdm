@@ -140,6 +140,42 @@ Mechanical Imbalance     1.0000    1.0000    1.0000        50
 - **PRD Metric M2**: $\le 5.0\,\text{s}$ **end-to-end** response — the ~30 ms inference step leaves ample margin, but inject→alert timing on the rig has not been measured, so M2 remains **unverified end-to-end**.
 - **Reproduce**: `.venv/bin/python ml/benchmark_latency.py` (or run the same script on the Pi with `--model/--meta/--csv`); `ml/train_rf.py` separately records the host figure in `ml/model_meta.json`.
 
+### 5.4 Results Register — totals to quote in the viva
+All rows below come from the **same 200-window, run-disjoint hold-out** (50 windows/class). They are synthetic-benchmark results only; no real-motor accuracy is claimed.
+
+| # | Measurement | Numerator / denominator | Total | Meaning |
+|---|---|---:|---:|---|
+| 1 | Group 5-fold CV accuracy | 1400 / 1400 windows | **100.0%** | Pipeline separates the four simulated classes under run-disjoint CV. |
+| 2 | Independent hold-out accuracy (RF) | 200 / 200 windows | **100.0%** | 4-class classification on unseen runs. |
+| 3 | Independent hold-out accuracy (if/else fallback) | 177 / 200 windows | **88.5%** | Rule-only replacement for the trained model is 11.5 points worse. |
+| 4 | Stage-1-only fault detection recall | 150 / 150 faulty windows | **100.0%** | The SPC gate catches every simulated anomaly, but it cannot name the fault class. |
+| 5 | Single-window inference latency | host / Pi | **26.19 ms / 29.99 ms** | Measured; full inject→alert timing remains unverified. |
+
+**If/else fallback by class (same 200 windows):**
+
+| Class | Correct / support | Recall | Failure mode |
+|---|---:|---:|---|
+| 0 — Normal Operation | 50 / 50 | 100% | no false alarms in the synthetic hold-out |
+| 1 — Mechanical Imbalance / Shaft Looseness | 27 / 50 | **54%** | overlaps Bearing and Thermal thresholds, so the rules cannot separate it reliably |
+| 2 — Bearing Defect | 50 / 50 | 100% | high kurtosis / ZCR is separable by a threshold |
+| 3 — Thermal Runaway | 50 / 50 | 100% | high temperature / slope is separable by a threshold |
+| **Total** | **177 / 200** | **88.5%** | see `tests/test_evaluation.py` (`TeamFollowUpTest`) to reproduce |
+
+> Quote line 3 and the class-1 row together. The hand-written `if/else` chain is already present in `ml/rf_predictor.py` as the fallback when the model fails to load; the table shows exactly what would be lost if the trained RF were replaced by rules alone.
+
+### 5.5 Role of AI — can the system run without it?
+**Short answer:** the **SPC gate still runs** without the AI model, so the system is not dead; it can still say “normal vs anomaly” and raise a threshold alarm. What it loses is the trained 4-way discrimination and the resulting decision quality.
+
+| Capability | SPC gate + if/else only | SPC gate + trained RF (deployed) |
+|---|---|---|
+| Fault detection (is something wrong?) | Yes — 150/150 simulated faults flagged | Yes — same Stage-1 gate |
+| Fault classification (which of 4?) | 177/200 correct; class 1 only 27/50 (54%) | 200/200 correct on the synthetic hold-out |
+| Confidence per class | Hand-set constants (0.89–0.98) | RF `predict_proba` per class |
+| New sensor patterns after calibration | Needs hand-written thresholds and retuning | Re-train from labeled windows; decision table stays unchanged |
+| Operator action after classification | Fixed alarm text | Structured `response_plan`: priority, action, timeframe, owner, rationale |
+
+The AI is therefore the **classification and decision layer**, not the sensor layer and not a time-to-failure predictor. The model is small enough to run on the Pi (measured 29.99 ms/window) and is deployed as `ml/model.joblib`; `edge/edge_daq.py` now publishes `ai.response_plan` so the dashboard shows the operator decision after each classification. Removing the model is supported as a degraded fallback, not as an equal replacement.
+
 ---
 
 ## 6. Generated Artifacts for Presentation & Binder

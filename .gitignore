@@ -8,3 +8,4 @@ circuit/out/*.png
 circuit/__pycache__/
 .venv/
 .stitch-mcp/
+.webcheck/

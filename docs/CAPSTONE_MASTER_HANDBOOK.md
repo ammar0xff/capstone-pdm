@@ -210,6 +210,8 @@ Training across 1,400 simulated multi-modal windows in 28 runs yielded the follo
 | **Inference Latency (host / Pi)** | $< 50\,\text{ms}$ | **$26.19\,\text{ms}$ / $29.99\,\text{ms}$** | **PASSED** |
 | **Model Binary Size** | $< 50\,\text{MB}$ | **$468\,\text{KB}$** | **PASSED** |
 
+> **Viva totals:** the full *Results Register* (RF vs. `if/else`, Stage-1 recall, per-class fallback) is in `ml/ai_report.md` §5.4, and the *Role of AI* answer is in §5.5. Headline comparison on the same 200 synthetic windows: RF **200/200 (100%)**, rule-only fallback **177/200 (88.5%)**, Stage-1 fault recall **150/150 (100%)**; the rule-only class-1 recall is only **27/50 (54%)**. No real-motor accuracy is claimed.
+
 ### 5.4 Feature Importance Ranking
 Empirical feature importance extraction confirmed the physical validity of the model:
 1. **RMS Dynamic ($14.8\%$):** Overall vibration energy under ISO 20816.

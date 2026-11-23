@@ -11,6 +11,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "ml"))
 
 from train_rf import (  # noqa: E402
+    FEATURE_COLS,
     META_FILE,
     assert_disjoint,
     group_holdout_split,
@@ -73,6 +74,109 @@ class GroupEvaluationTest(unittest.TestCase):
         self.assertEqual(len(result), 5)
         self.assertAlmostEqual(result[4]["z_score"], round(expected, 2))
         self.assertFalse(result[4]["rf_executed"])
+
+
+class TeamFollowUpTest(unittest.TestCase):
+    """Evidence requested in the G12 team discussion (read-only request, no chat writes)."""
+
+    REPORT = os.path.join(ROOT, "ml", "ai_report.md")
+    DASHBOARD = os.path.join(ROOT, "public", "index.html")
+    EDGE_DAQ = os.path.join(ROOT, "edge", "edge_daq.py")
+    PRIORITIES = ["ROUTINE", "SCHEDULE", "URGENT", "CRITICAL"]
+
+    def test_response_plan_is_structured_for_every_class(self):
+        clf = PdMClassifier()
+        priorities = []
+        for class_id in range(4):
+            plan = clf.get_response_plan(class_id)
+            for key in (
+                "class",
+                "priority",
+                "action",
+                "timeframe",
+                "owner",
+                "rationale",
+            ):
+                self.assertTrue(plan[key], f"class {class_id}: empty {key}")
+            self.assertIn(plan["priority"], self.PRIORITIES)
+            priorities.append(plan["priority"])
+        self.assertEqual(priorities, self.PRIORITIES)
+        for bad_class in (-1, 4, 99, 1.5, "1", None):
+            with self.subTest(bad_class=bad_class):
+                with self.assertRaises(ValueError):
+                    clf.get_response_plan(bad_class)
+
+    def test_predict_exposes_the_post_classification_decision(self):
+        clf = PdMClassifier()
+        nominal = clf.predict({"rms_dyn": 0.05, "temp_c": 26.0}, return_gate_info=True)
+        breach = clf.predict(
+            {
+                "rms_dyn": 0.20,
+                "peak_dyn": 0.55,
+                "crest_factor": 5.5,
+                "kurtosis": 9.0,
+                "temp_c": 72.0,
+                "temp_slope": 12.0,
+            },
+            return_gate_info=True,
+        )
+        for result in (nominal, breach):
+            plan = result[4]["response_plan"]
+            self.assertEqual(plan["class"], result[1])
+            self.assertTrue(result[3])  # advice text reaches the operator
+        self.assertFalse(nominal[4]["rf_executed"])
+        self.assertTrue(breach[4]["rf_executed"])
+
+    def test_edge_packet_and_dashboard_carry_the_decision(self):
+        with open(self.EDGE_DAQ) as f:
+            edge = f.read()
+        self.assertIn("predict(feature_dict, return_gate_info=True)", edge)
+        self.assertIn('"response_plan": response_plan', edge)
+
+        with open(self.DASHBOARD) as f:
+            html = f.read()
+        for token in (
+            'id="txt-decision-priority"',
+            'id="txt-decision-timeframe"',
+            "data.ai?.response_plan",
+        ):
+            self.assertIn(token, html)
+
+    def test_ifelse_baseline_is_weaker_and_documented(self):
+        X, y, groups = load_dataset()
+        _, _, test = group_holdout_split(y, groups)
+        rf = PdMClassifier()
+        rules = PdMClassifier()
+        rules.model = None  # exercises the documented if/else fallback
+        accuracies = {}
+        for name, clf in (("rf", rf), ("ifelse", rules)):
+            correct = 0
+            for idx in test:
+                features = {col: float(X[idx, j]) for j, col in enumerate(FEATURE_COLS)}
+                correct += int(clf.predict(features)[0] == y[idx])
+            accuracies[name] = correct / len(test)
+        self.assertGreaterEqual(accuracies["rf"], 0.95)
+        self.assertLess(accuracies["ifelse"], accuracies["rf"])
+        self.assertAlmostEqual(accuracies["ifelse"], 0.885, delta=0.01)
+        with open(self.REPORT) as f:
+            report = f.read()
+        self.assertIn("Results Register", report)
+        self.assertIn("Role of AI", report)
+        self.assertIn("88.5%", report)
+
+    def test_dashboard_has_no_simulation_controls(self):
+        with open(self.DASHBOARD) as f:
+            html = f.read()
+        for token in (
+            "toggleSimulator",
+            "simScenario",
+            "sim-tag-btn",
+            "Physics Simulator",
+            "runSimTick",
+            "broadcastToCloud",
+            'id="btn-sim"',
+        ):
+            self.assertNotIn(token, html)
 
 
 if __name__ == "__main__":
