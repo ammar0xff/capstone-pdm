@@ -19,8 +19,8 @@ CONFIG_FILE = os.path.join(BASE_DIR, "cloud_config.json")
 
 DEFAULT_CONFIG = {
     "enabled": True,
-    "firebase_url": "https://capstone-pdm-2026-default-rtdb.firebaseio.com/motor1.json",
-    "sync_interval_s": 15.0,
+    "firebase_url": "https://castpone2026-default-rtdb.firebaseio.com/motor1.json",
+    "sync_interval_s": 5.0,
     "max_daily_writes": 15000,
     "daily_writes_today": 0,
     "last_day": time.strftime("%Y-%m-%d"),
@@ -92,7 +92,7 @@ def sync_loop():
         except Exception:
             continue
 
-        # Prepare compact cloud payload conforming to shared data model (PRD §9.3)
+        # Prepare comprehensive cloud payload conforming to shared data model (PRD §9.3)
         payload = {
             "ts": data.get("timestamp", time.time()),
             "uptime_s": data.get("uptime_s", 0),
@@ -108,7 +108,13 @@ def sync_loop():
             "slope": data.get("temperature", {}).get("slope_c_per_min", 0.0),
             "sound_db": data.get("acoustic", {}).get("db_spl", 50.0),
             "zcr": data.get("acoustic", {}).get("zcr", 0.02),
-            "advice": data.get("advice", "Nominal limits.")
+            "advice": data.get("advice", "Nominal limits."),
+            "ai": data.get("ai", {}),
+            "equations": data.get("equations", {}),
+            "vibration": data.get("vibration", {}),
+            "temperature": data.get("temperature", {}),
+            "acoustic": data.get("acoustic", {}),
+            "system": data.get("system", {})
         }
 
         # Attempt HTTPS PUT to Firebase RTDB

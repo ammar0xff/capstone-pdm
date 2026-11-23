@@ -1,0 +1,1682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STEM Exhibition Presentation | Intelligent Industrial Predictive Maintenance</title>
+  
+  <!-- Fonts & Typography -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- KaTeX for Scientific & Mathematical Equations -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+
+  <style>
+    :root {
+      --bg-dark: #040711;
+      --bg-card: rgba(13, 20, 38, 0.78);
+      --bg-card-hover: rgba(22, 33, 62, 0.88);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(6, 182, 212, 0.45);
+      --cyan: #06b6d4;
+      --cyan-bright: #22d3ee;
+      --blue: #3b82f6;
+      --indigo: #6366f1;
+      --green: #10b981;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --purple: #a855f7;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Clean Technical SCADA Background */
+    .aurora-bg {
+      display: none;
+    }
+
+    /* Interactive Cyber Canvas */
+    #ambient-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.45;
+    }
+
+    /* Top Navigation Bar */
+    .header-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: rgba(8, 14, 28, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 22px;
+      z-index: 1000;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-badge {
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      color: #040711;
+      font-size: 10px;
+      font-weight: 900;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      box-shadow: 0 0 14px rgba(6, 182, 212, 0.5);
+      letter-spacing: 0.05em;
+    }
+
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--green);
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 2px 7px;
+      border-radius: 20px;
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--green);
+      animation: pulseGlow 1.8s infinite ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.6; }
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      text-decoration: none;
+      backdrop-filter: blur(8px);
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--cyan);
+      color: var(--cyan);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      color: #040711;
+      border: none;
+      font-weight: 800;
+      box-shadow: 0 4px 14px rgba(6, 182, 212, 0.35);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.94;
+      color: #040711;
+      box-shadow: 0 6px 20px rgba(6, 182, 212, 0.6);
+    }
+
+    .slide-counter {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--cyan-bright);
+      font-weight: 700;
+      padding: 5px 10px;
+      background: rgba(6, 182, 212, 0.08);
+      border: 1px solid rgba(6, 182, 212, 0.25);
+      border-radius: 6px;
+    }
+
+    /* Dynamic Top Progress Bar */
+    .progress-track {
+      position: fixed;
+      top: 56px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.04);
+      z-index: 999;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--cyan), var(--blue), var(--purple));
+      width: 8.33%;
+      transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.7);
+    }
+
+    /* Main Viewport Locked to 100vh Without Vertical Scrolling */
+    body:not(.scroll-mode) {
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    body:not(.scroll-mode) .viewport {
+      margin-top: 56px;
+      height: calc(100vh - 56px);
+      padding: clamp(6px, 1.2vh, 14px) clamp(14px, 2vw, 28px) 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      z-index: 10;
+    }
+
+    body:not(.scroll-mode) .slides-container {
+      width: 100%;
+      max-width: 1140px;
+      height: 100%;
+      max-height: calc(100vh - 122px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* Slide Card: Flexible Vertical Fit */
+    body:not(.scroll-mode) .slide {
+      width: 100%;
+      max-height: 100%;
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: clamp(14px, 2vh, 22px);
+      padding: clamp(14px, 2.6vh, 32px) clamp(18px, 2.8vw, 42px);
+      box-shadow: 0 24px 56px -12px rgba(0,0,0,0.7), inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      position: relative;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    body:not(.scroll-mode) .slide.active {
+      display: flex;
+      animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.99);
+        filter: blur(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    /* Fluid Typography */
+    .slide-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: clamp(9px, 1.1vh, 11px);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--cyan);
+      margin-bottom: clamp(4px, 0.8vh, 10px);
+      padding: 3px 8px;
+      background: rgba(6, 182, 212, 0.1);
+      border: 1px solid rgba(6, 182, 212, 0.28);
+      border-radius: 6px;
+      align-self: flex-start;
+    }
+
+    .slide-title {
+      font-size: clamp(18px, 2.7vh, 31px);
+      font-weight: 900;
+      line-height: 1.18;
+      margin-bottom: clamp(3px, 0.7vh, 8px);
+      letter-spacing: -0.025em;
+      background: linear-gradient(135deg, #ffffff 40%, #cbd5e1 75%, var(--cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .slide-subtitle {
+      font-size: clamp(11px, 1.4vh, 14px);
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin-bottom: clamp(8px, 1.6vh, 20px);
+    }
+
+    /* Grids */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(10px, 1.5vh, 20px); }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(8px, 1.4vh, 18px); }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(8px, 1.2vh, 16px); }
+
+    .mt-responsive { margin-top: clamp(8px, 1.6vh, 20px); }
+    .mt-sm-responsive { margin-top: clamp(6px, 1.1vh, 14px); }
+
+    /* Feature Cards */
+    .feature-card {
+      background: rgba(255, 255, 255, 0.028);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: clamp(10px, 1.4vh, 14px);
+      padding: clamp(10px, 1.6vh, 18px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card:hover {
+      border-color: var(--border-accent);
+      background: var(--bg-card-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px -6px rgba(0,0,0,0.5), 0 0 20px rgba(6, 182, 212, 0.15);
+    }
+
+    .card-icon {
+      font-size: clamp(18px, 2.2vh, 24px);
+      margin-bottom: clamp(4px, 0.8vh, 10px);
+      display: inline-block;
+    }
+
+    .card-title {
+      font-size: clamp(13px, 1.55vh, 15px);
+      font-weight: 700;
+      margin-bottom: clamp(2px, 0.4vh, 5px);
+      color: #fff;
+    }
+
+    .card-desc {
+      font-size: clamp(10.5px, 1.3vh, 12.5px);
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin-top: clamp(3px, 0.6vh, 6px);
+    }
+
+    /* Metric Display Units */
+    .stat-box {
+      background: rgba(6, 182, 212, 0.04);
+      border: 1px solid rgba(6, 182, 212, 0.2);
+      border-radius: clamp(10px, 1.4vh, 14px);
+      padding: clamp(10px, 1.5vh, 16px) 8px;
+      text-align: center;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-box:hover {
+      background: rgba(6, 182, 212, 0.09);
+      border-color: var(--cyan);
+      transform: translateY(-2px);
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.25);
+    }
+
+    .stat-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(22px, 3.2vh, 34px);
+      font-weight: 900;
+      color: var(--cyan-bright);
+      margin-bottom: 2px;
+      letter-spacing: -0.03em;
+    }
+
+    .stat-label {
+      font-size: clamp(9.5px, 1.1vh, 11px);
+      text-transform: uppercase;
+      font-weight: 800;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+    }
+
+    .stat-tag {
+      display: inline-block;
+      font-size: clamp(8.5px, 1vh, 9.5px);
+      font-weight: 800;
+      padding: 2px 5px;
+      border-radius: 4px;
+      margin-top: 3px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Flow Step Row */
+    .flow-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: clamp(6px, 1vh, 12px);
+      flex-wrap: wrap;
+    }
+
+    .flow-step {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: clamp(8px, 1.2vh, 12px) clamp(10px, 1vw, 14px);
+      flex: 1;
+      min-width: 140px;
+      transition: all 0.25s ease;
+    }
+
+    .flow-step:hover {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: var(--border-accent);
+      transform: translateY(-1px);
+    }
+
+    .flow-arrow {
+      color: var(--cyan);
+      font-size: 15px;
+    }
+
+    /* Tables */
+    .pdm-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: clamp(10.5px, 1.25vh, 12px);
+      margin-top: clamp(4px, 0.8vh, 8px);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .pdm-table th, .pdm-table td {
+      padding: clamp(5px, 0.8vh, 8px) clamp(6px, 0.8vw, 10px);
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .pdm-table th {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--cyan-bright);
+      font-weight: 800;
+      font-size: clamp(9.5px, 1.1vh, 11px);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .pdm-table tr:hover td {
+      background: rgba(255, 255, 255, 0.025);
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: clamp(9.5px, 1.1vh, 10.5px);
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .badge-green { background: rgba(16, 185, 129, 0.15); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.35); }
+    .badge-amber { background: rgba(245, 158, 11, 0.15); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.35); }
+    .badge-red { background: rgba(239, 68, 68, 0.15); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.35); }
+    .badge-blue { background: rgba(59, 130, 246, 0.15); color: var(--blue); border: 1px solid rgba(59, 130, 246, 0.35); }
+    .badge-purple { background: rgba(168, 85, 247, 0.15); color: var(--purple); border: 1px solid rgba(168, 85, 247, 0.35); }
+
+    /* Waveform Card */
+    .waveform-card {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: clamp(6px, 1vh, 10px);
+      margin-top: 6px;
+    }
+
+    /* Bottom Quick-Jump Dock */
+    .bottom-dock {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(8, 14, 28, 0.92);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 5px 12px;
+      border-radius: 30px;
+      backdrop-filter: blur(24px);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.6), 0 0 16px rgba(6, 182, 212, 0.15);
+      z-index: 100;
+    }
+
+    .dock-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.22);
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .dock-dot:hover {
+      background: var(--cyan);
+      transform: scale(1.35);
+    }
+
+    .dock-dot.active {
+      width: 22px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--cyan), var(--blue));
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.7);
+    }
+
+    .dock-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      cursor: pointer;
+      padding: 3px 6px;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      transition: color 0.2s ease;
+    }
+
+    .dock-btn:hover {
+      color: var(--cyan-bright);
+    }
+
+    /* Modal Lightbox for Artifacts */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(16px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 16px;
+    }
+
+    .modal-content {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--border-accent);
+      border-radius: 16px;
+      max-width: 760px;
+      width: 100%;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 32px 72px rgba(0,0,0,0.85), 0 0 30px rgba(6, 182, 212, 0.3);
+      animation: modalFadeIn 0.3s ease;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-header {
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-body {
+      padding: 18px;
+      overflow-y: auto;
+      text-align: center;
+    }
+
+    .modal-body img {
+      max-width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    /* Slide Overview Grid Modal */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      padding: 16px;
+      max-height: 68vh;
+      overflow-y: auto;
+    }
+
+    .grid-thumb {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s ease;
+    }
+
+    .grid-thumb:hover {
+      border-color: var(--cyan);
+      background: rgba(6, 182, 212, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .grid-thumb.active {
+      border-color: var(--cyan-bright);
+      box-shadow: 0 0 14px rgba(6, 182, 212, 0.4);
+    }
+
+    /* Scroll View Mode */
+    body.scroll-mode {
+      height: auto !important;
+      overflow-y: auto !important;
+    }
+    body.scroll-mode .viewport {
+      display: block;
+      padding: 30px 20px;
+      height: auto !important;
+      margin-top: 56px;
+    }
+    body.scroll-mode .slides-container {
+      max-width: 1020px;
+      margin: 0 auto;
+      max-height: none !important;
+      height: auto !important;
+    }
+    body.scroll-mode .slide {
+      display: block !important;
+      margin-bottom: 36px;
+      box-shadow: 0 14px 36px rgba(0,0,0,0.5);
+      max-height: none !important;
+      height: auto !important;
+      padding: 36px;
+    }
+    body.scroll-mode .bottom-dock,
+    body.scroll-mode .slide-counter {
+      display: none;
+    }
+
+    /* Low-Height Laptop Display Optimizations (e.g. 1366x768 or 1280x720) */
+    @media (max-height: 768px) {
+      .slide-title { font-size: 24px !important; }
+      .slide-subtitle { margin-bottom: 12px !important; }
+      .stat-number { font-size: 26px !important; }
+      .feature-card { padding: 10px 14px !important; }
+      .card-desc { font-size: 11px !important; }
+      .pdm-table th, .pdm-table td { padding: 4px 8px !important; font-size: 10.5px !important; }
+      .waveform-card { padding: 4px !important; }
+      .waveform-card svg { height: 24px !important; }
+    }
+
+    @media (max-width: 860px) {
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+      .slide-title { font-size: 22px; }
+      .header-bar { padding: 0 12px; }
+      .brand-title { display: none; }
+      .overview-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- AURORA AMBIENT GLOW -->
+  <div class="aurora-bg">
+    <div class="aurora-orb orb-1" id="orb1"></div>
+    <div class="aurora-orb orb-2" id="orb2"></div>
+    <div class="aurora-orb orb-3" id="orb3"></div>
+  </div>
+
+  <!-- INTERACTIVE CANVAS -->
+  <canvas id="ambient-canvas"></canvas>
+
+  <!-- TOP APP BAR -->
+  <header class="header-bar">
+    <div class="brand">
+      <div class="brand-badge"><i class="fa-solid fa-microchip"></i> STEM 2026</div>
+      <span class="brand-title">Intelligent Industrial PdM System</span>
+      <div class="live-indicator">
+        <div class="live-dot"></div>
+        <span>EDGE LIVE</span>
+      </div>
+    </div>
+
+    <div class="nav-controls">
+      <button class="btn" onclick="openOverviewModal()" title="View all slides in a grid (G)">
+        <i class="fa-solid fa-table-cells-large"></i> Grid
+      </button>
+      <button class="btn" id="audioToggleBtn" onclick="toggleAudio()" title="Sound FX Toggle">
+        <i class="fa-solid fa-volume-high" id="audioIcon"></i>
+      </button>
+      <button class="btn" id="viewModeBtn" onclick="toggleViewMode()" title="Toggle between Slide Deck and Scroll View (S)">
+        <i class="fa-solid fa-list-check"></i> <span id="viewModeText">Scroll</span>
+      </button>
+      <button class="btn" onclick="toggleFullScreen()" title="Fullscreen presentation (F)">
+        <i class="fa-solid fa-expand"></i>
+      </button>
+      <div class="slide-counter" id="slideCounter">01 / 12</div>
+      <a href="calibration.html" class="btn" title="Open Sensor Calibration Suite">
+        <i class="fa-solid fa-compass-drafting" style="color: #10b981;"></i> Calibration
+      </a>
+      <a href="/" class="btn btn-primary" target="_blank" title="Open live machine telemetry">
+        <i class="fa-solid fa-gauge-high"></i> Telemetry
+      </a>
+    </div>
+  </header>
+
+  <!-- PROGRESS BAR -->
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <!-- SLIDES VIEWPORT -->
+  <main class="viewport">
+    <div class="slides-container" id="slidesDeck">
+
+      <!-- SLIDE 1: COVER / HERO -->
+      <section class="slide active" data-slide="1" data-theme="cyan">
+        <div class="slide-tag"><i class="fa-solid fa-award"></i> Grade 12 STEM Capstone 2026/2027 &bull; Grand Challenge</div>
+        <h1 class="slide-title">Intelligent Cyber-Physical System for Industrial Predictive Maintenance (PdM)</h1>
+        <p class="slide-subtitle">
+          An offline-first, edge-computed multi-modal sensor fusion platform for rotating machinery fault diagnosis based on Shewhart Statistical Gating, Random Forest AI, and ISO 10816-3 standards.
+        </p>
+
+        <div class="grid-4 mt-responsive">
+          <div class="stat-box">
+            <div class="stat-number" data-target="0.00" data-decimals="2">0.00</div>
+            <div class="stat-label">EGP Added Software Cost</div>
+            <span class="stat-tag badge-green">100% Free-Tier &amp; FOSS</span>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number" data-target="100" data-suffix="%">100%</div>
+            <div class="stat-label">Offline Autonomous</div>
+            <span class="stat-tag badge-blue">Local SQLite Buffer</span>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number" data-target="1.8" data-decimals="1" data-prefix="< " data-suffix=" ms">&lt; 1.8 ms</div>
+            <div class="stat-label">Edge Inference Latency</div>
+            <span class="stat-tag badge-purple">300 Decision Trees</span>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number" data-target="92.4" data-decimals="1" data-suffix="%">92.4%</div>
+            <div class="stat-label">Edge CPU Energy Saved</div>
+            <span class="stat-tag badge-amber">Shewhart SPC Gating</span>
+          </div>
+        </div>
+
+        <div class="feature-card mt-responsive" style="border-left: 4px solid var(--cyan);">
+          <div style="font-weight: 800; font-size: 14px; margin-bottom: 6px; color: var(--cyan);">
+            <i class="fa-solid fa-flag"></i> National STEM Grand Challenge Alignment:
+          </div>
+          <p class="card-desc">
+            <b>Developing the Industrial Base of Egypt</b> &mdash; Replacing imported, expensive proprietary vibration monitoring systems (costing $3,000&ndash;$10,000 per motor) with a locally engineered, zero-licensing-cost edge AI cyber-physical unit that stops catastrophic factory downtime in Egyptian manufacturing plants.
+          </p>
+        </div>
+      </section>
+
+      <!-- SLIDE 2: RUBRIC HIGHLIGHT — 4 MEASURABLE DESIGN REQUIREMENTS -->
+      <section class="slide" data-slide="2" data-theme="green">
+        <div class="slide-tag"><i class="fa-solid fa-clipboard-check"></i> Rubric Compliance & Verification</div>
+        <h2 class="slide-title">The 4 Measurable Design Requirements (MDRs)</h2>
+        <p class="slide-subtitle">
+          Official Capstone Specification Requirement: <i>"Students must identify at least four measurable design requirements, including response time and system accuracy... and provide evidence."</i>
+        </p>
+
+        <table class="pdm-table">
+          <thead>
+            <tr>
+              <th>Requirement Code</th>
+              <th>Parameter / Metric</th>
+              <th>Official Target</th>
+              <th>Empirical Measured Result</th>
+              <th>Verification Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>MDR 1</b></td>
+              <td><b>System Accuracy</b> (Fault Identification)</td>
+              <td>$\ge 80.0\%$</td>
+              <td><b style="color: var(--green);">100.0%</b> (5-Fold Stratified Cross-Val)</td>
+              <td><span class="badge badge-green">PASSED (+20%)</span></td>
+            </tr>
+            <tr>
+              <td><b>MDR 2</b></td>
+              <td><b>System Response Time</b> (Shock to Alert)</td>
+              <td>$&lt; 5.0\text{ seconds}$</td>
+              <td><b style="color: var(--cyan);">1.28 s</b> windowing + <b>1.8 ms</b> inference</td>
+              <td><span class="badge badge-green">PASSED (3.7s faster)</span></td>
+            </tr>
+            <tr>
+              <td><b>MDR 3</b></td>
+              <td><b>Edge Computational Efficiency</b> (CPU Savings)</td>
+              <td>$&gt; 75.0\%$</td>
+              <td><b style="color: var(--amber);">92.4% reduction</b> via Shewhart SPC Gating</td>
+              <td><span class="badge badge-green">PASSED (+17.4%)</span></td>
+            </tr>
+            <tr>
+              <td><b>MDR 4</b></td>
+              <td><b>Data Resiliency</b> (Network Dropout Loss)</td>
+              <td>$0.0\%$ packet loss</td>
+              <td><b style="color: var(--purple);">0.0% loss</b> (100% recovered from SQLite buffer)</td>
+              <td><span class="badge badge-green">PASSED (Zero loss)</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="feature-card mt-responsive">
+          <div style="font-size: 13px; color: var(--text-muted);">
+            <b>Constraint Verification:</b> All processing runs entirely on a <b>Raspberry Pi 4 Quad-Core 64-bit ARM CPU</b> (satisfying the strict constraint: <i>"Arduino boards are not allowed; advanced controllers required"</i>).
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 3: THE PROBLEM & ECONOMIC IMPACT -->
+      <section class="slide" data-slide="3" data-theme="amber">
+        <div class="slide-tag"><i class="fa-solid fa-triangle-exclamation"></i> Industrial Problem & Motivation</div>
+        <h2 class="slide-title">The Real-World Crisis: Unplanned Factory Shutdowns</h2>
+        <p class="slide-subtitle">
+          Electric induction motors drive over 70% of all mechanical power in industry. Their unexpected failure halts assembly lines and destroys profitability.
+        </p>
+
+        <div class="grid-3">
+          <div class="feature-card" style="border-top: 3px solid var(--red);">
+            <div class="card-icon" style="color: var(--red);"><i class="fa-solid fa-fire"></i></div>
+            <div class="card-title">Reactive Maintenance</div>
+            <div class="card-desc">
+              "Run it until it blows up." Destroys shafts, ruins production batches, creates factory fire hazards, and repair costs exceed planned maintenance by <b>up to 500%</b>.
+            </div>
+          </div>
+
+          <div class="feature-card" style="border-top: 3px solid var(--amber);">
+            <div class="card-icon" style="color: var(--amber);"><i class="fa-solid fa-calendar-xmark"></i></div>
+            <div class="card-title">Preventive Maintenance</div>
+            <div class="card-desc">
+              "Replace parts every 90 days on a calendar." Highly wasteful: studies show up to <b>80% of replaced bearings</b> were completely healthy. Technicians also induce assembly faults during unnecessary teardowns.
+            </div>
+          </div>
+
+          <div class="feature-card" style="border-top: 3px solid var(--green);">
+            <div class="card-icon" style="color: var(--green);"><i class="fa-solid fa-brain"></i></div>
+            <div class="card-title">Our Predictive Paradigm</div>
+            <div class="card-desc">
+              "Replace only when physical degradation is mathematically confirmed." Continuous multi-modal condition monitoring flags microscopic raceway spalling and mass imbalance weeks before catastrophic seizure.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 4: SYSTEM ARCHITECTURE & DATA PIPELINE -->
+      <section class="slide" data-slide="4" data-theme="blue">
+        <div class="slide-tag"><i class="fa-solid fa-network-wired"></i> System Architecture</div>
+        <h2 class="slide-title">End-to-End Cyber-Physical Architecture</h2>
+        <p class="slide-subtitle">
+          A four-tier resilient design coupling embedded hardware, edge intelligence, resilient storage, and global serverless telemetry.
+        </p>
+
+        <div class="flow-row">
+          <div class="flow-step" style="border-left: 3px solid var(--blue);">
+            <div style="font-weight: 700; color: var(--blue); font-size: 13px;">1. PHYSICAL TESTBED</div>
+            <div style="font-size: 13px; margin-top: 4px;">12V Industrial Motor Rig</div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">ADXL345 (I2C) + MAX6675 (SPI)</div>
+          </div>
+          <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+
+          <div class="flow-step" style="border-left: 3px solid var(--cyan);">
+            <div style="font-weight: 700; color: var(--cyan); font-size: 13px;">2. EDGE COMPUTING</div>
+            <div style="font-size: 13px; margin-top: 4px;">Raspberry Pi (64-bit Linux)</div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">DSP Feature Extraction & AI</div>
+          </div>
+          <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+
+          <div class="flow-step" style="border-left: 3px solid var(--green);">
+            <div style="font-weight: 700; color: var(--green); font-size: 13px;">3. RESILIENT STORAGE</div>
+            <div style="font-size: 13px; margin-top: 4px;">Local Ring Buffer</div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Zero data loss on cut Wi-Fi</div>
+          </div>
+          <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+
+          <div class="flow-step" style="border-left: 3px solid var(--purple);">
+            <div style="font-weight: 700; color: var(--purple); font-size: 13px;">4. GLOBAL CLOUD</div>
+            <div style="font-size: 13px; margin-top: 4px;">Firebase Realtime DB</div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Worldwide live phone dashboard</div>
+          </div>
+        </div>
+
+        <div class="grid-2 mt-responsive">
+          <div class="feature-card">
+            <b style="color: var(--cyan);"><i class="fa-solid fa-microchip"></i> Why Edge Computing over Pure Cloud?</b>
+            <p class="card-desc">
+              Raw 100 Hz vibration sampling generates millions of records per hour. Streaming raw high-frequency waveforms to cloud APIs causes severe latency, costs thousands in egress fees, and fails when the internet drops. Edge DSP computes features in 1.8 ms locally.
+            </p>
+          </div>
+          <div class="feature-card">
+            <b style="color: var(--green);"><i class="fa-solid fa-bolt"></i> The 0-EGP Cloud Philosophy</b>
+            <p class="card-desc">
+              We engineered our telemetry around Google Firebase's generous Free Spark Tier. Non-blocking JSON streaming maintains sub-second synchronization worldwide without paying a single piastre in server fees.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 5: RUBRIC HIGHLIGHT — SENSOR CALIBRATION -->
+      <section class="slide" data-slide="5" data-theme="green">
+        <div class="slide-tag"><i class="fa-solid fa-ruler-combined"></i> Mandatory Rubric Verification</div>
+        <h2 class="slide-title">Sensor Calibration & Experimental Error Verification</h2>
+        <p class="slide-subtitle">
+          Official Capstone Requirement: <i>"Students must conduct and document sensor calibration."</i> Uncalibrated sensors cause false alarms.
+        </p>
+
+        <div class="grid-2">
+          <div>
+            <div style="font-weight: 700; font-size: 13px; color: var(--cyan); margin-bottom: 6px;">
+              <i class="fa-solid fa-compass"></i> ADXL345 6-Position Static Gravitational Calibration
+            </div>
+            <table class="pdm-table" style="font-size: 12px;">
+              <thead>
+                <tr>
+                  <th>Axis</th>
+                  <th>$+1g$ Test</th>
+                  <th>$-1g$ Test</th>
+                  <th>$0g$ Offset ($b$)</th>
+                  <th>Scale Factor ($S$)</th>
+                  <th>Residual Error</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><b>X-Axis</b></td>
+                  <td>$+264$ LSB</td>
+                  <td>$-248$ LSB</td>
+                  <td>$+8.0$ LSB ($+0.031g$)</td>
+                  <td>$0.00391g$/LSB</td>
+                  <td><span class="badge badge-green">&plusmn; 0.25%</span></td>
+                </tr>
+                <tr>
+                  <td><b>Y-Axis</b></td>
+                  <td>$+259$ LSB</td>
+                  <td>$-253$ LSB</td>
+                  <td>$+3.0$ LSB ($+0.012g$)</td>
+                  <td>$0.00390g$/LSB</td>
+                  <td><span class="badge badge-green">&plusmn; 0.00%</span></td>
+                </tr>
+                <tr>
+                  <td><b>Z-Axis</b></td>
+                  <td>$+271$ LSB</td>
+                  <td>$-241$ LSB</td>
+                  <td>$+15.0$ LSB ($+0.058g$)</td>
+                  <td>$0.00392g$/LSB</td>
+                  <td><span class="badge badge-green">&plusmn; 0.51%</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div>
+            <div style="font-weight: 700; font-size: 13px; color: var(--amber); margin-bottom: 6px;">
+              <i class="fa-solid fa-temperature-half"></i> MAX6675 2-Point Thermal Reference Calibration
+            </div>
+            <table class="pdm-table" style="font-size: 12px;">
+              <thead>
+                <tr>
+                  <th>Reference Environment</th>
+                  <th>True Standard ($T_{\text{ref}}$)</th>
+                  <th>Measured ($T_{\text{meas}}$)</th>
+                  <th>Error (&Delta;T)</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><b>Ice-Water Equilibrium</b></td>
+                  <td>$0.0^\circ\text{C}$</td>
+                  <td>$+0.25^\circ\text{C}$</td>
+                  <td>$+0.25^\circ\text{C}$</td>
+                  <td><span class="badge badge-green">PASSED</span></td>
+                </tr>
+                <tr>
+                  <td><b>Regulated Room Temp</b></td>
+                  <td>$22.5^\circ\text{C}$</td>
+                  <td>$+22.75^\circ\text{C}$</td>
+                  <td>$+0.25^\circ\text{C}$ ($1.1\%$)</td>
+                  <td><span class="badge badge-green">PASSED</span></td>
+                </tr>
+                <tr>
+                  <td><b>Boiling Distilled Water</b></td>
+                  <td>$100.0^\circ\text{C}$</td>
+                  <td>$+99.50^\circ\text{C}$</td>
+                  <td>$-0.50^\circ\text{C}$ ($0.5\%$)</td>
+                  <td><span class="badge badge-green">PASSED</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="feature-card mt-responsive">
+          <div style="font-size: 13px; color: var(--text-muted);">
+            <b>Firmware Compensation:</b> Offset vectors are loaded directly into the edge acquisition daemon (`pdm-daq`), guaranteeing zero DC drift during continuous 24/7 operation.
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 6: TWO-STAGE AI PIPELINE -->
+      <section class="slide" data-slide="6" data-theme="purple">
+        <div class="slide-tag"><i class="fa-solid fa-brain"></i> Edge Artificial Intelligence</div>
+        <h2 class="slide-title">Two-Stage Coarse-to-Fine Inference Gating</h2>
+        <p class="slide-subtitle">
+          Based on the Cyber-Physical System design by <b>Cinar et al. (2022)</b>: Continuous deep learning burns edge batteries; statistical gating saves &gt;90% of edge CPU cycles.
+        </p>
+
+        <div class="grid-2">
+          <div class="feature-card" style="border-top: 4px solid var(--green);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <span class="badge badge-green">STAGE 1: COARSE GATING</span>
+              <span style="font-size: 12px; color: var(--text-muted);">&lt; 0.1 ms latency</span>
+            </div>
+            <div class="card-title">Shewhart Statistical Process Control (SPC)</div>
+            <p class="card-desc">
+              Tracks the rolling baseline mean ($\mu$) and variance ($\sigma$) of the machine. As long as the vibration envelope satisfies:
+              <br><br>
+              <code style="background: rgba(0,0,0,0.5); padding: 6px 10px; border-radius: 6px; color: var(--green); font-family: 'JetBrains Mono';">z = |x - &mu;| / &sigma; &le; 3.0</code>
+              <br><br>
+              The machine is healthy. Heavy machine learning is <b>kept asleep</b>, saving power and thermal head.
+            </p>
+          </div>
+
+          <div class="feature-card" style="border-top: 4px solid var(--red);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <span class="badge badge-red">STAGE 2: FINE DIAGNOSTICS</span>
+              <span style="font-size: 12px; color: var(--text-muted);">&lt; 1.8 ms latency</span>
+            </div>
+            <div class="card-title">Ensemble Classifier (Random Forest / GBDT)</div>
+            <p class="card-desc">
+              The moment Stage 1 detects a $3\sigma$ violation or Kurtosis shock, Stage 2 wakes up immediately to classify the exact failure fingerprint:
+              <br><br>
+              &bull; <b>Healthy (Class 0):</b> Normal operational baseline.<br>
+              &bull; <b>Mechanical Imbalance (Class 1):</b> $1\times$ RPM sinusoidal wave.<br>
+              &bull; <b>Bearing Defect (Class 2):</b> High Kurtosis micro-impact shocks.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 7: FEATURE ENGINEERING & VIBRATION KINEMATICS -->
+      <section class="slide" data-slide="7" data-theme="cyan">
+        <div class="slide-tag"><i class="fa-solid fa-chart-line"></i> Physics & Waveform Kinematics</div>
+        <h2 class="slide-title">10 Mathematical Features & Diagnostic Physics</h2>
+        <p class="slide-subtitle">
+          Why our model doesn't guess: It learns the mechanical kinematics formalized by <b>Randall & Antoni (2011)</b> and <b>ISO 10816-3</b>.
+        </p>
+
+        <div class="grid-3">
+          <div class="feature-card">
+            <b style="color: var(--cyan);">Kurtosis ($K$) &mdash; Shock Physics</b>
+            <div class="waveform-card">
+              <svg viewBox="0 0 200 40" style="width:100%; height:32px;">
+                <path d="M0,20 Q20,19 40,20 T80,20 T100,2 L102,38 L104,4 L106,30 L108,20 T140,20 T200,20" fill="none" stroke="var(--cyan)" stroke-width="2"/>
+              </svg>
+            </div>
+            <p class="card-desc">
+              Healthy vibration is Gaussian ($K \approx 3.0$). When a bearing ball strikes a microscopic pit, it produces microsecond impact spikes driving $K > 5.0$ to $15.0+$.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <b style="color: var(--amber);">Crest Factor ($CF$)</b>
+            <div class="waveform-card">
+              <svg viewBox="0 0 200 40" style="width:100%; height:32px;">
+                <path d="M0,20 Q25,0 50,20 T100,20 T150,20 T200,20" fill="none" stroke="var(--amber)" stroke-width="2"/>
+              </svg>
+            </div>
+            <p class="card-desc">
+              $$CF = \frac{x_{\text{peak}}}{x_{\text{rms}}}$$
+              Ratio of peak amplitude to effective energy. Detects sharp impact spikes before overall RMS velocity climbs, serving as an early bearing wear indicator.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <b style="color: var(--green);">ISO 10816-3 Severity Zones</b>
+            <div style="margin-top: clamp(4px, 0.8vh, 8px); font-size: clamp(10.5px, 1.3vh, 12.5px); line-height: 1.5;">
+              <span class="badge badge-green">Zone A</span> &lt; 0.10g (Pristine)<br>
+              <span class="badge badge-blue">Zone B</span> &lt; 0.15g (Unrestricted)<br>
+              <span class="badge badge-amber">Zone C</span> 0.15 &ndash; 0.35g (Restricted)<br>
+              <span class="badge badge-red">Zone D</span> &gt; 0.35g (Catastrophic)
+            </div>
+          </div>
+        </div>
+
+        <div class="feature-card mt-responsive">
+          <div style="font-size: 13px; color: var(--text-muted);">
+            <b>Complete 10-Dimensional Vector:</b> <code>[RMS, Peak-to-Peak, Variance, StdDev, Crest Factor, Shape Factor, Impulse Factor, Margin Factor, Kurtosis, Temperature]</code>.
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 8: RUBRIC HIGHLIGHT — DATASETS & MODEL BENCHMARKING -->
+      <section class="slide" data-slide="8" data-theme="purple">
+        <div class="slide-tag"><i class="fa-solid fa-square-poll-vertical"></i> Rubric Evidence: Datasets & Evaluation</div>
+        <h2 class="slide-title">Machine Learning Benchmarking & Dataset Evidence</h2>
+        <p class="slide-subtitle">
+          Official Capstone Requirement: <i>"Students must provide datasets and a rubric for machine/deep learning algorithms... evidence of accuracy at least 80%."</i>
+        </p>
+
+        <div class="grid-2">
+          <table class="pdm-table">
+            <thead>
+              <tr>
+                <th>Model Architecture</th>
+                <th>Validation Accuracy</th>
+                <th>Pi Inference Time</th>
+                <th>Memory Footprint</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="background: rgba(16, 185, 129, 0.08);">
+                <td><b>Random Forest (Ours)</b></td>
+                <td><b style="color: var(--green);">100.0%</b></td>
+                <td><b>1.8 ms</b></td>
+                <td><span class="badge badge-green">Ultra-Light (~2 MB)</span></td>
+              </tr>
+              <tr>
+                <td>Gradient Boosting (GBDT)</td>
+                <td>100.0%</td>
+                <td>3.4 ms</td>
+                <td><span class="badge badge-blue">Light (~4 MB)</span></td>
+              </tr>
+              <tr>
+                <td>Logistic Regression</td>
+                <td>91.2%</td>
+                <td>0.4 ms</td>
+                <td><span class="badge badge-green">Minimal (Linear)</span></td>
+              </tr>
+              <tr>
+                <td>1D-CNN (Deep Learning)</td>
+                <td>99.1%</td>
+                <td>28.5 ms</td>
+                <td><span class="badge badge-red">Heavy (~65 MB RAM)</span></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="feature-card">
+            <div class="card-title"><i class="fa-solid fa-download" style="color: var(--cyan);"></i> Official Exhibition Datasets & Evidence</div>
+            <p class="card-desc">
+              Judges can click to inspect or download the original artifacts directly from our deployed system:
+            </p>
+            <div style="display: flex; flex-direction: column; gap: clamp(4px, 0.8vh, 8px); margin-top: clamp(6px, 1vh, 12px);">
+              <a href="/windows.csv" download class="btn" style="font-size: 12px;"><i class="fa-solid fa-file-csv" style="color: var(--green);"></i> Download Training Dataset (windows.csv)</a>
+              <button onclick="openModal('confusion_matrix.png', 'Confusion Matrix (100% Sensitivity)')" class="btn" style="font-size: 12px;"><i class="fa-solid fa-image" style="color: var(--cyan);"></i> View Confusion Matrix (100% Sensitivity)</button>
+              <button onclick="openModal('roc_curves.png', 'Multi-Class ROC Curves (AUC = 1.00)')" class="btn" style="font-size: 12px;"><i class="fa-solid fa-chart-line" style="color: var(--purple);"></i> View ROC Curves (AUC = 1.00)</button>
+              <button onclick="openModal('feature_importance.png', 'Random Forest Gini Feature Importance')" class="btn" style="font-size: 12px;"><i class="fa-solid fa-ranking-star" style="color: var(--amber);"></i> View Feature Importance Plot</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 9: OFFLINE-FIRST RESILIENCY -->
+      <section class="slide" data-slide="9" data-theme="blue">
+        <div class="slide-tag"><i class="fa-solid fa-shield-halved"></i> Engineering Robustness</div>
+        <h2 class="slide-title">Offline-First Resiliency: What If Internet Dies?</h2>
+        <p class="slide-subtitle">
+          Industrial equipment cannot rely on fragile Wi-Fi. Our Cyber-Physical System continues operating even with Ethernet cables severed.
+        </p>
+
+        <div class="grid-3">
+          <div class="feature-card">
+            <div class="card-icon" style="color: var(--cyan);"><i class="fa-solid fa-database"></i></div>
+            <div class="card-title">1. Local Ring Buffer</div>
+            <div class="card-desc">
+              Every telemetry frame is written first to a persistent local circular buffer on the Pi's internal storage. If cloud connectivity drops, data is never lost.
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="card-icon" style="color: var(--amber);"><i class="fa-solid fa-wifi"></i></div>
+            <div class="card-title">2. Standalone Hotspot</div>
+            <div class="card-desc">
+              Technicians in the plant can connect directly to the Raspberry Pi's local web server (<code style="color: var(--cyan);">http://192.168.4.1:5000</code>) inside the factory without internet access.
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="card-icon" style="color: var(--green);"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+            <div class="card-title">3. Auto-Replay Sync</div>
+            <div class="card-desc">
+              The moment factory Wi-Fi is restored, our asynchronous daemon (<code style="color: var(--cyan);">pdm-cloud</code>) flushes the queue, back-filling Firebase with 100% data integrity.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 10: RUBRIC HIGHLIGHT — DYNAMIC INPUT-OUTPUT DEMO -->
+      <section class="slide" data-slide="10" data-theme="amber">
+        <div class="slide-tag"><i class="fa-solid fa-vial-circle-check"></i> Rubric Requirement: Dynamic Output Response</div>
+        <h2 class="slide-title">Live Judge Demonstration Protocol (3-Minute Script)</h2>
+        <p class="slide-subtitle">
+          Official Capstone Requirement: <i>"Students must be able to show the change in system outputs or states as a function of changing inputs."</i>
+        </p>
+
+        <div class="grid-2">
+          <div class="feature-card">
+            <div style="font-weight: 700; color: var(--green); margin-bottom: 6px;">
+              <i class="fa-solid fa-1"></i> Input: Normal Baseline &rarr; Output: Green / Zone A
+            </div>
+            <p class="card-desc">
+              Run motor smoothly. Dashboard shows <b>Green Lamp</b>, RMS &lt; 0.08g, Kurtosis $\approx 3.0$. Stage 1 reports: <i>Normal Baseline &bull; AI Sleeping</i>.
+            </p>
+
+            <div style="font-weight: 700; color: var(--amber); margin-top: clamp(8px, 1.2vh, 14px); margin-bottom: 6px;">
+              <i class="fa-solid fa-2"></i> Input: Eccentric Rotor Mass &rarr; Output: Imbalance Alert
+            </div>
+            <p class="card-desc">
+              Snap eccentric counterweight clip onto motor shaft. Within 1.5 seconds, dashboard changes to <b>Warning / Mechanical Imbalance</b>, showing $1\times$ RPM surge.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div style="font-weight: 700; color: var(--red); margin-bottom: 6px;">
+              <i class="fa-solid fa-3"></i> Input: Bearing Shock &rarr; Output: Critical Red Alert
+            </div>
+            <p class="card-desc">
+              Tap the mounting plate with a screwdriver. Kurtosis immediately spikes from 3.0 to &gt; 5.5. Stage 2 triggers <b>Red Critical / Bearing Defect Alert</b> with audio chime.
+            </p>
+
+            <div style="font-weight: 700; color: var(--blue); margin-top: clamp(8px, 1.2vh, 14px); margin-bottom: 6px;">
+              <i class="fa-solid fa-4"></i> Input: Disconnect Wi-Fi &rarr; Output: Zero Packet Loss
+            </div>
+            <p class="card-desc">
+              Unplug uplink cable. Prove the local Raspberry Pi screen never freezes. Reconnect cable and watch Firebase automatically back-fill missed points!
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 11: ACADEMIC REFERENCES & STANDARDS -->
+      <section class="slide" data-slide="11" data-theme="cyan">
+        <div class="slide-tag"><i class="fa-solid fa-book-bookmark"></i> Scientific Foundation</div>
+        <h2 class="slide-title">Academic References & Industrial Standards</h2>
+        <p class="slide-subtitle">
+          All methodologies, thresholds, and algorithms are directly anchored in peer-reviewed literature and ISO standards.
+        </p>
+
+        <div class="grid-2">
+          <div class="feature-card">
+            <b style="color: var(--cyan);"><i class="fa-solid fa-file-pdf"></i> Cinar et al. (2022) &mdash; <i>Machines</i> (MDPI)</b><br>
+            <span style="font-size: 12px; color: var(--text-muted);">"A Predictive Maintenance System Design and Implementation for Intelligent Manufacturing"</span>
+            <p class="card-desc">
+              Established our Cyber-Physical System framework and coarse-to-fine gating, proving statistical triage reduces edge ML computing overhead by &gt;90%.<br>
+              <a href="https://doi.org/10.3390/machines10111006" target="_blank" style="color: var(--cyan); text-decoration: none; font-size: 12px;">DOI: 10.3390/machines10111006</a>
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <b style="color: var(--green);"><i class="fa-solid fa-certificate"></i> ISO 10816-3 / ISO 20816-3 Standards</b><br>
+            <span style="font-size: 12px; color: var(--text-muted);">"Evaluation of machine vibration by measurements on non-rotating parts"</span>
+            <p class="card-desc">
+              Provides international vibration severity threshold zones (Zone A: Pristine, B: Acceptable, C: Restricted, D: Danger) used to ground our AI predictions.<br>
+              <a href="https://www.iso.org/standard/50528.html" target="_blank" style="color: var(--green); text-decoration: none; font-size: 12px;">ISO Standard Catalog Reference</a>
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <b style="color: var(--amber);"><i class="fa-solid fa-microchip"></i> Mourtzis et al. (2020) &mdash; <i>Frontiers in Mech. Eng.</i></b><br>
+            <span style="font-size: 12px; color: var(--text-muted);">"Intelligent Predictive Maintenance and Remote Monitoring Framework"</span>
+            <p class="card-desc">
+              Governs our multi-modal sensor fusion (synchronous vibration + thermocouple temperature) and decoupled edge-to-cloud telemetry design.<br>
+              <a href="https://doi.org/10.3389/fmech.2020.578379" target="_blank" style="color: var(--amber); text-decoration: none; font-size: 12px;">DOI: 10.3389/fmech.2020.578379</a>
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <b style="color: var(--purple);"><i class="fa-solid fa-chart-line"></i> Randall & Antoni (2011) &mdash; <i>MSSP</i> (Elsevier)</b><br>
+            <span style="font-size: 12px; color: var(--text-muted);">"Rolling element bearing diagnostics—A tutorial"</span>
+            <p class="card-desc">
+              Formulates the mechanical shock kinematics of raceway spall impacts, establishing Kurtosis ($K$) and Crest Factor ($CF$) as primary indicators.<br>
+              <a href="https://doi.org/10.1016/j.ymssp.2010.07.017" target="_blank" style="color: var(--purple); text-decoration: none; font-size: 12px;">DOI: 10.1016/j.ymssp.2010.07.017</a>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 12: JUDGE DEFENSE MASTER KEY -->
+      <section class="slide" data-slide="12" data-theme="indigo">
+        <div class="slide-tag"><i class="fa-solid fa-shield-halved"></i> 100% Score Defense Key</div>
+        <h2 class="slide-title">Judge Defense Master Key: The 4 Toughest Questions</h2>
+        <p class="slide-subtitle">
+          Memorize these 4 definitive answers to instantly dismantle common judge critiques and score maximum evaluation points.
+        </p>
+
+        <div class="grid-2">
+          <div class="feature-card">
+            <b style="color: var(--cyan);"><i class="fa-solid fa-microchip"></i> Q1: Why didn't you just use an Arduino?</b>
+            <p class="card-desc">
+              <i>"First, the Capstone challenge strictly forbids Arduino. Second, an 8-bit Arduino AVR lacks a hardware floating-point unit (FPU) and cannot compute 100 Hz sliding window statistical moments, FFT spectral energies, or run 300-tree Random Forest models. Our Raspberry Pi 4 (Quad-Core 64-bit ARM) provides true real-time edge computing."</i>
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <b style="color: var(--green);"><i class="fa-solid fa-cloud-arrow-up"></i> Q2: Why not stream all raw vibration directly to the Cloud?</b>
+            <p class="card-desc">
+              <i>"Streaming raw 100 Hz 3-axis vibration generates millions of records daily, creating heavy network latency, costly cloud egress fees, and catastrophic vulnerabilities if the factory internet cuts. We compute features locally in 1.8 ms and only stream lightweight status frames."</i>
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <b style="color: var(--amber);"><i class="fa-solid fa-brain"></i> Q3: Why Random Forest over Deep Neural Networks?</b>
+            <p class="card-desc">
+              <i>"A 1D-CNN consumes ~65 MB RAM and takes 28.5 ms per inference, risking thermal throttling on embedded chips. Our Random Forest achieves 100% accuracy in just 1.8 ms with 2 MB memory, and its tree split thresholds are fully explainable for safety certification."</i>
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <b style="color: var(--purple);"><i class="fa-solid fa-ruler-combined"></i> Q4: How did you prove your sensors are accurate?</b>
+            <p class="card-desc">
+              <i>"We performed a 6-position static gravitational calibration on an optical surface to zero the ADXL345 0g offset vector, and calibrated the thermocouple against crushed ice ($0.0^\circ\text{C}$) and boiling water ($100.0^\circ\text{C}$), achieving $< 0.51\%$ residual error."</i>
+            </p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- BOTTOM INTERACTIVE DOCK -->
+  <div class="bottom-dock" id="bottomDock">
+    <button class="dock-btn" onclick="prevSlide()" title="Previous slide (Left Arrow)"><i class="fa-solid fa-chevron-left"></i></button>
+    <div id="dockDots" style="display: flex; gap: 6px; align-items: center;"></div>
+    <button class="dock-btn" onclick="nextSlide()" title="Next slide (Right Arrow)"><i class="fa-solid fa-chevron-right"></i></button>
+  </div>
+
+  <!-- MODAL LIGHTBOX OVERLAY -->
+  <div class="modal-overlay" id="artifactModal" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <b style="color: var(--cyan); font-size: 14px;" id="modalTitle">Artifact Preview</b>
+        <button onclick="closeModal()" style="background:transparent; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <img id="modalImg" src="" alt="Artifact">
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE OVERVIEW GRID MODAL -->
+  <div class="modal-overlay" id="overviewModal" onclick="closeOverviewModal(event)">
+    <div class="modal-content" style="max-width: 900px;" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <b style="color: var(--cyan); font-size: 14px;"><i class="fa-solid fa-table-cells-large"></i> Slide Deck Overview (12 Slides)</b>
+        <button onclick="closeOverviewModal()" style="background:transparent; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="overview-grid" id="overviewGrid"></div>
+    </div>
+  </div>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 12;
+    const slides = document.querySelectorAll('.slide');
+    const counterEl = document.getElementById('slideCounter');
+    const progressFill = document.getElementById('progressFill');
+    const dockDotsContainer = document.getElementById('dockDots');
+    let soundEnabled = true;
+
+    // Web Audio API Synthesizer for Clean Haptic Feedback
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playTone(freq, type, duration, vol) {
+      if (!soundEnabled) return;
+      try {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type || 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(vol || 0.05, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function toggleAudio() {
+      soundEnabled = !soundEnabled;
+      document.getElementById('audioIcon').className = soundEnabled ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark';
+      if (soundEnabled) playTone(880, 'sine', 0.1, 0.08);
+    }
+
+    // Build dock dots
+    for (let i = 1; i <= totalSlides; i++) {
+      const dot = document.createElement('div');
+      dot.className = `dock-dot ${i === 1 ? 'active' : ''}`;
+      dot.title = `Jump to Slide ${i}`;
+      dot.onclick = () => jumpToSlide(i);
+      dockDotsContainer.appendChild(dot);
+    }
+
+    // Build Overview Grid Thumbnails
+    const overviewGrid = document.getElementById('overviewGrid');
+    slides.forEach((s, idx) => {
+      const thumb = document.createElement('div');
+      thumb.className = `grid-thumb ${idx === 0 ? 'active' : ''}`;
+      const title = s.querySelector('.slide-title')?.textContent || `Slide ${idx+1}`;
+      const tag = s.querySelector('.slide-tag')?.textContent || `Topic`;
+      thumb.innerHTML = `
+        <div style="font-size:10px; font-weight:800; color:var(--cyan); margin-bottom:4px;">${String(idx+1).padStart(2,'0')} &bull; ${tag.slice(0, 18)}</div>
+        <div style="font-size:12px; font-weight:700; color:#fff; line-height:1.3;">${title.slice(0, 38)}...</div>
+      `;
+      thumb.onclick = () => {
+        jumpToSlide(idx + 1);
+        closeOverviewModal();
+      };
+      overviewGrid.appendChild(thumb);
+    });
+
+    function openOverviewModal() {
+      document.getElementById('overviewModal').style.display = 'flex';
+      playTone(520, 'triangle', 0.15, 0.05);
+    }
+
+    function closeOverviewModal() {
+      document.getElementById('overviewModal').style.display = 'none';
+    }
+
+    function jumpToSlide(idx) {
+      currentSlide = idx;
+      updateSlide();
+      playTone(700, 'sine', 0.08, 0.04);
+    }
+
+    // Dynamic Aurora Accent Adaptation
+    function updateAurora(theme) {
+      const orb1 = document.getElementById('orb1');
+      const orb2 = document.getElementById('orb2');
+      if (theme === 'green') {
+        orb1.style.background = 'radial-gradient(circle, var(--green) 0%, transparent 70%)';
+        orb2.style.background = 'radial-gradient(circle, var(--cyan) 0%, transparent 70%)';
+      } else if (theme === 'amber') {
+        orb1.style.background = 'radial-gradient(circle, var(--amber) 0%, transparent 70%)';
+        orb2.style.background = 'radial-gradient(circle, var(--red) 0%, transparent 70%)';
+      } else if (theme === 'purple' || theme === 'indigo') {
+        orb1.style.background = 'radial-gradient(circle, var(--purple) 0%, transparent 70%)';
+        orb2.style.background = 'radial-gradient(circle, var(--blue) 0%, transparent 70%)';
+      } else {
+        orb1.style.background = 'radial-gradient(circle, var(--cyan) 0%, transparent 70%)';
+        orb2.style.background = 'radial-gradient(circle, var(--blue) 0%, transparent 70%)';
+      }
+    }
+
+    function updateSlide() {
+      slides.forEach(slide => slide.classList.remove('active'));
+      const activeSlide = document.querySelector(`.slide[data-slide="${currentSlide}"]`);
+      if (activeSlide) {
+        activeSlide.classList.add('active');
+        triggerNumberCounters(activeSlide);
+        updateAurora(activeSlide.getAttribute('data-theme'));
+      }
+      counterEl.textContent = `${String(currentSlide).padStart(2, '0')} / ${String(totalSlides).padStart(2, '0')}`;
+      progressFill.style.width = `${(currentSlide / totalSlides) * 100}%`;
+
+      // Update dock dots
+      const dots = dockDotsContainer.querySelectorAll('.dock-dot');
+      dots.forEach((dot, i) => {
+        dot.className = `dock-dot ${i + 1 === currentSlide ? 'active' : ''}`;
+      });
+
+      // Update overview thumbs
+      const thumbs = overviewGrid.querySelectorAll('.grid-thumb');
+      thumbs.forEach((t, i) => {
+        t.className = `grid-thumb ${i + 1 === currentSlide ? 'active' : ''}`;
+      });
+
+      // Re-render KaTeX if available
+      if (window.renderMathInElement && activeSlide) {
+        renderMathInElement(activeSlide, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+          ]
+        });
+      }
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        currentSlide++;
+        updateSlide();
+        playTone(600, 'sine', 0.08, 0.04);
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        currentSlide--;
+        updateSlide();
+        playTone(450, 'sine', 0.08, 0.04);
+      }
+    }
+
+    // Number counting animation
+    function triggerNumberCounters(container) {
+      const counters = container.querySelectorAll('.stat-number[data-target]');
+      counters.forEach(el => {
+        const target = parseFloat(el.getAttribute('data-target'));
+        const prefix = el.getAttribute('data-prefix') || '';
+        const suffix = el.getAttribute('data-suffix') || '';
+        const decimals = parseInt(el.getAttribute('data-decimals') || '0');
+        let current = 0;
+        const duration = 650;
+        const stepTime = 20;
+        const totalSteps = duration / stepTime;
+        const increment = target / totalSteps;
+
+        const timer = setInterval(() => {
+          current += increment;
+          if (current >= target) {
+            current = target;
+            clearInterval(timer);
+          }
+          el.textContent = `${prefix}${current.toFixed(decimals)}${suffix}`;
+        }, stepTime);
+      });
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (document.body.classList.contains('scroll-mode')) return;
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      } else if (e.key.toLowerCase() === 'f') {
+        toggleFullScreen();
+      } else if (e.key.toLowerCase() === 's') {
+        toggleViewMode();
+      } else if (e.key.toLowerCase() === 'g') {
+        openOverviewModal();
+      } else if (e.key === 'Escape') {
+        closeModal();
+        closeOverviewModal();
+      }
+    });
+
+    // Touch Swipe Navigation for mobile & tablets
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    document.addEventListener('touchstart', e => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, false);
+
+    document.addEventListener('touchend', e => {
+      touchEndX = e.changedTouches[0].screenX;
+      if (document.body.classList.contains('scroll-mode')) return;
+      if (touchEndX < touchStartX - 50) nextSlide();
+      if (touchEndX > touchStartX + 50) prevSlide();
+    }, false);
+
+    // View mode toggle
+    function toggleViewMode() {
+      document.body.classList.toggle('scroll-mode');
+      const isScroll = document.body.classList.contains('scroll-mode');
+      document.getElementById('viewModeText').textContent = isScroll ? 'Slide' : 'Scroll';
+      document.getElementById('viewModeBtn').querySelector('i').className = isScroll ? 'fa-solid fa-film' : 'fa-solid fa-list-check';
+      if (!isScroll) {
+        updateSlide();
+      }
+    }
+
+    // Fullscreen toggle
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {});
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    // Modal Lightbox
+    function openModal(src, title) {
+      document.getElementById('modalImg').src = src;
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('artifactModal').style.display = 'flex';
+      playTone(550, 'triangle', 0.15, 0.05);
+    }
+
+    function closeModal() {
+      document.getElementById('artifactModal').style.display = 'none';
+    }
+
+    // Ambient Cyber Particle Canvas
+    (function initCanvas() {
+      const canvas = document.getElementById('ambient-canvas');
+      const ctx = canvas.getContext('2d');
+      let w, h;
+      let particles = [];
+
+      function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      for (let i = 0; i < 48; i++) {
+        particles.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: (Math.random() - 0.5) * 0.4,
+          radius: Math.random() * 1.8 + 0.8
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = 'rgba(6, 182, 212, 0.4)';
+        ctx.strokeStyle = 'rgba(6, 182, 212, 0.08)';
+
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.x < 0) p.x = w;
+          if (p.x > w) p.x = 0;
+          if (p.y < 0) p.y = h;
+          if (p.y > h) p.y = 0;
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fill();
+
+          for (let j = i + 1; j < particles.length; j++) {
+            const p2 = particles[j];
+            const dx = p.x - p2.x;
+            const dy = p.y - p2.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < 130) {
+              ctx.lineWidth = 1 - dist / 130;
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+
+    // Initialize first slide counter
+    window.addEventListener('DOMContentLoaded', () => {
+      updateSlide();
+    });
+  </script>
+</body>
+</html>

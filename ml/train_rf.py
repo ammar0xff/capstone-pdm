@@ -10,7 +10,7 @@ import os
 import json
 import time
 import numpy as np
-import pandas as pd
+import csv
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -65,11 +65,15 @@ def main():
         from dataset_generator import generate_dataset
         generate_dataset()
 
-    df = pd.read_csv(DATASET_FILE)
-    print(f"[INFO] Loaded dataset: {len(df)} samples across {df['class_id'].nunique()} classes.")
+    rows = []
+    with open(DATASET_FILE, 'r') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            rows.append(row)
 
-    X = df[FEATURE_COLS].values
-    y = df["class_id"].values
+    print(f"[INFO] Loaded dataset: {len(rows)} samples.")
+    X = np.array([[float(r[col]) for col in FEATURE_COLS] for r in rows], dtype=np.float32)
+    y = np.array([int(r["class_id"]) for r in rows], dtype=np.int32)
 
     # 1. Stratified 5-Fold Cross-Validation
     print("[INFO] Executing Stratified 5-Fold Cross-Validation (PRD Section 7)...")

@@ -1,0 +1,9 @@
+{
+  "enabled": true,
+  "firebase_url": "https://castpone2026-default-rtdb.firebaseio.com/motor1.json",
+  "sync_interval_s": 5.0,
+  "max_daily_writes": 15000,
+  "daily_writes_today": 0,
+  "last_day": "2026-11-23",
+  "last_sync_status": "Configured"
+}
