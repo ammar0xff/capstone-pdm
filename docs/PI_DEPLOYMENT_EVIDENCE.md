@@ -244,3 +244,30 @@ because no real calibration exists. `--calibrate-sound 94 --sound-cal
 `-49.989 dBFS`) and wrote constant `143.989 dB` to the temp path only. That temp file
 and the earlier stub-test JSON were removed; the real `edge/sound_cal.json` remains
 absent. All three services were `active` afterwards.
+
+## 2026-11-24 22:47 — operator's raw_measuree.py restored and sound fixed
+
+The operator asked to stop using my guided `edge/calibrate.py` and the sound-cal
+variant, and to use their own `edge/raw_measuree.py` (double-e filename) instead.
+That file no longer exists on the Pi, so it was reconstructed from the local copy
+made before my earlier edits, with all of my sound-calibration additions removed.
+`[NEED: the untouched original if exact 657-line formatting matters]` — the logic is
+the operator's, but editor normalisation changed the line layout.
+
+Only one change was made to that script: when `arecord` ends early, the reader now
+prints `[SOUND ERROR] <arecord stderr>`, a hint to stop `pdm-daq.service`, and backs
+off 1 s instead of silently restarting. Raw ADXL345 counts, MAX6675 words and
+INMP441 RMS/peak/dBFS output were left as written by the operator. Deployed to
+`/home/renad/pdm/edge/raw_measuree.py`, MD5
+`d138b961774a77514691289fb360f0fd`, `py_compile` OK. No existing file was
+overwritten.
+
+With the DAQ service active, a two-sample run showed
+`[SOUND ERROR] arecord: main:850: audio open error: Device or resource busy` plus the
+hint, while ADXL/MAX raw values were still logged. With `pdm-daq.service` briefly
+stopped, `/home/renad/raw_measuree_live_224721.csv` had four rows with nonzero sound
+RMS on all four (`0.002348`, `0.005073`, `0.000873`, `0.000690`) and dBFS values
+`-52.59`, `-45.89`, `-61.18`, `-63.22`; raw ADXL LSB and MAX words/counts were
+present. Services were restarted and all three are `active`.
+`edge/raw_measure.py` (MD5 `3ea87cc2cbfcc2884e39711b11e9630b`), `cal.json`
+(`790891637e9b49c0e3beafd59019f697`) and the absent `sound_cal.json` were untouched.
