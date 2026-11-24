@@ -132,3 +132,18 @@ Post-change verification: `py_compile` OK, all three services `active`, local da
 `latest_state.json` advancing (`seq 189`, 12.8 s old), Firebase `seq 189` (24.8 s old) and
 `last_sync_status = OK (HTTP 200)`. The real calibration runner remains
 `/home/renad/pdm/edge/calibrate.py`; `python3 edge/calibrate.py --help` works.
+
+## 2026-11-24 11:25 — raw measurement runner
+
+Added `edge/raw_measure.py` at commit `ab6fd4d` and copied it to the Pi with the
+updated README, runbook and file map. MD5 matched (`8dff67e48b8c5ab2af21a52a5071e3e7`),
+`py_compile` OK and `--help` worked. The old `edge/raw_sensors.py.save` remains in
+`backups/cleanup-20261124-111903/`; the new script supersedes it.
+
+With `pdm-daq.service` stopped, `python3 edge/raw_measure.py --count 3 --interval 0.3
+--csv /tmp/pdm_raw_check.csv` returned three live raw frames, for example
+`X=6 Y=-64 Z=95` LSB and `MAX6675 0x0340 counts=104 open_tc=0 T_datasheet=26.00 C
+(UNCALIBRATED)`. The CSV contained the same three rows. No `cal.json` value was
+applied or changed. The DAQ service was restarted afterwards; all three services
+were `active`, local state `seq 156` was 0.0 s old, `last_sync_status = OK (HTTP 200)`
+and the Tailscale dashboard returned HTTP 200.
