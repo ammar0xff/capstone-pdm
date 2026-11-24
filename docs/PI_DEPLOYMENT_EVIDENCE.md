@@ -161,3 +161,11 @@ The Pi could not be reached to deploy `25cfa67`: `tailscale status` reports
 `100.126.244.75 cast ... offline, last seen 4h ago` and SSH timed out. The Pi is still
 running the previously deployed template (`2d618fff6205d6a3cc8fa13ed62829f7`); this
 polish is pending until the Pi is back online. No rollback or destructive action was attempted.
+
+### 19:17 recheck
+
+`tailscale status` briefly listed `cast` as `idle` then `active; direct`, but the node is
+not actually reachable: `tailscale ping -c 2 cast` → `no reply`, `/dev/tcp/.../22` failed,
+and SSH timed out again. One short SSH command succeeded at 19:17:11 and confirmed the Pi
+still had template MD5 `2d618fff6205d6a3cc8fa13ed62829f7` and all three services `active`.
+The copy of `25cfa67` remains pending; no partial deploy was confirmed.
