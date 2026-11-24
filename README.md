@@ -44,7 +44,7 @@ Engineering corrections found by the checks and already applied to the book and 
 4. **Cold junction**: the MAX6675 die *is* T_cold — the module must sit ≥15 cm from the Pi or every reading carries the box's 12 °C rise.
 5. **Probe class**: a class-2 K-type is ±2.5 °C on its own — M4 (±2.0 °C) only holds with a **class-1** probe.
 
-Open documentation issues (deliberate WARNs): I²C cable must stay <10 cm, the sealed IP65 box needs a lid heat-spreader, and the SPC layer uses a 2-of-3 rule because a single 3σ point false-alarms about every 31 minutes.
+Open documentation issues (deliberate WARNs): I²C cable must stay <10 cm, the sealed IP65 box needs a lid heat-spreader, and the implemented Stage-1 gate is a single configured 2.0-sigma threshold; a 2-of-3 confirmation rule is a proposal only, not deployed. [NEED: measure the false-alarm interval on the physical rig before quoting one.]
 
 ## Budget: signed 9,370 ceiling (real quotes)
 

@@ -15,7 +15,7 @@
 ## 1. Executive Summary & Problem Formulation
 In Egyptian manufacturing lines, unexpected motor breakdowns cause catastrophic downtime ($>\$50\text{B/yr}$ globally). Traditional preventive maintenance replaces healthy bearings prematurely, wasting scarce capital. 
 
-To satisfy the Grade 12 Capstone Challenge theme (*"Communication, Sensing, Information & Informatics"*), we designed and deployed an **offline-first edge AI predictive maintenance system** that detects mechanical and thermal anomalies in **$\le 5$ seconds** with zero ongoing cloud expenditure.
+To satisfy the Grade 12 Capstone Challenge theme (*"Communication, Sensing, Information & Informatics"*), we designed and deployed an **offline-first edge AI predictive maintenance system** that classifies current mechanical and thermal fault states with zero ongoing cloud expenditure. The PRD's $\le 5.0\,\text{s}$ response time remains a **target**: single-window inference was measured, but full inject→alert timing has not been measured.
 
 ```
                                     +-----------------------------------------+

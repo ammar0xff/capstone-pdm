@@ -60,7 +60,7 @@ $$\text{RMS} = \sqrt{\frac{1}{N}\sum a_i^2}$$
 
 ### 2. Kurtosis (The Pinprick Detector)
 $$\kappa = \frac{\mu_4}{\sigma^4}$$
-- **Plain English:** Imagine sitting in a quiet classroom, and someone suddenly pops a balloon. That sharp sudden spike is what Kurtosis detects. When a steel bearing ball rolls over a microscopic crack, it creates a tiny sharp click. A healthy motor has a Kurtosis of $\approx 3.0$ (smooth bell curve). A cracked bearing spikes Kurtosis to $> 5.0$, catching the fault weeks before the motor breaks!
+- **Plain English:** Imagine sitting in a quiet classroom, and someone suddenly pops a balloon. That sharp sudden spike is what Kurtosis detects. When a steel bearing ball rolls over a microscopic crack, it creates a tiny sharp click. A healthy motor has a Kurtosis of $\approx 3.0$ (smooth bell curve); in the synthetic bearing-defect windows, kurtosis rises above 5.0. No real-motor lead time is claimed.
 
 ### 3. Crest Factor (Shock vs Steady)
 $$\text{CF} = \frac{\text{Peak}}{\text{RMS}}$$
@@ -68,11 +68,11 @@ $$\text{CF} = \frac{\text{Peak}}{\text{RMS}}$$
 
 ### 4. Shewhart SPC Z-Score (The Nightwatchman)
 $$Z = \frac{\text{RMS} - \mu_0}{\sigma_0}$$
-- **Plain English:** How weird is the machine acting compared to its healthy morning baseline? If $Z$ is between $-2$ and $+2$, the machine is behaving normally. If $Z$ jumps past $+2.0$ (95.4% confidence), the alarm sounds!
+- **Plain English:** How weird is the machine acting compared with the configured healthy baseline? In the runtime code, $\mu_0 = 0.080\,g$ and $\sigma_0 = 0.025\,g$. If $Z > 2.0$, the gate crosses the configured warning threshold; this is a tunable limit, not a measured confidence percentage.
 
 ### 5. Thermal Derivative $\Delta T/\Delta t$ (The Fever Rate)
 $$\frac{\Delta T}{\Delta t} = \frac{T_{\text{now}} - T_{\text{past}}}{\Delta t / 60} \quad [^\circ\text{C/min}]$$
-- **Plain English:** If a motor is $45^\circ\text{C}$, that's normal. But if its temperature jumps by $5^\circ\text{C}$ in just 60 seconds, friction is melting the bearings! Watching the slope lets us stop the motor 20 minutes before it catches fire.
+- **Plain English:** If a motor is $45^\circ\text{C}$, that can be normal under load. A rapid rise is a warning sign; the runtime uses fixed temperature and slope limits (warning above $50^\circ\text{C}$ or $5^\circ\text{C/min}$, fault above $70^\circ\text{C}$ or $10^\circ\text{C/min}$). No lead time before a real fault has been measured.
 
 ### 6. Acoustic Zero Crossing Rate (ZCR)
 - **Plain English:** How fast does the sound wave wiggle across zero? A low rumble has low ZCR. A dry metal-on-metal squeal has thousands of wiggles per second (high ZCR).
@@ -89,8 +89,8 @@ Running heavy artificial intelligence models 24 hours a day is like driving your
                                 │
                Is Z <= 2.0? ────┴──── Is Z > 2.0? (Anomaly!)
                      │                                │
-             (Stay in Low Power)             (Wake up Stage 2 AI!)
-             CPU usage < 8%                           │
+             (Cheap Stage-1 checks)          (Stage 2 classification)
+             CPU load not measured                    │
                                          [Stage 2: Random Forest]
                                          300 Decision Trees Vote:
                                          • Normal Operation
@@ -103,8 +103,8 @@ Running heavy artificial intelligence models 24 hours a day is like driving your
 Imagine asking a single doctor what disease you have—they might make a human error. Instead, imagine putting **300 doctors** in a room and having them vote. That is a Random Forest!
 - We created **300 decision trees**.
 - We trained them on **1,400 multi-modal machine windows**.
-- When an anomaly occurs, all 300 trees analyze the vibration, heat, and acoustics simultaneously and cast their vote in **under 1.5 milliseconds**!
-- Our model achieved **100.00% accuracy** on the test dataset!
+- When an anomaly occurs, all 300 trees analyze the vibration, heat, and acoustics and return a class plus per-class probability. Measured single-window inference was **26.19 ms on the training host** and **29.99 ms on the Raspberry Pi 4**; full inject→alert timing has not been measured.
+- Our model achieved **100.00% accuracy on the synthetic benchmark only** — this is not real-motor accuracy.
 
 ---
 
@@ -131,8 +131,8 @@ When you stand before the judges at the Capstone Exhibition, follow this winning
 | Time | Action | What to Say to the Judges |
 |---|---|---|
 | **0:00 - 0:30** | Open [`https://castpone2026.web.app`](https://castpone2026.web.app) on your smartphone. | *"Welcome, judges. Our Capstone project solves Egypt's industrial downtime challenge using edge AI and multi-modal sensing. Here on my phone, you can see our live machine telemetry streaming from our Raspberry Pi via Firebase at zero cloud cost."* |
-| **0:30 - 1:00** | Point to the Stage 1 Badge. | *"Notice our two-stage architecture from Cinar et al. (2022). We don't waste power running heavy neural nets continuously. Stage 1 Shewhart SPC monitors the baseline for free at under 8% CPU load."* |
-| **1:00 - 1:45** | **Inject Fault 1:** Attach the small weight to the motor shaft. | *"Now, watch what happens when I simulate a mechanical unbalance. The RMS vibration spikes, breaches our 2-sigma gate in under 1.5 seconds, awakens Stage 2, and our 300-tree Random Forest instantly classifies 'Mechanical Imbalance' with 98% confidence!"* |
+| **0:30 - 1:00** | Point to the Stage 1 Badge. | *"Notice our two-stage architecture from Cinar et al. (2022). Stage 1 Shewhart checks run before classification; CPU load has not been measured."* |
+| **1:00 - 1:45** | **Inject Fault 1:** Attach the small weight to the motor shaft. | *"Now, watch what happens when I simulate a mechanical unbalance. The RMS vibration can cross our configured 2.0-sigma warning threshold and Stage 2 returns a class and probability. Full inject→alert timing has not been measured, and no fixed confidence figure is promised."* |
 | **1:45 - 2:15** | **Inject Fault 2:** Tap the mounting base with a screwdriver. | *"Now I simulate a bearing raceway crack. Look at the Kurtosis equation on the dashboard: it spikes from 3.0 to over 5.5, identifying a 'Bearing Defect' before overall RMS rises!"* |
 | **2:15 - 3:00** | **Prove Offline Survival:** Turn off phone Wi-Fi or show the offline local panel. | *"Finally, our system is strictly offline-first. Even if factory internet is cut, the Raspberry Pi logs 100% of data to its SD card and serves the technician locally. All of this was built inside a 9,370 EGP budget with zero paid cloud subscriptions."* |
 

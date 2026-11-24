@@ -32,7 +32,7 @@ The paper develops an end-to-end Cyber-Physical System (CPS) for condition monit
 #### Direct Mapping to Our Capstone Rig
 1. **Two-Stage Coarse-to-Fine Pipeline**: 
    - Following Cinar et al.'s findings, our system uses **Stage 1 Shewhart Statistical Process Control (SPC)** at the edge.
-   - Heavy Random Forest / GBDT inference is gated; it only triggers when vibration metrics ($z$-score $> 3\sigma$) or thermal thresholds exhibit anomalous deviations, slashing edge CPU cycles by **>90%**.
+   - Heavy Random Forest / GBDT inference is gated by Stage 1; the implemented warning condition is **z-score > 2.0** on dynamic RMS vibration, with additional fixed kurtosis, peak and thermal limits. CPU savings have not been measured on our Pi, so no percentage is claimed.
 2. **Lightweight Edge Telemetry**:
    - Cinar et al. emphasized lightweight telemetry (MQTT/JSON) decoupled from backend analytics. We implemented this via our asynchronous streaming daemon (`pdm-cloud`) pushing non-blocking JSON frames to Firebase RTDB.
 3. **Automated KPI Monitoring**:

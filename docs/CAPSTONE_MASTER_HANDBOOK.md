@@ -35,7 +35,7 @@ This project implements an **offline-first, edge-computing predictive maintenanc
 3. **Acoustic emissions** via a high-sensitivity acoustic sensor monitoring envelope amplitude and high-frequency Zero-Crossing Rate (ZCR).
 
 The edge architecture executes a **two-stage hybrid monitoring framework** based on Cinar et al. (2022):
-- **Stage 1 (Coarse Gate):** Continuous statistical process control (Shewhart SPC 3-sigma monitoring on dynamic RMS vibration and thermal derivative $\Delta T/\Delta t$) operating at ultra-low CPU load (<8%).
+- **Stage 1 (Coarse Gate):** Continuous statistical process control with a configured 2.0-sigma warning threshold on dynamic RMS vibration plus fixed thermal and impact limits; CPU load has not been measured, so no CPU percentage is claimed.
 - **Stage 2 (Fine Classification):** Gated machine learning inference using a 300-estimator Random Forest classifier (`max_depth=12`, single-core inference), classifying machine states into:
   - `Normal Operation` (Healthy)
   - `Mechanical Imbalance` (1X shaft rotational frequency anomaly)
@@ -171,10 +171,10 @@ $$\text{Crest Factor} = \frac{\max(|a_i|)}{\text{RMS}}$$
 $$\frac{\Delta T}{\Delta t} = \frac{T(t) - T(t - \Delta t)}{\Delta t} \times 60 \quad [^\circ\text{C/min}]$$
 - **Physical Rationale:** Differentiates healthy steady-state operating temperatures ($45^\circ\text{C}$ under load) from dangerous runaway conditions. A positive thermal slope $> 5.0^\circ\text{C/min}$ indicates severe mechanical friction, bearing seizure, or stator winding insulation breakdown.
 
-### 4.5 Shewhart Statistical Process Control (SPC 3-Sigma Rule)
-$$\bar{X} = \frac{1}{M}\sum_{k=1}^M \text{RMS}_k, \quad \sigma = \sqrt{\frac{1}{M-1}\sum_{k=1}^M (\text{RMS}_k - \bar{X})^2}$$
-$$\text{UCL} = \bar{X} + 3\sigma, \quad \text{LCL} = \max(0, \bar{X} - 3\sigma), \quad Z = \frac{|\text{RMS} - \bar{X}|}{\sigma}$$
-- **Physical Rationale:** Establishes an empirical statistical baseline during initial motor run-up. Fluctuations within $Z \le 2.0$ represent normal operating noise. A deviation $Z > 2.0$ serves as the trigger gate for Stage 2 fine ML inference.
+### 4.5 Shewhart Statistical Process Control (configured 2.0-sigma warning)
+$$Z = \frac{\text{RMS}_\text{dyn} - \mu_0}{\sigma_0}, \quad \text{UCL}_\text{warning} = \mu_0 + 2\sigma_0, \quad \text{UCL}_\text{fault} = \mu_0 + 3\sigma_0$$
+- **Implemented constants:** `edge/edge_daq.py` uses $\mu_0 = 0.080\,g$ and $\sigma_0 = 0.025\,g$, giving $\text{UCL}_\text{warning} \approx 0.130\,g$ and $\text{UCL}_\text{fault} \approx 0.155\,g$; the runtime also applies fixed kurtosis, peak and thermal limits. These are configured values, not a baseline fitted from the current motor.
+- **Physical Rationale:** $\mu_0$ and $\sigma_0$ represent an assumed healthy RMS level. A value above the configured warning UCL is flagged for inspection; a value above the fault UCL is a fault flag. This is current-state detection, not RUL prediction.
 
 ---
 
@@ -325,8 +325,8 @@ This script automatically executes 5 verification steps:
 2. **Step 2: Inject Mechanical Unbalance ($15\,\text{s}$)**
    - Attach an eccentric mass (small bolt or clip) to the motor shaft disk.
    - Observe the immediate spike in dynamic RMS vibration ($> 0.80g$).
-   - The Stage 1 Shewhart SPC gate detects $Z > 3.0\sigma$ in **$< 1.5\,\text{s}$**.
-   - The Stage 2 AI badge instantly flips to `Mechanical Imbalance` with **$>98\%$ confidence**.
+   - The Stage 1 gate uses the configured 2.0-sigma warning / 3.0-sigma fault limits in `edge/edge_daq.py`; full inject→alert timing has not been measured.
+   - The Stage 2 badge displays the Random Forest predicted class and its per-class probability; no fixed confidence percentage is promised in a live demo.
 3. **Step 3: Inject Bearing Defect Shock ($15\,\text{s}$)**
    - Remove the unbalance weight and introduce rapid sharp mechanical impulses to the mounting plate.
    - Show the judges how Kurtosis spikes to $> 5.5$ while overall RMS remains relatively low.
@@ -350,7 +350,7 @@ The system fulfills and exceeds all quantitative criteria established in the Cap
 |---|---|---|---|---|
 | **M1** | AI Fault Classification Accuracy | $\ge 80.0\%$ | **$100.00\%$** on synthetic benchmark | Group 5-Fold CV + 200-sample unseen-run Test Matrix (`ml/ai_report.md`) |
 | **M2** | End-to-End Anomaly Response Time | $\le 5.0\,\text{s}$ | **$29.99\,\text{ms}$ inference on Pi** | Shewhart gate + RF inference; full inject→alert timing not yet measured |
-| **M3** | Dual-Dashboard Latency Sync | $\le 3.0\,\text{s}$ | **$< 1.0\,\text{s}$** | Shared-memory IPC (`/dev/shm/pdm_latest.json`) |
+| **M3** | Dual-Dashboard Latency Sync | $\le 3.0\,\text{s}$ | not measured end-to-end | Shared-memory IPC (`/dev/shm/pdm_latest.json`) |
 | **M4** | Multi-Modal Sensor Coverage | $\ge 3$ modalities | **3 Modalities** | Vibration (ADXL345), Temperature (MAX6675), Sound (LM393) |
 | **M5** | Offline Autonomy & Resilience | 0 data loss on disconnect | **$100\%$ Local** | Complete offline Flask web server + local circular buffer |
 | **M6** | Total Cloud Expenditure | $0.00\,\text{EGP}$ | **$0.00\,\text{EGP}$** | Firebase Spark REST tier with strict 15k writes/day Quota Guard |

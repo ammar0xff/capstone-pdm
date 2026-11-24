@@ -179,5 +179,59 @@ class TeamFollowUpTest(unittest.TestCase):
             self.assertNotIn(token, html)
 
 
+class DocumentationHonestyTest(unittest.TestCase):
+    """Docs must not promote unmeasured resource, timing or source claims."""
+
+    DOCS = os.path.join(ROOT, "docs")
+    CLAIM_FILES = {
+        "README.md": os.path.join(ROOT, "README.md"),
+        "CAPSTONE_MASTER_HANDBOOK.md": os.path.join(
+            DOCS, "CAPSTONE_MASTER_HANDBOOK.md"
+        ),
+        "LITERATURE_REFERENCES.md": os.path.join(DOCS, "LITERATURE_REFERENCES.md"),
+        "STUDENT_MASTER_GUIDE.md": os.path.join(DOCS, "STUDENT_MASTER_GUIDE.md"),
+        "ai_report.md": os.path.join(ROOT, "ml", "ai_report.md"),
+    }
+    FORBIDDEN_CLAIMS = (
+        ">90%",
+        "<8%",
+        "3-sigma monitoring",
+        "under 1.5 seconds",
+        "uses a 2-of-3 rule",
+        "in \u2264 5 seconds",
+    )
+
+    def test_unverified_resource_and_timing_claims_are_removed(self):
+        for name, path in self.CLAIM_FILES.items():
+            with self.subTest(file=name):
+                with open(path) as f:
+                    text = f.read()
+                for claim in self.FORBIDDEN_CLAIMS:
+                    self.assertNotIn(claim, text, f"{name}: {claim}")
+
+    def test_gate_threshold_is_documented_as_configured_two_sigma(self):
+        with open(self.CLAIM_FILES["LITERATURE_REFERENCES.md"]) as f:
+            literature = f.read()
+        self.assertIn("z-score > 2.0", literature)
+        self.assertNotIn("3\u03c3", literature)
+        with open(self.CLAIM_FILES["CAPSTONE_MASTER_HANDBOOK.md"]) as f:
+            handbook = f.read()
+        self.assertIn("configured 2.0-sigma", handbook)
+
+    def test_dataset_range_traceability_exists_and_is_honest(self):
+        path = os.path.join(self.DOCS, "DATASET_RANGE_TRACEABILITY.md")
+        self.assertTrue(os.path.exists(path), "missing range-to-source register")
+        with open(path) as f:
+            text = f.read()
+        for token in (
+            "F_R_NOMINAL",
+            "3200 Hz",
+            "1800 RPM",
+            "[NEED:",
+            "SPC baseline mismatch",
+        ):
+            self.assertIn(token, text)
+
+
 if __name__ == "__main__":
     unittest.main()
