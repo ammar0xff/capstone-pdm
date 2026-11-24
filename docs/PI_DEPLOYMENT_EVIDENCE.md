@@ -197,3 +197,37 @@ windows; the first six RMS values were `0.323, 0.342, 0.164, 0.035, 0.092, 0.130
 confirming a live microphone signal. `arecord -l` lists the expected Google
 voiceHAT/INMP441 capture device, and one `arecord` process runs under the DAQ service.
 The DAQ service was restarted and all three services remain `active`.
+
+## 2026-11-24 22:35 — Pi-only raw measurement script fix
+
+The Pi's `edge/raw_measure.py` had been replaced by the operator with a 1,011-line
+version containing six-position ADXL coefficients (`G_BIAS_*`, `G_SCALE_*`) and
+`ADXL_LSB_PER_G = 256.0`. That Pi file is distinct from the 4.8 KB clean script in
+this repository; the repository version was not overwritten. The fix was applied by
+exact-text replacement so the operator's coefficients and formatting were preserved.
+
+Final deployed file: `/home/renad/pdm/edge/raw_measure.py`, MD5
+`3ea87cc2cbfcc2884e39711b11e9630b`, backup
+`edge/raw_measure.py.bak-20261124-223357`. Changes: `sound_cal.json` is resolved beside
+the script (or via `--sound-cal`), the calibration constant must be finite,
+`--calibrate-sound REF_DB` adds an operator calibration step that writes a backed-up
+JSON with reference/measured values, CSV creation is append-only, and a failed
+`arecord` now prints `[SOUND ERROR] <arecord stderr>` and backs off 1 s instead of
+silently logging zero sound. No `cal.json` value was applied or changed and no SPL
+constant was invented.
+
+Verification on the Pi: `python3 -m py_compile` OK; `--help` shows both new flags.
+The operator's own `python3 raw_measure.py --interval 1` (PID 2778, `arecord` PID
+32491) still held the microphone, so the run reported
+`[SOUND ERROR] arecord: main:850: audio open error: Device or resource busy`
+exactly twice for two samples (one per backoff interval, down from 14 repeated
+errors), logged live ADXL/MAX raw values, left `sound_db_estimated` empty, and kept
+`sound_cal.json` absent. A second run with the same `--csv` appended one row without
+duplicating the header. All three services were `active` afterwards. The calibration
+math was unit-tested with a stubbed `SoundReader`: `REF_DB=94`, RMS `0.01` produced
+constant `134.000 dB`, matching the expected value; only `/tmp/cal_logic_test.json`
+was written on the Pi, not the real calibration file.
+
+`[NEED: reference dB SPL measurement at the mic]` before `--calibrate-sound` can be
+run for real. `[NEED: live RMS/peak confirmation once the operator stops PID 2778]`.
+No WhatsApp contact or state was changed.
