@@ -28,6 +28,24 @@ all three axes. It never changes the model, gate thresholds or dashboard code.
   use 97.5 °C as a default; the script asks you to confirm or replace it.
 - A level surface and a stable, printed operator sheet for photos/sign-off.
 
+## 2a. Raw measurement mode (not a calibration)
+
+If you need the sensor outputs themselves, use `edge/raw_measure.py`. It reads
+the same I2C/SPI buses but applies **no** `cal.json` coefficients and writes no
+calibration state:
+
+```bash
+sudo systemctl stop pdm-daq.service
+python3 edge/raw_measure.py
+python3 edge/raw_measure.py --csv edge/raw_measurements.csv --count 20
+sudo systemctl start pdm-daq.service
+```
+
+Each line shows ADXL345 X/Y/Z in raw LSB counts and the MAX6675 16-bit word,
+ADC counts, open-thermocouple flag and datasheet temperature. The datasheet
+temperature is marked `UNCALIBRATED`; it is not a reference thermometer reading.
+Use the raw counts as observations for `--manual` if you recorded them yourself.
+
 ## 3. Exact run procedure
 
 ```bash

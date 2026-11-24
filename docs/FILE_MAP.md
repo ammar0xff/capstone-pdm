@@ -49,6 +49,7 @@ files just because they look stale; confirm with the owner first.
 | `dashboard.py` | Presentation-only Flask server and JSON state endpoints | `pdm-dashboard.service` |
 | `firebase_mirror.py` | HTTPS PUT mirror with quota guard and backlog | `pdm-cloud.service` |
 | `calibrate.py` | Operator-run six-face/thermal calibration runner | Manual on Pi |
+| `raw_measure.py` | Raw, uncalibrated ADXL345/MAX6675 reader with optional CSV | Manual on Pi |
 | `exhibition_drill.py` | Exhibition rehearsal tool | Manual |
 | `stream_live.py` | Live stream helper | Manual |
 | `generate_qr.py` | QR generation helper | Manual |

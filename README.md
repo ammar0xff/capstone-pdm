@@ -70,8 +70,27 @@ sudo systemctl status pdm-daq.service pdm-cloud.service pdm-dashboard.service
 ```
 
 Only the three units above are services. `edge/calibrate.py`,
-`edge/exhibition_drill.py`, `edge/stream_live.py` and
+`edge/raw_measure.py`, `edge/exhibition_drill.py`, `edge/stream_live.py` and
 `edge/generate_qr.py` are operator-run tools, not daemons.
+
+### Raw measurements — read the sensors directly
+
+`edge/raw_measure.py` prints the uncalibrated ADXL345 LSB counts and the raw
+MAX6675 16-bit word. It does **not** apply `edge/cal.json` and does not write it.
+Stop the DAQ service first so the buses are not shared:
+
+```bash
+ssh renad@<pi-address>
+cd ~/pdm
+sudo systemctl stop pdm-daq.service
+python3 edge/raw_measure.py
+python3 edge/raw_measure.py --csv edge/raw_measurements.csv --count 20
+sudo systemctl start pdm-daq.service
+```
+
+Use these readings as the raw observations for a manual calibration entry; they
+are not calibrated `g` or `°C` values. The `T_datasheet` column is the MAX6675
+datasheet conversion only and is marked `UNCALIBRATED`.
 
 ### Calibration — run on the Pi, not on the laptop
 
