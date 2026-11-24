@@ -182,3 +182,18 @@ After restart: all three services `active`, `http://127.0.0.1:5000/` HTTP 200,
 `webcheck http://100.126.244.75:5000` → `RESULT: PASS (0 floor, 0 reflex)` at mobile,
 tablet and desktop. Local state `seq 45271` was 2.1 s old; Firebase `seq 45269` was
 16.3 s old with `last_sync_status = OK (HTTP 200)`. The earlier offline blocker is closed.
+
+## 2026-11-24 22:20 — sensor health check
+
+Live runtime state reported `adxl_ok=True`, `max6675_ok=True`, `acoustic_ok=True`,
+`storage_ok=True`, `state=Healthy`, `seq=45355`; acoustic status was
+`Hardware I2S Stream (INMP441)`.
+
+With `pdm-daq.service` briefly stopped, `edge/raw_measure.py --count 3` returned live
+raw ADXL345 counts (`X=3 Y=60 Z=95`, stable across samples) and MAX6675 words
+`0x0308 / 0x0300 / 0x0310` (`open_tc=0`), with no `cal.json` applied. A separate
+`arecord -D plughw:1,0 -c 2 -r 48000 -f S32_LE` capture produced 57 valid 50 ms
+windows; the first six RMS values were `0.323, 0.342, 0.164, 0.035, 0.092, 0.130`,
+confirming a live microphone signal. `arecord -l` lists the expected Google
+voiceHAT/INMP441 capture device, and one `arecord` process runs under the DAQ service.
+The DAQ service was restarted and all three services remain `active`.
