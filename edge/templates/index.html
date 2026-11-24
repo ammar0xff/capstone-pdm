@@ -12,7 +12,7 @@
       --card-border: rgba(56, 75, 112, 0.45);
       --text: #e2e8f0;
       --text-dim: #94a3b8;
-      --muted: #64748b;
+      --muted: #94a3b8;
       --cyan: #00f0ff;
       --cyan-dim: rgba(0, 240, 255, 0.12);
       --green: #10b981;
@@ -80,6 +80,7 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 1px;
+      white-space: nowrap;
     }
 
     .controls-group {
@@ -106,6 +107,12 @@
     .btn-toggle:hover {
       background: rgba(255, 255, 255, 0.12);
       border-color: var(--cyan);
+    }
+
+    .btn-toggle.btn-primary {
+      background: rgba(0, 240, 255, 0.14);
+      border-color: rgba(0, 240, 255, 0.6);
+      color: var(--cyan);
     }
 
     /* Main Hero Status Lamp */
@@ -405,6 +412,7 @@
       border: 1px solid var(--card-border);
       border-radius: 16px;
       padding: 18px;
+      min-width: 0;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -452,6 +460,8 @@
       font-size: 17px;
       color: var(--cyan);
       text-align: center;
+      white-space: nowrap;
+      overflow-x: auto;
       margin-bottom: 12px;
       box-shadow: inset 0 0 12px rgba(0, 240, 255, 0.04);
       user-select: all;
@@ -527,6 +537,7 @@
     }
 
     .dot.err { background: var(--red); }
+    .dot.wait { background: #64748b; }
 
     /* RTL Arabic styling */
     body.rtl {
@@ -539,14 +550,26 @@
     body.rtl .health-pill { margin-right: 0; margin-left: 18px; }
 
     @media (max-width: 1100px) {
+      header { flex-wrap: wrap; }
+      .controls-group { width: 100%; flex-wrap: nowrap; justify-content: flex-end; }
+      .controls-group .btn-toggle { white-space: nowrap; }
       .grid-eq { grid-template-columns: repeat(2, 1fr); }
       .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 900px) {
+      .formula-box { font-size: 13px; text-align: left; }
     }
 
     @media (max-width: 768px) {
       header { flex-direction: column; align-items: flex-start; gap: 12px; }
       .logo-group h1 { flex-wrap: wrap; }
-      .controls-group { flex-wrap: wrap; }
+      .controls-group {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+      }
+      .controls-group .btn-toggle { justify-content: center; }
       .section-head { flex-direction: column; align-items: flex-start; gap: 4px; }
       .section-head span { width: 100%; }
       .chart-container { height: 180px; }
@@ -571,7 +594,7 @@
         <button id="btn-sound" class="btn-toggle" onclick="toggleSound()">Sound: OFF</button>
         <button id="btn-lang" class="btn-toggle" onclick="toggleLang()">العربية</button>
         <a class="btn-toggle" href="https://castpone2026.web.app/calibration.html" target="_blank" rel="noopener noreferrer">Calibration</a>
-        <a class="btn-toggle" href="https://castpone2026.web.app/guide.html" target="_blank" rel="noopener noreferrer">Exhibition deck</a>
+        <a class="btn-toggle btn-primary" href="https://castpone2026.web.app/guide.html" target="_blank" rel="noopener noreferrer">Exhibition deck</a>
       </div>
     </header>
 
@@ -1321,10 +1344,11 @@
 
       // System Health Dots
       if (data.system) {
-        document.getElementById("dot-adxl").className = "dot" + (data.system.adxl_ok ? "" : " err");
-        document.getElementById("dot-max").className = "dot" + (data.system.max6675_ok ? "" : " err");
-        document.getElementById("dot-inmp").className = "dot" + (data.system.acoustic_ok ? "" : " err");
-        document.getElementById("dot-edge").className = "dot" + (online ? "" : " err");
+        const dotClass = (ok) => (online ? (ok ? "" : " err") : " wait");
+        document.getElementById("dot-adxl").className = "dot" + dotClass(data.system.adxl_ok);
+        document.getElementById("dot-max").className = "dot" + dotClass(data.system.max6675_ok);
+        document.getElementById("dot-inmp").className = "dot" + dotClass(data.system.acoustic_ok);
+        document.getElementById("dot-edge").className = "dot" + dotClass(online);
       }
 
       // =========================================================
