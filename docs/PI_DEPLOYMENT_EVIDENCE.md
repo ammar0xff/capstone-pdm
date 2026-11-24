@@ -147,3 +147,17 @@ With `pdm-daq.service` stopped, `python3 edge/raw_measure.py --count 3 --interva
 applied or changed. The DAQ service was restarted afterwards; all three services
 were `active`, local state `seq 156` was 0.0 s old, `last_sync_status = OK (HTTP 200)`
 and the Tailscale dashboard returned HTTP 200.
+
+## 2026-11-24 18:30 — local verification, Pi unreachable
+
+Re-ran both webchecks locally after the verification server restart:
+`http://127.0.0.1:5000` → `RESULT: PASS (0 floor, 0 reflex)` and
+`https://castpone2026.web.app/` → `RESULT: PASS (0 floor, 0 reflex)` with the four
+already documented waivers. Applied the critic's low-risk local fixes (single-line
+scrollable formulas, 2×2 mobile controls, lighter muted text, grey standby dots,
+primary deck button) and committed them as `25cfa67`; local tests: `Ran 37 tests`, `OK`.
+
+The Pi could not be reached to deploy `25cfa67`: `tailscale status` reports
+`100.126.244.75 cast ... offline, last seen 4h ago` and SSH timed out. The Pi is still
+running the previously deployed template (`2d618fff6205d6a3cc8fa13ed62829f7`); this
+polish is pending until the Pi is back online. No rollback or destructive action was attempted.
