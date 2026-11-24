@@ -169,3 +169,16 @@ not actually reachable: `tailscale ping -c 2 cast` → `no reply`, `/dev/tcp/...
 and SSH timed out again. One short SSH command succeeded at 19:17:11 and confirmed the Pi
 still had template MD5 `2d618fff6205d6a3cc8fa13ed62829f7` and all three services `active`.
 The copy of `25cfa67` remains pending; no partial deploy was confirmed.
+
+## 2026-11-24 22:09 — pending polish deployed
+
+The Pi became reachable again (Tailscale DERP, then direct). The final template
+`986869caa018ff30df1224065183d9b0` was copied after backup
+`edge/templates/index.html.bak-20261124-220934`; the MD5 matches the workstation.
+An earlier copy at `22:08` (`e592a588618dfc30d79bfef2fb47ad95`) was superseded by the
+accessibility fix in commit `b279f6f`.
+
+After restart: all three services `active`, `http://127.0.0.1:5000/` HTTP 200,
+`webcheck http://100.126.244.75:5000` → `RESULT: PASS (0 floor, 0 reflex)` at mobile,
+tablet and desktop. Local state `seq 45271` was 2.1 s old; Firebase `seq 45269` was
+16.3 s old with `last_sync_status = OK (HTTP 200)`. The earlier offline blocker is closed.
