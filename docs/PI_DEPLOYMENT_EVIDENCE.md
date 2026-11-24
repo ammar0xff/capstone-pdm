@@ -90,3 +90,21 @@ Verified on the Pi after the copy:
 `pdm-dashboard` were all `active`, and `http://127.0.0.1:5000/` returned HTTP 200 with the new
 standby text. Actual six-face calibration was **not** run remotely: it requires the operator,
 the stationary rig and the reference baths described in `docs/CALIBRATION_RUNBOOK.md`.
+
+## 2026-11-24 11:05 — cloud mirror URL repair
+
+The local dashboard was live (`latest_state.json` updating, `online=True`, `/api/latest`
+sequence advancing), but the hosted dashboard was showing a point from 2026-11-23 23:18.
+The Pi's local `edge/cloud_config.json` pointed at the non-existent database
+`capstone-pdm-2026-default-rtdb.firebaseio.com` (HTTP 404), so `pdm-cloud.service` had
+buffered 200 frames in `edge/cloud_backlog.json` and reported
+`Offline Buffering: HTTP Error 404: Not Found`.
+
+Backed up `edge/cloud_config.json` to `edge/cloud_config.json.bak-20261124-110456`, then used
+the service's own `python3 edge/firebase_mirror.py --set-url ...` to set the documented URL
+`https://castpone2026-default-rtdb.firebaseio.com/motor1.json`, and restarted `pdm-cloud.service`.
+
+Verified after the restart: `last_sync_status = OK (HTTP 200)`, `daily_writes_today = 2`,
+backlog file gone, service `active`. Two Firebase reads 20 s apart showed `seq 9744 → 9835`
+and `ts 11:06:15 → 11:06:29`, so the hosted dashboard is now receiving live data. The
+calibration file and all three services were left otherwise unchanged.
