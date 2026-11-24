@@ -108,3 +108,27 @@ Verified after the restart: `last_sync_status = OK (HTTP 200)`, `daily_writes_to
 backlog file gone, service `active`. Two Firebase reads 20 s apart showed `seq 9744 → 9835`
 and `ts 11:06:15 → 11:06:29`, so the hosted dashboard is now receiving live data. The
 calibration file and all three services were left otherwise unchanged.
+
+## 2026-11-24 11:19 — repository organisation on the Pi
+
+The Pi tree was brought in line with `main`. Nothing was permanently deleted: obsolete files were
+moved to `backups/cleanup-20261124-111903/`, earlier deployment backups to
+`backups/deployment-20261124/`, and the 14 replaced files were copied first to
+`backups/pre-sync-20261124-112022/`. A manifest of every move is in the cleanup folder.
+
+Removed from the active tree: duplicate `edge/edge_daq_backup.py` (identical to `edge_daq.py`),
+old `edge/index.html`, `edge/raw_sensors.py.save`, stale `ml.zipped.zip`, LibreOffice lock file,
+`__pycache__` folders, `.stitch-mcp/` tool cache and all `.bak-*` siblings. Empty `backups/`,
+`updates/` and `uploads/` placeholders were kept as documented in `docs/FILE_MAP.md`.
+
+Synced 30 tracked files that were missing or stale on the Pi, including the current
+`edge/edge_daq.py`, `edge/firebase_mirror.py`, `ml/*`, `public/calibration.html`,
+`public/guide.html`, the new docs and `requirements.txt`. Runtime state (`edge/cal.json`,
+`edge/cloud_config.json`, `latest_state.json`, `hot_backup.csv`) was deliberately not overwritten.
+MD5 verification: 30/30 matched the workstation. Remaining identical files are intentional
+(hosted-asset mirrors, Fritzing part library, waivers copy), not duplicates to remove.
+
+Post-change verification: `py_compile` OK, all three services `active`, local dashboard HTTP 200,
+`latest_state.json` advancing (`seq 189`, 12.8 s old), Firebase `seq 189` (24.8 s old) and
+`last_sync_status = OK (HTTP 200)`. The real calibration runner remains
+`/home/renad/pdm/edge/calibrate.py`; `python3 edge/calibrate.py --help` works.
