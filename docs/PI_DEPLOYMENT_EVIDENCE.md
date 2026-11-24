@@ -66,3 +66,27 @@ align the scikit-learn versions before final sign-off.
 - **Does not prove:** 100% accuracy on a real motor (all training data is synthetic), or the PRD M2
   end-to-end inject→alert time (only the inference step was timed). Real rig windows and an
   end-to-end timing run are still outstanding.
+
+## 2026-11-24 — clean-up and calibration runner deployment
+
+Applied over SSH to `renad@100.126.244.75` (host `CAST`, repository `/home/renad/pdm`).
+The Pi has no `git` binary, so the 18 changed/new files from commits `4a9e2c9` and `f9c9dd6`
+were streamed with `tar`/`ssh` into the existing tree. Nothing was deleted: the three runtime
+files were first copied to timestamped `.bak-20261124-102301` siblings, and `edge/cal.json`
+was not touched.
+
+Verified on the Pi after the copy:
+
+| File | MD5 on Pi and workstation |
+|---|---|
+| `edge/dashboard.py` | `76104e89e724638a900f1bccb2c5c03f` |
+| `edge/calibrate.py` | `551be0509530b658f2fe8a3116fd8ff1` |
+| `edge/templates/index.html` | `2d618fff6205d6a3cc8fa13ed62829f7` |
+| `public/index.html` | `4a0abcd5c4f73243068feb434b40e1d7` |
+
+`python3 -m py_compile edge/dashboard.py edge/calibrate.py` → `COMPILE_OK`.
+`python3 edge/calibrate.py --help` printed the full option list without touching hardware.
+`sudo systemctl restart pdm-dashboard.service` completed; `pdm-daq`, `pdm-cloud` and
+`pdm-dashboard` were all `active`, and `http://127.0.0.1:5000/` returned HTTP 200 with the new
+standby text. Actual six-face calibration was **not** run remotely: it requires the operator,
+the stationary rig and the reference baths described in `docs/CALIBRATION_RUNBOOK.md`.
