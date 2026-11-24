@@ -227,3 +227,18 @@ run-to-failure histories or failure-time statistics in this project.
   `tests/test_degradation_rul.py` covers the fits, statuses, validation and CLI.
 - `[NEED: measured degradation curve]` and `[NEED: run-to-failure series with
   timestamps and failure labels]` before this can be called real RUL.
+
+Illustrative smoke run only: a synthetic five-point trend in an arbitrary
+`condition_index`, with arbitrary thresholds chosen to exercise the CLI. These
+numbers are **not** physical limits, measured data or hours of motor life.
+
+```
+python3 ml/degradation_rul.py --history demo.csv \
+    --time-column unix_time --value-column condition_index \
+    --threshold 8 --model linear
+```
+
+The JSON returned `status: estimated`, `rul_seconds: 3.0`,
+`estimated_cross_time: 7.0`, `threshold_source: operator-supplied` and the
+`not field-validated` label. The 3.0 is only the fitted crossing time minus the
+last sample time (7.0 − 4.0) in the units of the supplied history.

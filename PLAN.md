@@ -15,6 +15,8 @@
 - C2 No change to model or Stage-1/Stage-2 decision behaviour.
 - C3 No invented physical/RUL/cost/CPU/lead-time claims; 100% stays synthetic-only.
 - C4 No new dependency, no deletion of data, no destructive command.
+- R10 Offline degradation estimator requires an operator-supplied threshold, fits linear/exponential trends, and labels every result not field-validated; no runtime, dashboard or model change.
+- C5 No physical failure threshold invented or bundled with the code.
 
 ## Checklist
 
@@ -30,3 +32,6 @@
 - [x] P9 Browser-verify dashboard at 390/768/1440 px and preview PDF; fix visual findings
 - [x] P10 Commit and push; report in Arabic with evidence
 - [x] P11 Deploy cleaned `public/` to Firebase Hosting and recheck the live URL
+- [x] P12 Restore the operator's `edge/raw_measuree.py`, remove my sound-cal additions, add sound-error reporting/backoff, deploy and verify live raw three-sensor logging
+- [x] P13 Add `ml/degradation_rul.py` with tests and docs; operator threshold required, every result not field-validated
+- [x] P14 Re-run full suite, `git diff --check`, commit and push the estimator work
