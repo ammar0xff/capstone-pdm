@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>G12 Predictive Maintenance Project Guide</title>
+<style>
+  :root {
+    --ink: #17232b;
+    --muted: #5b6b74;
+    --line: #cbd5d9;
+    --paper: #ffffff;
+    --wash: #f3f6f5;
+    --accent: #0b6b64;
+    --accent-soft: #dcece8;
+    --warn: #9a5b12;
+    --warn-soft: #fff3dc;
+    --code: #12262c;
+  }
+  @page { size: A4; margin: 18mm 16mm 16mm 16mm; }
+  * { box-sizing: border-box; }
+  html { font-size: 10.5pt; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    background: var(--paper);
+    font-family: "DejaVu Sans", "Carlito", sans-serif;
+    line-height: 1.5;
+  }
+  h1, h2, h3 { font-family: "DejaVu Sans", sans-serif; text-wrap: balance; }
+  h1 {
+    font-size: 30pt; line-height: 1.05; letter-spacing: -0.02em;
+    margin: 0 0 10mm; font-weight: 600;
+  }
+  h2 {
+    font-size: 17pt; margin: 0 0 5mm; padding-bottom: 2mm;
+    border-bottom: 1.5px solid var(--accent); font-weight: 600;
+  }
+  h3 { font-size: 12pt; margin: 6mm 0 2mm; color: var(--accent); }
+  p { margin: 0 0 3mm; max-width: 72ch; }
+  ul, ol { margin: 0 0 3mm; padding-left: 6mm; max-width: 72ch; }
+  li { margin-bottom: 1.2mm; }
+  .page { page-break-after: always; }
+  .page:last-child { page-break-after: auto; }
+  .cover {
+    min-height: 245mm; border-left: 7mm solid var(--accent);
+    padding: 22mm 0 0 12mm; display: flex; flex-direction: column;
+  }
+  .kicker {
+    font-size: 9pt; text-transform: uppercase; letter-spacing: .16em;
+    color: var(--accent); font-weight: 700; margin-bottom: 8mm;
+  }
+  .cover p { font-size: 12pt; color: var(--muted); max-width: 58ch; }
+  .meta {
+    margin-top: auto; border-top: 1px solid var(--line);
+    padding-top: 5mm; font-size: 9.5pt; color: var(--muted);
+  }
+  .meta b { color: var(--ink); }
+  .lead {
+    font-size: 11.5pt; line-height: 1.55; border-left: 3px solid var(--accent);
+    padding-left: 4mm; color: #2d4049; max-width: 70ch;
+  }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
+  .block {
+    border: 1px solid var(--line); border-top: 3px solid var(--accent);
+    padding: 4mm 5mm; background: var(--paper); break-inside: avoid;
+  }
+  .block h3 { margin-top: 0; }
+  .note {
+    border-left: 3px solid var(--warn); background: var(--warn-soft);
+    padding: 3mm 4mm; margin: 4mm 0; break-inside: avoid;
+  }
+  .note b { color: var(--warn); }
+  .good {
+    border-left: 3px solid var(--accent); background: var(--accent-soft);
+    padding: 3mm 4mm; margin: 4mm 0; break-inside: avoid;
+  }
+  pre {
+    background: var(--code); color: #e8f2f0; padding: 4mm 5mm;
+    border-radius: 2px; font-size: 8.7pt; line-height: 1.45;
+    overflow-wrap: anywhere; white-space: pre-wrap; break-inside: avoid;
+  }
+  code { font-family: "DejaVu Sans Mono", monospace; font-size: .92em; }
+  p code, li code, td code { background: var(--wash); padding: 0 .8mm; }
+  table {
+    width: 100%; border-collapse: collapse; margin: 3mm 0 5mm;
+    font-size: 9pt; break-inside: avoid;
+  }
+  th, td { border: 1px solid var(--line); padding: 2mm 2.5mm; text-align: left; vertical-align: top; }
+  th { background: var(--wash); font-weight: 700; }
+  td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .steps { counter-reset: s; }
+  .steps > div {
+    counter-increment: s; position: relative; padding-left: 11mm;
+    margin-bottom: 4mm; break-inside: avoid;
+  }
+  .steps > div::before {
+    content: counter(s, decimal-leading-zero); position: absolute; left: 0; top: 0;
+    font-family: "DejaVu Sans Mono", monospace; color: var(--accent);
+    font-size: 13pt; font-weight: 700;
+  }
+  .foot {
+    margin-top: 8mm; padding-top: 3mm; border-top: 1px solid var(--line);
+    font-size: 8.5pt; color: var(--muted);
+  }
+  .small { font-size: 9pt; color: var(--muted); }
+  .toc { columns: 2; column-gap: 10mm; }
+  .toc div { break-inside: avoid; margin-bottom: 2mm; }
+  .toc b { color: var(--accent); }
+  .flow {
+    font-family: "DejaVu Sans Mono", monospace; font-size: 9pt;
+    background: var(--wash); border: 1px solid var(--line);
+    padding: 4mm 5mm; line-height: 1.7; break-inside: avoid;
+  }
+  .status-ok { color: var(--accent); font-weight: 700; }
+  .status-gap { color: var(--warn); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<section class="page cover">
+  <div class="kicker">Grade 12 STEM Capstone · 2026/2027</div>
+  <h1>Predictive Maintenance on a Raspberry Pi</h1>
+  <p>A complete, evidence-led guide to how this project was designed, built, trained, deployed, calibrated and presented — and what is still unverified.</p>
+  <p style="font-size:10pt">Theme: Communication, Sensing, Information &amp; Informatics · Node: three-phase induction motor rig · Edge: Raspberry Pi 4 4 GB.</p>
+  <div class="meta">
+    <p><b>Companion files:</b> <code>README.md</code>, <code>docs/FILE_MAP.md</code>, <code>docs/DEVELOPMENT_OPERATIONS.md</code>, <code>docs/CALIBRATION_RUNBOOK.md</code>, <code>docs/FIREBASE_SETUP.md</code></p>
+    <p><b>Generated:</b> 2026-11-24 · <b>Language:</b> English · <b>Source:</b> <code>docs/PROJECT_GUIDE.html</code></p>
+    <p><b>Evidence rule:</b> measured facts are cited; anything not measured is written as <code>[NEED: ...]</code>.</p>
+  </div>
+</section>
+
+<section class="page">
+  <h2>Contents and how to use this guide</h2>
+  <div class="toc">
+    <div><b>01</b> Project purpose and architecture</div>
+    <div><b>02</b> Raspberry Pi setup</div>
+    <div><b>03</b> Firebase setup</div>
+    <div><b>04</b> Dashboard creation</div>
+    <div><b>05</b> Data generation</div>
+    <div><b>06</b> AI initialization and training</div>
+    <div><b>07</b> Using the model: how and why it predicts</div>
+    <div><b>08</b> How the papers were implemented</div>
+    <div><b>09</b> Calibration on the Pi</div>
+    <div><b>10</b> RUNNING STATUS and evidence</div>
+    <div><b>11</b> Guided operations and file map</div>
+    <div><b>12</b> Defense checklist</div>
+  </div>
+  <p class="lead">Read sections 1–7 for the build story, 8–9 for the academic and physical procedures, and 10–12 for the honest current state. Every command in this guide is also in the repository docs so it can be repeated, not just presented.</p>
+  <h3>Names used in this guide</h3>
+  <table>
+    <tr><th>Name</th><th>Meaning</th></tr>
+    <tr><td>Edge node</td><td>Raspberry Pi 4 running <code>edge_daq.py</code>, <code>firebase_mirror.py</code> and <code>dashboard.py</code>.</td></tr>
+    <tr><td>Stage 1</td><td>Shewhart statistical gate on vibration RMS and thermal rise.</td></tr>
+    <tr><td>Stage 2</td><td>Random Forest four-class diagnostic model.</td></tr>
+    <tr><td>Rig</td><td>Three-phase AC induction motor testbed with vibration, temperature and acoustic sensors.</td></tr>
+  </table>
+  <div class="note"><b>Honesty boundary.</b> The project reports 100% accuracy on a physics-simulated, run-disjoint benchmark. That number is not a real-motor result. No remaining-useful-life, cost-saving, energy-saving or early-warning lead-time claim is made.</div>
+</section>
+
+<section class="page">
+  <h2>01 · Project purpose and architecture</h2>
+  <p>The capstone asks for a monitored industrial machine that senses physical condition, detects abnormal behaviour at the edge, communicates the result, and presents an operator decision within a fixed student budget. The system was built as an offline-first cyber-physical pipeline: the Pi can keep monitoring and serving a local page without the internet, while a zero-cost Firebase mirror provides remote visibility when networking is available.</p>
+  <div class="flow">ADXL345 (I2C) ─┐
+MAX6675  (SPI) ─┼─► edge/edge_daq.py ─► Stage 1 SPC gate ─► Stage 2 RF ─► response plan
+INMP441  (I2S) ─┘          │                     │                     │
+                           ├─► edge/cal.json      ├─► Firebase RTDB mirror
+                           └─► latest_state.json  └─► Flask / hosted dashboard</div>
+  <h3>What each layer does</h3>
+  <table>
+    <tr><th>Layer</th><th>Implemented by</th><th>Observable output</th></tr>
+    <tr><td>Sensing</td><td><code>edge/edge_daq.py</code> drivers for ADXL345, MAX6675, INMP441</td><td>Raw counts, °C, acoustic RMS/ZCR, feature window</td></tr>
+    <tr><td>Calibration</td><td><code>edge/calibrate.py</code> → <code>edge/cal.json</code></td><td><code>g_scale</code>, three biases, <code>t_a</code>, <code>t_b</code></td></tr>
+    <tr><td>Coarse gate</td><td>Stage 1 in <code>edge_daq.py</code> and <code>ml/rf_predictor.py</code></td><td>Z-score, warning/fault flags, <code>rf_executed</code></td></tr>
+    <tr><td>Fine diagnosis</td><td><code>ml/model.joblib</code> through <code>ml/rf_predictor.py</code></td><td>Class, confidence, four-step response plan</td></tr>
+    <tr><td>Presentation</td><td><code>edge/dashboard.py</code>, <code>edge/templates/index.html</code>, <code>public/index.html</code></td><td>Live cards, charts, operator decision, deck links</td></tr>
+    <tr><td>Cloud mirror</td><td><code>edge/firebase_mirror.py</code></td><td>HTTPS PUT to <code>/motor1.json</code>, backlog on offline</td></tr>
+  </table>
+  <div class="good"><b>Design decision.</b> The hosted dashboard is presentation-only. Engineering write endpoints and simulator controls were removed so the public site cannot change calibration or inject fake state.</div>
+</section>
+
+<section class="page">
+  <h2>02 · Raspberry Pi setup</h2>
+  <p>The Pi is the acquisition and inference host. The verified deployment uses user <code>renad</code>, path <code>/home/renad/pdm</code> and three systemd units. The exact service table, model copy and MD5 match are recorded in <code>docs/PI_DEPLOYMENT_EVIDENCE.md</code>.</p>
+  <h3>2.1 Board and interfaces</h3>
+  <ol>
+    <li>Install Raspberry Pi OS, set hostname/user, and enable I2C, SPI and I2S.</li>
+    <li>Wire ADXL345 to I2C bus 1 address <code>0x53</code>, MAX6675 to SPI0 CE0, INMP441 to the I2S card used by <code>arecord</code>.</li>
+    <li>Keep the MAX6675 module away from the Pi heatsink; the cold junction is on the module. <code>[NEED: measured placement and temperature log]</code></li>
+    <li>Clone the repository into <code>~/pdm</code> and create a Python environment or install the pinned stack.</li>
+  </ol>
+  <pre>cd ~/pdm
+python3 -m pip install -r requirements.txt
+python3 -m unittest discover -s tests -v</pre>
+  <h3>2.2 Services</h3>
+  <table>
+    <tr><th>Unit</th><th>ExecStart</th><th>Role</th></tr>
+    <tr><td><code>pdm-daq.service</code></td><td><code>edge/edge_daq.py</code></td><td>Sampling, gate, classifier, state files</td></tr>
+    <tr><td><code>pdm-cloud.service</code></td><td><code>edge/firebase_mirror.py</code></td><td>Firebase mirror and offline backlog</td></tr>
+    <tr><td><code>pdm-dashboard.service</code></td><td><code>edge/dashboard.py</code></td><td>Local presentation dashboard</td></tr>
+  </table>
+  <pre>for s in pdm-daq pdm-cloud pdm-dashboard; do
+  sudo cp "edge/$s.service" "/etc/systemd/system/$s.service"
+done
+sudo systemctl daemon-reload
+sudo systemctl enable --now pdm-daq.service pdm-cloud.service pdm-dashboard.service
+sudo systemctl status pdm-daq.service pdm-cloud.service pdm-dashboard.service</pre>
+  <div class="note"><b>Not every uploaded file runs.</b> <code>calibrate.py</code>, <code>exhibition_drill.py</code>, <code>stream_live.py</code> and <code>generate_qr.py</code> are manual operator tools. Only the three units above are daemons.</div>
+  <p class="small">Observed environment note: the model was serialized with scikit-learn 1.9.1 and loaded on the Pi with 1.4.2. Predictions matched in the smoke test, but the loader emits an <code>InconsistentVersionWarning</code>. Align the versions before a final deployment.</p>
+</section>
+
+<section class="page">
+  <h2>03 · Firebase setup</h2>
+  <p>Firebase supplies the zero-cost cloud mirror and the hosted presentation site. The project is <code>castpone2026</code>; the mirror writes the latest state packet to <code>https://castpone2026-default-rtdb.firebaseio.com/motor1.json</code>. <code>edge/cloud_config.json</code> stores the URL, 5 s interval and 15,000-write daily guard; <code>edge/cloud_backlog.json</code> holds writes while offline.</p>
+  <h3>3.1 Creation steps</h3>
+  <div class="steps">
+    <div>Create or select the Firebase project <code>castpone2026</code>.</div>
+    <div>Create Realtime Database and keep the path <code>motor1</code>.</div>
+    <div>Set <code>firebase_url</code> in <code>edge/cloud_config.json</code> and <code>FIREBASE_RTDB_URL</code> in <code>public/index.html</code> to the same endpoint.</div>
+    <div>Copy <code>edge/pdm-cloud.service</code>, reload systemd and start the mirror.</div>
+    <div>Deploy the presentation files with <code>firebase deploy --only hosting</code>.</div>
+  </div>
+  <pre>firebase login
+firebase use castpone2026
+firebase deploy --only hosting
+curl -s https://castpone2026-default-rtdb.firebaseio.com/motor1.json</pre>
+  <h3>3.2 Dashboard creation</h3>
+  <p>There are two dashboard surfaces built from the same live state schema. The local Flask page in <code>edge/templates/index.html</code> is served by <code>edge/dashboard.py</code> on the Pi. The hosted page in <code>public/index.html</code> reads Firebase, draws the same charts, shows the operator decision, links to the exhibition deck and calibration explainer, and provides alarm mute. Neither page can write calibration data.</p>
+  <div class="note"><b>Security reality.</b> The deployed RTDB rules are public read/write. Anyone with the URL can read or overwrite <code>motor1</code>. This was kept for exhibition telemetry and is documented in <code>docs/FIREBASE_SETUP.md</code>. No auth change was made during cleanup. <code>[NEED: auth model and operator identities]</code></div>
+  <div class="good"><b>Safe migration.</b> Enable authentication, write least-privilege rules, add a deny-unauthenticated-write test, move any token to a Pi-local environment source, then verify both writer and dashboard before switching rules.</div>
+</section>
+
+<section class="page">
+  <h2>04 · Data generation</h2>
+  <p>Because a run-to-failure motor rig was not available, the team generated a physics-grounded synthetic benchmark with a custom dataset generator. <code>ml/dataset_generator.py</code> creates whole runs with seeded noise, then windows them into fixed-length rows saved as <code>ml/windows.csv</code>. A run ID column keeps every train/validation/test split disjoint: a run never appears on both sides of a split.</p>
+  <h3>4.1 Classes and physical grounding</h3>
+  <table>
+    <tr><th>Class</th><th>Physical idea encoded</th><th>Representative signals</th></tr>
+    <tr><td>Healthy</td><td>Baseline hum and thermal equilibrium</td><td>Low dynamic RMS, moderate kurtosis, stable temperature</td></tr>
+    <tr><td>Mechanical Imbalance</td><td>1X rotational forcing</td><td>Raised RMS and correlated vibration energy</td></tr>
+    <tr><td>Bearing Defect</td><td>Periodic spall impacts</td><td>High kurtosis and crest factor, impulsive peaks</td></tr>
+    <tr><td>Thermal Runaway</td><td>Rising temperature trend</td><td>Elevated °C and positive slope</td></tr>
+  </table>
+  <pre>python3 ml/dataset_generator.py
+# writes ml/windows.csv with run_id and nine RF feature columns</pre>
+  <div class="note"><b>Provenance gap.</b> The generator uses documented constants such as a 3200 Hz vibration sample rate and a 1800 RPM nominal speed. <code>[NEED: measured rig resonance, noise floor and reference application for those constants]</code>. See <code>docs/DATASET_RANGE_TRACEABILITY.md</code>. The generator does not integrate the bearing ODE it cites; it uses a bounded synthetic proxy.</div>
+  <h3>4.2 Split discipline</h3>
+  <p><code>train_rf.py</code> uses <code>StratifiedGroupKFold(n_splits=5, shuffle=True, random_state=42)</code> grouped by <code>run_id</code>, plus a 70/15/15 whole-run hold-out: 1000 train, 200 validation and 200 test windows. <code>tests/test_evaluation.py</code> asserts zero overlap and balanced classes. This matters because random window splits would leak a run's noise pattern into the test set and inflate the score.</p>
+</section>
+
+<section class="page">
+  <h2>05 · AI model initialization and training</h2>
+  <p>The model is a scikit-learn Random Forest, chosen because it is small enough for the Pi, works with tabular physical features and gives a confidence estimate. It is initialized by training in <code>ml/train_rf.py</code> and loaded at runtime by <code>ml/rf_predictor.py</code>.</p>
+  <h3>5.1 Nine model features</h3>
+  <table>
+    <tr><th>Feature</th><th>Why it was chosen</th></tr>
+    <tr><td>RMS, peak, crest factor, kurtosis</td><td>Energy and impulsiveness of the vibration window</td></tr>
+    <tr><td>Temperature, thermal slope</td><td>Slow thermal fault development</td></tr>
+    <tr><td>Acoustic RMS, peak, ZCR</td><td>Audible rubbing/squeal and waveform sign-change proxy</td></tr>
+    <tr><td>Crest/spectral context feature</td><td>Additional time-domain shock indicator</td></tr>
+  </table>
+  <p class="small"><code>z_score</code> is deliberately excluded from the RF features. It is a Stage-1 gate metric derived from dynamic RMS; including it would leak the gate decision into the classifier. The metadata records this policy and the tests enforce it.</p>
+  <pre>python3 ml/train_rf.py
+# outputs: ml/model.joblib, ml/model_meta.json, charts, benchmark report</pre>
+  <h3>5.2 Reported synthetic results</h3>
+  <table>
+    <tr><th>Metric</th><th class="num">Result</th><th>Scope</th></tr>
+    <tr><td>Group 5-fold mean accuracy</td><td class="num">100.00%</td><td>Synthetic benchmark only</td></tr>
+    <tr><td>Group 5-fold macro F1</td><td class="num">1.0000</td><td>Synthetic benchmark only</td></tr>
+    <tr><td>Hold-out test accuracy</td><td class="num">100.00%</td><td>200 windows, 50 per class, synthetic</td></tr>
+    <tr><td>Simple if/else fallback</td><td class="num">88.5%</td><td>Shows the learned model adds value on this benchmark</td></tr>
+  </table>
+  <div class="note"><b>Do not overstate.</b> These figures prove the pipeline and split discipline on generated data. They are not evidence of real-fault accuracy, RUL estimation or field reliability. <code>[NEED: labelled real-motor run data]</code></div>
+</section>
+
+<section class="page">
+  <h2>06 · Using the model: how and why it predicts</h2>
+  <p>Runtime inference is a two-stage operation in <code>ml/rf_predictor.py</code>, called once per acquired window from <code>edge/edge_daq.py</code>.</p>
+  <div class="flow">1. Build feature dict from the current window
+2. Stage 1: z = (rms_dyn - baseline_mu) / baseline_sigma
+   - nominal window  → return "Healthy", rf_executed=False
+   - breach or thermal limit → continue
+3. Stage 2: build the 9-feature vector → predict_proba → argmax
+4. Attach response_plan (class, priority, action, timeframe, owner, rationale)
+5. Publish in latest_state.json and to the dashboard/Firebase</div>
+  <h3>Why this design</h3>
+  <p>The coarse gate mirrors the triage idea in the literature: most windows are normal, so a cheap statistical check decides whether the more expensive diagnostic step is needed. On a nominal smoke-test window the wrapper returned <code>rf_executed=False</code>; on a synthetic breach it returned <code>rf_executed=True</code> with a class and response plan. No CPU percentage is claimed because no CPU measurement was taken.</p>
+  <p>The prediction is a four-class diagnosis, not a lifespan forecast. It can say “Bearing Defect” because kurtosis and crest factor show impulsive behaviour consistent with spall impacts in the generated model. It cannot say how many days remain. Remaining-useful-life regression would need a run-to-failure dataset with time-to-failure labels, which this project does not have.</p>
+  <table>
+    <tr><th>Observed signal</th><th>Model interpretation</th><th>Limit</th></tr>
+    <tr><td>High dynamic RMS</td><td>Unbalance/misalignment energy</td><td>Not calibrated to ISO zone severity on the real rig</td></tr>
+    <tr><td>High kurtosis / crest factor</td><td>Impulsive bearing-like events</td><td>No measured real-motor lead time</td></tr>
+    <tr><td>Rising thermal slope</td><td>Thermal runaway class</td><td>Thresholds are configured, not standards-certified</td></tr>
+    <tr><td>INMP441 features</td><td>Context for rubbing/squeal</td><td>ZCR is crossings/sample, not certified SPL metrology</td></tr>
+  </table>
+  <div class="good"><b>Measured latency.</b> Single-window classifier call: 26.19 ms on the training host and 29.99 ms on the Pi. The end-to-end inject-to-alert time has not been measured. <code>[NEED: full pipeline timing]</code></div>
+</section>
+
+<section class="page">
+  <h2>07 · How the papers were implemented</h2>
+  <p>The literature dossier is <code>docs/LITERATURE_REFERENCES.md</code>. The papers informed architecture and feature choices; they were not copied as performance claims.</p>
+  <table>
+    <tr><th>Source</th><th>Project mapping</th><th>Honest boundary</th></tr>
+    <tr><td><b>Cinar et al. (2022)</b>, <em>Machines</em> 10(11), 1006</td><td>Coarse-to-fine triage: Stage-1 statistical gate before the fine classifier; edge/CPS decomposition.</td><td>Their reported results are not ours; we ran our own synthetic benchmark.</td></tr>
+    <tr><td><b>ISO 20816-3 / 10816-3</b></td><td>Motivated vibration severity context and the RMS-based gate.</td><td>We do not claim certified ISO zone classification on the rig.</td></tr>
+    <tr><td><b>Randall &amp; Antoni (2011)</b> spectral kurtosis lineage</td><td>Motivated kurtosis/crest-factor features for impulsive bearing signals.</td><td>The deployed Runtime uses time-domain kurtosis, not a full spectral-kurtosis filter bank.</td></tr>
+    <tr><td><b>MathWorks PdM learning links</b></td><td>Team learning goals for RUL and bearing diagnosis examples.</td><td>External study only. No MathWorks model, RUL result or code was imported.</td></tr>
+  </table>
+  <h3>What was adapted, not copied</h3>
+  <ul>
+    <li>The two-stage pattern became a literal function boundary: gate check, then <code>predict_proba</code>.</li>
+    <li>Physical reasoning from bearing-fault theory became generated feature ranges; see the traceability register.</li>
+    <li>The dashboard references the literature as context, not as a certificate of compliance.</li>
+  </ul>
+  <div class="note"><b>Withdrawn wording.</b> Earlier text mentioned continuous deep learning, a 3-sigma rule, 95.4% confidence, sub-8% CPU and 15–30 minute warning lead time. These were not measured or not deployed and have been removed from the presentation surfaces.</div>
+</section>
+
+<section class="page">
+  <h2>08 · Calibration on the Raspberry Pi</h2>
+  <p>Calibration is a physical procedure, not a dashboard action. <code>edge/calibrate.py</code> runs on the Pi while the motor is stopped and <code>pdm-daq.service</code> is down. The full runbook is <code>docs/CALIBRATION_RUNBOOK.md</code>.</p>
+  <pre>ssh renad@&lt;pi-address&gt;
+cd ~/pdm
+sudo systemctl stop pdm-daq.service
+python3 edge/calibrate.py
+sudo systemctl start pdm-daq.service</pre>
+  <h3>8.1 What the script does</h3>
+  <ol>
+    <li>Prompts for the operator name and samples six ADXL345 orientations (100 readings each).</li>
+    <li>Fits one shared scale and three biases from the six-face means, using the same model as <code>edge_daq.py</code>.</li>
+    <li>Samples ice and boiling reference points (12 readings each), asks for the measured boiling reference and offers a third thermal check.</li>
+    <li>Validates every value: finite numbers only, correct face set, positive face differential, plausible scale/slope.</li>
+    <li>Backs up the old <code>cal.json</code>, writes the new one atomically, saves a markdown run record and appends a JSONL log line.</li>
+  </ol>
+  <h3>8.2 Outputs</h3>
+  <table>
+    <tr><th>Path</th><th>Meaning</th></tr>
+    <tr><td><code>edge/calibration_backups/cal-&lt;UTC&gt;.json</code></td><td>Previous calibration, timestamped</td></tr>
+    <tr><td><code>edge/cal.json</code></td><td>Active runtime coefficients</td></tr>
+    <tr><td><code>edge/calibration_certificate.md</code></td><td>Run record with verdict and missing evidence</td></tr>
+    <tr><td><code>edge/calibration_runs.jsonl</code></td><td>Append-only operational log</td></tr>
+  </table>
+  <div class="note"><b>Verdict meaning.</b> The script only writes <code>REVIEW</code>, <code>UNVERIFIED</code> or <code>FAILED</code>. It never prints <code>PASS</code>, <code>CERTIFIED</code> or exhibition authorization. <code>[NEED: signed sheet, reference thermometer ID, photographs, measured local boiling point]</code></div>
+</section>
+
+<section class="page">
+  <h2>09 · RUNNING STATUS and evidence</h2>
+  <p>This section is the authoritative snapshot for the defense. It separates what was run from what was only designed.</p>
+  <table>
+    <tr><th>Area</th><th>Status</th><th>Evidence / gap</th></tr>
+    <tr><td>Edge acquisition, gate and four-class decision</td><td><span class="status-ok">Implemented</span></td><td><code>edge/edge_daq.py</code>, <code>ml/rf_predictor.py</code>, smoke test</td></tr>
+    <tr><td>Synthetic dataset and run-disjoint benchmark</td><td><span class="status-ok">Complete</span></td><td><code>ml/ai_report.md</code>, 18 → 31 automated checks</td></tr>
+    <tr><td>Pi services and model deployment</td><td><span class="status-ok">Verified 2026-11-23</span></td><td><code>docs/PI_DEPLOYMENT_EVIDENCE.md</code></td></tr>
+    <tr><td>Hosted presentation dashboard and deck</td><td><span class="status-ok">Deployed</span></td><td><code>public/index.html</code>, <code>public/guide.html</code></td></tr>
+    <tr><td>Calibration runner and runbook</td><td><span class="status-ok">Ready</span></td><td><code>edge/calibrate.py</code>; <code>[NEED: signed physical run]</code></td></tr>
+    <tr><td>Real-motor accuracy / RUL</td><td><span class="status-gap">Blocked</span></td><td><code>[NEED: labelled run-to-failure data]</code></td></tr>
+    <tr><td>CPU saving, cost saving, warning lead time</td><td><span class="status-gap">Blocked</span></td><td><code>[NEED: measurements on the physical rig]</code></td></tr>
+    <tr><td>Firebase auth</td><td><span class="status-gap">Decision needed</span></td><td>Current rules are public read/write</td></tr>
+  </table>
+  <h3>Measured smoke evidence</h3>
+  <table>
+    <tr><th>Case</th><th class="num">z-score</th><th class="num">RF executed</th><th class="num">Call time</th></tr>
+    <tr><td>Nominal window</td><td class="num">-1.2</td><td class="num">false</td><td class="num">0.02 ms</td></tr>
+    <tr><td>Breach window</td><td class="num">4.8</td><td class="num">true</td><td class="num">30.995 ms</td></tr>
+  </table>
+  <p class="small">These are wrapper-call measurements, not an end-to-end sensor-to-alarm latency. The single-window classifier benchmark is 26.19 ms on the host and 29.99 ms on the Pi.</p>
+  <h3>Budget position</h3>
+  <p>Signed ceiling 9,370 EGP; planned 9,368.25 EGP from real 2026-10-25 quotes; 0 EGP cloud. The MAX6675 remains a 200 EGP allowance that must be quoted at or below 201.75 EGP. Decision record: <code>circuit/BOM_reconciliation.md</code>. <code>[NEED: final supplier invoice for the MAX6675]</code></p>
+</section>
+
+<section class="page">
+  <h2>10 · Guided development operation</h2>
+  <p>The operating manual is <code>docs/DEVELOPMENT_OPERATIONS.md</code> and the repository index is <code>docs/FILE_MAP.md</code>. The working loop is deliberately short and evidence-driven.</p>
+  <pre># local loop
+PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m unittest discover -s tests -v
+git diff --check
+
+# Pi deploy
+git pull --ff-only
+sudo systemctl restart pdm-daq.service pdm-cloud.service pdm-dashboard.service
+sudo systemctl status pdm-daq.service pdm-cloud.service pdm-dashboard.service
+journalctl -u pdm-daq.service -n 50 --no-pager</pre>
+  <h3>Repository ownership</h3>
+  <table>
+    <tr><th>Owner</th><th>Files</th></tr>
+    <tr><td>Source code</td><td><code>edge/*.py</code>, <code>ml/*.py</code>, <code>tests/*.py</code>, <code>circuit/*.py</code></td></tr>
+    <tr><td>Generated outputs</td><td><code>circuit/out/</code>, <code>ml/*.png</code>, <code>book_assets/*.png</code>, this PDF</td></tr>
+    <tr><td>Runtime state</td><td><code>edge/latest_state.json</code>, <code>edge/hot_backup.csv</code>, <code>edge/cloud_backlog.json</code></td></tr>
+    <tr><td>Calibration evidence</td><td><code>edge/cal.json</code>, certificate, log, backups</td></tr>
+    <tr><td>Local cache</td><td><code>.firebase/</code>, Python <code>__pycache__/</code> — ignored</td></tr>
+  </table>
+  <h3>Definition of done for any change</h3>
+  <ul>
+    <li>Requirement mapped to a test or a named evidence file.</li>
+    <li>Full test suite run and <code>git diff --check</code> clean.</li>
+    <li>Docs updated in the same commit as behavior.</li>
+    <li>No new unverified claim, secret, debug output or generated-file hand edit.</li>
+    <li>UI changes checked at 390, 768 and 1440 px before commit.</li>
+  </ul>
+  <div class="note"><b>Out of scope.</b> No WhatsApp messaging, no contact-state changes and no external chat writes are part of this workflow. All requests are answered in the register inside the repository.</div>
+</section>
+
+<section class="page">
+  <h2>11 · Defense checklist and next evidence</h2>
+  <h3>Questions the guide answers</h3>
+  <table>
+    <tr><th>Question</th><th>Section</th></tr>
+    <tr><td>How was the Raspberry Pi set up and how do services start?</td><td>02</td></tr>
+    <tr><td>How was Firebase and the hosted dashboard created?</td><td>03</td></tr>
+    <tr><td>How was data generated and how was the AI initialized/trained?</td><td>04, 05</td></tr>
+    <tr><td>How is the AI used, how does it predict and why?</td><td>06</td></tr>
+    <tr><td>How were the papers implemented?</td><td>07</td></tr>
+    <tr><td>What is the current status?</td><td>09</td></tr>
+    <tr><td>Which script is run on the Pi for calibration?</td><td>08</td></tr>
+  </table>
+  <h3>Highest-value next evidence</h3>
+  <ol>
+    <li>Collect labelled real-motor windows for each fault class and repeat the run-disjoint evaluation.</li>
+    <li>Measure end-to-end inject-to-alert latency on the rig, not just classifier call time.</li>
+    <li>Perform and sign the six-face and two-point calibration run with reference instrument details.</li>
+    <li>Decide the Firebase auth model, add deny-write tests and lock the database.</li>
+    <li>Align scikit-learn versions between training host and Pi; remove the version warning.</li>
+    <li>Measure CPU load with and without the Stage-1 skip before making any resource claim.</li>
+  </ol>
+  <div class="foot">G12 Project Guide · generated from <code>docs/PROJECT_GUIDE.html</code> · companion PDF <code>docs/G12_Project_Guide.pdf</code>. Evidence register: <code>docs/G12_REQUEST_RESPONSE_REGISTER.md</code>.</div>
+</section>
+
+</body>
+</html>

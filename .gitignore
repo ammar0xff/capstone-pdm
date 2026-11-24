@@ -9,3 +9,8 @@ circuit/__pycache__/
 .venv/
 .stitch-mcp/
 .webcheck/
+.firebase/
+.~lock.*#
+~$*
+edge/calibration_backups/
+edge/calibration_runs.jsonl

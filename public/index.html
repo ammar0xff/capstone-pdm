@@ -793,7 +793,7 @@
             Predictive Maintenance SCADA
             <span style="font-size: 11px; font-weight: 500; color: var(--text-muted);">// UNIT-01</span>
           </h1>
-          <p>Quad-Core Edge Telemetry Mirror &bull; ISO 10816-3 &bull; Randall &amp; Antoni (2011)</p>
+          <p>Live machine state &bull; operator decision &bull; offline-first telemetry</p>
         </div>
       </div>
 
@@ -867,7 +867,7 @@
         <div class="telemetry-kpis">
           <div class="kpi-cell">
             <div class="kpi-label">AI Confidence</div>
-            <div class="kpi-value font-mono" id="badge-ai-conf" style="color: var(--status-ok);">98%</div>
+            <div class="kpi-value font-mono" id="badge-ai-conf" style="color: var(--status-ok);">&mdash;</div>
           </div>
           <div class="kpi-cell">
             <div class="kpi-label">SPC Gate</div>
@@ -886,7 +886,7 @@
               <i class="fa-solid fa-wave-square" style="color: #38bdf8;"></i>
               Vibration Kinematics
             </div>
-            <span class="sensor-bus-spec">ADXL345 &bull; I2C 0x53 &bull; 270Hz</span>
+            <span class="sensor-bus-spec">ADXL345 &bull; I2C 0x53</span>
           </div>
 
           <div class="metrics-2x2">
@@ -1004,10 +1004,10 @@
             </div>
             <div class="metric-data-card">
               <div class="name">Zero-Crossing Rate</div>
-              <div class="value-display font-mono" id="val-sound-zcr">0.000<span class="unit">x/s</span></div>
+              <div class="value-display font-mono" id="val-sound-zcr">0.000<span class="unit">cross/sample</span></div>
             </div>
             <div class="metric-data-card">
-              <div class="name">Shewhart Z-Score</div>
+              <div class="name">Gate Z-Score (vibration)</div>
               <div class="value-display font-mono" id="val-spc-z">-2.82<span class="unit">&sigma;</span></div>
             </div>
             <div class="metric-data-card">
@@ -1051,7 +1051,7 @@
             <span class="gate-badge-tag active" id="pill-stage1">ACTIVE GATE</span>
           </h3>
           <p>
-            Continuous ultra-low-power evaluation. Shewhart 3-Sigma limits on dynamic RMS energy (Z = [RMS - &mu;<sub>0</sub>] / &sigma;<sub>0</sub>) and thermal derivatives (dT/dt). Keeps edge CPU &lt;8% without executing redundant inference loops during steady-state operations.
+            Continuous statistical check on vibration RMS and temperature rise. On a nominal window the classifier wrapper returns without running the Random Forest, so no fault class is produced while the machine is quiet.
           </p>
         </div>
 
@@ -1061,7 +1061,7 @@
             <span class="gate-badge-tag dormant" id="pill-stage2">STANDBY</span>
           </h3>
           <p>
-            Awakens when Z &gt; 2.0&sigma; or |dT/dt| &gt; 5&deg;C/min. Multi-modal kinematic feature classification (BPFO/BPFI raceway defects, 1X rotational unbalance, thermal runaway). 100% accuracy on the physics-simulated benchmark with run-disjoint Group 5-Fold CV; single-window inference measured at 26.1 ms on the training host and 30.0 ms on the Raspberry Pi 4 (end-to-end inject→alert timing not yet measured).
+            Runs on an anomaly breach and classifies the current state into Healthy, Mechanical Imbalance, Bearing Defect or Thermal Runaway. The result is a four-class diagnosis plus an operator action, not a remaining-life prediction.
           </p>
         </div>
       </section>
@@ -1095,7 +1095,7 @@
             </div>
             <div class="math-code-block font-mono">&kappa; = &mu;<sub>4</sub> / &sigma;<sup>4</sup> = [ &Sigma;(a - &mu;)<sup>4</sup> / N ] / &sigma;<sup>4</sup></div>
             <div class="math-live-eval font-mono" id="calc-kurt">&kappa; = 0.00000002 / (0.000088)&sup2; = <b>4.53</b></div>
-            <div class="math-rationale">Measures heavy-tailed distribution shocks. Microscopic raceway spalls produce impulsive high-frequency spikes (&kappa; &gt; 5) well before RMS energy elevates.</div>
+            <div class="math-rationale">Measures heavy-tailed shocks. Bearing-fault theory links spall impacts to high kurtosis before RMS rises; no real-motor lead time has been measured on this rig.</div>
           </div>
 
           <div class="math-card">
@@ -1115,7 +1115,7 @@
             </div>
             <div class="math-code-block font-mono">Z = (RMS<sub>dyn</sub> - &mu;<sub>0</sub>) / &sigma;<sub>0</sub></div>
             <div class="math-live-eval font-mono" id="calc-spc">Z = (0.0094 - 0.080) / 0.025 = <b>-2.82 &sigma;</b></div>
-            <div class="math-rationale">Statistical process control thresholding. Guards edge computational resources; complex ML inference wakes only upon confirmed statistical breach (Z &gt; 2.0&sigma;).</div>
+            <div class="math-rationale">Shewhart check on dynamic RMS. A nominal window skips the Random Forest; CPU savings from that skip have not been measured.</div>
           </div>
 
           <div class="math-card">
@@ -1125,7 +1125,7 @@
             </div>
             <div class="math-code-block font-mono">&Delta;T/&Delta;t = (T<sub>now</sub> - T<sub>past</sub>) / (&Delta;t / 60) [&deg;C/min]</div>
             <div class="math-live-eval font-mono" id="calc-slope">&Delta;T = -0.10 &deg;C over 15.0 s &rarr; <b>-0.40 &deg;C/min</b></div>
-            <div class="math-rationale">Detects lubrication starvation and dry bearing seizure 15-30 minutes ahead of catastrophic temperature trips.</div>
+            <div class="math-rationale">Detects a rapid temperature rise. It is one input to the thermal-fault class; no warning lead time has been measured on a real motor.</div>
           </div>
 
           <div class="math-card">
@@ -1149,7 +1149,7 @@
         <b>Grade 12 STEM Capstone 2026/2027</b> &bull; Theme: Communication, Sensing, Information &amp; Informatics &bull; Machine: 3-Phase AC Induction Motor Rig
       </div>
       <div class="font-mono">
-        Raspberry Pi 4B &bull; Linux 6.6 &bull; Realtime Cloud Mirror: <a href="https://castpone2026-default-rtdb.firebaseio.com/motor1.json" target="_blank">castpone2026-default-rtdb</a>
+        Raspberry Pi 4B &bull; Realtime Cloud Mirror: <a href="https://castpone2026-default-rtdb.firebaseio.com/motor1.json" target="_blank">castpone2026-default-rtdb</a>
       </div>
     </footer>
 
@@ -1383,7 +1383,7 @@
       document.getElementById('val-slope').innerHTML = `${slope >= 0 ? '+' : ''}${slope.toFixed(2)}<span class="unit">&deg;C/m</span>`;
 
       document.getElementById('val-sound-db').innerHTML = `${sound_db.toFixed(1)}<span class="unit">dB</span>`;
-      document.getElementById('val-sound-zcr').innerHTML = `${zcr.toFixed(4)}<span class="unit">x/s</span>`;
+      document.getElementById('val-sound-zcr').innerHTML = `${zcr.toFixed(4)}<span class="unit">cross/sample</span>`;
 
       const z_score = ((rms - 0.080) / 0.025);
       document.getElementById('val-spc-z').innerHTML = `${z_score >= 0 ? '+' : ''}${z_score.toFixed(2)}<span class="unit">&sigma;</span>`;

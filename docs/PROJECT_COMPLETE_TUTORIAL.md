@@ -313,16 +313,28 @@ python3 ml/train_rf.py
 ```
 
 ### Step 3: Calibrate Physical Sensors on the Raspberry Pi
-Connect to the Raspberry Pi over SSH and run the interactive calibration suite:
+`edge/calibrate.py` runs on the Pi, not on the laptop, and is not a systemd
+service. Stop the DAQ so the I2C/SPI buses are free:
+
 ```bash
+ssh renad@<pi-address>
+cd ~/pdm
+sudo systemctl stop pdm-daq.service
 python3 edge/calibrate.py
+sudo systemctl start pdm-daq.service
 ```
-Place the rig flat on a granite surface ($+Z$ up), press ENTER to sample 100 stationary readings. Offsets are automatically written to `edge/cal.json`.
+
+The script asks for the operator, samples six ADXL345 faces (100 readings each)
+and two MAX6675 reference points (12 readings each), offers a third thermal
+check, backs up `edge/cal.json`, writes it atomically, and creates
+`edge/calibration_certificate.md` plus `edge/calibration_runs.jsonl`. The
+verdict is `REVIEW` or `UNVERIFIED` — it never issues a fake PASS. See
+`docs/CALIBRATION_RUNBOOK.md` for the full guided procedure.
 
 ### Step 4: Configure Firebase Realtime Database
 1. Go to [Firebase Console](https://console.firebase.google.com/) and create project `castpone2026`.
 2. Create a Realtime Database in `us-central1` or default region.
-3. Set Security Rules to allow read and write:
+3. The deployed project currently uses public read/write rules for exhibition telemetry:
 ```json
 {
   "rules": {
@@ -331,6 +343,9 @@ Place the rig flat on a granite surface ($+Z$ up), press ENTER to sample 100 sta
   }
 }
 ```
+   **Security warning:** anyone with the URL can read or overwrite `motor1`.
+   No auth change was made in this cleanup because it changes client behavior.
+   See `docs/FIREBASE_SETUP.md` for the least-privilege migration plan.
 4. Verify the database URL matches `https://castpone2026-default-rtdb.firebaseio.com/motor1.json`.
 
 ### Step 5: Start Edge Daemons as Systemd Services

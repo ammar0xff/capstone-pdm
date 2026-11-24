@@ -1,105 +1,97 @@
-# Sensor Calibration & Experimental Error Verification Report
-**Official Documentation for STEM Capstone Grade 12 Evaluation Rubric**
+# Sensor calibration method and evidence status
 
-> **Requirement Reference**: *G12_27_ Capstone.pdf* &mdash; *"Students must conduct and document sensor calibration."*
+This document replaces the earlier report that contained example-looking raw
+counts and verdicts without attached measurement evidence. Those numbers were
+not used to write `edge/cal.json` and are withdrawn. The current procedure is
+implemented by `edge/calibrate.py`; the operating procedure is
+`docs/CALIBRATION_RUNBOOK.md`.
 
----
+## 1. Why calibrate
 
-## 1. Overview & Calibration Objectives
+Uncalibrated sensors add static offset, sensitivity error and thermal drift.
+On this rig the raw ADXL345 counts are converted in `edge/edge_daq.py` as:
 
-In industrial condition monitoring, uncalibrated sensors introduce static DC bias, scale factor errors, and thermal drift, leading to false-positive fault classifications. To satisfy the Capstone criteria, rigorous empirical calibration was conducted on both physical sensors:
-
-1. **Vibration Sensor**: ADXL345 3-Axis Digital MEMS Accelerometer (I2C Address: `0x53`)
-2. **Temperature Sensor**: MAX6675 Cold-Junction-Compensated K-Type Thermocouple (SPI Bus 0, CE0)
-
----
-
-## 2. ADXL345 3-Axis Accelerometer Calibration
-
-### 2.1 Theoretical Error Model
-The raw sensor measurement $\mathbf{a}_{\text{raw}} = [a_x, a_y, a_z]^T$ differs from the true physical acceleration $\mathbf{a}_{\text{true}}$ according to:
-
-$$\mathbf{a}_{\text{true}} = \mathbf{S} \cdot (\mathbf{a}_{\text{raw}} - \mathbf{b})$$
-
-Where:
-- $\mathbf{b} = [b_x, b_y, b_z]^T$ is the static $0g$ offset bias vector.
-- $\mathbf{S} = \text{diag}(s_x, s_y, s_z)$ is the sensitivity scaling factor matrix.
-
-### 2.2 Calibration Methodology (6-Position Static Gravitational Test)
-The sensor was sequentially placed flat on an optical calibration granite table in six orthogonal orientations under Earth's local gravity ($1.000g \approx 9.80665\,\text{m/s}^2$):
-
-1. $+Z$ pointing upwards ($\mathbf{a} = [0, 0, +1g]$)
-2. $-Z$ pointing upwards ($\mathbf{a} = [0, 0, -1g]$)
-3. $+X$ pointing upwards ($\mathbf{a} = [+1g, 0, 0]$)
-4. $-X$ pointing upwards ($\mathbf{a} = [-1g, 0, 0]$)
-5. $+Y$ pointing upwards ($\mathbf{a} = [0, +1g, 0]$)
-6. $-Y$ pointing upwards ($\mathbf{a} = [0, -1g, 0]$)
-
-At each orientation, 500 samples were recorded at 100 Hz and averaged.
-
-### 2.3 Experimental Calibration Data
-
-| Axis | $+1g$ Raw Reading | $-1g$ Raw Reading | Calculated Offset Bias ($b$) | Sensitivity Scale ($s$) | Manufacturer Spec | Calibrated Deviation |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **X** | $+264$ LSB | $-248$ LSB | **$+8.0$ LSB** ($+0.031g$) | **$0.00391g$/LSB** | $0.00390g$/LSB | **$0.25\%$** |
-| **Y** | $+259$ LSB | $-253$ LSB | **$+3.0$ LSB** ($+0.012g$) | **$0.00390g$/LSB** | $0.00390g$/LSB | **$0.00\%$** |
-| **Z** | $+271$ LSB | $-241$ LSB | **$+15.0$ LSB** ($+0.058g$) | **$0.00392g$/LSB** | $0.00390g$/LSB | **$0.51\%$** |
-
-### 2.4 Software Calibration Implementation
-These calibration parameters are coded directly into our acquisition engine:
-```python
-# Calibration Offsets & Scale Factors (ADXL345 Full-Res Mode @ +-16g)
-OFFSET_X = 8.0
-OFFSET_Y = 3.0
-OFFSET_Z = 15.0
-SCALE_FACTOR = 0.00390625  # 1 / 256 LSB per g
-
-def get_calibrated_acceleration(bus):
-    raw_bytes = bus.read_i2c_block_data(0x53, 0x32, 6)
-    rx, ry, rz = struct.unpack('<hhh', bytes(raw_bytes))
-    
-    # Apply empirical calibration matrix
-    ax = (rx - OFFSET_X) * SCALE_FACTOR
-    ay = (ry - OFFSET_Y) * SCALE_FACTOR
-    az = (rz - OFFSET_Z) * SCALE_FACTOR
-    return ax, ay, az
+```
+acceleration_axis = raw_axis * g_scale - g_bias_axis
+temperature_c     = raw_temperature_c * t_a + t_b
 ```
 
----
+`edge/calibrate.py` fits exactly those five runtime coefficients. It does not
+change the classifier, the SPC gate thresholds or the dashboard.
 
-## 3. MAX6675 Thermocouple Sensor Calibration
+## 2. ADXL345 six-face static test
 
-### 3.1 Calibration Methodology (Two-Point Physical Verification)
-The K-type thermocouple probe was benchmarked against two thermodynamic reference states and verified with a laboratory digital thermometer:
+The sensor is placed with each axis pointing up and down on a level surface.
+For axis `i`, let `p_i` be the averaged raw reading with the axis pointing up
+(+1 g) and `n_i` the averaged reading pointing down (-1 g).
 
-1. **Ice-Water Equilibrium (Ice Point)**: Crushed ice in distilled water at atmospheric pressure ($0.0^\circ\text{C}$).
-2. **Boiling Point of Distilled Water**: At sea level ($100.0^\circ\text{C}$).
-3. **Ambient Room Calibration**: Regulated laboratory temperature ($22.5^\circ\text{C}$).
+Per-axis sensitivity in the runtime's units is:
 
-### 3.2 Temperature Verification Results
+```
+scale_i = 2 / (p_i - n_i)                    [g per raw count]
+bias_i  = ((p_i + n_i) / 2) * shared_scale   [g]
+```
 
-| Reference Environment | True Reference ($T_{\text{ref}}$) | MAX6675 Measured ($T_{\text{meas}}$) | Absolute Error ($\Delta T$) | Percentage Error | Pass Criteria |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| **Crushed Ice Bath** | $0.0^\circ\text{C}$ | $+0.25^\circ\text{C}$ | $+0.25^\circ\text{C}$ | &mdash; | **PASS** ($\le \pm 1.5^\circ\text{C}$) |
-| **Ambient Room Temp** | $22.5^\circ\text{C}$ | $22.75^\circ\text{C}$ | $+0.25^\circ\text{C}$ | **$1.11\%$** | **PASS** ($\le \pm 1.5^\circ\text{C}$) |
-| **Boiling Water** | $100.0^\circ\text{C}$ | $99.50^\circ\text{C}$ | $-0.50^\circ\text{C}$ | **$0.50\%$** | **PASS** ($\le \pm 1.5^\circ\text{C}$) |
+The runtime applies one `g_scale` to all axes, so the shared scale is the mean
+of the three `scale_i` values. Each bias uses that same shared scale; this
+keeps the certificate and `edge_daq.py` consistent.
 
----
+Residual for every face and axis is computed after applying the runtime model.
+The configured review tolerance is 0.05 g. A residual above tolerance is
+reported as `REVIEW`, not hidden or rounded away.
 
-## 4. Signal-to-Noise Ratio (SNR) & Noise Floor
+Face order used by the script: `+X, -X, +Y, -Y, +Z, -Z`.
 
-With the motor completely de-energized (stationary testbed):
-- **Vibration Noise Floor ($a_{\text{noise}}$)**: $0.0084g$ RMS.
-- **Dynamic Range**: $0.0084g \to 16.0g$ ($> 65\text{ dB}$ SNR).
-- **ISO 10816-3 Compliance**: Noise floor is less than $10\%$ of Zone A boundary ($0.10g$), preventing false noise alarms.
+## 3. MAX6675 two-point thermal fit
 
----
+The K-type probe is measured in two reference states:
 
-## 5. Summary for Judges
+1. Crushed ice/distilled water slush: reference 0.0 °C.
+2. Boiling distilled water: reference entered by the operator. The historical
+   project value is 97.5 °C; `[NEED: measured local boiling temperature or site pressure]`.
 
-| Evaluation Checkpoint | Official Standard / Target | Experimental Result | Status |
-| :--- | :--- | :--- | :---: |
-| **Vibration Sensor Calibration** | 6-position gravitational calibration | Residual error $< 0.51\%$ | **VERIFIED** |
-| **Temperature Calibration** | Ice point & boiling reference | Max error $\pm 0.50^\circ\text{C}$ | **VERIFIED** |
-| **Sensor Offset Correction** | Applied in software DAQ loop | Live $0g$ drift eliminated | **VERIFIED** |
-| **Sensor Resolution** | $3.9\text{ mg/LSB}$ & $0.25^\circ\text{C}$ | Verified via bus dump | **VERIFIED** |
+For averaged raw readings `R_ice` and `R_boil` and references `T_ice`, `T_boil`:
+
+```
+t_a = (T_boil - T_ice) / (R_boil - R_ice)
+t_b = T_ice - t_a * R_ice
+```
+
+The fit is exact at those two points by construction. It does **not** prove
+accuracy at other temperatures. The script therefore offers an optional third
+known-temperature check and records its residual separately. Without that
+check the certificate explicitly says `Third point: NOT PERFORMED`.
+
+## 4. Safety and data integrity
+
+- The DAQ service must be stopped before calibration so I2C/SPI are not shared.
+- Existing `edge/cal.json` is copied to a timestamped backup before any write.
+- The new file is written to a temporary file in the same directory and
+  replaced atomically.
+- Non-finite numbers, wrong face counts, reversed face pairs, implausible
+  slopes and hardware read failures abort the run without writing.
+- The certificate never issues `PASS`, `CERTIFIED` or exhibition authorization.
+  Its verdict is `REVIEW`, `UNVERIFIED` or `FAILED`.
+
+## 5. Evidence status
+
+| Item | Status | Evidence needed |
+|---|---|---|
+| Calibration runner code | Complete | `edge/calibrate.py`, `tests/test_evaluation.py` |
+| Pi operating procedure | Complete | `docs/CALIBRATION_RUNBOOK.md` |
+| Six-face raw averages | Not recorded in repository | `[NEED: signed sheet and calibration_runs.jsonl line]` |
+| Thermal reference instrument | Not recorded | `[NEED: thermometer ID, calibration date, uncertainty]` |
+| Local boiling reference | Default only | `[NEED: measured site value or pressure]` |
+| Cold-junction placement | Design constraint documented | `[NEED: photograph and temperature log showing module isolation]` |
+| Real-motor feature validation | Not performed | `[NEED: physical run data correlating features with condition]` |
+
+## 6. Withdrawn claims
+
+The following earlier statements are not supported by retained evidence and
+must not be repeated in presentations or reports:
+
+- Specific raw ADXL345 counts, offsets and sensitivity percentages in the old
+  results table.
+- Max temperature error of ±0.50 °C and class-1 probe verification.
+- Vibration noise floor of 0.0084 g RMS and derived SNR/ISO zone claim.
+- Any automatic “SYSTEM CALIBRATED & AUTHORIZED FOR EXHIBITION” verdict.

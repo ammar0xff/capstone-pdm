@@ -229,29 +229,34 @@ Empirical feature importance extraction confirmed the physical validity of the m
 
 ## 6. Sensor Calibration Procedures & Traceability
 
-Per Capstone rubric requirements (10 pts), all physical sensors must undergo documented calibration traceable to physical reference standards. The calibration engine is provided in `edge/calibrate.py`.
+Calibration is an operator-run Pi task implemented in `edge/calibrate.py`.
+The exact commands, prompts and evidence checklist are in
+`docs/CALIBRATION_RUNBOOK.md`; the method and withdrawn claims are in
+`docs/SENSOR_CALIBRATION.md`. The DAQ service must be stopped before sampling.
 
 ### 6.1 ADXL345 6-Face Static Gravitational Tilt Calibration
-The accelerometer is placed on each of its 6 orthogonal faces on an engineered precision surface plate:
-- **Faces Measured:** $+X, -X, +Y, -Y, +Z, -Z$ exposed sequentially to Earth's $1.000g$ gravity vector ($9.80665\,\text{m/s}^2$).
-- **Offset & Sensitivity Calculation:**
-  $$\text{Offset}_i = \frac{a_{i,+1g} + a_{i,-1g}}{2}, \quad \text{Gain}_i = \frac{a_{i,+1g} - a_{i,-1g}}{2}$$
-  $$a_{\text{calibrated}, i} = \frac{a_{\text{raw}, i} - \text{Offset}_i}{\text{Gain}_i}$$
-- **Hardware Register Trim:** Offsets are written directly into the ADXL345 `OFSX`, `OFSY`, and `OFSZ` non-volatile registers ($15.6\,\text{mg/LSB}$) for zero-overhead hardware correction.
+For each axis, averaged raw readings are taken with that axis pointing up
+($+1g$) and down ($-1g$). The runtime model is
+$a_{\text{calibrated},i} = a_{\text{raw},i}\,g_{\text{scale}} - b_i$, so the
+fitted sensitivity is $g_{\text{scale},i} = 2/(p_i - n_i)$ in g/LSB and
+$b_i = ((p_i + n_i)/2)\,g_{\text{scale}}$. One shared `g_scale` is used because
+`edge/edge_daq.py` applies a single scale to all axes. Residuals above 0.05 g
+are reported as `REVIEW`; no hardware register trim is performed.
 
-### 6.2 MAX6675 2-Point Thermal Calibration (Cairo Atmospheric Standard)
-The thermocouple probe undergoes a 2-point physical calibration:
-1. **Point 1 (Ice Point):** Immersed in a distilled water ice slush equilibrium ($0.00^\circ\text{C}$).
-2. **Point 2 (Boiling Point):** Immersed in boiling water adjusted for Cairo's atmospheric elevation:
-   $$T_{\text{boil}} = 100^\circ\text{C} - 0.0033 \times h \approx 97.50^\circ\text{C} \quad (h \approx 75\,\text{m ASL})$$
-3. **Linear Correction:** Computes scale slope $m$ and zero-offset $c$:
-   $$T_{\text{corrected}} = m \cdot T_{\text{measured}} + c$$
+### 6.2 MAX6675 2-Point Thermal Calibration
+The operator measures an ice slush (0.0 °C reference) and boiling distilled
+water. The boiling reference must be entered explicitly; the historical
+97.5 °C value is a project default, not a verified site measurement.
+The script solves $T_{\text{corrected}} = t_a T_{\text{raw}} + t_b$ and records
+an optional third-point residual. `[NEED: reference thermometer ID and local
+boiling reference]`.
 
-### 6.3 Calibration Certificate Export
-Executing `python3 edge/calibrate.py` generates an official markdown certificate saved at `edge/calibration_certificate.md` containing:
-- Calibration timestamp and operator signature block.
-- Measured offsets, gains, and residual Root-Mean-Square Error ($\text{RMSE} < 0.02g$ and $< 0.35^\circ\text{C}$).
-- Traceability declaration to international physical standards.
+### 6.3 Calibration Run Record
+`python3 edge/calibrate.py` writes a timestamped backup, atomically updates
+`edge/cal.json`, saves `edge/calibration_certificate.md` and appends
+`edge/calibration_runs.jsonl`. The verdict is `REVIEW`, `UNVERIFIED` or
+`FAILED`. It is a run record, not a certified metrology report and not an
+exhibition authorization.
 
 ---
 
@@ -288,7 +293,7 @@ All production processes run as supervised systemd background services with auto
    - Restart Policy: `always`, `RestartSec=3s`
 2. **`pdm-dashboard.service`** (Web Presentation Layer):
    - Location: `/etc/systemd/system/pdm-dashboard.service`
-   - Executes: `/usr/bin/python3 /home/renad/pdm/edge/app.py`
+   - Executes: `/usr/bin/python3 /home/renad/pdm/edge/dashboard.py`
    - Restart Policy: `always`, `RestartSec=3s`
 
 ### 8.2 Operational Commands

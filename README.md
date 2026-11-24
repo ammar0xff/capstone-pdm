@@ -1,69 +1,140 @@
 # Intelligent Predictive Maintenance & Remote Monitoring — G12 Capstone 2026/27
 
-AI-driven edge PdM on Raspberry Pi 4 4GB. Offline-first, 0-EGP cloud mirror.
-**Budget: 9,370 EGP signed ceiling — planned 9,368.25 from real 2026-10-25 quotes. The MAX6675 is a 200 allowance that must be quoted ≤201.75. 0 EGP cloud.**
+Raspberry Pi 4 edge condition monitoring for a three-phase induction motor rig.
+The system samples vibration, temperature and acoustic sensors, applies a
+statistical gate, then runs a four-class Random Forest diagnosis when that gate
+is breached. Results are presented on a local Flask dashboard and mirrored to
+Firebase Realtime Database. The hosted dashboard is presentation-only.
 
-- 📖 Live book: GitHub Pages `index.html` (mirrors `Project_Book.html`)
-- 📋 PRD: `PRD.md` v2.0 (Problem → Solution → Features → Grade → Technical)
-- 🎬 Video prompt: `video_prompt.txt`
-- 📊 Charts: `book_assets/` (regenerate with `python3 book_assets/make_charts.py`)
-- 📦 BOM: `DOC-20261014-WA0055.xlsx` (supplier sheet) · `circuit/bom_target.csv` (build list)
-- 📚 Sources: `G12_27_ Capstone.pdf`, `fmech-06-578379.pdf`, `machines-10-01006-v3.pdf`
-- 🧾 G12 request-by-request answers: `docs/G12_REQUEST_RESPONSE_REGISTER.md` (done / partial / blocked, with evidence)
+**Current status:** implementation and synthetic benchmark are complete;
+physical-rig validation, run-to-failure/RUL and measured CPU savings are not.
+See `docs/G12_REQUEST_RESPONSE_REGISTER.md` for request-by-request evidence.
 
-Stack: ADXL345 (I2C) + K-type/MAX6675 (SPI) + INMP441 (I2S) → SPC coarse → RF fine (≥80%) → Flask Custom Panel (offline) + Firebase RTDB (mirror) + Grafana Cloud (analytics).
+## Start here
 
-## Circuit design package (generated, machine-checked)
+| Goal | Read |
+|---|---|
+| Understand every file and generated artifact | `docs/FILE_MAP.md` |
+| Develop, test, deploy and roll back safely | `docs/DEVELOPMENT_OPERATIONS.md` |
+| Calibrate the sensors on the Pi | `docs/CALIBRATION_RUNBOOK.md` and `edge/calibrate.py` |
+| Create or audit the Firebase mirror | `docs/FIREBASE_SETUP.md` |
+| Full English step-by-step project guide | `docs/PROJECT_GUIDE.html` → `docs/G12_Project_Guide.pdf` |
+| Honest answers to all 13 G12 requests | `docs/G12_REQUEST_RESPONSE_REGISTER.md` |
+| AI design, training and measured results | `ml/ai_report.md` |
+| Pi deployment evidence and latency | `docs/PI_DEPLOYMENT_EVIDENCE.md` |
+| Requirements and scope | `PRD.md` |
 
-One source of truth: `circuit/design.py` (components, pins, nets). Rebuild everything:
+## System at a glance
 
-```bash
-python3 circuit/build.py     # stdlib only — runs on the Pi, no KiCad needed
+```
+ADXL345 (I2C) ─┐
+MAX6675 (SPI) ─┼─> edge/edge_daq.py ─> Stage 1 SPC gate ─> Stage 2 RF diagnosis
+INMP441 (I2S) ─┘          │                       │
+                          ├─> edge/dashboard.py    ├─> edge/firebase_mirror.py
+                          └─> edge/cal.json        └─> hosted public/index.html
 ```
 
-| Output | What it is |
-|---|---|
-| `circuit/out/erc_report.md` | 52 checks = 44 design + 8 BOM — **0 ERC errors, 8 documented WARN, 0 FAIL** |
-| `circuit/out/schematic_main.svg` | Sheet 1: system wiring + cable schedule (A3) |
-| `circuit/out/tc_frontend.svg` | Sheet 2: K-type/MAX6675 theory, cold junction + computed error budget |
-| `circuit/out/wiring_a3.svg` | Sheet 3: assembly, glands, cable lengths, power-on checklist |
-| `circuit/out/breadboard.svg` | Sheet 4: true-scale (1:1 on A3) breadboard view — real part artwork, hole-by-hole |
-| `circuit/out/fritzing_breadboard.svg` / `.png` | Verified Fritzing breadboard CAD render — real ADXL345/MAX6675/INMP441/Pi 4/5 V fan artwork, net-coloured wires, machine-audited (0 geometry problems) |
-| `circuit/out/PDM_Predictive_Maintenance.fzz` | The Fritzing sketch deliverable — 14 instances, 15 nets, 166 wires, all `PDM_*` module IDs; rebuilt by `circuit/fzz/build_fzz.py` and audited by `circuit/fzz/check_export.py` |
-| `book_assets/breadboard.png` | Raster preview of Sheet 4 (for slides/print; the SVG is the source of truth) |
-| `circuit/out/pdm.net` | KiCad-format netlist (15 nets, 13 components) |
-| `circuit/out/pdm_skidl.py` | SKiDL source for a machine with KiCad libraries |
-| `circuit/out/block.mmd`, `sequence.mmd`, `state.mmd` | Mermaid diagrams (render on GitHub) |
+- **Stage 1** checks vibration RMS and thermal rise. On a nominal window the
+  classifier wrapper returns without calling `predict_proba`.
+- **Stage 2** returns one of four classes: Healthy, Mechanical Imbalance,
+  Bearing Defect or Thermal Runaway, plus an operator response plan.
+- The 100% score in `ml/ai_report.md` belongs only to the run-disjoint
+  **synthetic** benchmark. It is not a real-motor accuracy claim.
+- The dashboard shows live state, decisions, charts and links. It has no
+  calibration write endpoint and no simulator controls.
 
-The build **fails** on any ERC error, so a wrong wire cannot produce a drawing. Sheets are embedded in Project Book §4.3–4.4 — §4.4 is the true-scale (1:1 on A3) breadboard view with real part artwork (preview: `book_assets/breadboard.png`).
+## First-time setup
 
-Engineering corrections found by the checks and already applied to the book and code:
+### Development machine
 
-1. **Nyquist**: 50 Hz sampling cannot see a 240 Hz bearing tone — now ODR = fs = 800 Hz with timestamp resampling.
-2. **Kurtosis** divided by σ² instead of σ⁴ — now `w.var()**2`.
-3. **Gravity**: RMS of |a| included the 1 g offset — now per-axis mean removal.
-4. **Cold junction**: the MAX6675 die *is* T_cold — the module must sit ≥15 cm from the Pi or every reading carries the box's 12 °C rise.
-5. **Probe class**: a class-2 K-type is ±2.5 °C on its own — M4 (±2.0 °C) only holds with a **class-1** probe.
+```bash
+cd ~/Documents/antigravity/intelligent-raman
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m unittest discover -s tests -v
+python3 circuit/build.py
+```
 
-Open documentation issues (deliberate WARNs): I²C cable must stay <10 cm, the sealed IP65 box needs a lid heat-spreader, and the implemented Stage-1 gate is a single configured 2.0-sigma threshold; a 2-of-3 confirmation rule is a proposal only, not deployed. [NEED: measure the false-alarm interval on the physical rig before quoting one.]
+### Raspberry Pi
 
-## Budget: signed 9,370 ceiling (real quotes)
+The verified Pi path is `/home/renad/pdm`, user `renad`. Confirm `User=`,
+`WorkingDirectory=` and `ExecStart=` in `edge/*.service` before copying them.
 
-The 2026-10-25 supplier quotes are real, and they killed the self-imposed 8240 estimate. The
-ceiling was restated in writing the same day, because `G12_27_ Capstone.pdf` sets no budget of
-its own — only 0 EGP cloud is absolute.
+```bash
+ssh renad@<pi-address>
+cd ~/pdm
+sudo cp edge/pdm-daq.service edge/pdm-cloud.service edge/pdm-dashboard.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now pdm-daq.service pdm-cloud.service pdm-dashboard.service
+sudo systemctl status pdm-daq.service pdm-cloud.service pdm-dashboard.service
+```
 
-| | EGP |
-|---|---|
-| 2026-10-25 quotes (20 lines) | 8,888.25 |
-| Re-added fan + glands + heat-shrink | 280.00 |
-| MAX6675 allowance (not a quote) | 200.00 |
-| **Planned** | **9,368.25** |
-| **Signed ceiling** | **9,370.00** |
-| Headroom | **1.75** |
+Only the three units above are services. `edge/calibrate.py`,
+`edge/exhibition_drill.py`, `edge/stream_live.py` and
+`edge/generate_qr.py` are operator-run tools, not daemons.
 
-The Pi 4 4 GB is already bought at 6,850 (73 % of spend, sunk), so a cheaper board is no longer
-a lever — that is why the ceiling moved and the parts did not. The only open rule: **the MAX6675
-must be quoted at or below 201.75 EGP**; if it is higher, collect the order in person (−220
-shipping) rather than raise the ceiling. Decision record and the rejected alternatives:
-**`circuit/BOM_reconciliation.md`**.
+### Calibration — run on the Pi, not on the laptop
+
+Stop the DAQ service first so the SPI/I2C buses are not shared during sampling:
+
+```bash
+ssh renad@<pi-address>
+cd ~/pdm
+sudo systemctl stop pdm-daq.service
+python3 edge/calibrate.py
+sudo systemctl start pdm-daq.service
+```
+
+The script asks for the operator name, samples six ADXL345 faces and two
+MAX6675 reference points, backs up `edge/cal.json`, writes it atomically, saves
+`edge/calibration_certificate.md` and appends `edge/calibration_runs.jsonl`.
+It reports `REVIEW` or `UNVERIFIED`; it never issues a fake PASS. Use
+`python3 edge/calibrate.py --manual` only when entering previously recorded
+averaged readings. Full procedure: `docs/CALIBRATION_RUNBOOK.md`.
+
+### Firebase
+
+The current project is `castpone2026` and the mirror URL is
+`https://castpone2026-default-rtdb.firebaseio.com/motor1.json`.
+The existing rules are public read/write; no auth change has been made.
+See `docs/FIREBASE_SETUP.md` before altering the rules or client behavior.
+
+### Dashboard
+
+- Local: `http://<pi-address>:5000/` from `edge/dashboard.py`.
+- Hosted: `https://castpone2026.web.app/` from `public/index.html`.
+- Exhibition deck: `https://castpone2026.web.app/guide.html`.
+- Update hosted files: `firebase deploy --only hosting`.
+
+## Verification status
+
+| Area | Evidence | Status |
+|---|---|---|
+| Run-disjoint synthetic benchmark | `ml/ai_report.md`, `tests/test_evaluation.py` | Complete |
+| Edge gate and four-class decision | `edge/edge_daq.py`, `ml/rf_predictor.py` | Complete in code |
+| Pi services and model deployment | `docs/PI_DEPLOYMENT_EVIDENCE.md` | Verified on 2026-11-23 |
+| Pi latency | 26.19 ms host / 29.99 ms Pi, single-window inference | Measured; full inject→alert timing not measured |
+| Real-motor accuracy, RUL, cost savings | — | `[NEED: physical run data]` |
+| Sensor calibration certificate | `edge/calibrate.py` and runbook | Procedure ready; `[NEED: signed run record]` |
+
+## Budget
+
+Signed ceiling **9,370 EGP**; planned **9,368.25 EGP** from 2026-10-25 quotes.
+The MAX6675 remains a 200 EGP allowance that must be quoted at or below
+201.75 EGP. Cloud cost is 0 EGP. Decision record:
+`circuit/BOM_reconciliation.md`.
+
+## Circuit package
+
+`circuit/design.py` is the single source of truth. Rebuild all sheets, netlist,
+Fritzing sketch and checks with `python3 circuit/build.py`. Generated outputs
+live in `circuit/out/` and are described in `docs/FILE_MAP.md`. The build fails
+on ERC errors; the remaining WARNs are documented design constraints, not
+hidden failures.
+
+## Repository conventions
+
+- Edit sources, never generated `circuit/out/` files directly.
+- Keep model and gate behavior unchanged unless a test and evidence are updated.
+- Do not commit secrets, local `.firebase/` cache, calibration backups or logs.
+- No WhatsApp contact or chat state changes are part of this repository workflow.

@@ -8,12 +8,11 @@ import os
 import json
 import csv
 import time
-from flask import Flask, render_template, jsonify, Response, request
+from flask import Flask, render_template, jsonify, Response
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATE_FILE = os.path.join(BASE_DIR, "latest_state.json")
 HISTORY_FILE = os.path.join(BASE_DIR, "hot_backup.csv")
-CAL_FILE = os.path.join(BASE_DIR, "cal.json")
 CLOUD_CONFIG_FILE = os.path.join(BASE_DIR, "cloud_config.json")
 CLOUD_BACKLOG_FILE = os.path.join(BASE_DIR, "cloud_backlog.json")
 
@@ -81,6 +80,7 @@ def get_latest_state():
             "baseline_sigma": 0.025,
             "ucl_warning": 0.13,
             "ucl_fault": 0.155,
+            "z_score": 0.0,
         },
         "vibration": {
             "rms_dyn": 0.0,
@@ -93,7 +93,12 @@ def get_latest_state():
             "fs_hz": 0.0,
         },
         "temperature": {"temp_c": 0.0, "slope_c_per_min": 0.0, "open_tc": 0},
-        "system": {"adxl_ok": False, "max6675_ok": False, "storage_ok": True},
+        "system": {
+            "adxl_ok": False,
+            "max6675_ok": False,
+            "acoustic_ok": False,
+            "storage_ok": True,
+        },
     }
 
 
@@ -144,23 +149,6 @@ def api_stream():
             time.sleep(0.5)
 
     return Response(event_stream(), mimetype="text/event-stream")
-
-
-@app.route("/api/cal", methods=["GET", "POST"])
-def api_cal():
-    if request.method == "POST":
-        try:
-            new_cal = request.json
-            with open(CAL_FILE, "w") as f:
-                json.dump(new_cal, f, indent=2)
-            return jsonify({"status": "success", "cal": new_cal})
-        except Exception as e:
-            return jsonify({"status": "error", "message": str(e)}), 400
-    else:
-        if os.path.exists(CAL_FILE):
-            with open(CAL_FILE, "r") as f:
-                return jsonify(json.load(f))
-        return jsonify({})
 
 
 if __name__ == "__main__":
