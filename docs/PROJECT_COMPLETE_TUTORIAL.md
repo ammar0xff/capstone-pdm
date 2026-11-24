@@ -12,7 +12,7 @@ Industrial motors represent over **70% of electrical power consumption** in heav
 
 This project implements an **end-to-end Cyber-Physical Predictive Maintenance (PdM) System** that satisfies the Grade 12 STEM Capstone requirements:
 1. **Multi-Modal Edge Sensing**: High-rate digital vibration ($400\,\text{Hz}$ via I2C), cold-junction-compensated casing temperature (SPI), and high-frequency acoustic emission (I2S DMA).
-2. **Offline-First Two-Stage Edge AI**: Grounded in **Cinar et al. (2022)**, utilizing a coarse **Shewhart Statistical Process Control (SPC)** gate to keep edge CPU utilization $<8\%$, activating a **300-Tree Random Forest Classifier** only when statistical anomalies occur.
+2. **Offline-First Two-Stage Edge AI**: Grounded in **Cinar et al. (2022)**, utilizing a coarse **Shewhart Statistical Process Control (SPC)** gate before a **300-Tree Random Forest Classifier**. CPU savings have not been measured on our Pi, so no percentage is claimed (see `docs/G12_REQUEST_RESPONSE_REGISTER.md` §7).
 3. **Traceable Sensor Metrology**: Conducts empirical 6-position gravitational tilt calibration ($<0.51\%$ error) and 2-point thermodynamic calibration satisfying rubric criteria (10 pts).
 4. **Zero-Cost Cloud Mirror**: Synchronizes real-time machine health states to Firebase Realtime Database (Spark free tier) with Quota Guard and offline queueing.
 5. **Interactive Global Web Dashboards**: Global live telemetry mirror, 12-slide exhibition presentation deck, and official metrology calibration certificate.
@@ -198,7 +198,7 @@ Trains a 300-estimator Random Forest classifier (`max_depth=12`, `min_samples_sp
 1. Reads 6 bytes from ADXL345 via I2C at $400\,\text{Hz}$, subtracts static calibrated $0g$ biases ($b_x, b_y, b_z$), and evaluates sliding window RMS, Peak, Kurtosis, and Crest Factor.
 2. Reads 2 bytes from MAX6675 via SPI Bus 0 every 1 second ($0.25^\circ\text{C}$ resolution) and calculates thermal slope $\Delta T / \Delta t$.
 3. Reads 24-bit DMA acoustic samples from INMP441 via I2S ALSA capture.
-4. **Stage 1 Shewhart SPC Gating**: Computes normalized $Z = \frac{\text{RMS} - \mu_0}{\sigma_0}$. If $Z \le 2.0\sigma$ and $\frac{dT}{dt} < 5^\circ\text{C/min}$, the system remains in healthy low-power mode (CPU $<8\%$). If exceeded, Stage 2 Random Forest inference awakens and classifies the fault.
+4. **Stage 1 Shewhart SPC Gating**: Computes normalized $Z = \frac{\text{RMS} - \mu_0}{\sigma_0}$ with the configured $\mu_0=0.080\,g$, $\sigma_0=0.025\,g$. The classifier wrapper in `ml/rf_predictor.py` skips `predict_proba` on a nominal window (`rf_executed=False`), but `edge_daq.py:511-520` still calls the wrapper on every 100 ms state update. CPU reduction has **not** been measured; do not quote a percentage.
 5. Emits state to local shared memory file `edge/latest_state.json` and circular buffer `edge/pdm_buffer.db`.
 
 ### 6.2 Zero-Cost Firebase Cloud Mirror (`edge/firebase_mirror.py`)
@@ -212,8 +212,8 @@ To ensure automatic launch on boot and continuous recovery from crashes:
 
 ```ini
 [Unit]
-Description=Intelligent Predictive Maintenance DAQ & Cloud Mirror
-After=network.target sound.target
+Description=Predictive Maintenance Edge DAQ & SPC Engine
+After=network.target
 
 [Service]
 Type=simple
@@ -221,13 +221,16 @@ User=renad
 WorkingDirectory=/home/renad/pdm/edge
 ExecStart=/usr/bin/python3 /home/renad/pdm/edge/edge_daq.py
 Restart=always
-RestartSec=5
+RestartSec=3
 StandardOutput=journal
 StandardError=journal
 
 [Install]
 WantedBy=multi-user.target
 ```
+
+This is the exact content of `edge/pdm-daq.service`. Only files named in `ExecStart=` of an
+enabled unit start automatically; uploading another `.py` file does not run it.
 
 Enable and start on the Raspberry Pi:
 ```bash

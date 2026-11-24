@@ -79,7 +79,7 @@ Mourtzis et al. establish a comprehensive framework for smart factories connecti
 
 #### Direct Mapping to Our Capstone Rig
 1. **Sensor Fusion**: 
-   - We integrated a 3-axis MEMS accelerometer (`ADXL345` / `MPU6050`) coupled with a digital temperature probe (`DS18B20` / `BMP280`), adhering directly to Mourtzis et al.'s multi-modal parameter schema.
+   - We integrated a 3-axis MEMS accelerometer (`ADXL345`) coupled with a K-type thermocouple read by `MAX6675` and an `INMP441` I2S microphone, following Mourtzis et al.'s multi-modal parameter schema. The older `MPU6050` / `DS18B20` / `BMP280` names in earlier drafts did not match the deployed BOM and are removed.
 2. **Offline-First Resilience**:
    - In strict alignment with Mourtzis et al.'s edge architecture, our Raspberry Pi logs locally to SQLite / Ring Buffer (`pdm_buffer.db`) first. Telemetry to Firebase Cloud operates via an asynchronous worker thread that buffers and recovers without stalling the real-time DAQ loop.
 
@@ -110,7 +110,7 @@ Widely recognized as the seminal tutorial on rolling element bearing vibration d
    - Impact faults: $CF > 6.0$.
 
 #### Direct Mapping to Our Capstone Rig
-- Our DSP engine (`ml/train_pdm.py` and edge feature extractors) extracts 10 features per window, placing **Kurtosis, Crest Factor, and Peak-to-Peak** as core inputs. This ensures our AI model learns the exact spalling dynamics formalized by Randall & Antoni.
+- Our DSP engine (`ml/dataset_generator.py`, `edge/edge_daq.py`, `ml/train_rf.py`) extracts **9 model features** per window (`rms_dyn`, `peak_dyn`, `crest_factor`, `kurtosis`, `temp_c`, `temp_slope`, `sound_rms`, `sound_db`, `sound_zcr`), with **Kurtosis and Crest Factor** as core shock indicators. `z_score` is a Stage-1 gate metric, not a model input. This follows the spalling dynamics formalized by Randall & Antoni.
 
 ---
 

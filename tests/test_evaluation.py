@@ -190,6 +190,12 @@ class DocumentationHonestyTest(unittest.TestCase):
         ),
         "LITERATURE_REFERENCES.md": os.path.join(DOCS, "LITERATURE_REFERENCES.md"),
         "STUDENT_MASTER_GUIDE.md": os.path.join(DOCS, "STUDENT_MASTER_GUIDE.md"),
+        "PROJECT_COMPLETE_TUTORIAL.md": os.path.join(
+            DOCS, "PROJECT_COMPLETE_TUTORIAL.md"
+        ),
+        "G12_REQUEST_RESPONSE_REGISTER.md": os.path.join(
+            DOCS, "G12_REQUEST_RESPONSE_REGISTER.md"
+        ),
         "ai_report.md": os.path.join(ROOT, "ml", "ai_report.md"),
     }
     FORBIDDEN_CLAIMS = (
@@ -231,6 +237,71 @@ class DocumentationHonestyTest(unittest.TestCase):
             "SPC baseline mismatch",
         ):
             self.assertIn(token, text)
+
+
+class G12ResponseRegisterTest(unittest.TestCase):
+    """The 13 forwarded G12 requests are answered without inventing measurements."""
+
+    REGISTER = os.path.join(ROOT, "docs", "G12_REQUEST_RESPONSE_REGISTER.md")
+    TUTORIAL = os.path.join(ROOT, "docs", "PROJECT_COMPLETE_TUTORIAL.md")
+    HANDBOOK = os.path.join(ROOT, "docs", "CAPSTONE_MASTER_HANDBOOK.md")
+    GENERATOR = os.path.join(ROOT, "ml", "dataset_generator.py")
+    SERVICE = os.path.join(ROOT, "edge", "pdm-daq.service")
+
+    @classmethod
+    def setUpClass(cls):
+        for name in ("REGISTER", "TUTORIAL", "HANDBOOK", "GENERATOR", "SERVICE"):
+            with open(getattr(cls, name)) as f:
+                setattr(cls, name.lower() + "_text", f.read())
+
+    def test_all_thirteen_requests_and_statuses_are_present(self):
+        for number in range(1, 14):
+            with self.subTest(request=number):
+                self.assertIn(f"| {number} |", self.register_text)
+        for status in ("✅ تم", "◐", "⛔ متوقف", "لا ينطبق"):
+            self.assertIn(status, self.register_text)
+
+    def test_register_contains_direct_answers_and_evidence(self):
+        for token in (
+            "ml/dataset_generator.py:58-72",
+            "edge/edge_daq.py:405-406",
+            "rf_executed=False",
+            "pdm-daq.service",
+            "ليس كل ملف يُرفع يعمل",
+            "Results Register",
+            "[NEED: run-to-failure series",
+            "MathWorks",
+            "crossings/sample",
+            "9 features",
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, self.register_text)
+
+    def test_register_does_not_promote_unmeasured_results(self):
+        for token in (
+            "100% on real motor",
+            "measured CPU savings",
+            "actual cost measured",
+            "remaining runtime forecast",
+        ):
+            self.assertNotIn(token, self.register_text)
+
+    def test_traceability_line_references_match_generator(self):
+        with open(self.GENERATOR) as f:
+            lines = f.readlines()
+        self.assertIn("F_R_NOMINAL = 30.0", lines[57])  # 1-based line 58
+        self.assertIn("FS_VIB = 3200.0", lines[58])  # 1-based line 59
+        self.assertIn("spc_mu_0 = 0.038", lines[228])  # 1-based line 229
+
+    def test_equation_and_unit_fixes_are_visible_in_docs_and_code(self):
+        self.assertIn("9 Dimensions", self.handbook_text)
+        self.assertIn("crossings/sample", self.handbook_text)
+        self.assertIn("does NOT integrate that ODE", self.generator_text)
+        self.assertNotIn("3-sigma screening gating", self.generator_text)
+        self.assertNotIn("<8%", self.tutorial_text)
+        self.assertIn("RestartSec=3", self.tutorial_text)
+        self.assertNotIn("RestartSec=5", self.tutorial_text)
+        self.assertIn("Restart=always", self.service_text)
 
 
 if __name__ == "__main__":

@@ -20,11 +20,15 @@ Direct Literature Foundations:
 
 3. Cinar et al. (2022), "A Predictive Maintenance System Design and Implementation for
    Intelligent Manufacturing", Machines, 10(11), 1006. DOI: 10.3390/machines10111006.
-   - Statistical Process Control (SPC) Shewhart 3-sigma screening gating edge inference.
+   - Statistical Process Control (SPC) Shewhart screening gating edge inference. The
+     deployed warning/fault limits are configured 2-sigma / 3-sigma (edge/edge_daq.py),
+     not a measured 3-sigma fit of this benchmark.
 
-4. Blok & Jaeger Flash Temperature Theory / Newton's Law of Cooling:
-   - First-order thermal ODE: dT/dt = (mu * F_N * v_sliding) / C_th - (T - T_amb) / (R_th * C_th).
-   - Boundary lubrication failure and thermal runaway trajectories.
+4. Blok & Jaeger Flash Temperature Theory / Newton's Law of Cooling (inspiration only):
+   - Reference ODE: dT/dt = (mu * F_N * v_sliding) / C_th - (T - T_amb) / (R_th * C_th).
+   - This generator does NOT integrate that ODE: synthesize_thermal_state() assigns
+     class-specific normal draws for temperature and slope. `[NEED: implement or remove
+     any ODE claim in presentation material.]`
 
 5. Acoustic Wave Theory (INMP441 I2S MEMS):
    - Sound Pressure Level: SPL = 120.0 + 20 * log10(RMS_acoustic) dB SPL.

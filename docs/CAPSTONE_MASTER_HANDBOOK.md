@@ -161,7 +161,7 @@ $$\text{RMS}_{\text{dynamic}} = \sqrt{\frac{1}{N} \sum_{i=1}^{N} \left(a_i - \ba
 
 ### 4.2 Kurtosis (4th Standardized Moment)
 $$\text{Kurtosis} = \frac{\frac{1}{N}\sum_{i=1}^{N} (a_i - \bar{a})^4}{\left(\frac{1}{N}\sum_{i=1}^{N} (a_i - \bar{a})^2\right)^2}$$
-- **Physical Rationale:** Kurtosis measures the "tailedness" of the acceleration distribution. A healthy motor exhibits Gaussian noise with $\text{Kurtosis} \approx 3.0$. When a rolling element strikes a spall or race crack in a bearing, it generates short-duration, high-amplitude impulsive peaks, driving $\text{Kurtosis} > 4.5$ long before overall RMS increases.
+- **Physical Rationale:** Kurtosis measures the "tailedness" of the acceleration distribution. A healthy motor exhibits Gaussian noise with $\text{Kurtosis} \approx 3.0$. When a rolling element strikes a spall or race crack in a bearing, it generates short-duration, high-amplitude impulsive peaks that can lift $\text{Kurtosis}$ before RMS moves (mechanism from Randall & Antoni 2011; no real-motor lead time has been measured here).
 
 ### 4.3 Spectral Crest Factor
 $$\text{Crest Factor} = \frac{\max(|a_i|)}{\text{RMS}}$$
@@ -188,16 +188,21 @@ To satisfy **Metric M1 ($\ge 80\%$ accuracy)** with hard real-time latency on ed
 - **Class Balancing:** `class_weight='balanced'` ensures equal penalty across all 4 operational states.
 - **Single-Threaded Execution:** Serialized with `n_jobs=1` to eliminate multi-threaded Python GIL contention on the Pi.
 
-### 5.2 Feature Vector Construction (8 Dimensions)
-For every $1.0\,\text{second}$ sliding window ($N \approx 340$ samples), the pipeline extracts:
-1. `rms_dynamic`: Dynamic vibration RMS ($g$).
-2. `peak_accel`: Peak instantaneous dynamic acceleration ($g$).
-3. `kurtosis`: 4th standardized moment.
-4. `crest_factor`: Peak-to-RMS ratio.
-5. `temp_c`: Instantaneous thermocouple temperature ($^\circ\text{C}$).
+### 5.2 Feature Vector Construction (9 Dimensions)
+The deployed DAQ uses a 256-sample sliding window (`edge/edge_daq.py:333`); the synthetic
+benchmark uses 1024 samples at a virtual 3200 Hz (`docs/DATASET_RANGE_TRACEABILITY.md`).
+Both produce the same 9 model inputs (`ml/model_meta.json`):
+1. `rms_dyn`: Dynamic vibration RMS ($g$).
+2. `peak_dyn`: Peak instantaneous dynamic acceleration ($g$).
+3. `crest_factor`: Peak-to-RMS ratio (dimensionless).
+4. `kurtosis`: 4th standardized moment (dimensionless).
+5. `temp_c`: Calibrated thermocouple temperature ($^\circ\text{C}$).
 6. `temp_slope`: First derivative of temperature ($^\circ\text{C/min}$).
-7. `sound_db`: Acoustic envelope equivalent SPL ($\text{dB}$).
-8. `sound_zcr`: Acoustic Zero-Crossing Rate ($\text{crossings/s}$).
+7. `sound_rms`: Acoustic RMS (normalised microphone units).
+8. `sound_db`: Estimated SPL ($\text{dB}$, not acoustically calibrated).
+9. `sound_zcr`: Zero-crossing rate (**crossings/sample**, dimensionless; multiply by $f_s$ for crossings/second).
+
+`z_score` is the Stage-1 SPC gate metric derived from `rms_dyn`, not a 10th model input.
 
 ### 5.3 Run-Disjoint 5-Fold Cross-Validation & Test Results
 Training across 1,400 simulated multi-modal windows in 28 runs yielded the following benchmark metrics (group-disjoint `StratifiedGroupKFold` CV and 70/15/15 whole-run hold-out):
@@ -255,7 +260,7 @@ Executing `python3 edge/calibrate.py` generates an official markdown certificate
 ### 7.1 Local Flask Dual Dashboard (`http://100.126.244.75:5000`)
 - **Architecture:** Lightweight asynchronous Python Flask web server reading shared memory `/dev/shm/pdm_latest.json`.
 - **Live Equation Rendering:** Real-time values are dynamically inserted into mathematical formulas (RMS, Kurtosis, Shewhart UCL/LCL, Crest Factor, $\Delta T/\Delta t$) alongside explanatory physical rationales.
-- **Stage 1 / Stage 2 Status Badge:** Displays whether the system is operating in low-power Shewhart gating mode or active Random Forest classification mode.
+- **Stage 1 / Stage 2 Status Badge:** Shows the state derived in `edge/edge_daq.py:530-573` and published at `:598-600`. It is **not** a direct readout of `gate_info["rf_executed"]`: the wrapper can skip `predict_proba` while the badge still says Stage 2. See `docs/G12_REQUEST_RESPONSE_REGISTER.md` §7 before making a resource-saving claim.
 - **Responsive Mobile Layout:** Optimized for hand-held inspection tablets and smartphones connected via local WiFi hotspot.
 
 ### 7.2 0-EGP Firebase Cloud Mirror (`edge/firebase_mirror.py`)
@@ -330,7 +335,7 @@ This script automatically executes 5 verification steps:
 3. **Step 3: Inject Bearing Defect Shock ($15\,\text{s}$)**
    - Remove the unbalance weight and introduce rapid sharp mechanical impulses to the mounting plate.
    - Show the judges how Kurtosis spikes to $> 5.5$ while overall RMS remains relatively low.
-   - The classifier identifies `Bearing Defect`, demonstrating that the system detects bearing spalling before gross motor failure occurs.
+   - In this injected demo the classifier reports `Bearing Defect`. This shows current-state classification only; it is not a measured time-to-failure or RUL result.
 4. **Step 4: Inject Thermal Runaway ($15\,\text{s}$)**
    - Apply warm airflow to the thermocouple tip.
    - The thermal rate calculator detects $\Delta T/\Delta t > 6.0^\circ\text{C/min}$.

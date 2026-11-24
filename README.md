@@ -9,6 +9,7 @@ AI-driven edge PdM on Raspberry Pi 4 4GB. Offline-first, 0-EGP cloud mirror.
 - 📊 Charts: `book_assets/` (regenerate with `python3 book_assets/make_charts.py`)
 - 📦 BOM: `DOC-20261014-WA0055.xlsx` (supplier sheet) · `circuit/bom_target.csv` (build list)
 - 📚 Sources: `G12_27_ Capstone.pdf`, `fmech-06-578379.pdf`, `machines-10-01006-v3.pdf`
+- 🧾 G12 request-by-request answers: `docs/G12_REQUEST_RESPONSE_REGISTER.md` (done / partial / blocked, with evidence)
 
 Stack: ADXL345 (I2C) + K-type/MAX6675 (SPI) + INMP441 (I2S) → SPC coarse → RF fine (≥80%) → Flask Custom Panel (offline) + Firebase RTDB (mirror) + Grafana Cloud (analytics).
 

@@ -9,6 +9,8 @@
 - **Evidence Files:** `ml/confusion_matrix.png`, `ml/roc_curves.png`, `ml/feature_importance.png`, `ml/model.joblib`, `ml/model_meta.json`, `tests/test_evaluation.py`
 
 > **Honesty note — read this before quoting any number.** The dataset is generated from published physics equations, not measured on a real motor. The 100% figure proves the pipeline separates the simulated classes; it is **not** evidence of 100% accuracy on real hardware. This system performs **fault detection and 4-class fault classification**, with rule-based maintenance advice; it does **not** estimate Remaining Useful Life (predict how many days until failure), which would require run-to-failure time-series measurements. `z_score` appears in the CSV but is intentionally **not** a Random Forest input: it is the Stage-1 SPC gate metric computed from `rms_dyn`, and the gate returns it in `gate_info`.
+>
+> The request-by-request G12 answer register is `docs/G12_REQUEST_RESPONSE_REGISTER.md`; it states exactly which items are done locally and which are blocked on real measurements.
 
 ---
 
@@ -64,10 +66,10 @@ The feature vector $\mathbf{x} \in \mathbb{R}^9$ is extracted across three physi
 | 3 | `crest_factor` | ADXL345 | $\text{Peak}_{\text{dyn}} / \text{RMS}_{\text{dyn}}$ | Ratio of impact spike to steady vibration. Early flaking flag. |
 | 4 | `kurtosis` | ADXL345 | $\frac{\frac{1}{N}\sum(a_{\text{dyn}}-\mu)^4}{\sigma^4}$ | 4th standardized moment. Explodes ($6-15$) on raceway spalls. |
 | 5 | `temp_c` | MAX6675 | $\text{ADC}_{12} \times 0.25^\circ\text{C}$ | Motor casing temperature with cold-junction compensation. |
-| 6 | `temp_slope` | MAX6675 | $\frac{\Delta T}{\Delta t / 60}$ | Thermal derivative ($^\circ\text{C/min}$). Detects runaway 15 min early. |
+| 6 | `temp_slope` | MAX6675 | $\frac{\Delta T}{\Delta t / 60}$ | Thermal derivative ($^\circ\text{C/min}$). A high positive slope is a thermal-fault input; no real-motor lead time has been measured. |
 | 7 | `sound_rms` | INMP441 | $\sqrt{\frac{1}{M}\sum s^2}$ | Acoustic root-mean-square emission power. |
 | 8 | `sound_db` | INMP441 | $120.0 + 20\log_{10}(\text{RMS})$ | Calibrated industrial sound pressure level ($\text{dB SPL}$). |
-| 9 | `sound_zcr` | INMP441 | $\frac{1}{2M}\sum |\Delta\text{sgn}|$ | Zero-crossing rate. Distinguishes 50Hz hum from squeals. |
+| 9 | `sound_zcr` | INMP441 | $\frac{1}{2M}\sum |\Delta\text{sgn}|$ | Zero-crossing rate in **crossings/sample** (dimensionless); multiply by $f_s$ for crossings/s. Distinguishes low hum from squeals. |
 
 ---
 
