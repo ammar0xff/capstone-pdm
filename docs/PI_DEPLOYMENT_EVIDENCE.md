@@ -229,5 +229,18 @@ constant `134.000 dB`, matching the expected value; only `/tmp/cal_logic_test.js
 was written on the Pi, not the real calibration file.
 
 `[NEED: reference dB SPL measurement at the mic]` before `--calibrate-sound` can be
-run for real. `[NEED: live RMS/peak confirmation once the operator stops PID 2778]`.
-No WhatsApp contact or state was changed.
+run for real. No WhatsApp contact or state was changed.
+
+### 22:40 — live mic test completed
+
+With the operator's approval, PID 2778 was continued and terminated (its stopped
+state had swallowed the first TERM), along with its `arecord` child. With
+`pdm-daq.service` briefly stopped, the final script produced five live frames in
+`/home/renad/raw_measure_live_test_224021.csv`: nonzero RMS on all 5 rows, for example
+`RMS 0.002288 / peak 0.005034 / -52.81 dBFS` and
+`RMS 0.005213 / peak 0.015647 / -45.66 dBFS`; `sound_db_estimated` stayed empty
+because no real calibration exists. `--calibrate-sound 94 --sound-cal
+/tmp/cal_live_test.json` captured a live 2 s window (`RMS 0.003166`,
+`-49.989 dBFS`) and wrote constant `143.989 dB` to the temp path only. That temp file
+and the earlier stub-test JSON were removed; the real `edge/sound_cal.json` remains
+absent. All three services were `active` afterwards.
