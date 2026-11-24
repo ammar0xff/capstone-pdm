@@ -7,7 +7,9 @@ is breached. Results are presented on a local Flask dashboard and mirrored to
 Firebase Realtime Database. The hosted dashboard is presentation-only.
 
 **Current status:** implementation and synthetic benchmark are complete;
-physical-rig validation, run-to-failure/RUL and measured CPU savings are not.
+physical-rig validation, field-validated RUL and measured CPU savings are not.
+An offline degradation estimator is available as an analysis tool only; it
+requires an operator-supplied threshold and is explicitly not field-validated.
 See `docs/G12_REQUEST_RESPONSE_REGISTER.md` for request-by-request evidence.
 
 ## Start here
@@ -42,6 +44,9 @@ INMP441 (I2S) ─┘          │                       │
   **synthetic** benchmark. It is not a real-motor accuracy claim.
 - The dashboard shows live state, decisions, charts and links. It has no
   calibration write endpoint and no simulator controls.
+- `ml/degradation_rul.py` is an **offline** trend-to-threshold estimator. It is
+  not part of the runtime diagnosis, needs an operator threshold, and is
+  labelled "not field-validated" in every result.
 
 ## First-time setup
 
@@ -133,8 +138,29 @@ See `docs/FIREBASE_SETUP.md` before altering the rules or client behavior.
 | Edge gate and four-class decision | `edge/edge_daq.py`, `ml/rf_predictor.py` | Complete in code |
 | Pi services and model deployment | `docs/PI_DEPLOYMENT_EVIDENCE.md` | Verified on 2026-11-23 |
 | Pi latency | 26.19 ms host / 29.99 ms Pi, single-window inference | Measured; full inject→alert timing not measured |
-| Real-motor accuracy, RUL, cost savings | — | `[NEED: physical run data]` |
+| Offline degradation estimator | `ml/degradation_rul.py`, `tests/test_degradation_rul.py` | Implemented; operator threshold required; not field-validated |
+| Real-motor accuracy, field-validated RUL, cost savings | — | `[NEED: physical run data]` |
 | Sensor calibration certificate | `edge/calibrate.py` and runbook | Procedure ready; `[NEED: signed run record]` |
+
+## Offline degradation estimate (not field-validated)
+
+`ml/degradation_rul.py` fits a linear or exponential trend to one condition
+indicator from a CSV history and returns the estimated time to a threshold.
+The runtime diagnosis, model and dashboard are unchanged. The threshold is a
+required argument and must come from the operator; no physical threshold is
+bundled with the code.
+
+```
+python3 ml/degradation_rul.py \
+    --history raw_measurements.csv \
+    --time-column unix_time --value-column sound_rms \
+    --threshold '<operator value>' [--model exponential]
+```
+
+Every result carries `"threshold_source": "operator-supplied"` and a
+`"not field-validated"` label. `[NEED: measured degradation curve]` and
+`[NEED: run-to-failure series with timestamps and failure labels]` remain
+before this can be presented as real RUL.
 
 ## Budget
 

@@ -8,7 +8,7 @@
 - **Result:** Test accuracy **100.0% on the synthetic benchmark only** · single-window inference **26.19 ms on the training host** and **29.99 ms on the Raspberry Pi 4** (both measured) · full inject→alert timing not measured
 - **Evidence Files:** `ml/confusion_matrix.png`, `ml/roc_curves.png`, `ml/feature_importance.png`, `ml/model.joblib`, `ml/model_meta.json`, `tests/test_evaluation.py`
 
-> **Honesty note — read this before quoting any number.** The dataset is generated from published physics equations, not measured on a real motor. The 100% figure proves the pipeline separates the simulated classes; it is **not** evidence of 100% accuracy on real hardware. This system performs **fault detection and 4-class fault classification**, with rule-based maintenance advice; it does **not** estimate Remaining Useful Life (predict how many days until failure), which would require run-to-failure time-series measurements. `z_score` appears in the CSV but is intentionally **not** a Random Forest input: it is the Stage-1 SPC gate metric computed from `rms_dyn`, and the gate returns it in `gate_info`.
+> **Honesty note — read this before quoting any number.** The dataset is generated from published physics equations, not measured on a real motor. The 100% figure proves the pipeline separates the simulated classes; it is **not** evidence of 100% accuracy on real hardware. This system performs **fault detection and 4-class fault classification**, with rule-based maintenance advice; it does **not** estimate Remaining Useful Life (predict how many days until failure), which would require run-to-failure time-series measurements. The separate offline tool `ml/degradation_rul.py` can extrapolate a trend to an operator-supplied threshold, but its output is explicitly labelled **not field-validated** and is not used by the runtime or dashboard. `z_score` appears in the CSV but is intentionally **not** a Random Forest input: it is the Stage-1 SPC gate metric computed from `rms_dyn`, and the gate returns it in `gate_info`.
 >
 > The request-by-request G12 answer register is `docs/G12_REQUEST_RESPONSE_REGISTER.md`; it states exactly which items are done locally and which are blocked on real measurements.
 
@@ -205,6 +205,25 @@ The following publication-grade charts have been generated in `ml/`:
 
 ## 8. Limitations and Next Step (read before presenting)
 1. **Synthetic data only.** Every number above comes from physics-based simulation. Do not present 100% as real-motor accuracy.
-2. **No RUL.** The output is a current condition class (`Healthy`, `Mechanical Imbalance`, `Bearing Defect`, `Thermal Runaway`) plus a maintenance action, not a time-to-failure prediction.
+2. **No field-validated RUL.** The runtime output is a current condition class (`Healthy`, `Mechanical Imbalance`, `Bearing Defect`, `Thermal Runaway`) plus a maintenance action, not a time-to-failure prediction. The separate offline degradation estimator (`ml/degradation_rul.py`) requires an operator-supplied threshold and is labelled not field-validated; it does not change the runtime claim.
 3. **Latency honesty.** 26.19 ms (host) and 29.99 ms (Pi) are single-window inference benchmarks only; full inject→alert timing and real-motor validation remain outstanding.
 4. **Next step to close the gaps:** record labeled windows from the physical rig (healthy + induced imbalance + faulty bearing + thermal fault), keep the same 28-run group protocol, retrain, and re-run `tests/test_evaluation.py` plus an on-Pi latency benchmark.
+
+## 9. Offline degradation estimate — analysis only, not field-validated
+
+`ml/degradation_rul.py` implements the **degradation-model** branch of the
+MathWorks RUL taxonomy. It fits `linear` (value vs time) or `exponential`
+(log value vs time) to a CSV history and estimates when the indicator would
+reach a threshold. It is **not** a similarity or survival model: there are no
+run-to-failure histories or failure-time statistics in this project.
+
+- The threshold is a required CLI argument (`--threshold`). No physical value
+  is assumed or stored; every result reports
+  `threshold_source: operator-supplied` and a `not field-validated` label.
+- Statuses are `estimated`, `threshold_reached` (zero remaining time) and
+  `no_increasing_trend` (no estimate returned). Invalid histories, thresholds
+  and model names raise `ValueError` rather than returning a plausible number.
+- It never imports the classifier, writes Firebase, or changes the dashboard.
+  `tests/test_degradation_rul.py` covers the fits, statuses, validation and CLI.
+- `[NEED: measured degradation curve]` and `[NEED: run-to-failure series with
+  timestamps and failure labels]` before this can be called real RUL.

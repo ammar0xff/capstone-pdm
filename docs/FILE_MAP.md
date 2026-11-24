@@ -72,6 +72,7 @@ The dashboard exposes only read-only JSON endpoints and page rendering. The old
 | `train_rf.py` | Run-disjoint splits, RF training, metadata and benchmark → `model.joblib`, `model_meta.json` |
 | `rf_predictor.py` | Runtime classifier wrapper and response plans |
 | `benchmark_latency.py` | Single-window latency measurement helper |
+| `degradation_rul.py` | Offline trend-to-threshold estimator (operator threshold; not field-validated) |
 | `ai_report.md` | Training, evaluation and honest evidence register |
 | `windows.csv` | Generated dataset used by training |
 | `model.joblib`, `model_meta.json` | Deployed model artifacts |

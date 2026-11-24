@@ -271,3 +271,15 @@ RMS on all four (`0.002348`, `0.005073`, `0.000873`, `0.000690`) and dBFS values
 present. Services were restarted and all three are `active`.
 `edge/raw_measure.py` (MD5 `3ea87cc2cbfcc2884e39711b11e9630b`), `cal.json`
 (`790891637e9b49c0e3beafd59019f697`) and the absent `sound_cal.json` were untouched.
+
+## 2026-11-24 23:05 — offline degradation estimator (no Pi change)
+
+The operator chose the clearly-labelled degradation-model option from the
+MathWorks RUL taxonomy. `ml/degradation_rul.py` and
+`tests/test_degradation_rul.py` were added on the host only. The tool is an
+offline CSV analyser with a required operator threshold; it does not import
+the classifier, touch Firebase or change the dashboard. No Pi file, service
+or calibration artifact was changed for this step. Full host suite:
+`50 tests ... OK`. The result remains **not field-validated** RUL;
+`[NEED: measured degradation curve]` and
+`[NEED: run-to-failure series with timestamps and failure labels]` are unchanged.

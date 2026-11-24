@@ -168,6 +168,11 @@ restating any resource-saving claim]`
 
 - لينكا MathWorks (`Remaining Useful Life Estimation`, `Rolling Element Bearing Fault
   Diagnosis`) مراجع تعليمية خارجية توضّح ما هو الـ RUL، وليست دليلاً على أن نظامنا ينفّذه.
+- أُضيفت أداة تحليل offline (`ml/degradation_rul.py`) تمدّ منحنى تدهور خطّياً أو
+  أُسّياً إلى عتبة يُدخلها المشغّل صراحةً (`--threshold`)؛ لا توجد عتبة فيزيائية
+  مخزّنة، ولا ربط بالـ runtime أو الداشبورد، وكل نتيجة موسومة
+  `not field-validated` و`operator-supplied`. لذلك هي أداة تقدير مشروحة فقط،
+  وليست RUL حقيقياً ولا دليلاً على زمن بقاء الموتور.
 - التنفيذ الحالي يصنّف **الحالة الحالية** ويُصدر `response_plan` بأربع أولويات
   (`ROUTINE/SCHEDULE/URGENT/CRITICAL`) وإجراءات ثابتة لكل فئة. هذا «تدرّج في القرار»،
   لكنه **ليس** تدرّجاً محسوباً من منحنى تدهور، ولا تكلفة/زمن بقاء.
