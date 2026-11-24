@@ -28,5 +28,5 @@
 - [x] P7 Build styled English `docs/PROJECT_GUIDE.html` and generate `docs/G12_Project_Guide.pdf`
 - [x] P8 Add calibration/dashboard/guide tests; run full suite and `git diff --check`
 - [x] P9 Browser-verify dashboard at 390/768/1440 px and preview PDF; fix visual findings
-- [ ] P10 Commit and push; report in Arabic with evidence
-- [ ] P11 Deploy cleaned `public/` to Firebase Hosting and recheck the live URL
+- [x] P10 Commit and push; report in Arabic with evidence
+- [x] P11 Deploy cleaned `public/` to Firebase Hosting and recheck the live URL

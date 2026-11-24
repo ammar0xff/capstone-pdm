@@ -1,0 +1,8 @@
+{
+  "waive": {
+    "tiny-text": "Deliberate instrument-panel grammar: 9-11px uppercase micro-labels keep 25-point histories and three modality cards on one SCADA screen. Confirmed by visual critique as the dashboard's strongest consistent element; raising them globally breaks the grid.",
+    "small-body": "This is a dense telemetry instrument panel, not a prose page. Body copy is composed of short status strings and labels; 16px body text would overflow the single-screen layout used on the exhibition display.",
+    "long-lines": "The measured ~123-character line is the hardware/RTDB utility string in the header/footer, not article prose. It is a fixed device path and cannot be shortened without losing the Firebase endpoint shown to operators.",
+    "default-font": "Inter + JetBrains Mono is the established type system across index.html, guide.html and calibration.html. Changing it only on the dashboard would break visual consistency with the rest of the capstone site."
+  }
+}
