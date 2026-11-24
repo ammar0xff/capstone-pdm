@@ -283,3 +283,24 @@ or calibration artifact was changed for this step. Full host suite:
 `50 tests ... OK`. The result remains **not field-validated** RUL;
 `[NEED: measured degradation curve]` and
 `[NEED: run-to-failure series with timestamps and failure labels]` are unchanged.
+
+## 2026-11-24 23:10 — read-only deployment check; operator-owned scripts changed
+
+Hosted `https://castpone2026.web.app/` and `/guide.html` both returned HTTP 200.
+All three Pi services were `active`; `cal.json` remains MD5
+`790891637e9b49c0e3beafd59019f697`.
+
+The operator has since edited the raw scripts themselves, so these are now
+**operator-owned and must not be overwritten** without an explicit request:
+
+- `edge/raw_measuree.py`, mtime `2026-11-24 23:07:10`, MD5
+  `5caef29453067dd34ce8b9fef00c9bfc`, 16,741 bytes. It keeps the
+  `[SOUND ERROR]` / `[HINT]` / 1 s backoff fix, now states 256 LSB/g and writes
+  extra `adxl_*_g_calibrated` columns.
+- `edge/raw_measure.py`, mtime `2026-11-24 23:05:58`, MD5
+  `11be08561ed100c95331656b892acd3f`, back to the operator's original 21,227
+  byte version; my earlier fixed variant is no longer deployed there.
+
+`/home/renad/raw_sensor_data.csv` (51 rows, 23:08) has all three sensors'
+columns but `sound_rms=0.0` and empty `sound_dbfs`, consistent with the DAQ
+service holding the microphone during that run; no script change was made.
