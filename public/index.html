@@ -1288,7 +1288,7 @@
         document.getElementById("txt-rf").innerText = RF_TEXT_IDLE;
         return;
       }
-      const gated = Boolean(gateText && /gated/i.test(gateText));
+      const gated = Boolean(gateText && /gated|no alarm/i.test(gateText));
       if (isStale) {
         pill1.className = "gate-badge-tag pending"; pill1.innerText = "OLD PACKET";
         pill2.className = "gate-badge-tag pending"; pill2.innerText = "OLD PACKET";
