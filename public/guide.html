@@ -854,8 +854,8 @@
 
         <div class="grid-4 mt-responsive">
           <div class="stat-box stat-hero">
-            <div class="stat-number">29.99 ms</div>
-            <div class="stat-label">Pi inference time (earlier note, not re-verified)</div>
+            <div class="stat-number">NOT MEASURED</div>
+            <div class="stat-label">Pi inference time, to be measured</div>
             <span class="stat-tag">One window</span>
           </div>
           <div class="stat-box">
@@ -928,7 +928,7 @@
               <td><b>MDR 2</b></td>
               <td><b>System Response Time</b> (Shock to Alert)</td>
               <td>$&lt; 5.0\text{ seconds}$</td>
-              <td>29.99 ms (earlier note, not re-verified) inference measured on Pi; end-to-end shock-to-alert not measured</td>
+              <td>Pi inference time and end-to-end shock-to-alert time: not yet measured</td>
               <td><span class="badge badge-amber">[NEED: timing test]</span></td>
             </tr>
             <tr>
@@ -1031,7 +1031,7 @@
           <div class="feature-card">
             <b style="color: var(--cyan);"><i class="fa-solid fa-microchip"></i> Why Edge Computing over Pure Cloud?</b>
             <p class="card-desc">
-              Streaming every raw window would increase bandwidth and expose raw signals; an offline link would also break the live view. Features are computed on the Pi and lightweight status frames are mirrored. Inference was measured at 29.99 ms (earlier note, not re-verified) on the Raspberry Pi 4; cloud cost and end-to-end latency were not measured.
+              Streaming every raw window would increase bandwidth and expose raw signals; an offline link would also break the live view. Features are computed on the Pi and lightweight status frames are mirrored. Inference has no verified latency yet on the Raspberry Pi 4; cloud cost and end-to-end latency were not measured.
             </p>
           </div>
           <div class="feature-card">
@@ -1104,7 +1104,7 @@
           <div class="feature-card" style="border-top: 4px solid var(--red);">
             <div class="stage-header" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; margin-bottom: 12px;">
               <span class="badge badge-red" style="white-space: nowrap;">STAGE 2: FINE DIAGNOSTICS</span>
-              <span style="font-size: 12px; color: var(--text-muted);">29.99 ms (earlier note, not re-verified) on Pi; 26.19 ms host</span>
+              <span style="font-size: 12px; color: var(--text-muted);">not yet measured on the Pi</span>
             </div>
             <div class="card-title">Random Forest classifier</div>
             <p class="card-desc">
@@ -1205,7 +1205,7 @@
               </tr>
               <tr>
                 <td><b>Pi inference</b></td>
-                <td><b>29.99 ms (earlier note, not re-verified)</b> for one window on Raspberry Pi 4</td>
+                <td><b>not yet measured</b> on the Raspberry Pi 4</td>
                 <td><span class="badge badge-blue">Measured; not end-to-end</span></td>
               </tr>
             </tbody>
@@ -1381,7 +1381,7 @@
           <div class="feature-card">
             <b style="color: var(--amber);"><i class="fa-solid fa-brain"></i> Q3: Why Random Forest over Deep Neural Networks?</b>
             <p class="card-desc">
-              <i>"We did not benchmark deep networks locally, so we quote no CNN memory or latency number. Random Forest fits the small tabular feature set, was measured at 29.99 ms (earlier note, not re-verified) per window on the Pi, and gives inspectable feature importance. Its 100% score is synthetic-only."</i>
+              <i>"We did not benchmark deep networks locally, so we quote no CNN memory or latency number. Random Forest fits the small tabular feature set, has no verified per-window latency on the Pi yet, and gives inspectable feature importance. Its 100% score is synthetic-only."</i>
             </p>
           </div>
 
