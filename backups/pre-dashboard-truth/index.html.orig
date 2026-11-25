@@ -1,0 +1,2027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Industrial Predictive Maintenance SCADA | Motor-01 Cloud Mirror</title>
+  <meta name="description" content="Live vibration, thermal and acoustic telemetry from a Raspberry Pi industrial motor monitor, with two-stage SPC and Random Forest fault classification.">
+  
+  <!-- Fonts and icons -->
+  <style>
+    @font-face { font-family: 'Inter'; font-style: normal; font-weight: 400; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-400-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'Inter'; font-style: normal; font-weight: 500; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-500-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'Inter'; font-style: normal; font-weight: 600; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-600-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'Inter'; font-style: normal; font-weight: 700; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-700-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-400-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 500; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-500-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 600; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-600-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 700; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-700-normal.woff2') format('woff2'); }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root {
+      --bg-base: #f4f7fb;
+      --bg-surface: #ffffff;
+      --bg-surface-elevated: #f8fafc;
+      --bg-subtle: #eef3f8;
+      --border-subtle: #dbe4ee;
+      --border-strong: #b8c7d9;
+
+      --text-main: #182230;
+      --text-secondary: #4b6078;
+      --text-muted: #52677d;
+
+      --status-ok: #0f766e;
+      --status-ok-bg: #ecfdf7;
+      --status-ok-border: #99d5c5;
+
+      --status-warn: #b45309;
+      --status-warn-bg: #fff8eb;
+      --status-warn-border: #f0cf93;
+
+      --status-alarm: #c24141;
+      --status-alarm-bg: #fff1f1;
+      --status-alarm-border: #f0b5b5;
+
+      --accent-blue: #2563eb;
+      --accent-cyan: #0f766e;
+      --accent-purple: #6d28d9;
+      --shadow-card: 0 1px 2px rgba(24, 34, 48, 0.04), 0 8px 24px rgba(24, 34, 48, 0.04);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(180deg, #f7fafc 0%, var(--bg-base) 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      line-height: 1.45;
+      padding: 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .font-mono {
+      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-feature-settings: "tnum" 1;
+    }
+
+    .app-container {
+      max-width: 1480px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Top Utility Header */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 18px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .system-identity {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .system-badge-icon {
+      width: 34px;
+      height: 34px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-strong);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      color: var(--text-secondary);
+    }
+
+    .system-title-group h1 {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .system-title-group p {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .telemetry-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .status-indicator-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 4px;
+      letter-spacing: 0.02em;
+      border: 1px solid transparent;
+    }
+
+    .status-indicator-pill.online {
+      background: var(--status-ok-bg);
+      color: var(--status-ok);
+      border-color: var(--status-ok-border);
+    }
+
+    .status-indicator-pill.stale {
+      background: var(--status-warn-bg);
+      color: var(--status-warn);
+      border-color: var(--status-warn-border);
+    }
+
+    .status-indicator-pill.offline {
+      background: var(--status-alarm-bg);
+      color: var(--status-alarm);
+      border-color: var(--status-alarm-border);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-control {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+
+    .btn-control:hover {
+      background: var(--bg-surface-elevated);
+      border-color: var(--border-strong);
+      color: var(--text-main);
+    }
+
+    .btn-control.active {
+      background: rgba(139, 92, 246, 0.2);
+      border-color: rgba(139, 92, 246, 0.5);
+      color: #c4b5fd;
+    }
+
+    /* Edge Hardware Rig Alert Ribbon */
+    .edge-alert-ribbon {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      border-radius: 4px;
+      font-size: 12px;
+      gap: 12px;
+      border: 1px solid;
+    }
+
+    .edge-alert-ribbon.offline {
+      background: var(--status-alarm-bg);
+      border-color: var(--status-alarm-border);
+      color: #991b1b;
+    }
+
+    .edge-alert-ribbon.stale {
+      background: var(--status-warn-bg);
+      border-color: var(--status-warn-border);
+      color: #92400e;
+    }
+
+    .ribbon-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ribbon-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Main Grid Structure */
+    .dashboard-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Primary State Banner */
+    .scada-hero-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-left: 4px solid var(--status-ok);
+      border-radius: 4px;
+      padding: 16px 20px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 24px;
+      align-items: center;
+      transition: border-left-color 0.25s;
+    }
+
+    .scada-hero-panel.warning { border-left-color: var(--status-warn); }
+    .scada-hero-panel.fault { border-left-color: var(--status-alarm); }
+    .scada-hero-panel.awaiting { border-left-color: var(--border-strong); }
+    .scada-hero-panel.awaiting .state-icon-box {
+      background: var(--bg-subtle);
+      border-color: var(--border-strong);
+      color: var(--text-muted);
+    }
+
+    .state-indicator-block {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .state-icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 4px;
+      background: var(--status-ok-bg);
+      border: 1px solid var(--status-ok-border);
+      color: var(--status-ok);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .scada-hero-panel.warning .state-icon-box {
+      background: var(--status-warn-bg);
+      border-color: var(--status-warn-border);
+      color: var(--status-warn);
+    }
+
+    .scada-hero-panel.fault .state-icon-box {
+      background: var(--status-alarm-bg);
+      border-color: var(--status-alarm-border);
+      color: var(--status-alarm);
+    }
+
+    .state-title-text h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+
+    .state-title-text p {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 3px;
+    }
+
+    .telemetry-kpis {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .kpi-cell {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 8px 14px;
+      min-width: 95px;
+      text-align: right;
+    }
+
+    .kpi-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .kpi-value {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-top: 2px;
+    }
+
+    /* 3-Modality Engineering Cards */
+    .modality-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    @media (max-width: 1100px) {
+      .modality-grid { grid-template-columns: 1fr; }
+      .scada-hero-panel { grid-template-columns: 1fr; }
+      .telemetry-kpis { justify-content: flex-start; }
+    }
+
+    .sensor-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .sensor-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .sensor-name {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sensor-bus-spec {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    /* Metric Grid within Modality Card */
+    .metrics-2x2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .metric-data-card {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 8px 10px;
+    }
+
+    .metric-data-card .header-sub {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .metric-data-card .name {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .metric-data-card .value-display {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-top: 3px;
+    }
+
+    .metric-data-card .unit {
+      font-size: 10px;
+      color: var(--text-secondary);
+      font-weight: 400;
+      margin-left: 2px;
+    }
+
+    /* ISO Standard Vibration Severity Bar */
+    .iso-severity-widget {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .widget-title {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      display: flex;
+      justify-content: space-between;
+      letter-spacing: 0.04em;
+    }
+
+    .iso-track {
+      height: 6px;
+      border-radius: 3px;
+      background: #1e293b;
+      position: relative;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .iso-segment { height: 100%; }
+    .iso-seg-a { width: 25%; background: #10b981; }
+    .iso-seg-b { width: 30%; background: #3b82f6; }
+    .iso-seg-c { width: 25%; background: #f59e0b; }
+    .iso-seg-d { width: 20%; background: #ef4444; }
+
+    .iso-indicator-pointer {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: #ffffff;
+      box-shadow: 0 0 3px #000;
+      transition: left 0.3s ease;
+      left: 8%;
+    }
+
+    .iso-indicator-pointer.is-unavailable { display: none; }
+
+    .iso-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Chart Container */
+    .chart-panel-box {
+      height: 160px;
+      position: relative;
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 6px 8px;
+    }
+
+    .chart-panel-box.no-data canvas {
+      opacity: 0.25;
+    }
+
+    .chart-panel-box.no-data::after {
+      content: attr(data-empty-label);
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* Two-Stage Architecture Section */
+    .two-stage-banner {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 14px 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 800px) {
+      .two-stage-banner { grid-template-columns: 1fr; }
+    }
+
+    .architecture-column {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 12px;
+      border-left: 3px solid var(--border-strong);
+    }
+
+    .architecture-column.active-gate {
+      border-left-color: #8b5cf6;
+      background: rgba(139, 92, 246, 0.05);
+    }
+
+    .architecture-column h3 {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-main);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .architecture-column p {
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+    }
+
+    .gate-badge-tag {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+
+    .gate-badge-tag.dormant,
+    .gate-badge-tag.pending {
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+    }
+
+    .gate-badge-tag.active {
+      background: rgba(139, 92, 246, 0.2);
+      color: #5b21b6;
+      border: 1px solid rgba(139, 92, 246, 0.4);
+    }
+
+    /* Mathematical Physics Section */
+    .math-engine-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 14px 18px;
+    }
+
+    .math-engine-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 12px;
+    }
+
+    .math-engine-header h2 {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .math-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 1024px) {
+      .math-grid { grid-template-columns: 1fr; }
+    }
+
+    .math-card {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .math-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .math-code-block {
+      background: #060910;
+      border: 1px solid #1a2234;
+      padding: 6px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+      color: #38bdf8;
+      overflow-x: auto;
+    }
+
+    .math-live-eval {
+      font-size: 12px;
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    .math-live-eval b {
+      color: var(--status-ok);
+    }
+
+    .math-rationale {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* SCADA Footer */
+    .scada-footer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 14px 0 6px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .scada-footer a {
+      color: var(--accent-blue);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 2px 4px;
+    }
+
+    .scada-footer a:hover {
+      color: var(--accent-blue);
+    }
+
+    .scada-footer a:focus-visible {
+      outline: 2px solid var(--accent-blue);
+      outline-offset: 2px;
+    }
+
+    .chart-panel-box.no-data {
+      height: 96px;
+    }
+
+    /* Benchmark and provenance evidence - never live telemetry */
+    .benchmark-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      box-shadow: var(--shadow-card);
+      padding: 16px 18px;
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) minmax(260px, 1.4fr);
+      gap: 18px;
+    }
+
+    .benchmark-panel h2 {
+      font-size: 14px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .benchmark-panel p {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      margin-bottom: 8px;
+    }
+
+    .benchmark-warning {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .benchmark-warning span {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 3px 7px;
+      border-radius: 3px;
+      background: var(--status-warn-bg);
+      color: #92400e;
+      border: 1px solid var(--status-warn-border);
+    }
+
+    .benchmark-metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+    }
+
+    .benchmark-metric {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 10px 12px;
+    }
+
+    .benchmark-metric strong {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      font-variant-numeric: tabular-nums;
+      color: var(--accent-blue);
+    }
+
+    .benchmark-metric small {
+      display: block;
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      line-height: 1.35;
+    }
+
+    .provenance-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .provenance-table th,
+    .provenance-table td {
+      text-align: left;
+      vertical-align: top;
+      padding: 7px 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.45;
+    }
+
+    .provenance-table th {
+      color: var(--text-main);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .provenance-table a {
+      color: var(--accent-blue);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+    }
+
+    .provenance-need {
+      color: #92400e;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+    }
+
+    @media (max-width: 860px) {
+      .benchmark-panel { grid-template-columns: 1fr; }
+      .provenance-table th, .provenance-table td { padding: 6px; }
+    }
+
+    @media (max-width: 480px) {
+      .system-title-group h1 { font-size: 12px; line-height: 1.2; letter-spacing: 0.02em; }
+      .system-title-group h1 span { white-space: nowrap; }
+      .telemetry-meta {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+        gap: 8px;
+      }
+      .telemetry-meta > .status-indicator-pill { grid-column: 1 / -1; justify-self: start; }
+      .telemetry-meta > div:last-child { justify-content: space-between; }
+      .benchmark-panel { padding: 12px; }
+      .benchmark-panel > div { min-width: 0; }
+      .benchmark-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .benchmark-metric { min-width: 0; padding: 8px; }
+      .benchmark-metric strong { font-size: 15px; overflow-wrap: anywhere; }
+      .provenance-table { table-layout: fixed; }
+      .provenance-table th, .provenance-table td { overflow-wrap: anywhere; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Top Utility Bar -->
+    <header class="top-bar">
+      <div class="system-identity">
+        <div class="system-badge-icon">
+          <i class="fa-solid fa-server"></i>
+        </div>
+        <div class="system-title-group">
+          <h1>
+            Predictive Maintenance SCADA
+            <span style="font-size: 11px; font-weight: 500; color: var(--text-muted);">// UNIT-01</span>
+          </h1>
+          <p>Live machine state &bull; offline-first telemetry</p>
+        </div>
+      </div>
+
+      <div class="telemetry-meta">
+        <div class="status-indicator-pill offline" id="cloud-indicator">
+          <span class="status-dot" id="cloud-dot"></span>
+          <span id="txt-cloud-status" class="font-mono">AWAITING DATA</span>
+        </div>
+        
+        <div style="font-size: 11px; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 12px;">
+          <span>SEQ: <b class="font-mono" style="color: var(--text-main);" id="badge-seq">NO DATA</b></span>
+          <span>UPTIME: <b class="font-mono" style="color: var(--text-main);" id="badge-uptime">NO DATA</b></span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <a href="guide.html" class="btn-control" title="STEM Exhibition Presentation Deck">
+          <i class="fa-solid fa-chalkboard-user"></i>
+          <span>Exhibition Deck</span>
+        </a>
+        <a href="calibration.html" class="btn-control" title="Sensor Metrology &amp; Traceability">
+          <i class="fa-solid fa-ruler-combined"></i>
+          <span>Metrology Suite</span>
+        </a>
+        <button class="btn-control" id="btn-sound" onclick="toggleMute()" title="Audio Alarm Status">
+          <i class="fa-solid fa-volume-high" id="sound-icon"></i>
+          <span id="txt-sound">Alarm ON</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Edge Hardware Rig Alert Ribbon -->
+    <div id="hardware-alert-bar" class="edge-alert-ribbon offline" style="display: none;">
+      <div class="ribbon-info">
+        <i class="fa-solid fa-triangle-exclamation" id="banner-icon"></i>
+        <div>
+          <b id="banner-title">Raspberry Pi Edge Hardware Offline</b>
+          <span id="banner-desc" style="opacity: 0.9; margin-left: 6px;">No recent telemetry received from edge DAQ. Cached cloud mirror displayed.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Dashboard Layout -->
+    <main class="dashboard-layout">
+      
+      <!-- Primary Machine State Banner -->
+      <section class="scada-hero-panel awaiting" id="main-status-card">
+        <div class="state-indicator-block">
+          <div class="state-icon-box" id="status-lamp">
+            <i class="fa-solid fa-circle-question" id="lamp-icon"></i>
+          </div>
+          <div class="state-title-text">
+            <h2 id="status-title">Awaiting telemetry</h2>
+            <p id="status-sub">No classified packet received from the Raspberry Pi mirror yet</p>
+          </div>
+        </div>
+
+        <div class="telemetry-kpis">
+          <div class="kpi-cell">
+            <div class="kpi-label">AI Confidence</div>
+            <div class="kpi-value font-mono" id="badge-ai-conf">NO DATA</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3-Modality Engineering Cards -->
+      <section class="modality-grid">
+        
+        <!-- MODALITY 1: VIBRATION -->
+        <article class="sensor-panel">
+          <div class="sensor-panel-header">
+            <div class="sensor-name">
+              <i class="fa-solid fa-wave-square" style="color: #0369a1;"></i>
+              Vibration Kinematics
+            </div>
+            <span class="sensor-bus-spec">ADXL345 &bull; I2C 0x53</span>
+          </div>
+
+          <div class="metrics-2x2">
+            <div class="metric-data-card">
+              <div class="name">Dynamic RMS</div>
+              <div class="value-display font-mono" id="val-rms">NO DATA</div>
+            </div>
+            <div class="metric-data-card">
+              <div class="name">Peak Acceleration</div>
+              <div class="value-display font-mono" id="val-peak">NO DATA</div>
+            </div>
+            <div class="metric-data-card">
+              <div class="name">Kurtosis (&kappa;)</div>
+              <div class="value-display font-mono" id="val-kurt">NO DATA</div>
+            </div>
+            <div class="metric-data-card">
+              <div class="name">Crest Factor</div>
+              <div class="value-display font-mono" id="val-cf">NO DATA</div>
+            </div>
+          </div>
+
+          <!-- ISO Severity Bar -->
+          <div class="iso-severity-widget">
+            <div class="widget-title">
+              <span>ISO 10816-3 Severity Zone</span>
+              <span id="txt-iso-zone" class="font-mono" style="color: var(--text-muted);">AWAITING DATA</span>
+            </div>
+            <div class="iso-track">
+              <div class="iso-segment iso-seg-a" title="Zone A: Good"></div>
+              <div class="iso-segment iso-seg-b" title="Zone B: Satisfactory"></div>
+              <div class="iso-segment iso-seg-c" title="Zone C: Unsatisfactory"></div>
+              <div class="iso-segment iso-seg-d" title="Zone D: Unacceptable"></div>
+              <div class="iso-indicator-pointer is-unavailable" id="iso-pointer"></div>
+            </div>
+            <div class="iso-labels">
+              <span>0.0g</span>
+              <span>0.05g</span>
+              <span>0.15g</span>
+              <span>0.30g+</span>
+            </div>
+          </div>
+
+          <div class="chart-panel-box no-data" data-empty-label="NO TELEMETRY">
+            <canvas id="chart-vib"></canvas>
+          </div>
+        </article>
+
+        <!-- MODALITY 2: THERMAL -->
+        <article class="sensor-panel">
+          <div class="sensor-panel-header">
+            <div class="sensor-name">
+              <i class="fa-solid fa-temperature-half" style="color: #92400e;"></i>
+              Thermal Dynamics
+            </div>
+            <span class="sensor-bus-spec">MAX6675 &bull; SPI0.0 &bull; Class-1 K</span>
+          </div>
+
+          <div class="metrics-2x2">
+            <div class="metric-data-card">
+              <div class="name">Casing Temp</div>
+              <div class="value-display font-mono" id="val-temp">NO DATA</div>
+            </div>
+            <div class="metric-data-card">
+              <div class="name">Thermal Slope</div>
+              <div class="value-display font-mono" id="val-slope">NO DATA</div>
+            </div>
+            <div class="metric-data-card">
+              <div class="name">Cold Junction</div>
+              <div class="value-display font-mono" id="val-coldj" style="font-size: 15px; color: var(--text-muted);">NOT REPORTED</div>
+            </div>
+            <div class="metric-data-card">
+              <div class="name">ADC Resolution</div>
+              <div class="value-display font-mono" id="val-res">NO DATA</div>
+            </div>
+          </div>
+
+          <!-- Thermal Gradient Severity Bar -->
+          <div class="iso-severity-widget">
+            <div class="widget-title">
+              <span>Runaway Threshold (Blok ODE)</span>
+              <span id="txt-thermal-zone" class="font-mono" style="color: var(--text-muted);">AWAITING DATA</span>
+            </div>
+            <div class="iso-track">
+              <div class="iso-segment iso-seg-a" style="width: 40%;" title="Nominal (<45°C)"></div>
+              <div class="iso-segment iso-seg-c" style="width: 35%;" title="Warning (45-65°C)"></div>
+              <div class="iso-segment iso-seg-d" style="width: 25%;" title="Trip (>65°C)"></div>
+              <div class="iso-indicator-pointer is-unavailable" id="temp-pointer"></div>
+            </div>
+            <div class="iso-labels">
+              <span>Ambient</span>
+              <span>45&deg;C Warning</span>
+              <span>65&deg;C Critical</span>
+            </div>
+          </div>
+
+          <div class="chart-panel-box no-data" data-empty-label="NO TELEMETRY">
+            <canvas id="chart-temp"></canvas>
+          </div>
+        </article>
+
+        <!-- MODALITY 3: ACOUSTIC -->
+        <article class="sensor-panel">
+          <div class="sensor-panel-header">
+            <div class="sensor-name">
+              <i class="fa-solid fa-volume-high" style="color: #c084fc;"></i>
+              Acoustic Emission
+            </div>
+            <span class="sensor-bus-spec">INMP441 &bull; I2S DMA &bull; 48kHz</span>
+          </div>
+
+          <div class="metrics-2x2">
+            <div class="metric-data-card">
+              <div class="name">Sound Pressure</div>
+              <div class="value-display font-mono" id="val-sound-db">NO DATA</div>
+            </div>
+            <div class="metric-data-card">
+              <div class="name">Zero-Crossing Rate</div>
+              <div class="value-display font-mono" id="val-sound-zcr">NO DATA</div>
+            </div>
+            <div class="metric-data-card">
+              <div class="name">Gate Z-Score (vibration)</div>
+              <div class="value-display font-mono" id="val-spc-z">NO DATA</div>
+            </div>
+            <div class="metric-data-card">
+              <div class="name">DMA Stream Health</div>
+              <div class="value-display font-mono" id="val-sound-status" style="font-size: 15px; color: var(--text-muted);">NOT REPORTED</div>
+            </div>
+          </div>
+
+          <!-- Acoustic Friction Severity Bar -->
+          <div class="iso-severity-widget">
+            <div class="widget-title">
+              <span>Acoustic Pressure Level</span>
+              <span id="txt-sound-zone" class="font-mono" style="color: var(--text-muted);">AWAITING DATA</span>
+            </div>
+            <div class="iso-track">
+              <div class="iso-segment iso-seg-a" style="width: 50%;" title="Quiet (<70dB)"></div>
+              <div class="iso-segment iso-seg-c" style="width: 30%;" title="Elevated (70-85dB)"></div>
+              <div class="iso-segment iso-seg-d" style="width: 20%;" title="Severe Rubbing (>85dB)"></div>
+              <div class="iso-indicator-pointer is-unavailable" id="sound-pointer"></div>
+            </div>
+            <div class="iso-labels">
+              <span>50 dB</span>
+              <span>70 dB</span>
+              <span>85 dB</span>
+              <span>100+ dB</span>
+            </div>
+          </div>
+
+          <div class="chart-panel-box no-data" data-empty-label="NO TELEMETRY">
+            <canvas id="chart-sound"></canvas>
+          </div>
+        </article>
+
+      </section>
+
+      <!-- Two-Stage Gated Architecture (Cinar et al. 2022) -->
+      <section class="two-stage-banner">
+        <div class="architecture-column active-gate" id="step-stage1">
+          <h3>
+            <span>Stage 1: Statistical Process Control (SPC)</span>
+            <span class="gate-badge-tag pending" id="pill-stage1">AWAITING DATA</span>
+          </h3>
+          <p>
+            Continuous statistical check on vibration RMS and temperature rise. On a nominal window the classifier wrapper returns without running the Random Forest, so no fault class is produced while the machine is quiet.
+          </p>
+        </div>
+
+        <div class="architecture-column" id="step-stage2">
+          <h3>
+            <span>Stage 2: 300-Tree Random Forest Classifier</span>
+            <span class="gate-badge-tag pending" id="pill-stage2">AWAITING DATA</span>
+          </h3>
+          <p>
+            Runs on an anomaly breach and classifies the current state into Healthy, Mechanical Imbalance, Bearing Defect or Thermal Runaway. The result is a four-class diagnosis plus an operator action, not a remaining-life prediction.
+          </p>
+        </div>
+      </section>
+
+      <!-- Dynamic Mathematical Formulations & Physical Rationales -->
+      <section class="math-engine-panel">
+        <div class="math-engine-header">
+          <h2>
+            <i class="fa-solid fa-microchip"></i>
+            Mathematical Formulations &amp; In-Place Physics Verification
+          </h2>
+          <span class="sensor-bus-spec">VALUES FROM CURRENT PACKET</span>
+        </div>
+
+        <div class="math-grid">
+          
+          <div class="math-card">
+            <div class="math-card-top">
+              <span>1. Dynamic RMS Energy</span>
+              <span class="font-mono">ISO 20816</span>
+            </div>
+            <div class="math-code-block font-mono">RMS = &radic;[ &Sigma;(a<sub>dyn</sub>[i])<sup>2</sup> / N ]</div>
+            <div class="math-live-eval font-mono" id="calc-rms">Awaiting telemetry</div>
+            <div class="math-rationale">Quantifies continuous kinetic mechanical stress. Rises proportionally with rotating unbalance and misalignment forces (F = m &middot; r &middot; &omega;<sup>2</sup>).</div>
+          </div>
+
+          <div class="math-card">
+            <div class="math-card-top">
+              <span>2. Vibration Kurtosis</span>
+              <span class="font-mono">4th Standardized Moment</span>
+            </div>
+            <div class="math-code-block font-mono">&kappa; = &mu;<sub>4</sub> / &sigma;<sup>4</sup> = [ &Sigma;(a - &mu;)<sup>4</sup> / N ] / &sigma;<sup>4</sup></div>
+            <div class="math-live-eval font-mono" id="calc-kurt">Awaiting telemetry</div>
+            <div class="math-rationale">Measures heavy-tailed shocks. Bearing-fault theory links spall impacts to high kurtosis before RMS rises; no real-motor lead time has been measured on this rig.</div>
+          </div>
+
+          <div class="math-card">
+            <div class="math-card-top">
+              <span>3. Crest Factor (CF)</span>
+              <span class="font-mono">Shock-to-RMS Ratio</span>
+            </div>
+            <div class="math-code-block font-mono">CF = Peak<sub>dyn</sub> / RMS<sub>dyn</sub></div>
+            <div class="math-live-eval font-mono" id="calc-cf">Awaiting telemetry</div>
+            <div class="math-rationale">Ratio of localized impact amplitude to background mechanical energy. Distinguishes impulsive spall clicks from steady distributed vibration.</div>
+          </div>
+
+          <div class="math-card">
+            <div class="math-card-top">
+              <span>4. Shewhart SPC Z-Score</span>
+              <span class="font-mono">Stage 1 Gating</span>
+            </div>
+            <div class="math-code-block font-mono">Z = (RMS<sub>dyn</sub> - &mu;<sub>0</sub>) / &sigma;<sub>0</sub></div>
+            <div class="math-live-eval font-mono" id="calc-spc">Awaiting telemetry</div>
+            <div class="math-rationale">Shewhart check on dynamic RMS. A nominal window skips the Random Forest; CPU savings from that skip have not been measured.</div>
+          </div>
+
+          <div class="math-card">
+            <div class="math-card-top">
+              <span>5. Thermal Derivative</span>
+              <span class="font-mono">Runaway Rate (dT/dt)</span>
+            </div>
+            <div class="math-code-block font-mono">&Delta;T/&Delta;t = (T<sub>now</sub> - T<sub>past</sub>) / (&Delta;t / 60) [&deg;C/min]</div>
+            <div class="math-live-eval font-mono" id="calc-slope">Awaiting telemetry</div>
+            <div class="math-rationale">Detects a rapid temperature rise. It is one input to the thermal-fault class; no warning lead time has been measured on a real motor.</div>
+          </div>
+
+          <div class="math-card">
+            <div class="math-card-top">
+              <span>6. Acoustic Pressure &amp; ZCR</span>
+              <span class="font-mono">High-Frequency Friction</span>
+            </div>
+            <div class="math-code-block font-mono">SPL = 120 + 20&middot;log<sub>10</sub>(RMS) | ZCR = &Sigma;|sgn(&Delta;s)| / 2M</div>
+            <div class="math-live-eval font-mono" id="calc-sound">Awaiting telemetry</div>
+            <div class="math-rationale">Airborne acoustic emissions capture metal-on-metal rubbing and friction squeal in audible/ultrasonic spectra, driving high zero-crossing rates.</div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Labelled public benchmark: never live telemetry, never our motor; headline CWRU diagnosis panel -->
+      <section class="benchmark-panel" aria-label="Public induction-motor diagnosis benchmark and data provenance">
+        <div>
+          <h2>Diagnosis benchmark <span class="font-mono">/ CWRU induction motor</span></h2>
+          <div class="benchmark-warning">
+            <span>BENCHMARK</span>
+            <span>NOT OUR MOTOR</span>
+            <span>NOT FIELD-VALIDATED</span>
+          </div>
+          <p>
+            Four-class bearing-condition diagnosis on a real 2 hp Reliance
+            Electric induction motor: healthy, inner race, rolling element and
+            outer race. These four bearing-condition classes are <b>not</b> the deployed runtime classes,
+            and this is <b>not</b> RUL or a measurement from the capstone rig.
+          </p>
+          <div class="benchmark-metrics">
+            <div class="benchmark-metric">
+              <strong>1.000</strong>
+              <small>four-class accuracy · 100.0%</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>0.4004</strong>
+              <small>majority baseline · 40.04%</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>1,039</strong>
+              <small>windows · 150 contiguous blocks</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>5</strong>
+              <small>sample-disjoint folds</small>
+            </div>
+          </div>
+          <p style="margin-top:10px">
+            Windows of 1,024 samples are taken inside non-overlapping 4,096-sample
+            blocks; a fold holds out whole blocks from every recording, so no
+            vibration sample appears in both training and test. The scaler and
+            forest are fitted on training folds only. All five folds reported
+            <b>1.000</b>; this perfect score is limited to this controlled public
+            sample with seeded faults.
+          </p>
+        </div>
+        <div>
+          <h2>Source &amp; licence evidence</h2>
+          <table class="provenance-table">
+            <thead>
+              <tr><th>Source</th><th>Evidence</th><th>Limit</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>CWRU motor</th>
+                <td>Official CWRU drive-end recordings, four MD5-checked 0 hp files and explicit condition labels; report <span class="font-mono">ml/diagnosis_cwru_report.json</span>.</td>
+                <td>Real motor, but seeded faults and short steady-state files. Not our rig, not field validation and no RUL endpoint.</td>
+              </tr>
+              <tr>
+                <th>Licence gap</th>
+                <td class="provenance-need">[NEED: explicit CWRU licence; exact catalogue number]</td>
+                <td>The same evaluator accepts an operator-supplied class manifest for another motor; no runtime or Firebase file changes.</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="margin-top:10px">
+            Full evidence: <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/ml/diagnosis_cwru.py" target="_blank">ml/diagnosis_cwru.py</a>
+            &middot; <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/tests/test_diagnosis_cwru.py" target="_blank">tests/test_diagnosis_cwru.py</a>
+            &middot; <a href="https://engineering.case.edu/bearingdatacenter/welcome" target="_blank">CWRU Bearing Data Center</a>.
+          </p>
+        </div>
+      </section>
+
+      <!-- Separate labelled public RUL warning benchmark: simulated turbofan, never live telemetry, never our motor -->
+      <section class="benchmark-panel" aria-label="Public simulated-turbofan RUL warning benchmark and data provenance">
+        <div>
+          <h2>RUL warning benchmark <span class="font-mono">/ NASA C-MAPSS FD001</span></h2>
+          <div class="benchmark-warning">
+            <span>BENCHMARK</span>
+            <span>SIMULATED TURBOFAN</span>
+            <span>NOT OUR MOTOR</span>
+            <span>NOT FIELD-VALIDATED</span>
+          </div>
+          <p>
+            Binary <b>30-cycle RUL warning</b> from explicit run-to-failure RUL
+            labels on NASA's public simulated turbofan benchmark: one decision
+            per unit's final recorded cycle, plus unit-disjoint folds over all
+            training windows. This is <b>not</b> continuous RUL accuracy,
+            <b>not</b> an induction-motor result, <b>not</b> a deployed alarm
+            threshold and <b>not</b> validation on our rig.
+          </p>
+          <div class="benchmark-metrics">
+            <div class="benchmark-metric">
+              <strong>94.0%</strong>
+              <small>last-cycle warning accuracy · 0.940</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>75.0%</strong>
+              <small>majority baseline · 0.750</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>0.9524</strong>
+              <small>warning precision · 100 units</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>0.800</strong>
+              <small>warning recall · 25 positive units</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>97.05%</strong>
+              <small>mean unit-disjoint CV accuracy · 0.9705</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>82.48%</strong>
+              <small>mean CV majority baseline · 0.8248</small>
+            </div>
+          </div>
+          <p style="margin-top:10px">
+            The 30-cycle horizon is a published short-horizon maintenance-planning
+            convention, fixed before scoring; no threshold was chosen from the
+            test result. The separate real-induction-motor FMCG RUL result below
+            remains <b>below 80%</b> and is shown unchanged.
+          </p>
+        </div>
+        <div>
+          <h2>Source &amp; licence evidence</h2>
+          <table class="provenance-table">
+            <thead>
+              <tr><th>Source</th><th>Evidence</th><th>Limit</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>NASA C-MAPSS FD001</th>
+                <td>Zenodo DOI <a href="https://zenodo.org/records/15346912" target="_blank">10.5281/zenodo.15346912</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>; three MD5-checked raw files; report <span class="font-mono">ml/rul_cmapss_warning_report.json</span>.</td>
+                <td>Simulated turbofan, not our motor and not field validation. No runtime or Firebase value is taken from this benchmark.</td>
+              </tr>
+              <tr>
+                <th>Fixed inputs</th>
+                <td class="font-mono">259f340bac32ce6fa8894815600fa757 · 62316d1dd70f88a9a43a1e2690765437 · 8f4a8b3d2692b2f7d8e72b344927bf4b</td>
+                <td>Five grouped folds on train; NASA's withheld last-cycle RUL labels used only for scoring.</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="margin-top:10px">
+            Full evidence: <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/ml/rul_cmapss_warning.py" target="_blank">ml/rul_cmapss_warning.py</a>
+            &middot; <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/tests/test_rul_cmapss_warning.py" target="_blank">tests/test_rul_cmapss_warning.py</a>
+            &middot; <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/data/cmapss/README.md" target="_blank">data/cmapss/README.md</a>.
+          </p>
+        </div>
+      </section>
+
+      <!-- Separate labelled public RUL benchmark: never live telemetry, never our motor -->
+      <section class="benchmark-panel" aria-label="Public induction-motor RUL benchmark and data provenance">
+        <div>
+          <h2>RUL benchmark <span class="font-mono">/ FMCG induction motor</span></h2>
+          <div class="benchmark-warning">
+            <span>BENCHMARK</span>
+            <span>NOT OUR MOTOR</span>
+            <span>NOT FIELD-VALIDATED</span>
+          </div>
+          <p>
+            Leave-one-run-out evaluation on four complete RUL-to-zero runs from
+            a public 160 kW three-phase induction-motor dataset. RUL is in
+            operating hours from the source maintenance record. These are
+            <b>not</b> hours-to-failure for the capstone motor, and the 24-hour
+            value is a benchmark bin, <b>not</b> an operator-approved alarm.
+          </p>
+          <div class="benchmark-metrics">
+            <div class="benchmark-metric">
+              <strong>141.716 h</strong>
+              <small>RUL MAE · 334 tail rows</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>204.069 h</strong>
+              <small>RUL RMSE · tail rows</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>67.7%</strong>
+              <small>24 h warning accuracy · 0.677</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>0.029</strong>
+              <small>24 h warning recall</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>69.185 h</strong>
+              <small>zero-baseline MAE · better than model</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>0.686</strong>
+              <small>no-warning baseline accuracy · better than model</small>
+            </div>
+          </div>
+          <p style="margin-top:10px">
+            The measured warning accuracy is <b>below 80%</b> and worse than both
+            the zero regression baseline and the no-warning baseline. It is shown
+            as measured, not tuned or hidden. Source:
+            <a href="https://zenodo.org/records/15637023" target="_blank">Zenodo DOI 10.5281/zenodo.15637023</a>
+            &middot; <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>
+            &middot; <a href="https://doi.org/10.35784/acs_7299" target="_blank">companion paper</a>.
+          </p>
+        </div>
+        <div>
+          <h2>Source &amp; licence evidence</h2>
+          <table class="provenance-table">
+            <thead>
+              <tr><th>Source</th><th>Evidence</th><th>Limit</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>FMCG motor</th>
+                <td><a href="https://zenodo.org/records/15637023" target="_blank">Zenodo record</a> states <b>CC BY 4.0</b>; published MD5 <span class="font-mono">52df07317901bdb7647c86df479d06c6</span> matches the vendored CSV.</td>
+                <td>Real industrial motor, not our rig. Dataset RUL endpoint and 24 h bin are not operator acceptance.</td>
+              </tr>
+              <tr>
+                <th>Other sources</th>
+                <td>Separate PRONOSTIA, XJTU-SY and NASA IMS benchmarks remain labelled on this page.</td>
+                <td class="provenance-need">[NEED: explicit FEMTO-ST licence] · [NEED: explicit XJTU-SY reuse licence] · [NEED: explicit CWRU licence; exact catalogue number]</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="margin-top:10px">
+            Full evidence: <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/docs/DATA_PROVENANCE_LICENSES.md" target="_blank">DATA_PROVENANCE_LICENSES.md</a>
+            &middot; <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/ml/rul_fmcg_report.json" target="_blank">ml/rul_fmcg_report.json</a>
+          </p>
+          <p style="margin-top:10px">
+            Device-only rule: <b>REMOVE SIMULATOR, ALL FROM DEVICE</b>. Unknown,
+            null or stale readings remain <span class="font-mono">NO DATA</span>,
+            <span class="font-mono">AWAITING DATA</span> or
+            <span class="font-mono">NOT REPORTED</span>; no benchmark value is
+            written to the live telemetry path.
+          </p>
+        </div>
+      </section>
+
+      <!-- Additional labelled public benchmark: never live telemetry, never our motor -->
+      <section class="benchmark-panel" aria-label="Public bearing RUL benchmark and data provenance">
+        <div>
+          <h2>RUL benchmark <span class="font-mono">/ XJTU-SY</span></h2>
+          <div class="benchmark-warning">
+            <span>BENCHMARK</span>
+            <span>NOT OUR MOTOR</span>
+            <span>NOT FIELD-VALIDATED</span>
+          </div>
+          <p>
+            Leave-one-bearing-out evaluation on 15 public run-to-failure bearings,
+            using the last 20% of each held-out run. These are public bearing
+            minutes, <b>not</b> hours-to-failure for the capstone motor. A public
+            dataset's end-of-life rule is not operator confirmation on our rig.
+          </p>
+          <div class="benchmark-metrics">
+            <div class="benchmark-metric">
+              <strong>134.924</strong>
+              <small>min MAE · tail windows</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>171.776</strong>
+              <small>min RMSE · tail windows</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>160.859</strong>
+              <small>min RMSE · constant baseline</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>15 / 9,216</strong>
+              <small>bearings / one-minute snapshots</small>
+            </div>
+          </div>
+          <p style="margin-top:10px">
+            Source: <a href="https://biaowang.tech/xjtu-sy-bearing-datasets" target="_blank">XJTU-SY official page</a>
+            &middot; <a href="https://data.mendeley.com/datasets/mpn45f4gxc/1" target="_blank">CC BY 4.0 derived feature record</a>
+            &middot; <a href="https://doi.org/10.1109/TR.2018.2882682" target="_blank">Wang et al., IEEE TR 2020</a>
+          </p>
+          <p style="margin-top:10px">
+            A separately sourced benchmark on four documented
+            <a href="https://data.nasa.gov/dataset/ims-bearings" target="_blank">NASA IMS</a>
+            failed bearings is reported in <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/ml/rul_nasa_ims_report.json" target="_blank">ml/rul_nasa_ims_report.json</a>
+            under the same <span class="font-mono">BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED</span>
+            label. Its minutes are nominal recorded cadence, not wall-clock operating hours.
+          </p>
+        </div>
+        <div>
+          <h2>Source &amp; licence evidence</h2>
+          <table class="provenance-table">
+            <thead>
+              <tr><th>Source</th><th>Evidence</th><th>Limit</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>XJTU-SY</th>
+                <td>Official page: "anyone can use them to validate prognostics algorithms"; citation requested.</td>
+                <td><span class="provenance-need">[NEED: explicit reuse licence]</span> (SPDX name); no temperature or acoustic channels.</td>
+              </tr>
+              <tr>
+                <th>Derived features</th>
+                <td><a href="https://data.mendeley.com/datasets/mpn45f4gxc/1" target="_blank">Mendeley DOI 10.17632/mpn45f4gxc.1</a>: CC BY 4.0; hashes checked.</td>
+                <td>Derived record only; does not replace the original publisher's terms.</td>
+              </tr>
+              <tr>
+                <th>FEMTO / PRONOSTIA</th>
+                <td><a href="https://raw.githubusercontent.com/Lucky-Loek/ieee-phm-2012-data-challenge-dataset/master/IEEEPHM2012-Challenge-Details.pdf" target="_blank">Challenge PDF</a>: datasets "made publicly available", citation requested; <a href="https://doi.org/10.6084/m9.figshare.30595484.v1" target="_blank">combined copy</a> CC BY 4.0.</td>
+                <td><span class="provenance-need">[NEED: explicit FEMTO-ST licence]</span> (SPDX name); 20 g stop rule is challenge-defined.</td>
+              </tr>
+              <tr>
+                <th>CWRU / Reliance</th>
+                <td><a href="https://engineering.case.edu/bearingdatacenter" target="_blank">Bearing Data Center</a>: 2 hp Reliance Electric motor; EDM-seeded faults. Derived <a href="https://doi.org/10.5281/zenodo.10986655" target="_blank">Zenodo copy</a>: CC BY 4.0.</td>
+                <td><span class="provenance-need">[NEED: CWRU licence; exact catalogue number]</span>; no run-to-failure endpoint.</td>
+              </tr>
+              <tr>
+                <th>NASA IMS</th>
+                <td><a href="https://data.nasa.gov/dataset/ims-bearings" target="_blank">NASA Open Data Portal</a> metadata names <a href="https://www.usa.gov/government-works" target="_blank">US Government Work</a>; three real bearing run-to-failure tests.</td>
+                <td>Not our motor; failure endpoint is dataset-defined, not operator sign-off.</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="margin-top:10px">
+            Full evidence: <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/docs/DATA_PROVENANCE_LICENSES.md" target="_blank">DATA_PROVENANCE_LICENSES.md</a>
+            &middot; <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/docs/REAL_MOTOR_READINESS.md" target="_blank">REAL_MOTOR_READINESS.md</a>
+          </p>
+          <p style="margin-top:10px">
+            Device-only rule: <b>REMOVE SIMULATOR, ALL FROM DEVICE</b>. Simulator
+            uplink tools are retired; absent, null or stale readings stay
+            <span class="font-mono">NO DATA</span> / <span class="font-mono">AWAITING DATA</span>
+            rather than being labelled as device telemetry.
+          </p>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Professional Footer -->
+    <footer class="scada-footer">
+      <div>
+        <b>Grade 12 STEM Capstone 2026/2027</b> &bull; Theme: Communication, Sensing, Information &amp; Informatics &bull; Machine: 3-Phase AC Induction Motor Rig
+      </div>
+      <div class="font-mono">
+        Raspberry Pi 4B &bull; Realtime Cloud Mirror: <a href="https://castpone2026-default-rtdb.firebaseio.com/motor1.json" target="_blank">castpone2026-default-rtdb</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Audio Context & Client Controller -->
+  <script>
+    const FIREBASE_RTDB_URL = "https://castpone2026-default-rtdb.firebaseio.com/motor1.json";
+    let isMuted = false;
+    let audioCtx = null;
+    let lastAlertTime = 0;
+    let lastProcessedSeq = null;
+
+    // Charts references
+    let chartVib, chartTemp, chartSound;
+    const historyData = {
+      labels: [],
+      rms: [],
+      peak: [],
+      temp: [],
+      slope: [],
+      sound_db: []
+    };
+
+    function initCharts() {
+      if (typeof Chart === "undefined") return;
+      const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 300 },
+        plugins: { 
+          legend: { 
+            position: 'top',
+            align: 'end',
+            labels: {
+              color: '#4b6078',
+              boxWidth: 8,
+              boxHeight: 8,
+              font: { size: 10, family: 'Inter' }
+            }
+          } 
+        },
+        scales: {
+          x: { display: false },
+          y: {
+            grid: { color: 'rgba(24, 34, 48, 0.08)' },
+            ticks: {
+              color: '#52677d',
+              font: { size: 9, family: 'JetBrains Mono' },
+              maxTicksLimit: 4
+            }
+          }
+        }
+      };
+
+      // Vibration Chart
+      chartVib = new Chart(document.getElementById('chart-vib'), {
+        type: 'line',
+        data: {
+          labels: historyData.labels,
+          datasets: [
+            { label: 'RMS (g)', data: historyData.rms, borderColor: '#0369a1', borderWidth: 1.5, pointRadius: 0, tension: 0.2 },
+            { label: 'Peak (g)', data: historyData.peak, borderColor: '#52677d', borderWidth: 1, borderDash: [3, 3], pointRadius: 0, tension: 0.2 }
+          ]
+        },
+        options: commonOptions
+      });
+
+      // Temp Chart
+      chartTemp = new Chart(document.getElementById('chart-temp'), {
+        type: 'line',
+        data: {
+          labels: historyData.labels,
+          datasets: [
+            { label: 'Temp (°C)', data: historyData.temp, borderColor: '#b45309', borderWidth: 1.5, pointRadius: 0, tension: 0.2 }
+          ]
+        },
+        options: commonOptions
+      });
+
+      // Sound Chart
+      chartSound = new Chart(document.getElementById('chart-sound'), {
+        type: 'line',
+        data: {
+          labels: historyData.labels,
+          datasets: [
+            { label: 'Sound (dB)', data: historyData.sound_db, borderColor: '#6d28d9', borderWidth: 1.5, pointRadius: 0, tension: 0.2 }
+          ]
+        },
+        options: commonOptions
+      });
+    }
+
+    function playBeep(freq = 880, duration = 0.2) {
+      if (isMuted) return;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) { }
+    }
+
+    function toggleMute() {
+      isMuted = !isMuted;
+      document.getElementById('txt-sound').innerText = isMuted ? "Alarm OFF" : "Alarm ON";
+      document.getElementById('sound-icon').className = isMuted ? "fa-solid fa-volume-xmark" : "fa-solid fa-volume-high";
+    }
+
+    function readFinite(value) {
+      if (value === null || value === undefined || value === "" || typeof value === "boolean") return null;
+      const number = typeof value === "number" ? value : Number(String(value).trim());
+      return Number.isFinite(number) ? number : null;
+    }
+
+    function firstFinite(...values) {
+      for (const value of values) {
+        const number = readFinite(value);
+        if (number !== null) return number;
+      }
+      return null;
+    }
+
+    function textOrNull(value) {
+      if (typeof value !== "string") return null;
+      const text = value.trim();
+      return text || null;
+    }
+
+    function formatValue(value, digits, unit, signed = false) {
+      const suffix = unit ? `<span class="unit">${unit}</span>` : "";
+      if (value === null) return "NO DATA";
+      const prefix = signed && value >= 0 ? "+" : "";
+      return `${prefix}${value.toFixed(digits)}${suffix}`;
+    }
+
+    function renderValue(id, value, digits, unit, signed = false, color = null) {
+      const element = document.getElementById(id);
+      element.innerHTML = formatValue(value, digits, unit, signed);
+      if (value === null) element.style.removeProperty("color");
+      else if (color) element.style.color = color;
+    }
+
+    function setZone(id, text, color) {
+      const element = document.getElementById(id);
+      element.innerText = text;
+      element.style.color = color;
+    }
+
+    function setPointer(id, value, min, max) {
+      const pointer = document.getElementById(id);
+      pointer.classList.toggle("is-unavailable", value === null);
+      if (value === null) {
+        pointer.style.removeProperty("left");
+        return;
+      }
+      const percent = Math.min(98, Math.max(2, ((value - min) / (max - min)) * 100));
+      pointer.style.left = `${percent}%`;
+    }
+
+    function setPendingGates() {
+      for (const id of ["step-stage1", "step-stage2"]) {
+        document.getElementById(id).classList.remove("active-gate");
+      }
+      for (const id of ["pill-stage1", "pill-stage2"]) {
+        const pill = document.getElementById(id);
+        pill.className = "gate-badge-tag pending";
+        pill.innerText = "AWAITING DATA";
+      }
+    }
+
+    function showAwaitingState() {
+      const card = document.getElementById("main-status-card");
+      card.className = "scada-hero-panel awaiting";
+      document.getElementById("lamp-icon").className = "fa-solid fa-circle-question";
+      document.getElementById("status-title").innerText = "Awaiting telemetry";
+      document.getElementById("status-sub").innerText = "No classified packet received from the Raspberry Pi mirror yet";
+      document.getElementById("badge-ai-conf").innerText = "NO DATA";
+      document.getElementById("badge-ai-conf").style.removeProperty("color");
+      document.getElementById("badge-seq").innerText = "NO DATA";
+      document.getElementById("badge-uptime").innerText = "NO DATA";
+
+      for (const id of [
+        "val-rms", "val-peak", "val-kurt", "val-cf", "val-temp",
+        "val-slope", "val-res", "val-sound-db", "val-sound-zcr", "val-spc-z"
+      ]) renderValue(id, null, 0, "");
+      document.getElementById("val-coldj").innerText = "NOT REPORTED";
+      document.getElementById("val-coldj").style.color = "var(--text-muted)";
+      document.getElementById("val-sound-status").innerText = "NOT REPORTED";
+      document.getElementById("val-sound-status").style.color = "var(--text-muted)";
+
+      setZone("txt-iso-zone", "AWAITING DATA", "var(--text-muted)");
+      setZone("txt-thermal-zone", "AWAITING DATA", "var(--text-muted)");
+      setZone("txt-sound-zone", "AWAITING DATA", "var(--text-muted)");
+      setPointer("iso-pointer", null, 0, 0.30);
+      setPointer("temp-pointer", null, 20, 80);
+      setPointer("sound-pointer", null, 50, 100);
+
+      for (const id of ["calc-rms", "calc-kurt", "calc-cf", "calc-spc", "calc-slope", "calc-sound"]) {
+        document.getElementById(id).innerText = "Awaiting telemetry";
+      }
+      setPendingGates();
+    }
+
+    function updateDashboard(data) {
+      if (!data || typeof data !== "object") {
+        showAwaitingState();
+        return;
+      }
+      showAwaitingState();
+
+      const state = textOrNull(data.state);
+      const fault = textOrNull(data.fault) || textOrNull(data.fault_label);
+      const proba = firstFinite(data.proba, data.fault_proba);
+      const rms = firstFinite(data.rms, data.vibration?.rms_dyn);
+      const peak = firstFinite(data.peak, data.vibration?.peak_dyn);
+      const kurt = firstFinite(data.kurt, data.vibration?.kurtosis);
+      const cf = firstFinite(data.cf, data.vibration?.crest_factor);
+      const temp = firstFinite(data.temp, data.temperature?.temp_c);
+      const slope = firstFinite(data.slope, data.temperature?.slope_c_per_min);
+      const sound_db = firstFinite(data.sound_db, data.acoustic?.db_spl);
+      const zcr = firstFinite(data.zcr, data.acoustic?.zcr);
+      const seq = firstFinite(data.seq);
+      const uptime = firstFinite(data.uptime_s);
+      const dataTs = firstFinite(data.ts);
+      const ageSec = dataTs === null ? null : Math.max(0, Date.now() / 1000 - dataTs);
+      const isStaleTelemetry = ageSec === null || ageSec > 20;
+      const knownState = state && ["Healthy", "Warning", "Fault"].includes(state) ? state : null;
+
+      // Only a classified packet can change the state lamp.
+      if (knownState) {
+        const card = document.getElementById("main-status-card");
+        const icon = document.getElementById("lamp-icon");
+        const title = document.getElementById("status-title");
+        const sub = document.getElementById("status-sub");
+        const displayFault = fault || "Classified telemetry";
+        const stalePrefix = isStaleTelemetry ? "Last known: " : "";
+
+        card.className = "scada-hero-panel";
+        if (knownState === "Healthy") {
+          icon.className = "fa-solid fa-check";
+          title.innerText = `${stalePrefix}${displayFault}`;
+          sub.innerText = isStaleTelemetry
+            ? "Historical packet only - verify live Pi telemetry before acting"
+            : "Nominal baseline operation within ISO 10816 limits";
+        } else if (knownState === "Warning") {
+          card.classList.add("warning");
+          icon.className = "fa-solid fa-triangle-exclamation";
+          title.innerText = `${stalePrefix}Warning: ${displayFault}`;
+          sub.innerText = "Incipient mechanical or thermal anomaly detected (Stage 1 threshold breach)";
+          if (!isStaleTelemetry && Date.now() - lastAlertTime > 5000) { playBeep(660, 0.3); lastAlertTime = Date.now(); }
+        } else {
+          card.classList.add("fault");
+          icon.className = "fa-solid fa-triangle-exclamation";
+          title.innerText = `${stalePrefix}CRITICAL FAULT: ${displayFault}`;
+          sub.innerText = "Immediate machine maintenance protocol required - trip risk active";
+          if (!isStaleTelemetry && Date.now() - lastAlertTime > 2000) { playBeep(980, 0.4); lastAlertTime = Date.now(); }
+        }
+      }
+
+      // Confidence uses only the probability in the packet, never a derived default.
+      if (proba !== null && knownState) {
+        const confPercent = Math.max(0, Math.min(100, Math.round((knownState === "Healthy" ? 1 - proba : proba) * 100)));
+        const confEl = document.getElementById("badge-ai-conf");
+        confEl.innerText = confPercent + "%";
+        confEl.style.color = knownState === "Healthy" ? "var(--status-ok)" : (knownState === "Warning" ? "var(--status-warn)" : "var(--status-alarm)");
+      }
+
+      if (seq !== null) document.getElementById("badge-seq").innerText = "#" + seq;
+      if (uptime !== null) {
+        document.getElementById("badge-uptime").innerText = uptime >= 60
+          ? (uptime / 60).toFixed(1) + "m"
+          : uptime.toFixed(0) + "s";
+      }
+      // Stage gating is only asserted when the packet has a recognised state.
+      if (knownState) {
+        const isStage2 = knownState !== "Healthy" || Boolean(data.ai?.gate_status?.includes("Stage 2"));
+        const step1 = document.getElementById("step-stage1");
+        const step2 = document.getElementById("step-stage2");
+        const pill1 = document.getElementById("pill-stage1");
+        const pill2 = document.getElementById("pill-stage2");
+        if (isStage2) {
+          step1.classList.remove("active-gate");
+          step2.classList.add("active-gate");
+          pill1.className = "gate-badge-tag dormant";
+          pill1.innerText = "BREACHED";
+          pill2.className = "gate-badge-tag active";
+          pill2.innerText = "INFERENCE ACTIVE";
+        } else {
+          step1.classList.add("active-gate");
+          step2.classList.remove("active-gate");
+          pill1.className = "gate-badge-tag active";
+          pill1.innerText = "ACTIVE GATE";
+          pill2.className = "gate-badge-tag dormant";
+          pill2.innerText = "STANDBY";
+        }
+      }
+
+      // Gauges: a missing or non-finite field is shown as unavailable, not filled in.
+      renderValue("val-rms", rms, 4, "g");
+      renderValue("val-peak", peak, 4, "g");
+      renderValue("val-kurt", kurt, 2, "&kappa;");
+      renderValue("val-cf", cf, 2, "CF");
+      renderValue("val-temp", temp, 2, "&deg;C", false, "#92400e");
+      renderValue("val-slope", slope, 2, "&deg;C/m", true);
+      renderValue("val-sound-db", sound_db, 1, "dB");
+      renderValue("val-sound-zcr", zcr, 4, "cross/sample");
+
+      const zScore = rms === null ? null : (rms - 0.080) / 0.025;
+      renderValue("val-spc-z", zScore, 2, "&sigma;", true);
+
+      // Severity pointers stay hidden until their own measured value exists.
+      if (rms !== null) {
+        setPointer("iso-pointer", rms, 0, 0.30);
+        if (rms < 0.075) setZone("txt-iso-zone", "Zone A (Good)", "var(--status-ok)");
+        else if (rms < 0.165) setZone("txt-iso-zone", "Zone B (Acceptable)", "#0369a1");
+        else if (rms < 0.24) setZone("txt-iso-zone", "Zone C (Unsatisfactory)", "var(--status-warn)");
+        else setZone("txt-iso-zone", "Zone D (Unacceptable)", "var(--status-alarm)");
+      }
+
+      if (temp !== null) {
+        setPointer("temp-pointer", temp, 20, 80);
+        if (temp < 45) setZone("txt-thermal-zone", "Nominal Temperature", "var(--status-ok)");
+        else if (temp < 65) setZone("txt-thermal-zone", "Warning (High Drift)", "var(--status-warn)");
+        else setZone("txt-thermal-zone", "Trip Threshold Exceeded", "var(--status-alarm)");
+      }
+
+      if (sound_db !== null) {
+        setPointer("sound-pointer", sound_db, 50, 100);
+        if (sound_db < 70) setZone("txt-sound-zone", "Quiet", "var(--status-ok)");
+        else if (sound_db < 85) setZone("txt-sound-zone", "Elevated", "var(--status-warn)");
+        else setZone("txt-sound-zone", "Severe Rubbing", "var(--status-alarm)");
+      }
+
+      // Worked equations are substituted only when their inputs are present.
+      if (rms !== null) {
+        document.getElementById("calc-rms").innerHTML =
+          `RMS = &radic;(${((rms ** 2) * 256).toFixed(6)} / 256) = <b>${rms.toFixed(4)} g</b>`;
+      }
+      if (kurt !== null) {
+        document.getElementById("calc-kurt").innerHTML =
+          `&kappa; = <b>${kurt.toFixed(2)}</b> (Gaussian Baseline &sim; 3.0)`;
+      }
+      if (cf !== null && peak !== null && rms !== null) {
+        document.getElementById("calc-cf").innerHTML =
+          `CF = ${peak.toFixed(4)} g / ${rms.toFixed(4)} g = <b>${cf.toFixed(2)}</b>`;
+      }
+      if (rms !== null && zScore !== null) {
+        document.getElementById("calc-spc").innerHTML =
+          `Z = (${rms.toFixed(4)} - 0.080) / 0.025 = <b>${zScore >= 0 ? "+" : ""}${zScore.toFixed(2)} &sigma;</b> (Threshold: &gt; 2.0 &sigma;)`;
+      }
+      if (slope !== null) {
+        document.getElementById("calc-slope").innerHTML =
+          `&Delta;T/&Delta;t = <b>${slope >= 0 ? "+" : ""}${slope.toFixed(2)} &deg;C/min</b> (Threshold: &gt; 5.0 &deg;C/min)`;
+      }
+      if (sound_db !== null && zcr !== null) {
+        document.getElementById("calc-sound").innerHTML =
+          `SPL = <b>${sound_db.toFixed(1)} dB</b> | ZCR = <b>${zcr.toFixed(4)}</b> (${zcr > 0.20 ? "High Friction" : "Nominal Hum"})`;
+      }
+
+      // Charts advance only on a fresh sequence with all plotted values present.
+      const isFreshHardwareData = seq !== null && dataTs !== null && lastProcessedSeq !== seq && ageSec < 60;
+      const hasChartValues = rms !== null && peak !== null && temp !== null && sound_db !== null;
+      const shouldPushChart = isFreshHardwareData && hasChartValues;
+
+      document.querySelectorAll(".chart-panel-box").forEach(box => {
+        box.dataset.emptyLabel = lastProcessedSeq === null ? "NO TELEMETRY" : "BUFFER FROZEN";
+        box.classList.toggle("no-data", !shouldPushChart);
+      });
+
+      if (shouldPushChart && chartVib && chartTemp && chartSound) {
+        lastProcessedSeq = seq;
+        const timeLabel = new Date().toLocaleTimeString();
+        historyData.labels.push(timeLabel);
+        historyData.rms.push(rms);
+        historyData.peak.push(peak);
+        historyData.temp.push(temp);
+        historyData.slope.push(slope);
+        historyData.sound_db.push(sound_db);
+
+        if (historyData.labels.length > 25) {
+          historyData.labels.shift();
+          historyData.rms.shift();
+          historyData.peak.shift();
+          historyData.temp.shift();
+          historyData.slope.shift();
+          historyData.sound_db.shift();
+        }
+
+        chartVib.update();
+        chartTemp.update();
+        chartSound.update();
+      }
+    }
+
+    function formatTimeAgo(seconds) {
+      if (seconds === null || isNaN(seconds) || seconds < 0) return "unknown time";
+      if (seconds < 60) return `${Math.max(1, Math.round(seconds))}s ago`;
+      const mins = Math.floor(seconds / 60);
+      if (mins < 60) return `${mins}m ago`;
+      const hours = Math.floor(mins / 60);
+      if (hours < 24) return `${hours}h ago`;
+      const days = Math.floor(hours / 24);
+      return `${days}d ago`;
+    }
+
+    function updateHardwareStatus(data, isError = false) {
+      const indicator = document.getElementById('cloud-indicator');
+      const txtStatus = document.getElementById('txt-cloud-status');
+      const banner = document.getElementById('hardware-alert-bar');
+      const bannerTitle = document.getElementById('banner-title');
+      const bannerDesc = document.getElementById('banner-desc');
+      const bannerIcon = document.getElementById('banner-icon');
+
+      if (isError || !data) {
+        indicator.className = "status-indicator-pill offline";
+        txtStatus.innerText = "RIG OFFLINE";
+        banner.style.display = "flex";
+        banner.className = "edge-alert-ribbon offline";
+        bannerIcon.className = "fa-solid fa-triangle-exclamation";
+        bannerTitle.innerText = "Edge Rig Disconnected";
+        bannerDesc.innerText = "Unable to reach Firebase RTDB or Raspberry Pi telemetry stream. Verify Pi power supply and Tailscale network.";
+        return;
+      }
+
+      const nowSec = Date.now() / 1000;
+      const dataTs = firstFinite(data.ts);
+      const ageSec = dataTs === null ? null : Math.max(0, nowSec - dataTs);
+      const timeAgoStr = formatTimeAgo(ageSec);
+      const seq = firstFinite(data.seq);
+      const seqLabel = seq === null ? "NO DATA" : seq;
+
+      if (ageSec !== null && ageSec <= 20) {
+        indicator.className = "status-indicator-pill online";
+        txtStatus.innerText = `STREAMING (< ${Math.max(1, Math.round(ageSec))}s)`;
+        banner.style.display = "none";
+      } else if (ageSec !== null && ageSec < 90) {
+        indicator.className = "status-indicator-pill stale";
+        txtStatus.innerText = `STALE (${timeAgoStr})`;
+        banner.style.display = "flex";
+        banner.className = "edge-alert-ribbon stale";
+        bannerIcon.className = "fa-solid fa-clock-rotate-left";
+        bannerTitle.innerText = "Raspberry Pi Telemetry Delayed";
+        bannerDesc.innerText = `Last sensor packet received ${timeAgoStr} (Frame #${seqLabel}). Edge daemon sampling or sleeping.`;
+      } else {
+        indicator.className = "status-indicator-pill offline";
+        txtStatus.innerText = `OFFLINE (${timeAgoStr})`;
+        banner.style.display = "flex";
+        banner.className = "edge-alert-ribbon offline";
+        bannerIcon.className = "fa-solid fa-plug-circle-xmark";
+        bannerTitle.innerText = "Raspberry Pi Edge Rig Offline";
+        bannerDesc.innerText = `No updates received since ${timeAgoStr} (Frame #${seqLabel}). Charts are holding the last received packet; waiting for fresh telemetry.`;
+      }
+    }
+
+    function fetchLatest() {
+      fetch(FIREBASE_RTDB_URL + "?shallow=false")
+        .then(res => res.json())
+        .then(data => {
+          if (data) {
+            updateDashboard(data);
+            updateHardwareStatus(data);
+          }
+        })
+        .catch(() => {
+          updateHardwareStatus(null, true);
+        });
+    }
+
+    function connectFirebase() {
+      fetchLatest();
+      setInterval(fetchLatest, 2500);
+
+      try {
+        const sse = new EventSource(FIREBASE_RTDB_URL);
+        sse.addEventListener('put', function(e) {
+          try {
+            const parsed = JSON.parse(e.data);
+            if (parsed && parsed.data) {
+              updateDashboard(parsed.data);
+              updateHardwareStatus(parsed.data);
+            }
+          } catch (err) { }
+        });
+        sse.onerror = function() {
+          sse.close();
+        };
+      } catch (err) { }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initCharts();
+      connectFirebase();
+    });
+  </script>
+</body>
+</html>

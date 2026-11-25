@@ -353,7 +353,7 @@
     }
 
     @media (max-width: 1100px) {
-      .modality-grid { grid-template-columns: 1fr; }
+      .modality-grid { grid-template-columns: minmax(0, 1fr); }
       .scada-hero-panel { grid-template-columns: 1fr; }
       .telemetry-kpis { justify-content: flex-start; }
     }
@@ -709,6 +709,10 @@
     }
 
     /* Benchmark and provenance evidence - never live telemetry */
+    .modality-grid > *, .two-stage-banner > *, .dashboard-layout > * { min-width: 0; }
+    .provenance-table { display: block; overflow-x: auto; }
+    .cal-note { margin: 10px 0 0; font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+    .dashboard-layout.is-stale .metrics-2x2, .dashboard-layout.is-stale .chart-panel-box { opacity: 0.55; }
     .benchmark-panel {
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
@@ -858,7 +862,7 @@
             Predictive Maintenance SCADA
             <span style="font-size: 11px; font-weight: 500; color: var(--text-muted);">// UNIT-01</span>
           </h1>
-          <p>Live machine state &bull; offline-first telemetry</p>
+          <p>Live machine state from the Raspberry Pi mirror</p>
         </div>
       </div>
 
@@ -918,8 +922,8 @@
 
         <div class="telemetry-kpis">
           <div class="kpi-cell">
-            <div class="kpi-label">AI Confidence</div>
-            <div class="kpi-value font-mono" id="badge-ai-conf">NO DATA</div>
+            <div class="kpi-label">Last packet</div>
+            <div class="kpi-value font-mono" id="badge-age">NO DATA</div>
           </div>
         </div>
       </section>
@@ -932,7 +936,7 @@
           <div class="sensor-panel-header">
             <div class="sensor-name">
               <i class="fa-solid fa-wave-square" style="color: #0369a1;"></i>
-              Vibration Kinematics
+              Vibration
             </div>
             <span class="sensor-bus-spec">ADXL345 &bull; I2C 0x53</span>
           </div>
@@ -956,26 +960,8 @@
             </div>
           </div>
 
-          <!-- ISO Severity Bar -->
-          <div class="iso-severity-widget">
-            <div class="widget-title">
-              <span>ISO 10816-3 Severity Zone</span>
-              <span id="txt-iso-zone" class="font-mono" style="color: var(--text-muted);">AWAITING DATA</span>
-            </div>
-            <div class="iso-track">
-              <div class="iso-segment iso-seg-a" title="Zone A: Good"></div>
-              <div class="iso-segment iso-seg-b" title="Zone B: Satisfactory"></div>
-              <div class="iso-segment iso-seg-c" title="Zone C: Unsatisfactory"></div>
-              <div class="iso-segment iso-seg-d" title="Zone D: Unacceptable"></div>
-              <div class="iso-indicator-pointer is-unavailable" id="iso-pointer"></div>
-            </div>
-            <div class="iso-labels">
-              <span>0.0g</span>
-              <span>0.05g</span>
-              <span>0.15g</span>
-              <span>0.30g+</span>
-            </div>
-          </div>
+
+          <p class="cal-note" id="note-vib">Uncalibrated. Accelerometer sampling rate: NO DATA.</p>
 
           <div class="chart-panel-box no-data" data-empty-label="NO TELEMETRY">
             <canvas id="chart-vib"></canvas>
@@ -987,7 +973,7 @@
           <div class="sensor-panel-header">
             <div class="sensor-name">
               <i class="fa-solid fa-temperature-half" style="color: #92400e;"></i>
-              Thermal Dynamics
+              Temperature
             </div>
             <span class="sensor-bus-spec">MAX6675 &bull; SPI0.0 &bull; Class-1 K</span>
           </div>
@@ -1002,33 +988,17 @@
               <div class="value-display font-mono" id="val-slope">NO DATA</div>
             </div>
             <div class="metric-data-card">
-              <div class="name">Cold Junction</div>
-              <div class="value-display font-mono" id="val-coldj" style="font-size: 15px; color: var(--text-muted);">NOT REPORTED</div>
+              <div class="name">Thermocouple Link</div>
+              <div class="value-display font-mono" id="val-tc" style="font-size: 15px;">NO DATA</div>
             </div>
             <div class="metric-data-card">
-              <div class="name">ADC Resolution</div>
-              <div class="value-display font-mono" id="val-res">NO DATA</div>
+              <div class="name">Open Thermocouple</div>
+              <div class="value-display font-mono" id="val-open" style="font-size: 15px;">NO DATA</div>
             </div>
           </div>
 
-          <!-- Thermal Gradient Severity Bar -->
-          <div class="iso-severity-widget">
-            <div class="widget-title">
-              <span>Runaway Threshold (Blok ODE)</span>
-              <span id="txt-thermal-zone" class="font-mono" style="color: var(--text-muted);">AWAITING DATA</span>
-            </div>
-            <div class="iso-track">
-              <div class="iso-segment iso-seg-a" style="width: 40%;" title="Nominal (<45°C)"></div>
-              <div class="iso-segment iso-seg-c" style="width: 35%;" title="Warning (45-65°C)"></div>
-              <div class="iso-segment iso-seg-d" style="width: 25%;" title="Trip (>65°C)"></div>
-              <div class="iso-indicator-pointer is-unavailable" id="temp-pointer"></div>
-            </div>
-            <div class="iso-labels">
-              <span>Ambient</span>
-              <span>45&deg;C Warning</span>
-              <span>65&deg;C Critical</span>
-            </div>
-          </div>
+
+          <p class="cal-note">Uncalibrated. Reading only; no validated limit is applied on this page.</p>
 
           <div class="chart-panel-box no-data" data-empty-label="NO TELEMETRY">
             <canvas id="chart-temp"></canvas>
@@ -1040,14 +1010,14 @@
           <div class="sensor-panel-header">
             <div class="sensor-name">
               <i class="fa-solid fa-volume-high" style="color: #c084fc;"></i>
-              Acoustic Emission
+              Microphone
             </div>
-            <span class="sensor-bus-spec">INMP441 &bull; I2S DMA &bull; 48kHz</span>
+            <span class="sensor-bus-spec">INMP441 &bull; I2S</span>
           </div>
 
           <div class="metrics-2x2">
             <div class="metric-data-card">
-              <div class="name">Sound Pressure</div>
+              <div class="name">Mic Level (dB, uncalibrated)</div>
               <div class="value-display font-mono" id="val-sound-db">NO DATA</div>
             </div>
             <div class="metric-data-card">
@@ -1055,34 +1025,17 @@
               <div class="value-display font-mono" id="val-sound-zcr">NO DATA</div>
             </div>
             <div class="metric-data-card">
-              <div class="name">Gate Z-Score (vibration)</div>
-              <div class="value-display font-mono" id="val-spc-z">NO DATA</div>
+              <div class="name">Mic Level (normalised RMS)</div>
+              <div class="value-display font-mono" id="val-sound-rms">NO DATA</div>
             </div>
             <div class="metric-data-card">
-              <div class="name">DMA Stream Health</div>
-              <div class="value-display font-mono" id="val-sound-status" style="font-size: 15px; color: var(--text-muted);">NOT REPORTED</div>
+              <div class="name">Microphone Link</div>
+              <div class="value-display font-mono" id="val-mic" style="font-size: 15px;">NO DATA</div>
             </div>
           </div>
 
-          <!-- Acoustic Friction Severity Bar -->
-          <div class="iso-severity-widget">
-            <div class="widget-title">
-              <span>Acoustic Pressure Level</span>
-              <span id="txt-sound-zone" class="font-mono" style="color: var(--text-muted);">AWAITING DATA</span>
-            </div>
-            <div class="iso-track">
-              <div class="iso-segment iso-seg-a" style="width: 50%;" title="Quiet (<70dB)"></div>
-              <div class="iso-segment iso-seg-c" style="width: 30%;" title="Elevated (70-85dB)"></div>
-              <div class="iso-segment iso-seg-d" style="width: 20%;" title="Severe Rubbing (>85dB)"></div>
-              <div class="iso-indicator-pointer is-unavailable" id="sound-pointer"></div>
-            </div>
-            <div class="iso-labels">
-              <span>50 dB</span>
-              <span>70 dB</span>
-              <span>85 dB</span>
-              <span>100+ dB</span>
-            </div>
-          </div>
+
+          <p class="cal-note">Uncalibrated microphone level. Not a measured sound pressure level. Microphone capture is currently on hold.</p>
 
           <div class="chart-panel-box no-data" data-empty-label="NO TELEMETRY">
             <canvas id="chart-sound"></canvas>
@@ -1091,425 +1044,51 @@
 
       </section>
 
-      <!-- Two-Stage Gated Architecture (Cinar et al. 2022) -->
       <section class="two-stage-banner">
         <div class="architecture-column active-gate" id="step-stage1">
-          <h3>
-            <span>Stage 1: Statistical Process Control (SPC)</span>
-            <span class="gate-badge-tag pending" id="pill-stage1">AWAITING DATA</span>
-          </h3>
-          <p>
-            Continuous statistical check on vibration RMS and temperature rise. On a nominal window the classifier wrapper returns without running the Random Forest, so no fault class is produced while the machine is quiet.
-          </p>
+          <h3><span>State rules on the Raspberry Pi</span><span class="gate-badge-tag pending" id="pill-stage1">AWAITING DATA</span></h3>
+          <p id="txt-gate">Gate status from the last packet: NO DATA. The state above comes from fixed threshold rules on the Pi. The thresholds are not yet calibrated against this rig.</p>
         </div>
-
         <div class="architecture-column" id="step-stage2">
-          <h3>
-            <span>Stage 2: 300-Tree Random Forest Classifier</span>
-            <span class="gate-badge-tag pending" id="pill-stage2">AWAITING DATA</span>
-          </h3>
-          <p>
-            Runs on an anomaly breach and classifies the current state into Healthy, Mechanical Imbalance, Bearing Defect or Thermal Runaway. The result is a four-class diagnosis plus an operator action, not a remaining-life prediction.
-          </p>
+          <h3><span>Random Forest output</span><span class="gate-badge-tag pending" id="pill-stage2">AWAITING DATA</span></h3>
+          <p id="txt-rf">Class from the last packet: NO DATA. The classifier is trained on generated data and has not been tested on real faults. No probability or confidence is shown, and it gives no remaining-life estimate.</p>
         </div>
       </section>
 
-      <!-- Dynamic Mathematical Formulations & Physical Rationales -->
-      <section class="math-engine-panel">
-        <div class="math-engine-header">
-          <h2>
-            <i class="fa-solid fa-microchip"></i>
-            Mathematical Formulations &amp; In-Place Physics Verification
-          </h2>
-          <span class="sensor-bus-spec">VALUES FROM CURRENT PACKET</span>
-        </div>
-
-        <div class="math-grid">
-          
-          <div class="math-card">
-            <div class="math-card-top">
-              <span>1. Dynamic RMS Energy</span>
-              <span class="font-mono">ISO 20816</span>
-            </div>
-            <div class="math-code-block font-mono">RMS = &radic;[ &Sigma;(a<sub>dyn</sub>[i])<sup>2</sup> / N ]</div>
-            <div class="math-live-eval font-mono" id="calc-rms">Awaiting telemetry</div>
-            <div class="math-rationale">Quantifies continuous kinetic mechanical stress. Rises proportionally with rotating unbalance and misalignment forces (F = m &middot; r &middot; &omega;<sup>2</sup>).</div>
-          </div>
-
-          <div class="math-card">
-            <div class="math-card-top">
-              <span>2. Vibration Kurtosis</span>
-              <span class="font-mono">4th Standardized Moment</span>
-            </div>
-            <div class="math-code-block font-mono">&kappa; = &mu;<sub>4</sub> / &sigma;<sup>4</sup> = [ &Sigma;(a - &mu;)<sup>4</sup> / N ] / &sigma;<sup>4</sup></div>
-            <div class="math-live-eval font-mono" id="calc-kurt">Awaiting telemetry</div>
-            <div class="math-rationale">Measures heavy-tailed shocks. Bearing-fault theory links spall impacts to high kurtosis before RMS rises; no real-motor lead time has been measured on this rig.</div>
-          </div>
-
-          <div class="math-card">
-            <div class="math-card-top">
-              <span>3. Crest Factor (CF)</span>
-              <span class="font-mono">Shock-to-RMS Ratio</span>
-            </div>
-            <div class="math-code-block font-mono">CF = Peak<sub>dyn</sub> / RMS<sub>dyn</sub></div>
-            <div class="math-live-eval font-mono" id="calc-cf">Awaiting telemetry</div>
-            <div class="math-rationale">Ratio of localized impact amplitude to background mechanical energy. Distinguishes impulsive spall clicks from steady distributed vibration.</div>
-          </div>
-
-          <div class="math-card">
-            <div class="math-card-top">
-              <span>4. Shewhart SPC Z-Score</span>
-              <span class="font-mono">Stage 1 Gating</span>
-            </div>
-            <div class="math-code-block font-mono">Z = (RMS<sub>dyn</sub> - &mu;<sub>0</sub>) / &sigma;<sub>0</sub></div>
-            <div class="math-live-eval font-mono" id="calc-spc">Awaiting telemetry</div>
-            <div class="math-rationale">Shewhart check on dynamic RMS. A nominal window skips the Random Forest; CPU savings from that skip have not been measured.</div>
-          </div>
-
-          <div class="math-card">
-            <div class="math-card-top">
-              <span>5. Thermal Derivative</span>
-              <span class="font-mono">Runaway Rate (dT/dt)</span>
-            </div>
-            <div class="math-code-block font-mono">&Delta;T/&Delta;t = (T<sub>now</sub> - T<sub>past</sub>) / (&Delta;t / 60) [&deg;C/min]</div>
-            <div class="math-live-eval font-mono" id="calc-slope">Awaiting telemetry</div>
-            <div class="math-rationale">Detects a rapid temperature rise. It is one input to the thermal-fault class; no warning lead time has been measured on a real motor.</div>
-          </div>
-
-          <div class="math-card">
-            <div class="math-card-top">
-              <span>6. Acoustic Pressure &amp; ZCR</span>
-              <span class="font-mono">High-Frequency Friction</span>
-            </div>
-            <div class="math-code-block font-mono">SPL = 120 + 20&middot;log<sub>10</sub>(RMS) | ZCR = &Sigma;|sgn(&Delta;s)| / 2M</div>
-            <div class="math-live-eval font-mono" id="calc-sound">Awaiting telemetry</div>
-            <div class="math-rationale">Airborne acoustic emissions capture metal-on-metal rubbing and friction squeal in audible/ultrasonic spectra, driving high zero-crossing rates.</div>
-          </div>
-
-        </div>
-      </section>
-
-      <!-- Labelled public benchmark: never live telemetry, never our motor; headline CWRU diagnosis panel -->
-      <section class="benchmark-panel" aria-label="Public induction-motor diagnosis benchmark and data provenance">
+      <section class="benchmark-panel" aria-label="Evidence status">
         <div>
-          <h2>Diagnosis benchmark <span class="font-mono">/ CWRU induction motor</span></h2>
+          <h2>Evidence status <span class="font-mono">/ public benchmark, not this rig</span></h2>
           <div class="benchmark-warning">
-            <span>BENCHMARK</span>
+            <span>EXPLORATORY</span>
+            <span>OFFLINE PUBLIC DATA</span>
             <span>NOT OUR MOTOR</span>
-            <span>NOT FIELD-VALIDATED</span>
           </div>
-          <p>
-            Four-class bearing-condition diagnosis on a real 2 hp Reliance
-            Electric induction motor: healthy, inner race, rolling element and
-            outer race. These four bearing-condition classes are <b>not</b> the deployed runtime classes,
-            and this is <b>not</b> RUL or a measurement from the capstone rig.
-          </p>
+          <p>Fault detection was tested offline on the HUST bearing dataset (real 750 W induction-motor bench, artificial 0.2 mm bearing cracks, 51.2 kHz vibration). Every bearing type was held out of training in turn. Bearing type is used as the specimen identity; the dataset does not publish per-bearing serial numbers.</p>
           <div class="benchmark-metrics">
-            <div class="benchmark-metric">
-              <strong>1.000</strong>
-              <small>four-class accuracy · 100.0%</small>
-            </div>
-            <div class="benchmark-metric">
-              <strong>0.4004</strong>
-              <small>majority baseline · 40.04%</small>
-            </div>
-            <div class="benchmark-metric">
-              <strong>1,039</strong>
-              <small>windows · 150 contiguous blocks</small>
-            </div>
-            <div class="benchmark-metric">
-              <strong>5</strong>
-              <small>sample-disjoint folds</small>
-            </div>
+            <div class="benchmark-metric"><strong>99.86%</strong><small>fault vs normal, held-out bearing type<br>majority baseline 84.3%</small></div>
+            <div class="benchmark-metric"><strong>about 41%</strong><small>7-class fault type, held-out bearing type<br>majority baseline 15.7%. Below 80%.</small></div>
+            <div class="benchmark-metric"><strong>baseline</strong><small>fault vs normal at 3.2 kHz and lower (rate test, not comparable to the first row)</small></div>
+            <div class="benchmark-metric"><strong>NONE</strong><small>RUL not demonstrated on a whole motor. No valid run-to-failure data is available, so no RUL number is shown.</small></div>
           </div>
-          <p style="margin-top:10px">
-            Windows of 1,024 samples are taken inside non-overlapping 4,096-sample
-            blocks; a fold holds out whole blocks from every recording, so no
-            vibration sample appears in both training and test. The scaler and
-            forest are fitted on training folds only. All five folds reported
-            <b>1.000</b>; this perfect score is limited to this controlled public
-            sample with seeded faults.
-          </p>
+          <p style="margin-top:10px">This rig: the accelerometer samples at about 30 Hz, so the benchmark detector cannot be applied to it. No accuracy has been measured on this rig, and its sensors are not yet calibrated.</p>
         </div>
         <div>
           <h2>Source &amp; licence evidence</h2>
           <table class="provenance-table">
-            <thead>
-              <tr><th>Source</th><th>Evidence</th><th>Limit</th></tr>
-            </thead>
+            <thead><tr><th>Source</th><th>Evidence</th><th>Limit</th></tr></thead>
             <tbody>
               <tr>
-                <th>CWRU motor</th>
-                <td>Official CWRU drive-end recordings, four MD5-checked 0 hp files and explicit condition labels; report <span class="font-mono">ml/diagnosis_cwru_report.json</span>.</td>
-                <td>Real motor, but seeded faults and short steady-state files. Not our rig, not field validation and no RUL endpoint.</td>
+                <th>HUST bearing dataset</th>
+                <td><a href="https://data.mendeley.com/datasets/cbv7jyx4p9/3" target="_blank">Mendeley Data v3</a>, licence CC BY 4.0. Descriptor: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10327369/" target="_blank">PMC10327369</a>. 99 recordings, 5,918 windows.</td>
+                <td>Component-level artificial defects on a lab bench. Random forest on 16 spectral and statistical features. Results are exploratory: the 80% target was fixed for the 7-class task, not for fault vs normal.</td>
               </tr>
               <tr>
-                <th>Licence gap</th>
-                <td class="provenance-need">[NEED: explicit CWRU licence; exact catalogue number]</td>
-                <td>The same evaluator accepts an operator-supplied class manifest for another motor; no runtime or Firebase file changes.</td>
+                <th>Removed benchmarks</th>
+                <td>CWRU, NASA C-MAPSS, FMCG and XJTU-SY panels were removed from this page.</td>
+                <td>Same-recording block splits, a simulated turbofan, unverified labels and bearing-only minutes: none supports a claim about this motor.</td>
               </tr>
             </tbody>
           </table>
-          <p style="margin-top:10px">
-            Full evidence: <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/ml/diagnosis_cwru.py" target="_blank">ml/diagnosis_cwru.py</a>
-            &middot; <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/tests/test_diagnosis_cwru.py" target="_blank">tests/test_diagnosis_cwru.py</a>
-            &middot; <a href="https://engineering.case.edu/bearingdatacenter/welcome" target="_blank">CWRU Bearing Data Center</a>.
-          </p>
-        </div>
-      </section>
-
-      <!-- Separate labelled public RUL warning benchmark: simulated turbofan, never live telemetry, never our motor -->
-      <section class="benchmark-panel" aria-label="Public simulated-turbofan RUL warning benchmark and data provenance">
-        <div>
-          <h2>RUL warning benchmark <span class="font-mono">/ NASA C-MAPSS FD001</span></h2>
-          <div class="benchmark-warning">
-            <span>BENCHMARK</span>
-            <span>SIMULATED TURBOFAN</span>
-            <span>NOT OUR MOTOR</span>
-            <span>NOT FIELD-VALIDATED</span>
-          </div>
-          <p>
-            Binary <b>30-cycle RUL warning</b> from explicit run-to-failure RUL
-            labels on NASA's public simulated turbofan benchmark: one decision
-            per unit's final recorded cycle, plus unit-disjoint folds over all
-            training windows. This is <b>not</b> continuous RUL accuracy,
-            <b>not</b> an induction-motor result, <b>not</b> a deployed alarm
-            threshold and <b>not</b> validation on our rig.
-          </p>
-          <div class="benchmark-metrics">
-            <div class="benchmark-metric">
-              <strong>94.0%</strong>
-              <small>last-cycle warning accuracy · 0.940</small>
-            </div>
-            <div class="benchmark-metric">
-              <strong>75.0%</strong>
-              <small>majority baseline · 0.750</small>
-            </div>
-            <div class="benchmark-metric">
-              <strong>0.9524</strong>
-              <small>warning precision · 100 units</small>
-            </div>
-            <div class="benchmark-metric">
-              <strong>0.800</strong>
-              <small>warning recall · 25 positive units</small>
-            </div>
-            <div class="benchmark-metric">
-              <strong>97.05%</strong>
-              <small>mean unit-disjoint CV accuracy · 0.9705</small>
-            </div>
-            <div class="benchmark-metric">
-              <strong>82.48%</strong>
-              <small>mean CV majority baseline · 0.8248</small>
-            </div>
-          </div>
-          <p style="margin-top:10px">
-            The 30-cycle horizon is a published short-horizon maintenance-planning
-            convention, fixed before scoring; no threshold was chosen from the
-            test result. The separate real-induction-motor FMCG RUL result below
-            remains <b>below 80%</b> and is shown unchanged.
-          </p>
-        </div>
-        <div>
-          <h2>Source &amp; licence evidence</h2>
-          <table class="provenance-table">
-            <thead>
-              <tr><th>Source</th><th>Evidence</th><th>Limit</th></tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>NASA C-MAPSS FD001</th>
-                <td>Zenodo DOI <a href="https://zenodo.org/records/15346912" target="_blank">10.5281/zenodo.15346912</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>; three MD5-checked raw files; report <span class="font-mono">ml/rul_cmapss_warning_report.json</span>.</td>
-                <td>Simulated turbofan, not our motor and not field validation. No runtime or Firebase value is taken from this benchmark.</td>
-              </tr>
-              <tr>
-                <th>Fixed inputs</th>
-                <td class="font-mono">259f340bac32ce6fa8894815600fa757 · 62316d1dd70f88a9a43a1e2690765437 · 8f4a8b3d2692b2f7d8e72b344927bf4b</td>
-                <td>Five grouped folds on train; NASA's withheld last-cycle RUL labels used only for scoring.</td>
-              </tr>
-            </tbody>
-          </table>
-          <p style="margin-top:10px">
-            Full evidence: <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/ml/rul_cmapss_warning.py" target="_blank">ml/rul_cmapss_warning.py</a>
-            &middot; <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/tests/test_rul_cmapss_warning.py" target="_blank">tests/test_rul_cmapss_warning.py</a>
-            &middot; <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/data/cmapss/README.md" target="_blank">data/cmapss/README.md</a>.
-          </p>
-        </div>
-      </section>
-
-      <!-- Separate labelled public RUL benchmark: never live telemetry, never our motor -->
-      <section class="benchmark-panel" aria-label="Public induction-motor RUL benchmark and data provenance">
-        <div>
-          <h2>RUL benchmark <span class="font-mono">/ FMCG induction motor</span></h2>
-          <div class="benchmark-warning">
-            <span>BENCHMARK</span>
-            <span>NOT OUR MOTOR</span>
-            <span>NOT FIELD-VALIDATED</span>
-          </div>
-          <p>
-            Leave-one-run-out evaluation on four complete RUL-to-zero runs from
-            a public 160 kW three-phase induction-motor dataset. RUL is in
-            operating hours from the source maintenance record. These are
-            <b>not</b> hours-to-failure for the capstone motor, and the 24-hour
-            value is a benchmark bin, <b>not</b> an operator-approved alarm.
-          </p>
-          <div class="benchmark-metrics">
-            <div class="benchmark-metric">
-              <strong>141.716 h</strong>
-              <small>RUL MAE · 334 tail rows</small>
-            </div>
-            <div class="benchmark-metric">
-              <strong>204.069 h</strong>
-              <small>RUL RMSE · tail rows</small>
-            </div>
-            <div class="benchmark-metric">
-              <strong>67.7%</strong>
-              <small>24 h warning accuracy · 0.677</small>
-            </div>
-            <div class="benchmark-metric">
-              <strong>0.029</strong>
-              <small>24 h warning recall</small>
-            </div>
-            <div class="benchmark-metric">
-              <strong>69.185 h</strong>
-              <small>zero-baseline MAE · better than model</small>
-            </div>
-            <div class="benchmark-metric">
-              <strong>0.686</strong>
-              <small>no-warning baseline accuracy · better than model</small>
-            </div>
-          </div>
-          <p style="margin-top:10px">
-            The measured warning accuracy is <b>below 80%</b> and worse than both
-            the zero regression baseline and the no-warning baseline. It is shown
-            as measured, not tuned or hidden. Source:
-            <a href="https://zenodo.org/records/15637023" target="_blank">Zenodo DOI 10.5281/zenodo.15637023</a>
-            &middot; <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>
-            &middot; <a href="https://doi.org/10.35784/acs_7299" target="_blank">companion paper</a>.
-          </p>
-        </div>
-        <div>
-          <h2>Source &amp; licence evidence</h2>
-          <table class="provenance-table">
-            <thead>
-              <tr><th>Source</th><th>Evidence</th><th>Limit</th></tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>FMCG motor</th>
-                <td><a href="https://zenodo.org/records/15637023" target="_blank">Zenodo record</a> states <b>CC BY 4.0</b>; published MD5 <span class="font-mono">52df07317901bdb7647c86df479d06c6</span> matches the vendored CSV.</td>
-                <td>Real industrial motor, not our rig. Dataset RUL endpoint and 24 h bin are not operator acceptance.</td>
-              </tr>
-              <tr>
-                <th>Other sources</th>
-                <td>Separate PRONOSTIA, XJTU-SY and NASA IMS benchmarks remain labelled on this page.</td>
-                <td class="provenance-need">[NEED: explicit FEMTO-ST licence] · [NEED: explicit XJTU-SY reuse licence] · [NEED: explicit CWRU licence; exact catalogue number]</td>
-              </tr>
-            </tbody>
-          </table>
-          <p style="margin-top:10px">
-            Full evidence: <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/docs/DATA_PROVENANCE_LICENSES.md" target="_blank">DATA_PROVENANCE_LICENSES.md</a>
-            &middot; <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/ml/rul_fmcg_report.json" target="_blank">ml/rul_fmcg_report.json</a>
-          </p>
-          <p style="margin-top:10px">
-            Device-only rule: <b>REMOVE SIMULATOR, ALL FROM DEVICE</b>. Unknown,
-            null or stale readings remain <span class="font-mono">NO DATA</span>,
-            <span class="font-mono">AWAITING DATA</span> or
-            <span class="font-mono">NOT REPORTED</span>; no benchmark value is
-            written to the live telemetry path.
-          </p>
-        </div>
-      </section>
-
-      <!-- Additional labelled public benchmark: never live telemetry, never our motor -->
-      <section class="benchmark-panel" aria-label="Public bearing RUL benchmark and data provenance">
-        <div>
-          <h2>RUL benchmark <span class="font-mono">/ XJTU-SY</span></h2>
-          <div class="benchmark-warning">
-            <span>BENCHMARK</span>
-            <span>NOT OUR MOTOR</span>
-            <span>NOT FIELD-VALIDATED</span>
-          </div>
-          <p>
-            Leave-one-bearing-out evaluation on 15 public run-to-failure bearings,
-            using the last 20% of each held-out run. These are public bearing
-            minutes, <b>not</b> hours-to-failure for the capstone motor. A public
-            dataset's end-of-life rule is not operator confirmation on our rig.
-          </p>
-          <div class="benchmark-metrics">
-            <div class="benchmark-metric">
-              <strong>134.924</strong>
-              <small>min MAE · tail windows</small>
-            </div>
-            <div class="benchmark-metric">
-              <strong>171.776</strong>
-              <small>min RMSE · tail windows</small>
-            </div>
-            <div class="benchmark-metric">
-              <strong>160.859</strong>
-              <small>min RMSE · constant baseline</small>
-            </div>
-            <div class="benchmark-metric">
-              <strong>15 / 9,216</strong>
-              <small>bearings / one-minute snapshots</small>
-            </div>
-          </div>
-          <p style="margin-top:10px">
-            Source: <a href="https://biaowang.tech/xjtu-sy-bearing-datasets" target="_blank">XJTU-SY official page</a>
-            &middot; <a href="https://data.mendeley.com/datasets/mpn45f4gxc/1" target="_blank">CC BY 4.0 derived feature record</a>
-            &middot; <a href="https://doi.org/10.1109/TR.2018.2882682" target="_blank">Wang et al., IEEE TR 2020</a>
-          </p>
-          <p style="margin-top:10px">
-            A separately sourced benchmark on four documented
-            <a href="https://data.nasa.gov/dataset/ims-bearings" target="_blank">NASA IMS</a>
-            failed bearings is reported in <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/ml/rul_nasa_ims_report.json" target="_blank">ml/rul_nasa_ims_report.json</a>
-            under the same <span class="font-mono">BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED</span>
-            label. Its minutes are nominal recorded cadence, not wall-clock operating hours.
-          </p>
-        </div>
-        <div>
-          <h2>Source &amp; licence evidence</h2>
-          <table class="provenance-table">
-            <thead>
-              <tr><th>Source</th><th>Evidence</th><th>Limit</th></tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>XJTU-SY</th>
-                <td>Official page: "anyone can use them to validate prognostics algorithms"; citation requested.</td>
-                <td><span class="provenance-need">[NEED: explicit reuse licence]</span> (SPDX name); no temperature or acoustic channels.</td>
-              </tr>
-              <tr>
-                <th>Derived features</th>
-                <td><a href="https://data.mendeley.com/datasets/mpn45f4gxc/1" target="_blank">Mendeley DOI 10.17632/mpn45f4gxc.1</a>: CC BY 4.0; hashes checked.</td>
-                <td>Derived record only; does not replace the original publisher's terms.</td>
-              </tr>
-              <tr>
-                <th>FEMTO / PRONOSTIA</th>
-                <td><a href="https://raw.githubusercontent.com/Lucky-Loek/ieee-phm-2012-data-challenge-dataset/master/IEEEPHM2012-Challenge-Details.pdf" target="_blank">Challenge PDF</a>: datasets "made publicly available", citation requested; <a href="https://doi.org/10.6084/m9.figshare.30595484.v1" target="_blank">combined copy</a> CC BY 4.0.</td>
-                <td><span class="provenance-need">[NEED: explicit FEMTO-ST licence]</span> (SPDX name); 20 g stop rule is challenge-defined.</td>
-              </tr>
-              <tr>
-                <th>CWRU / Reliance</th>
-                <td><a href="https://engineering.case.edu/bearingdatacenter" target="_blank">Bearing Data Center</a>: 2 hp Reliance Electric motor; EDM-seeded faults. Derived <a href="https://doi.org/10.5281/zenodo.10986655" target="_blank">Zenodo copy</a>: CC BY 4.0.</td>
-                <td><span class="provenance-need">[NEED: CWRU licence; exact catalogue number]</span>; no run-to-failure endpoint.</td>
-              </tr>
-              <tr>
-                <th>NASA IMS</th>
-                <td><a href="https://data.nasa.gov/dataset/ims-bearings" target="_blank">NASA Open Data Portal</a> metadata names <a href="https://www.usa.gov/government-works" target="_blank">US Government Work</a>; three real bearing run-to-failure tests.</td>
-                <td>Not our motor; failure endpoint is dataset-defined, not operator sign-off.</td>
-              </tr>
-            </tbody>
-          </table>
-          <p style="margin-top:10px">
-            Full evidence: <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/docs/DATA_PROVENANCE_LICENSES.md" target="_blank">DATA_PROVENANCE_LICENSES.md</a>
-            &middot; <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/docs/REAL_MOTOR_READINESS.md" target="_blank">REAL_MOTOR_READINESS.md</a>
-          </p>
-          <p style="margin-top:10px">
-            Device-only rule: <b>REMOVE SIMULATOR, ALL FROM DEVICE</b>. Simulator
-            uplink tools are retired; absent, null or stale readings stay
-            <span class="font-mono">NO DATA</span> / <span class="font-mono">AWAITING DATA</span>
-            rather than being labelled as device telemetry.
-          </p>
         </div>
       </section>
 
@@ -1518,7 +1097,7 @@
     <!-- Professional Footer -->
     <footer class="scada-footer">
       <div>
-        <b>Grade 12 STEM Capstone 2026/2027</b> &bull; Theme: Communication, Sensing, Information &amp; Informatics &bull; Machine: 3-Phase AC Induction Motor Rig
+        <b>Grade 12 STEM Capstone 2026/2027</b> &bull; Theme: Communication, Sensing, Information &amp; Informatics &bull; Machine: fan-motor test rig
       </div>
       <div class="font-mono">
         Raspberry Pi 4B &bull; Realtime Cloud Mirror: <a href="https://castpone2026-default-rtdb.firebaseio.com/motor1.json" target="_blank">castpone2026-default-rtdb</a>
@@ -1671,32 +1250,37 @@
       else if (color) element.style.color = color;
     }
 
-    function setZone(id, text, color) {
+    const TEXT_ONLY_IDS = ["val-tc", "val-open", "val-mic"];
+    let lastDataTs = null;
+
+    function setText(id, text, color) {
       const element = document.getElementById(id);
       element.innerText = text;
-      element.style.color = color;
+      if (color) element.style.color = color; else element.style.removeProperty("color");
     }
 
-    function setPointer(id, value, min, max) {
-      const pointer = document.getElementById(id);
-      pointer.classList.toggle("is-unavailable", value === null);
-      if (value === null) {
-        pointer.style.removeProperty("left");
+    function linkLabel(flag) {
+      if (flag === true) return ["OK", "var(--status-ok)"];
+      if (flag === false) return ["FAULT", "var(--status-alarm)"];
+      return ["NO DATA", null];
+    }
+
+    function setGates(gateText, rfText, knownState) {
+      const pill1 = document.getElementById("pill-stage1");
+      const pill2 = document.getElementById("pill-stage2");
+      if (!knownState) {
+        pill1.className = "gate-badge-tag pending"; pill1.innerText = "AWAITING DATA";
+        pill2.className = "gate-badge-tag pending"; pill2.innerText = "AWAITING DATA";
+        document.getElementById("txt-gate").innerText = "Gate status from the last packet: NO DATA. The state above comes from fixed threshold rules on the Pi. The thresholds are not yet calibrated against this rig.";
+        document.getElementById("txt-rf").innerText = "Class from the last packet: NO DATA. The classifier is trained on generated data and has not been tested on real faults. No probability or confidence is shown, and it gives no remaining-life estimate.";
         return;
       }
-      const percent = Math.min(98, Math.max(2, ((value - min) / (max - min)) * 100));
-      pointer.style.left = `${percent}%`;
-    }
-
-    function setPendingGates() {
-      for (const id of ["step-stage1", "step-stage2"]) {
-        document.getElementById(id).classList.remove("active-gate");
-      }
-      for (const id of ["pill-stage1", "pill-stage2"]) {
-        const pill = document.getElementById(id);
-        pill.className = "gate-badge-tag pending";
-        pill.innerText = "AWAITING DATA";
-      }
+      pill1.className = "gate-badge-tag " + (knownState === "Healthy" ? "active" : "dormant");
+      pill1.innerText = knownState === "Healthy" ? "NO BREACH" : "RULE BREACHED";
+      pill2.className = "gate-badge-tag pending";
+      pill2.innerText = "UNVALIDATED";
+      document.getElementById("txt-gate").innerText = "Gate status from the last packet: " + (gateText || "NO DATA") + ". The state above comes from fixed threshold rules on the Pi. The thresholds are not yet calibrated against this rig.";
+      document.getElementById("txt-rf").innerText = "Class from the last packet: " + (rfText || "NO DATA") + ". The classifier is trained on generated data and has not been tested on real faults. No probability or confidence is shown, and it gives no remaining-life estimate.";
     }
 
     function showAwaitingState() {
@@ -1705,31 +1289,16 @@
       document.getElementById("lamp-icon").className = "fa-solid fa-circle-question";
       document.getElementById("status-title").innerText = "Awaiting telemetry";
       document.getElementById("status-sub").innerText = "No classified packet received from the Raspberry Pi mirror yet";
-      document.getElementById("badge-ai-conf").innerText = "NO DATA";
-      document.getElementById("badge-ai-conf").style.removeProperty("color");
+      document.getElementById("badge-age").innerText = "NO DATA";
       document.getElementById("badge-seq").innerText = "NO DATA";
       document.getElementById("badge-uptime").innerText = "NO DATA";
-
       for (const id of [
         "val-rms", "val-peak", "val-kurt", "val-cf", "val-temp",
-        "val-slope", "val-res", "val-sound-db", "val-sound-zcr", "val-spc-z"
+        "val-slope", "val-sound-db", "val-sound-zcr", "val-sound-rms"
       ]) renderValue(id, null, 0, "");
-      document.getElementById("val-coldj").innerText = "NOT REPORTED";
-      document.getElementById("val-coldj").style.color = "var(--text-muted)";
-      document.getElementById("val-sound-status").innerText = "NOT REPORTED";
-      document.getElementById("val-sound-status").style.color = "var(--text-muted)";
-
-      setZone("txt-iso-zone", "AWAITING DATA", "var(--text-muted)");
-      setZone("txt-thermal-zone", "AWAITING DATA", "var(--text-muted)");
-      setZone("txt-sound-zone", "AWAITING DATA", "var(--text-muted)");
-      setPointer("iso-pointer", null, 0, 0.30);
-      setPointer("temp-pointer", null, 20, 80);
-      setPointer("sound-pointer", null, 50, 100);
-
-      for (const id of ["calc-rms", "calc-kurt", "calc-cf", "calc-spc", "calc-slope", "calc-sound"]) {
-        document.getElementById(id).innerText = "Awaiting telemetry";
-      }
-      setPendingGates();
+      for (const id of TEXT_ONLY_IDS) setText(id, "NO DATA", null);
+      document.getElementById("note-vib").innerText = "Uncalibrated. Accelerometer sampling rate: NO DATA.";
+      setGates(null, null, null);
     }
 
     function updateDashboard(data) {
@@ -1741,7 +1310,6 @@
 
       const state = textOrNull(data.state);
       const fault = textOrNull(data.fault) || textOrNull(data.fault_label);
-      const proba = firstFinite(data.proba, data.fault_proba);
       const rms = firstFinite(data.rms, data.vibration?.rms_dyn);
       const peak = firstFinite(data.peak, data.vibration?.peak_dyn);
       const kurt = firstFinite(data.kurt, data.vibration?.kurtosis);
@@ -1749,13 +1317,18 @@
       const temp = firstFinite(data.temp, data.temperature?.temp_c);
       const slope = firstFinite(data.slope, data.temperature?.slope_c_per_min);
       const sound_db = firstFinite(data.sound_db, data.acoustic?.db_spl);
+      const sound_rms = firstFinite(data.acoustic?.rms);
       const zcr = firstFinite(data.zcr, data.acoustic?.zcr);
+      const fsHz = firstFinite(data.vibration?.fs_hz);
       const seq = firstFinite(data.seq);
       const uptime = firstFinite(data.uptime_s);
       const dataTs = firstFinite(data.ts);
+      lastDataTs = dataTs;
       const ageSec = dataTs === null ? null : Math.max(0, Date.now() / 1000 - dataTs);
       const isStaleTelemetry = ageSec === null || ageSec > 20;
       const knownState = state && ["Healthy", "Warning", "Fault"].includes(state) ? state : null;
+      document.getElementById("main-status-card").dataset.stale = isStaleTelemetry ? "1" : "0";
+      document.querySelector(".dashboard-layout").classList.toggle("is-stale", isStaleTelemetry);
 
       // Only a classified packet can change the state lamp.
       if (knownState) {
@@ -1771,30 +1344,24 @@
           icon.className = "fa-solid fa-check";
           title.innerText = `${stalePrefix}${displayFault}`;
           sub.innerText = isStaleTelemetry
-            ? "Historical packet only - verify live Pi telemetry before acting"
-            : "Nominal baseline operation within ISO 10816 limits";
+            ? "Old packet only. Not live: check the Raspberry Pi before relying on it."
+            : "No threshold rule breached in the last packet";
         } else if (knownState === "Warning") {
           card.classList.add("warning");
           icon.className = "fa-solid fa-triangle-exclamation";
           title.innerText = `${stalePrefix}Warning: ${displayFault}`;
-          sub.innerText = "Incipient mechanical or thermal anomaly detected (Stage 1 threshold breach)";
+          sub.innerText = "A threshold rule on the Pi was breached. Inspect the machine.";
           if (!isStaleTelemetry && Date.now() - lastAlertTime > 5000) { playBeep(660, 0.3); lastAlertTime = Date.now(); }
         } else {
           card.classList.add("fault");
           icon.className = "fa-solid fa-triangle-exclamation";
-          title.innerText = `${stalePrefix}CRITICAL FAULT: ${displayFault}`;
-          sub.innerText = "Immediate machine maintenance protocol required - trip risk active";
+          title.innerText = `${stalePrefix}Fault flagged: ${displayFault}`;
+          sub.innerText = "The Pi's threshold rules flagged a fault. Inspect the machine.";
           if (!isStaleTelemetry && Date.now() - lastAlertTime > 2000) { playBeep(980, 0.4); lastAlertTime = Date.now(); }
         }
       }
 
-      // Confidence uses only the probability in the packet, never a derived default.
-      if (proba !== null && knownState) {
-        const confPercent = Math.max(0, Math.min(100, Math.round((knownState === "Healthy" ? 1 - proba : proba) * 100)));
-        const confEl = document.getElementById("badge-ai-conf");
-        confEl.innerText = confPercent + "%";
-        confEl.style.color = knownState === "Healthy" ? "var(--status-ok)" : (knownState === "Warning" ? "var(--status-warn)" : "var(--status-alarm)");
-      }
+      setGates(textOrNull(data.ai?.gate_status), textOrNull(data.ai?.predicted_class), knownState);
 
       if (seq !== null) document.getElementById("badge-seq").innerText = "#" + seq;
       if (uptime !== null) {
@@ -1802,90 +1369,30 @@
           ? (uptime / 60).toFixed(1) + "m"
           : uptime.toFixed(0) + "s";
       }
-      // Stage gating is only asserted when the packet has a recognised state.
-      if (knownState) {
-        const isStage2 = knownState !== "Healthy" || Boolean(data.ai?.gate_status?.includes("Stage 2"));
-        const step1 = document.getElementById("step-stage1");
-        const step2 = document.getElementById("step-stage2");
-        const pill1 = document.getElementById("pill-stage1");
-        const pill2 = document.getElementById("pill-stage2");
-        if (isStage2) {
-          step1.classList.remove("active-gate");
-          step2.classList.add("active-gate");
-          pill1.className = "gate-badge-tag dormant";
-          pill1.innerText = "BREACHED";
-          pill2.className = "gate-badge-tag active";
-          pill2.innerText = "INFERENCE ACTIVE";
-        } else {
-          step1.classList.add("active-gate");
-          step2.classList.remove("active-gate");
-          pill1.className = "gate-badge-tag active";
-          pill1.innerText = "ACTIVE GATE";
-          pill2.className = "gate-badge-tag dormant";
-          pill2.innerText = "STANDBY";
-        }
-      }
+      updateAge();
 
-      // Gauges: a missing or non-finite field is shown as unavailable, not filled in.
+      // A missing or non-finite field is shown as unavailable, not filled in.
       renderValue("val-rms", rms, 4, "g");
       renderValue("val-peak", peak, 4, "g");
       renderValue("val-kurt", kurt, 2, "&kappa;");
       renderValue("val-cf", cf, 2, "CF");
-      renderValue("val-temp", temp, 2, "&deg;C", false, "#92400e");
+      renderValue("val-temp", temp, 2, "&deg;C");
       renderValue("val-slope", slope, 2, "&deg;C/m", true);
       renderValue("val-sound-db", sound_db, 1, "dB");
       renderValue("val-sound-zcr", zcr, 4, "cross/sample");
+      renderValue("val-sound-rms", sound_rms, 4, "");
 
-      const zScore = rms === null ? null : (rms - 0.080) / 0.025;
-      renderValue("val-spc-z", zScore, 2, "&sigma;", true);
-
-      // Severity pointers stay hidden until their own measured value exists.
-      if (rms !== null) {
-        setPointer("iso-pointer", rms, 0, 0.30);
-        if (rms < 0.075) setZone("txt-iso-zone", "Zone A (Good)", "var(--status-ok)");
-        else if (rms < 0.165) setZone("txt-iso-zone", "Zone B (Acceptable)", "#0369a1");
-        else if (rms < 0.24) setZone("txt-iso-zone", "Zone C (Unsatisfactory)", "var(--status-warn)");
-        else setZone("txt-iso-zone", "Zone D (Unacceptable)", "var(--status-alarm)");
-      }
-
-      if (temp !== null) {
-        setPointer("temp-pointer", temp, 20, 80);
-        if (temp < 45) setZone("txt-thermal-zone", "Nominal Temperature", "var(--status-ok)");
-        else if (temp < 65) setZone("txt-thermal-zone", "Warning (High Drift)", "var(--status-warn)");
-        else setZone("txt-thermal-zone", "Trip Threshold Exceeded", "var(--status-alarm)");
-      }
-
-      if (sound_db !== null) {
-        setPointer("sound-pointer", sound_db, 50, 100);
-        if (sound_db < 70) setZone("txt-sound-zone", "Quiet", "var(--status-ok)");
-        else if (sound_db < 85) setZone("txt-sound-zone", "Elevated", "var(--status-warn)");
-        else setZone("txt-sound-zone", "Severe Rubbing", "var(--status-alarm)");
-      }
-
-      // Worked equations are substituted only when their inputs are present.
-      if (rms !== null) {
-        document.getElementById("calc-rms").innerHTML =
-          `RMS = &radic;(${((rms ** 2) * 256).toFixed(6)} / 256) = <b>${rms.toFixed(4)} g</b>`;
-      }
-      if (kurt !== null) {
-        document.getElementById("calc-kurt").innerHTML =
-          `&kappa; = <b>${kurt.toFixed(2)}</b> (Gaussian Baseline &sim; 3.0)`;
-      }
-      if (cf !== null && peak !== null && rms !== null) {
-        document.getElementById("calc-cf").innerHTML =
-          `CF = ${peak.toFixed(4)} g / ${rms.toFixed(4)} g = <b>${cf.toFixed(2)}</b>`;
-      }
-      if (rms !== null && zScore !== null) {
-        document.getElementById("calc-spc").innerHTML =
-          `Z = (${rms.toFixed(4)} - 0.080) / 0.025 = <b>${zScore >= 0 ? "+" : ""}${zScore.toFixed(2)} &sigma;</b> (Threshold: &gt; 2.0 &sigma;)`;
-      }
-      if (slope !== null) {
-        document.getElementById("calc-slope").innerHTML =
-          `&Delta;T/&Delta;t = <b>${slope >= 0 ? "+" : ""}${slope.toFixed(2)} &deg;C/min</b> (Threshold: &gt; 5.0 &deg;C/min)`;
-      }
-      if (sound_db !== null && zcr !== null) {
-        document.getElementById("calc-sound").innerHTML =
-          `SPL = <b>${sound_db.toFixed(1)} dB</b> | ZCR = <b>${zcr.toFixed(4)}</b> (${zcr > 0.20 ? "High Friction" : "Nominal Hum"})`;
+      const flag = (v) => (typeof v === "boolean" ? v : (v === 0 || v === 1 ? v === 1 : null));
+      const sys = data.system || {};
+      const openTc = data.temperature && data.temperature.open_tc !== undefined ? flag(data.temperature.open_tc) : null;
+      const [tcLabel, tcColor] = linkLabel(flag(sys.max6675_ok));
+      setText("val-tc", tcLabel, tcColor);
+      setText("val-open", openTc === null ? "NO DATA" : (openTc ? "OPEN" : "NO"), openTc === true ? "var(--status-alarm)" : null);
+      const [micLabel, micColor] = linkLabel(flag(sys.acoustic_ok));
+      setText("val-mic", micLabel, micColor);
+      const adxlOk = flag(sys.adxl_ok);
+      if (fsHz !== null) {
+        document.getElementById("note-vib").innerText = `Uncalibrated. Accelerometer link: ${adxlOk === null ? "NO DATA" : (adxlOk ? "OK" : "FAULT")}. Sampling rate: ${fsHz.toFixed(1)} Hz, too slow for bearing-fault frequencies.`;
       }
 
       // Charts advance only on a fresh sequence with all plotted values present.
@@ -1894,33 +1401,31 @@
       const shouldPushChart = isFreshHardwareData && hasChartValues;
 
       document.querySelectorAll(".chart-panel-box").forEach(box => {
-        box.dataset.emptyLabel = lastProcessedSeq === null ? "NO TELEMETRY" : "BUFFER FROZEN";
-        box.classList.toggle("no-data", !shouldPushChart);
+        box.dataset.emptyLabel = "NO TELEMETRY";
+        box.classList.toggle("no-data", historyData.labels.length === 0 && !shouldPushChart);
       });
 
       if (shouldPushChart && chartVib && chartTemp && chartSound) {
         lastProcessedSeq = seq;
-        const timeLabel = new Date().toLocaleTimeString();
-        historyData.labels.push(timeLabel);
+        historyData.labels.push(new Date().toLocaleTimeString());
         historyData.rms.push(rms);
         historyData.peak.push(peak);
         historyData.temp.push(temp);
         historyData.slope.push(slope);
         historyData.sound_db.push(sound_db);
-
         if (historyData.labels.length > 25) {
-          historyData.labels.shift();
-          historyData.rms.shift();
-          historyData.peak.shift();
-          historyData.temp.shift();
-          historyData.slope.shift();
-          historyData.sound_db.shift();
+          for (const k of Object.keys(historyData)) historyData[k].shift();
         }
-
         chartVib.update();
         chartTemp.update();
         chartSound.update();
       }
+    }
+
+    function updateAge() {
+      const el = document.getElementById("badge-age");
+      if (lastDataTs === null) { el.innerText = "NO DATA"; return; }
+      el.innerText = formatTimeAgo(Math.max(0, Date.now() / 1000 - lastDataTs));
     }
 
     function formatTimeAgo(seconds) {
@@ -2000,6 +1505,7 @@
     function connectFirebase() {
       fetchLatest();
       setInterval(fetchLatest, 2500);
+      setInterval(updateAge, 1000);
 
       try {
         const sse = new EventSource(FIREBASE_RTDB_URL);
