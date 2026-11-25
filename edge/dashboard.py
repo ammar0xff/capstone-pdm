@@ -13,6 +13,7 @@ from flask import Flask, render_template, jsonify, Response
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATE_FILE = os.path.join(BASE_DIR, "latest_state.json")
 HISTORY_FILE = os.path.join(BASE_DIR, "hot_backup.csv")
+from history_log import read_rows  # noqa: E402
 CLOUD_CONFIG_FILE = os.path.join(BASE_DIR, "cloud_config.json")
 CLOUD_BACKLOG_FILE = os.path.join(BASE_DIR, "cloud_backlog.json")
 
@@ -117,9 +118,8 @@ def api_history():
     rows = []
     if os.path.exists(HISTORY_FILE):
         try:
-            with open(HISTORY_FILE, "r") as f:
-                reader = csv.DictReader(f)
-                all_rows = list(reader)
+            if True:
+                all_rows = read_rows(BASE_DIR)
                 # Return last 100 entries
                 recent = all_rows[-100:]
                 for r in recent:

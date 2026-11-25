@@ -33,11 +33,13 @@ try:
 except ImportError:
     mqtt = None
 
+from history_log import ensure_header, resolve_history_path  # noqa: E402
+
 # Base directories
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATE_FILE = os.path.join(BASE_DIR, "latest_state.json")
 TMP_STATE_FILE = os.path.join(BASE_DIR, "latest_state.tmp")
-HISTORY_FILE = os.path.join(BASE_DIR, "hot_backup.csv")
+HISTORY_FILE = resolve_history_path(BASE_DIR)
 CAL_FILE = os.path.join(BASE_DIR, "cal.json")
 
 # Machine Learning Module Path
@@ -347,28 +349,8 @@ def main():
 
     latest_raw_xyz = (0, 0, 0)
 
-    # Ensure CSV header
-    if not os.path.exists(HISTORY_FILE):
-        with open(HISTORY_FILE, "w", newline="") as f:
-            writer = csv.writer(f)
-            writer.writerow(
-                [
-                    "timestamp",
-                    "seq",
-                    "g_mag",
-                    "rms_dyn",
-                    "kurtosis",
-                    "crest_factor",
-                    "peak_dyn",
-                    "temp_c",
-                    "temp_slope",
-                    "sound_db",
-                    "sound_zcr",
-                    "state",
-                    "fault_label",
-                    "fault_proba",
-                ]
-            )
+    # Ensure CSV header. A log with a different header is never edited; see history_log.py.
+    ensure_header(HISTORY_FILE)
 
     print("[INFO] High-Speed Sensor Ingestion active. Sampling 200-400Hz...")
 
