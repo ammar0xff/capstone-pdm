@@ -199,7 +199,7 @@ Trains a 300-estimator Random Forest classifier (`max_depth=12`, `min_samples_sp
 2. Reads 2 bytes from MAX6675 via SPI Bus 0 every 1 second ($0.25^\circ\text{C}$ resolution) and calculates thermal slope $\Delta T / \Delta t$.
 3. Reads 24-bit DMA acoustic samples from INMP441 via I2S ALSA capture.
 4. **Stage 1 Shewhart SPC Gating**: Computes normalized $Z = \frac{\text{RMS} - \mu_0}{\sigma_0}$ with the configured $\mu_0=0.080\,g$, $\sigma_0=0.025\,g$. The classifier wrapper in `ml/rf_predictor.py` skips `predict_proba` on a nominal window (`rf_executed=False`), but `edge_daq.py:511-520` still calls the wrapper on every 100 ms state update. CPU reduction has **not** been measured; do not quote a percentage.
-5. Emits state to local shared memory file `edge/latest_state.json` and circular buffer `edge/pdm_buffer.db`.
+5. Emits state to local shared memory file `edge/latest_state.json` and appends one row per second to edge/hot_backup.csv (no SQLite circular buffer exists in the code; see docs/FULL_CYCLE_STATUS.md).
 
 ### 6.2 Zero-Cost Firebase Cloud Mirror (`edge/firebase_mirror.py`)
 1. Reads `edge/latest_state.json` every 5 seconds.
