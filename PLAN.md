@@ -40,4 +40,4 @@
 - [x] P14 Re-run full suite, `git diff --check`, commit and push the estimator work
 - [x] P15 Vendor C-MAPSS FD001 raw files with provenance and build `ml/train_rul_cmapss.py`; reproduce official test RMSE 15.51 / MAE 11.51
 - [x] P16 Add `tests/test_rul_cmapss.py`, document the benchmark as public simulated turbofan data in README, AI report, G12 register, file map and Pi evidence
-- [ ] P17 Run `git diff --check` plus the full suite, then commit and push the benchmark work
+- [x] P17 Run `git diff --check` plus the full suite, then commit and push the benchmark work (63 tests OK, commit `9c5f8f2`)
