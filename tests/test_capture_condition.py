@@ -16,7 +16,7 @@ class T(unittest.TestCase):
         log = os.path.join(d, "log")
         env = dict(os.environ,
                    ARECORD=fake(d, "arecord", ("echo oops >&2; exit 1" if fail else 'for a; do last=$a; done; echo RIFF > "$last"; echo arecord >> %s' % log)),
-                   SYSTEMCTL=fake(d, "systemctl", 'echo "$@" >> %s; [ "$1" = is-active ] && echo %s' % (log, "inactive" if inactive else "active")),
+                   SYSTEMCTL=fake(d, "systemctl", 'echo "$@" >> %s; if [ "$1" = is-active ]; then echo %s; fi; exit 0' % (log, "inactive" if inactive else "active")),
                    FUSER=fake(d, "fuser", ('echo 123; exit 0' if busy else 'exit 1')))
         # sudo shim: run the rest as is
         fake(d, "sudo", '"$@"')
