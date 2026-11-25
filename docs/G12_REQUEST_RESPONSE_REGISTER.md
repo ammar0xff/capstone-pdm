@@ -181,6 +181,14 @@ restating any resource-saving claim]`
   توربينات محاكاة، مش موتورنا، ومش validation ميداني**؛ بتثبت بس إن الـ pipeline
   شغال على مسار run-to-failure عام بملصقات منشورة، وممنوع تقديمها كزمن بقاء
   للموتور بتاع المشروع.
+- وبناءً على طلب «داتا موتور حقيقي من مصدر موثوق» جُلبت عيّنة من **CWRU
+  Bearing Data Center** الرسمي: الموتور **2 hp Reliance Electric induction
+  motor**، ومحامل SKF 6205-2RS JEM (DE) و6203-2RS JEM (FE). الملفات في
+  `data/cwru/` مع هاشات موثّقة في `data/cwru/README.md`. العيوب مِصَنعة
+  بـ EDM (0.007 بوصة) وليست تطوّراً طبيعياً، فالعيّنة تصلح لـ benchmark
+  تشخيص على موتور حقيقي **مش** لـ RUL. رقم الكتالوج الدقيق للموتور غير منشور
+  في صفحات CWRU: `[NEED: exact Reliance Electric catalogue number]`، ورخصة
+  إعادة الاستخدام غير مصرّح بها صراحةً هناك: `[NEED: explicit CWRU reuse licence]`.
 - التنفيذ الحالي يصنّف **الحالة الحالية** ويُصدر `response_plan` بأربع أولويات
   (`ROUTINE/SCHEDULE/URGENT/CRITICAL`) وإجراءات ثابتة لكل فئة. هذا «تدرّج في القرار»،
   لكنه **ليس** تدرّجاً محسوباً من منحنى تدهور، ولا تكلفة/زمن بقاء.

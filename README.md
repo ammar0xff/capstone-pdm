@@ -12,8 +12,10 @@ An offline degradation estimator is available as an analysis tool only; it
 requires an operator-supplied threshold and is explicitly not field-validated.
 A separate RUL benchmark on public NASA C-MAPSS FD001 data is complete and
 reproducible, but those are simulated turbofan data — not our motor, not field
-validation. See `docs/G12_REQUEST_RESPONSE_REGISTER.md` for request-by-request
-evidence.
+validation. A small real-motor sample from CWRU (2 hp Reliance Electric
+induction motor) is vendored in `data/cwru/` for diagnosis benchmarks; its
+faults are seeded, so it is not a run-to-failure series. See
+`docs/G12_REQUEST_RESPONSE_REGISTER.md` for request-by-request evidence.
 
 ## Start here
 
@@ -146,6 +148,7 @@ See `docs/FIREBASE_SETUP.md` before altering the rules or client behavior.
 | Pi latency | 26.19 ms host / 29.99 ms Pi, single-window inference | Measured; full inject→alert timing not measured |
 | Offline degradation estimator | `ml/degradation_rul.py`, `tests/test_degradation_rul.py` | Implemented; operator threshold required; not field-validated |
 | Public RUL benchmark | `ml/train_rul_cmapss.py`, `data/cmapss/`, `tests/test_rul_cmapss.py` | Complete on NASA C-MAPSS FD001 (simulated turbofan); not our motor |
+| Real-motor sample | `data/cwru/`, `tests/test_cwru_data.py` | CWRU 2 hp Reliance Electric; seeded faults, no run-to-failure |
 | Real-motor accuracy, field-validated RUL, cost savings | — | `[NEED: physical run data]` |
 | Sensor calibration certificate | `edge/calibrate.py` and runbook | Procedure ready; `[NEED: signed run record]` |
 

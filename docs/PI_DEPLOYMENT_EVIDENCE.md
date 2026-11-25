@@ -320,3 +320,13 @@ No Pi file, service, calibration artifact or Firebase state was changed for
 this step. The operator-owned scripts listed above remain untouched. Runtime
 diagnosis and the dashboard still report current state only; the benchmark is
 an offline reproducibility check, not a live RUL feature.
+
+## 2026-11-25 — real-motor CWRU sample (no Pi change)
+
+At the operator's request, seven unmodified `.mat` files were fetched from the
+official CWRU Bearing Data Center (2 hp Reliance Electric induction motor,
+healthy plus 7 mil seeded inner-race / ball / outer-race faults at 0 hp) into
+`data/cwru/`, with documented MD5 hashes and `tests/test_cwru_data.py`. The
+faults are seeded short recordings, so this is **not** a run-to-failure series
+and cannot validate RUL. No Pi file, service, calibration artifact or Firebase
+state was changed; the runtime classifier remains the same.

@@ -87,6 +87,8 @@ The dashboard exposes only read-only JSON endpoints and page rendering. The old
 | `data/cmapss/train_FD001.txt` | NASA raw training trajectories (do not edit) |
 | `data/cmapss/test_FD001.txt` | NASA raw test trajectories (do not edit) |
 | `data/cmapss/RUL_FD001.txt` | NASA withheld test RUL labels (do not edit) |
+| `data/cwru/README.md` | Provenance for a real 2 hp Reliance Electric motor sample |
+| `data/cwru/*.mat` | Unmodified CWRU healthy and seeded-fault recordings (do not edit) |
 
 ## Hosted presentation (`public/`)
 
