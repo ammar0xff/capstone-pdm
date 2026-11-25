@@ -36,7 +36,7 @@ Files, with md5 of the repo copies:
 - edge/history_log.py ea61df736a2765474c05e995ee9c4f1b
 - ml/rf_predictor.py 5c8eaa228a03c55fdc19ee19afb7688e
 - ml/gate_thresholds.py 3d877787309b03a6d68f6a1b075e5da3
-Order: back up the five target files on the Pi (copy with a date suffix), copy the new files, restart `pdm-daq` and `pdm-dashboard`, then check the services are active, the dashboard `/api/history` returns correctly labelled rows, and `hot_backup.csv` is byte-identical to before. `edge_daq.py` imports `gate_thresholds` from `ml/`, so `ml/` and `edge/` go together.
+Order: back up the five target files on the Pi (copy with a date suffix), copy the new files, restart `pdm-daq` and `pdm-dashboard`, then check the services are active, the dashboard `/api/history` returns correctly labelled rows, and `hot_backup.csv` has the same size and md5 as measured right after `pdm-daq` was stopped (the running logger keeps appending to the old file until then, so compare with a copy taken after the stop, not before). With the new resolver the old file stops growing after the restart; new rows go to `hot_backup_v2.csv`. Take the copy and its md5 before touching anything else, and keep it as the rollback reference. `edge_daq.py` imports `gate_thresholds` from `ml/`, so `ml/` and `edge/` go together.
 Rollback: restore the dated backups and restart the two services. `hot_backup_v2.csv` can stay; the old reader ignores it.
 Not part of the deploy: audio capture, any filter wiring, threshold changes, Firebase rules.
 
