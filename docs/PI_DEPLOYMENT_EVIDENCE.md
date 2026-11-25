@@ -412,3 +412,57 @@ No runtime service was restarted, no calibration artifact, calibration run
 record, Stage-1/Stage-2 behaviour, Firebase state or deployed model was changed.
 The unresolved `[NEED: ...]` items above are still open and no field-validated
 RUL claim is made.
+
+## 2026-11-25 (final) — NASA IMS benchmark and simulator removal
+
+The verified working tree was committed as `83c22e7`
+(`Add NASA IMS benchmark, licence evidence and device-only telemetry guard`)
+and pushed to `origin/main`. Local checks before deployment:
+`PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m unittest discover -s tests` →
+`Ran 133 tests` / `OK` in 134.524 s; the 32 targeted NASA/device-only/dashboard
+tests also passed; `git diff --check`, `py_compile` and the staged secret scan
+passed.
+
+The NASA IMS CSV now contains all 11,620 documented snapshots
+(s1_b3 2,156; s1_b4 2,156; s2_b1 984; s3_b3 6,324), SHA-256
+`bea57b5ba1fc81c39adda9d550f4a3d39402cbb26bb0ed5c06e0fcba98a7d77d`. The
+labelled report gives 2,328 tail windows with MAE 9,165.276 min and RMSE
+12,531.872 min against constant-baseline MAE 17,011.804 min and RMSE
+17,382.217 min. These are nominal recorded minutes from public bearing tests,
+`BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`, never hours-to-failure for
+our motor.
+
+Web verification: the live `https://castpone2026.web.app/` passed webcheck with
+`FLOOR 0`, `REFLEX 0`. A local fixture with an empty RTDB event stream also
+passed with `FLOOR 0`, `REFLEX 0` using the written brief; this removes
+changing live device figures from the unsourced-figure scan while still
+rendering the same page and its `NO DATA` / `AWAITING DATA` paths. The existing
+waivers for tiny-text, default-font, long-lines and small-body were retained.
+An independent visual-critic subagent was attempted but could not run because
+the model usage limit was reached; no visual change was made on that basis.
+
+Firebase CLI (`15.35.0`, logged in as `ammar0xf@gmail.com`) deployed 14 files:
+`firebase deploy --only hosting --project castpone2026` finished with
+`Release complete` and `Hosting URL: https://castpone2026.web.app`. After
+deployment, `index.html`, `guide.html` and `calibration.html` each returned
+HTTP 200 (70,200 / 73,727 / 38,644 bytes). The live index contains
+`DEVICE TELEMETRY ONLY` and the benchmark label, contains no simulator tokens,
+and the calibration page still shows `REVIEW` / `UNVERIFIED`.
+
+All 19 changed/new files from commit `83c22e7` were copied to `/home/renad/pdm`
+over SSH. Files already present on the Pi (11) were backed up first to
+`/home/renad/pdm_backup_20261125T141936Z`; all 19 files then passed
+`md5sum -c` on the Pi with no FAILED lines. Verification on the Pi:
+`pdm-daq.service`, `pdm-cloud.service` and `pdm-dashboard.service` were all
+`active`; `http://127.0.0.1:5000/` returned HTTP 200; and
+`python3 /home/renad/pdm/edge/stream_live.py` only printed
+`SIMULATOR REMOVED: telemetry must come from the Raspberry Pi device via
+edge/firebase_mirror.py. No simulated data is generated or uploaded.` and
+exited without generating or uploading packets.
+
+The runtime services, `edge/templates/index.html`, calibration artifacts,
+model and Firebase state were not changed by this sync. The user wording
+`REMOVE SIMULATOR, ALL FROM DEVICE` is now present in README, plan, dashboard
+and review pack; missing, null and stale dashboard values remain `NO DATA`,
+`AWAITING DATA` or `NOT REPORTED`. The unresolved licence `NEED` markers are
+still visible and no field-validated RUL claim is made.
