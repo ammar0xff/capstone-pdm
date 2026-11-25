@@ -869,9 +869,9 @@
             <span class="stat-tag">Synthetic-trained</span>
           </div>
           <div class="stat-box">
-            <div class="stat-number">6</div>
-            <div class="stat-label">RUL bearing runs</div>
-            <span class="stat-tag">Public benchmark</span>
+            <div class="stat-number">67.7%</div>
+            <div class="stat-label">24 h warning accuracy</div>
+            <span class="stat-tag">Real 160 kW motor · not ours</span>
           </div>
         </div>
 
@@ -1162,6 +1162,8 @@
         <h2 class="slide-title">Machine Learning Benchmarking & Dataset Evidence</h2>
         <p class="slide-subtitle">
           Official Capstone Requirement: <i>"Students must provide datasets and a rubric for machine/deep learning algorithms... evidence of accuracy at least 80%."</i>
+          The headline real-motor RUL benchmark measures <b>67.7%</b>, below that
+          target, and is reported as measured rather than tuned or hidden.
         </p>
 
         <div class="grid-2">
@@ -1175,6 +1177,11 @@
             </thead>
             <tbody>
               <tr style="background: rgba(16, 185, 129, 0.08);">
+                <td><b>FMCG induction-motor RUL</b></td>
+                <td>MAE <b>141.716 h</b>, RMSE <b>204.069 h</b>; 24 h warning accuracy <b>67.7%</b> (recall 0.029) — below zero baseline 69.185/106.164 h and no-warning baseline 0.686</td>
+                <td><span class="badge badge-amber">BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED</span> · <a href="https://zenodo.org/records/15637023" target="_blank">DOI 10.5281/zenodo.15637023</a>, CC BY 4.0</td>
+              </tr>
+              <tr>
                 <td><b>Four-class diagnosis</b></td>
                 <td><b>100.0%</b> run-disjoint Group 5-Fold CV, 1,400 windows</td>
                 <td><span class="badge badge-amber">Synthetic only</span></td>
@@ -1386,14 +1393,14 @@
           <div class="feature-card">
             <b style="color: var(--green);"><i class="fa-solid fa-hourglass-half"></i> Q5: Is remaining useful life working?</b>
             <p class="card-desc">
-              <i>"Yes on public real-bearing benchmarks, no on our motor. On six PRONOSTIA/FEMTO-ST bearings, leave-one-bearing-out last-window MAE is 182.91 s and RMSE 335.26 s. On 15 XJTU-SY bearings the last-20% MAE is 134.924 min and RMSE 171.776 min, slightly worse than the 160.859 min constant baseline; that gap is reported honestly. Both are BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED, never hours-to-failure for our rig. Field RUL needs our own run-to-failure series and operator-confirmed failure times. ml/rul_from_rig.py is the ready path, not a result today."</i>
+              <i>"Yes on a public real induction-motor benchmark, no on our motor. The headline source is a 160 kW three-phase induction-motor dataset (Zenodo DOI 10.5281/zenodo.15637023, CC BY 4.0) with RUL in operating hours. Four leave-one-run-out runs measured 141.716 h MAE, 204.069 h RMSE and 67.7% 24-hour warning accuracy with recall 0.029 — below 80% and worse than the zero (69.185/106.164 h) and no-warning (0.686) baselines, so we report it as measured. PRONOSTIA (182.91 s / 335.26 s) and XJTU-SY (134.924 / 171.776 min) remain labelled public bearing benchmarks. All are BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED, never hours-to-failure for our rig. Field RUL needs our own run-to-failure series and operator-confirmed failure times; ml/rul_from_rig.py is the ready path, not a result today."</i>
             </p>
           </div>
 
           <div class="feature-card">
             <b style="color: var(--amber);"><i class="fa-solid fa-database"></i> Q6: Which data is actually real?</b>
             <p class="card-desc">
-              <i>"CWRU is a real 2 hp Reliance Electric motor with seeded faults; PRONOSTIA has six and XJTU-SY has fifteen real bearing run-to-failure trajectories; our 100% result is synthetic only. None of these datasets came from our capstone rig, and no result is presented as field validation. Source and licence evidence is on the dashboard; explicit reuse licences that could not be verified stay marked [NEED: ...]."</i>
+              <i>"FMCG is a real 160 kW three-phase induction motor with explicit operating-hour RUL labels (CC BY 4.0); CWRU is a real 2 hp Reliance Electric motor with seeded faults; PRONOSTIA has six and XJTU-SY has fifteen real bearing run-to-failure trajectories; our 100% result is synthetic only. None of these datasets came from our capstone rig, and no result is presented as field validation. Source and licence evidence is on the dashboard; explicit reuse licences that could not be verified stay marked [NEED: ...]."</i>
             </p>
           </div>
         </div>

@@ -1,0 +1,199 @@
+{
+  "constant_median_baseline_tail_windows": {
+    "mae_h": 254.993,
+    "rmse_h": 263.054
+  },
+  "constant_no_warning_baseline_tail_windows": {
+    "accuracy": 0.686,
+    "f1": 0.0,
+    "false_negative": 105,
+    "false_positive": 0,
+    "precision": 0.0,
+    "recall": 0.0,
+    "true_negative": 229,
+    "true_positive": 0
+  },
+  "constant_zero_baseline_tail_windows": {
+    "mae_h": 69.185,
+    "rmse_h": 106.164
+  },
+  "data": {
+    "channels_not_available": [
+      "airborne acoustic level",
+      "four-class fault label"
+    ],
+    "channels_used": [
+      "rms_x",
+      "rms_y",
+      "rms_z",
+      "temp_c",
+      "stator_hz",
+      "speed_rpm",
+      "slip_hz",
+      "torque_nm",
+      "accel_geo",
+      "bearing_state",
+      "misalignment_state",
+      "unbalance_state",
+      "velocity_geo"
+    ],
+    "date_note": "source mixes ISO dates and Excel serial dates; both are converted once at load",
+    "n_rows": 1639,
+    "n_runs": 4,
+    "rul_endpoint": "source RUL label reaches 0; Downtime=YES is present in two runs",
+    "rul_unit": "hours from startup to shutdown or retirement (paper definition)"
+  },
+  "label": "BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED",
+  "method": {
+    "baseline": "constant zero, constant median RUL of the training runs, and a constant no-warning classifier",
+    "causal": true,
+    "features": "trailing 5-row causal mean and std for each numeric channel plus elapsed hours",
+    "imputation": "median fitted on training runs only",
+    "model": "RandomForestRegressor(n_estimators=200, max_depth=12, random_state=42)",
+    "tail_fraction": 0.2,
+    "validation": "leave-one-run-out; last 20% of the held run's rows",
+    "warning_label": "benchmark bin RUL <= 24 h, not an operator-approved alarm",
+    "warning_threshold_h": 24.0
+  },
+  "per_run": {
+    "run_01": {
+      "accuracy": 0.847,
+      "actual_last_rul_h": 0.0,
+      "downtime_yes_rows": 1,
+      "duration_h": 837.722,
+      "f1": 0.0,
+      "false_negative": 18,
+      "false_positive": 0,
+      "precision": 0.0,
+      "predicted_last_rul_h": 78.489,
+      "recall": 0.0,
+      "rows": 582,
+      "source_rows": [
+        2,
+        583
+      ],
+      "tail_mae_h": 37.893,
+      "tail_rows": 118,
+      "train_runs": [
+        "run_02",
+        "run_03",
+        "run_04"
+      ],
+      "true_negative": 100,
+      "true_positive": 0
+    },
+    "run_02": {
+      "accuracy": 0.703,
+      "actual_last_rul_h": 0.0,
+      "downtime_yes_rows": 0,
+      "duration_h": 456.017,
+      "f1": 0.0,
+      "false_negative": 19,
+      "false_positive": 0,
+      "precision": 0.0,
+      "predicted_last_rul_h": 348.25,
+      "recall": 0.0,
+      "rows": 312,
+      "source_rows": [
+        860,
+        1171
+      ],
+      "tail_mae_h": 302.188,
+      "tail_rows": 64,
+      "train_runs": [
+        "run_01",
+        "run_03",
+        "run_04"
+      ],
+      "true_negative": 45,
+      "true_positive": 0
+    },
+    "run_03": {
+      "accuracy": 0.696,
+      "actual_last_rul_h": 0.0,
+      "downtime_yes_rows": 0,
+      "duration_h": 814.006,
+      "f1": 0.15,
+      "false_negative": 28,
+      "false_positive": 6,
+      "precision": 0.333,
+      "predicted_last_rul_h": 16.835,
+      "recall": 0.097,
+      "rows": 552,
+      "source_rows": [
+        9534,
+        10085
+      ],
+      "tail_mae_h": 75.04,
+      "tail_rows": 112,
+      "train_runs": [
+        "run_01",
+        "run_02",
+        "run_04"
+      ],
+      "true_negative": 75,
+      "true_positive": 3
+    },
+    "run_04": {
+      "accuracy": 0.075,
+      "actual_last_rul_h": 0.0,
+      "downtime_yes_rows": 21,
+      "duration_h": 280.998,
+      "f1": 0.0,
+      "false_negative": 37,
+      "false_positive": 0,
+      "precision": 0.0,
+      "predicted_last_rul_h": 385.18,
+      "recall": 0.0,
+      "rows": 193,
+      "source_rows": [
+        10086,
+        10278
+      ],
+      "tail_mae_h": 377.93,
+      "tail_rows": 40,
+      "train_runs": [
+        "run_01",
+        "run_02",
+        "run_03"
+      ],
+      "true_negative": 3,
+      "true_positive": 0
+    }
+  },
+  "readiness": {
+    "hours_to_failure_for_our_rig": null,
+    "not_field_validated": true,
+    "not_our_motor": true,
+    "operator_action_required": true,
+    "runtime_or_dashboard_claim_changed": false
+  },
+  "source": {
+    "citation": "Anindhito, M. D. (2025). Dataset for Predicting Downtime and RUL for 3 Phase Induction Motor from FMCG Company [Dataset]. Zenodo, DOI 10.5281/zenodo.15637023. Companion paper: Anindhito & Suharjito, Applied Computer Science 21(3), 72-86, DOI 10.35784/acs_7299.",
+    "dataset": "FMCG 160 kW three-phase induction motor vibration and maintenance records",
+    "doi": "10.5281/zenodo.15637023",
+    "field_validation": false,
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "operator_confirmed_failure": false,
+    "our_motor": false,
+    "paper_doi": "10.35784/acs_7299",
+    "source_filename": "Downtime and RUL Prediction .csv",
+    "source_md5": "52df07317901bdb7647c86df479d06c6",
+    "zenodo_url": "https://zenodo.org/records/15637023"
+  },
+  "status": "benchmark_complete",
+  "tail_windows": {
+    "accuracy": 0.677,
+    "f1": 0.053,
+    "false_negative": 102,
+    "false_positive": 6,
+    "mae_h": 141.716,
+    "n_rows": 334,
+    "precision": 0.333,
+    "recall": 0.029,
+    "rmse_h": 204.069,
+    "true_negative": 223,
+    "true_positive": 3
+  }
+}

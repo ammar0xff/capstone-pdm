@@ -13,6 +13,7 @@ PAGES = {
 }
 DASHBOARD = PAGES["index"]
 REPORT = os.path.join(ROOT, "ml", "rul_xjtu_sy_report.json")
+FMCG_REPORT = os.path.join(ROOT, "ml", "rul_fmcg_report.json")
 
 
 class BenchmarkDisplayTest(unittest.TestCase):
@@ -59,6 +60,88 @@ class BenchmarkDisplayTest(unittest.TestCase):
             "Labelled public benchmark: never live telemetry, never our motor",
             self.html,
         )
+
+
+class FmcgBenchmarkDisplayTest(unittest.TestCase):
+    """The headline real-motor panel quotes the committed measured report."""
+
+    @classmethod
+    def setUpClass(cls):
+        with open(DASHBOARD, encoding="utf-8") as handle:
+            cls.html = handle.read()
+        with open(PAGES["guide"], encoding="utf-8") as handle:
+            cls.guide = handle.read()
+        with open(FMCG_REPORT, encoding="utf-8") as handle:
+            cls.report = json.load(handle)
+
+    def test_headline_numbers_match_the_committed_report(self):
+        tail = self.report["tail_windows"]
+        zero = self.report["constant_zero_baseline_tail_windows"]
+        no_warning = self.report["constant_no_warning_baseline_tail_windows"]
+        self.assertEqual(tail["mae_h"], 141.716)
+        self.assertEqual(tail["rmse_h"], 204.069)
+        self.assertEqual(tail["accuracy"], 0.677)
+        self.assertEqual(tail["recall"], 0.029)
+        for expected in (
+            f"<strong>{tail['mae_h']} h</strong>",
+            f"<strong>{tail['rmse_h']} h</strong>",
+            "<strong>67.7%</strong>",
+            f"<strong>{tail['recall']}</strong>",
+            f"<strong>{zero['mae_h']} h</strong>",
+            f"<strong>{no_warning['accuracy']}</strong>",
+            f"<small>24 h warning accuracy · {tail['accuracy']}</small>",
+        ):
+            with self.subTest(expected=expected):
+                self.assertIn(expected, self.html)
+
+    def test_headline_panel_keeps_provenance_licence_gaps_and_device_only_rule(self):
+        for token in (
+            "FMCG induction motor",
+            "10.5281/zenodo.15637023",
+            "CC BY 4.0",
+            "10.35784/acs_7299",
+            "52df07317901bdb7647c86df479d06c6",
+            "BENCHMARK",
+            "NOT OUR MOTOR",
+            "NOT FIELD-VALIDATED",
+            "[NEED: explicit FEMTO-ST licence]",
+            "[NEED: explicit XJTU-SY reuse licence]",
+            "[NEED: explicit CWRU licence; exact catalogue number]",
+            "REMOVE SIMULATOR, ALL FROM DEVICE",
+            "NO DATA",
+            "AWAITING DATA",
+            "NOT REPORTED",
+            "below 80%",
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, self.html)
+
+    def test_guide_deck_states_the_same_measured_result(self):
+        for token in (
+            "141.716 h",
+            "204.069 h",
+            "67.7%",
+            "0.029",
+            "69.185/106.164 h",
+            "0.686",
+            "10.5281/zenodo.15637023",
+            "CC BY 4.0",
+            "below 80%",
+            "BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED",
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, self.guide)
+
+    def test_no_field_validation_claim_is_introduced(self):
+        for page, text in (("index", self.html), ("guide", self.guide)):
+            for forbidden in (
+                "100% on real motor",
+                "field-validated RUL complete",
+                "hours-to-failure for our motor",
+                "operator-approved alarm threshold of 24 h",
+            ):
+                with self.subTest(page=page, forbidden=forbidden):
+                    self.assertNotIn(forbidden, text)
 
 
 class LightModeTest(unittest.TestCase):

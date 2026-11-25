@@ -908,6 +908,13 @@
       .telemetry-meta > div:last-child { justify-content: space-between; }
       .decision-meta { grid-template-columns: 1fr; gap: 8px; }
       .decision-chip { justify-self: start; }
+      .benchmark-panel { padding: 12px; }
+      .benchmark-panel > div { min-width: 0; }
+      .benchmark-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .benchmark-metric { min-width: 0; padding: 8px; }
+      .benchmark-metric strong { font-size: 15px; overflow-wrap: anywhere; }
+      .provenance-table { table-layout: fixed; }
+      .provenance-table th, .provenance-table td { overflow-wrap: anywhere; }
     }
   </style>
 </head>
@@ -1274,7 +1281,91 @@
         </div>
       </section>
 
-      <!-- Labelled public benchmark: never live telemetry, never our motor -->
+      <!-- Labelled public benchmark: never live telemetry, never our motor; headline FMCG induction-motor panel -->
+      <section class="benchmark-panel" aria-label="Public induction-motor RUL benchmark and data provenance">
+        <div>
+          <h2>RUL benchmark <span class="font-mono">/ FMCG induction motor</span></h2>
+          <div class="benchmark-warning">
+            <span>BENCHMARK</span>
+            <span>NOT OUR MOTOR</span>
+            <span>NOT FIELD-VALIDATED</span>
+          </div>
+          <p>
+            Leave-one-run-out evaluation on four complete RUL-to-zero runs from
+            a public 160 kW three-phase induction-motor dataset. RUL is in
+            operating hours from the source maintenance record. These are
+            <b>not</b> hours-to-failure for the capstone motor, and the 24-hour
+            value is a benchmark bin, <b>not</b> an operator-approved alarm.
+          </p>
+          <div class="benchmark-metrics">
+            <div class="benchmark-metric">
+              <strong>141.716 h</strong>
+              <small>RUL MAE · 334 tail rows</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>204.069 h</strong>
+              <small>RUL RMSE · tail rows</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>67.7%</strong>
+              <small>24 h warning accuracy · 0.677</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>0.029</strong>
+              <small>24 h warning recall</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>69.185 h</strong>
+              <small>zero-baseline MAE · better than model</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>0.686</strong>
+              <small>no-warning baseline accuracy · better than model</small>
+            </div>
+          </div>
+          <p style="margin-top:10px">
+            The measured warning accuracy is <b>below 80%</b> and worse than both
+            the zero regression baseline and the no-warning baseline. It is shown
+            as measured, not tuned or hidden. Source:
+            <a href="https://zenodo.org/records/15637023" target="_blank">Zenodo DOI 10.5281/zenodo.15637023</a>
+            &middot; <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>
+            &middot; <a href="https://doi.org/10.35784/acs_7299" target="_blank">companion paper</a>.
+          </p>
+        </div>
+        <div>
+          <h2>Source &amp; licence evidence</h2>
+          <table class="provenance-table">
+            <thead>
+              <tr><th>Source</th><th>Evidence</th><th>Limit</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>FMCG motor</th>
+                <td><a href="https://zenodo.org/records/15637023" target="_blank">Zenodo record</a> states <b>CC BY 4.0</b>; published MD5 <span class="font-mono">52df07317901bdb7647c86df479d06c6</span> matches the vendored CSV.</td>
+                <td>Real industrial motor, not our rig. Dataset RUL endpoint and 24 h bin are not operator acceptance.</td>
+              </tr>
+              <tr>
+                <th>Other sources</th>
+                <td>Separate PRONOSTIA, XJTU-SY and NASA IMS benchmarks remain labelled on this page.</td>
+                <td class="provenance-need">[NEED: explicit FEMTO-ST licence] · [NEED: explicit XJTU-SY reuse licence] · [NEED: explicit CWRU licence; exact catalogue number]</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="margin-top:10px">
+            Full evidence: <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/docs/DATA_PROVENANCE_LICENSES.md" target="_blank">DATA_PROVENANCE_LICENSES.md</a>
+            &middot; <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/ml/rul_fmcg_report.json" target="_blank">ml/rul_fmcg_report.json</a>
+          </p>
+          <p style="margin-top:10px">
+            Device-only rule: <b>REMOVE SIMULATOR, ALL FROM DEVICE</b>. Unknown,
+            null or stale readings remain <span class="font-mono">NO DATA</span>,
+            <span class="font-mono">AWAITING DATA</span> or
+            <span class="font-mono">NOT REPORTED</span>; no benchmark value is
+            written to the live telemetry path.
+          </p>
+        </div>
+      </section>
+
+      <!-- Additional labelled public benchmark: never live telemetry, never our motor -->
       <section class="benchmark-panel" aria-label="Public bearing RUL benchmark and data provenance">
         <div>
           <h2>RUL benchmark <span class="font-mono">/ XJTU-SY</span></h2>

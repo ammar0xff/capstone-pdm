@@ -1,0 +1,115 @@
+{
+  "dataset": {
+    "name": "Dataset for Predicting Downtime and RUL for 3 Phase Induction Motor from FMCG Company",
+    "zenodo_url": "https://zenodo.org/records/15637023",
+    "doi": "10.5281/zenodo.15637023",
+    "creator": "Anindhito, Muhammad Dzulfiqar",
+    "published": "2025-06-11",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "paper_doi": "10.35784/acs_7299",
+    "paper_title": "Prediction of remaining useful life and downtime of induction motors with supervised machine learning",
+    "paper_authors": "Anindhito, M. D. and Suharjito",
+    "motor_context": "160 kW three-phase induction motors in an FMCG company; accelerometer vibration parameters combined with SAP Plant Maintenance records",
+    "rul_definition": "hours the motor runs from startup to shutdown or retirement, from the companion paper section 3.4.2"
+  },
+  "file": {
+    "source_filename": "Downtime and RUL Prediction .csv",
+    "vendored_as": "raw.csv",
+    "bytes": 3005861,
+    "lines_including_header": 14829,
+    "data_rows": 14828,
+    "encoding": "cp1252",
+    "delimiter": ";",
+    "md5": "52df07317901bdb7647c86df479d06c6",
+    "sha256": "792014186c980d8f7efd2b0fd3abe24667a9210230864e15c2396ed33cb41c27",
+    "zenodo_published_md5": "52df07317901bdb7647c86df479d06c6"
+  },
+  "source_columns": [
+    "Date",
+    "Time",
+    "RMSVelX (mm/s)",
+    "RMSVelY (mm/s)",
+    "RMSVelZ (mm/s)",
+    "Temperature (°C)",
+    "ElectricalStatorFrequency (Hz)",
+    "Rotation Speed (rpm)",
+    "Slip Frequency (Hz)",
+    "Torque (Nm)",
+    "AccelerationGeometricMean (mm/s²)",
+    "BearingState",
+    "MisalignmentState",
+    "UnbalanceState",
+    "VelocityGeometricMean (mm/s)",
+    "RUL (jam)",
+    "Downtime"
+  ],
+  "date_handling": "Source mixes ISO date strings and Excel serial dates; time is stored as 1970-01-01 HH:MM:SS. The loader converts each row once, before any feature is built.",
+  "run_selection": {
+    "segment_break": "RUL label increases",
+    "eligibility": [
+      "at least 100 rows",
+      "at least 20 strictly decreasing RUL steps",
+      "minimum RUL equals 0 hours",
+      "maximum RUL at least 50 hours",
+      "timestamps strictly increasing"
+    ],
+    "excluded_blocks": "Blocks that never reach RUL 0 are excluded; their labels are never rewritten.",
+    "selected_runs": [
+      {
+        "id": "run_01",
+        "source_rows_including_header": [2, 583],
+        "rows": 582,
+        "duration_h": 837.722,
+        "downtime_yes_rows": 1
+      },
+      {
+        "id": "run_02",
+        "source_rows_including_header": [860, 1171],
+        "rows": 312,
+        "duration_h": 456.017,
+        "downtime_yes_rows": 0
+      },
+      {
+        "id": "run_03",
+        "source_rows_including_header": [9534, 10085],
+        "rows": 552,
+        "duration_h": 814.006,
+        "downtime_yes_rows": 0
+      },
+      {
+        "id": "run_04",
+        "source_rows_including_header": [10086, 10278],
+        "rows": 193,
+        "duration_h": 280.998,
+        "downtime_yes_rows": 21
+      }
+    ]
+  },
+  "benchmark": {
+    "script": "ml/rul_fmcg.py",
+    "report": "ml/rul_fmcg_report.json",
+    "label": "BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED",
+    "validation": "leave-one-run-out; last 20% of the held run's rows",
+    "rul_mae_h": 141.716,
+    "rul_rmse_h": 204.069,
+    "warning_24h_accuracy": 0.677,
+    "warning_24h_recall": 0.029,
+    "zero_baseline_mae_h": 69.185,
+    "zero_baseline_rmse_h": 106.164,
+    "no_warning_baseline_accuracy": 0.686,
+    "warning_basis": "24 h is a benchmark bin only; it is not an operator-approved alarm threshold.",
+    "honest_result": "The model is worse than the constant-zero regression baseline and the constant-no-warning accuracy baseline on this split."
+  },
+  "constraints": {
+    "our_motor": false,
+    "field_validated": false,
+    "runtime_model_changed": false,
+    "dashboard_telemetry_changed": false,
+    "licence_gaps_preserved": [
+      "[NEED: explicit FEMTO-ST licence]",
+      "[NEED: explicit XJTU-SY reuse licence]",
+      "[NEED: explicit CWRU licence; exact catalogue number]"
+    ]
+  }
+}

@@ -8,7 +8,7 @@
 - **Result:** Test accuracy **100.0% on the synthetic benchmark only** · single-window inference **26.19 ms on the training host** and **29.99 ms on the Raspberry Pi 4** (both measured) · full inject→alert timing not measured
 - **Evidence Files:** `ml/confusion_matrix.png`, `ml/roc_curves.png`, `ml/feature_importance.png`, `ml/model.joblib`, `ml/model_meta.json`, `tests/test_evaluation.py`
 
-> **Honesty note — read this before quoting any number.** The dataset is generated from published physics equations, not measured on a real motor. The 100% figure proves the pipeline separates the simulated classes; it is **not** evidence of 100% accuracy on real hardware. This system performs **fault detection and 4-class fault classification**, with rule-based maintenance advice; it does **not** estimate Remaining Useful Life (predict how many days until failure), which would require run-to-failure time-series measurements. The separate offline tool `ml/degradation_rul.py` can extrapolate a trend to an operator-supplied threshold, but its output is explicitly labelled **not field-validated** and is not used by the runtime or dashboard. A separate public benchmark on NASA C-MAPSS FD001 simulated turbofan data (§10) verifies the RUL pipeline on trusted run-to-failure data; it is **not our motor and not field validation**. `z_score` appears in the CSV but is intentionally **not** a Random Forest input: it is the Stage-1 SPC gate metric computed from `rms_dyn`, and the gate returns it in `gate_info`.
+> **Honesty note — read this before quoting any number.** The dataset is generated from published physics equations, not measured on a real motor. The 100% figure proves the pipeline separates the simulated classes; it is **not** evidence of 100% accuracy on real hardware. The headline public RUL evidence is now §15: the Zenodo FMCG induction-motor benchmark measured **141.716 h MAE**, **204.069 h RMSE** and **0.677 (67.7%)** 24-hour warning accuracy, below 80% and below two baselines. This system performs **fault detection and 4-class fault classification**, with rule-based maintenance advice; it does **not** estimate Remaining Useful Life (predict how many days until failure) for our rig, which would require run-to-failure time-series measurements from that rig. The separate offline tool `ml/degradation_rul.py` can extrapolate a trend to an operator-supplied threshold, but its output is explicitly labelled **not field-validated** and is not used by the runtime or dashboard. A separate public benchmark on NASA C-MAPSS FD001 simulated turbofan data (§10) verifies the RUL pipeline on trusted run-to-failure data; it is **not our motor and not field validation**. `z_score` appears in the CSV but is intentionally **not** a Random Forest input: it is the Stage-1 SPC gate metric computed from `rms_dyn`, and the gate returns it in `gate_info`.
 >
 > The request-by-request G12 answer register is `docs/G12_REQUEST_RESPONSE_REGISTER.md`; it states exactly which items are done locally and which are blocked on real measurements.
 
@@ -470,3 +470,63 @@ baseline reporting, CLI reproducibility and honest label. Reproduce with:
 python3 ml/nasa_ims_features.py --zip /path/IMS.zip --out data/nasa_ims/failed_bearings.csv
 python3 ml/rul_nasa_ims.py --report /tmp/rul_nasa_ims_report.json
 ```
+
+## 15. Headline public RUL benchmark — FMCG induction motor (not our motor)
+
+The user asked to replace the synthetic headline claim with a public real
+induction-motor dataset that has an explicit RUL. The adopted source is
+[Zenodo DOI `10.5281/zenodo.15637023`](https://zenodo.org/records/15637023),
+licence **CC BY 4.0**, companion paper DOI `10.35784/acs_7299`. The paper states
+that RUL is the number of hours a 160 kW three-phase induction motor runs from
+startup to shutdown or retirement, from SAP Plant Maintenance history combined
+with accelerometer readings. This is an industrial benchmark, not our rig.
+
+| Item | Value |
+|---|---|
+| Vendored source | `data/fmcg_induction_rul/raw.csv` |
+| Source MD5 | `52df07317901bdb7647c86df479d06c6` (matches Zenodo metadata) |
+| Vendored SHA-256 | `792014186c980d8f7efd2b0fd3abe24667a9210230864e15c2396ed33cb41c27` |
+| Data rows | 14,828; semicolon-delimited, `cp1252` |
+| Complete RUL-to-zero runs | 582 / 312 / 552 / 193 rows |
+| Excluded blocks | RUL never reaches zero; labels are not rewritten |
+| Report | `ml/rul_fmcg_report.json` |
+
+The evaluator splits the source wherever RUL increases, keeps only strictly
+time-ordered blocks with at least 100 rows, at least 20 decreasing RUL steps,
+maximum RUL at least 50 h and minimum RUL 0 h. Features at row *i* use only rows
+0..i: elapsed hours plus trailing five-row mean and standard deviation for
+vibration, temperature, stator frequency, speed, slip, torque and condition
+states. A median imputer and a 200-tree Random Forest (depth 12, seed 42) are
+fitted only on the other runs. The last 20% of the held run (334 rows total) is
+scored; `RUL <= 24 h` is the warning label, explicitly a benchmark bin, not an
+operator alarm threshold.
+
+| Result | Value |
+|---|---:|
+| RUL MAE | **141.716 h** |
+| RUL RMSE | **204.069 h** |
+| 24-hour warning accuracy | **0.677 (67.7%)** |
+| 24-hour warning precision / recall / F1 | 0.333 / 0.029 / 0.053 |
+| Confusion counts (TP / FP / FN / TN) | 3 / 6 / 102 / 223 |
+| Constant-zero baseline MAE / RMSE | 69.185 h / 106.164 h |
+| Constant-median baseline MAE / RMSE | 254.993 h / 263.054 h |
+| Constant-no-warning baseline accuracy | 0.686 |
+
+The measured accuracy is **below 80%**, and the model is worse than both the
+zero regression baseline and the no-warning accuracy baseline. All results are
+retained. `tests/test_rul_fmcg.py` verifies source hashes, run selection,
+causal features, run-disjoint folds, the committed report, the CLI and the
+honest documentation. Reproduce with:
+
+```
+python3 ml/rul_fmcg.py --report ml/rul_fmcg_report.json
+```
+
+**Scope limit.** `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`. The source
+has no airborne acoustic channel and no four-class fault label for our runtime
+model. No result here is hours-to-failure for the capstone motor; field RUL
+still needs `[NEED: run-to-failure series with timestamps and failure labels
+from our rig]`. The deployed classifier, dashboard readings, Firebase state and
+Pi files are unchanged. Other licence gaps remain exactly
+`[NEED: explicit FEMTO-ST licence]`, `[NEED: explicit XJTU-SY reuse licence]`
+and `[NEED: explicit CWRU licence; exact catalogue number]`.

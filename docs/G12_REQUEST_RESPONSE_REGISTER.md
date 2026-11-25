@@ -23,7 +23,7 @@
 | 8 | تشغيل ملفات الراسبري تلقائياً وهل كل ملف مرفوع يعمل؟ | ✅ تم | §8 يشرح systemd والـ enable عند الإقلاع ويوضح أن ليس كل ملف يعمل | §8 أدناه; `edge/*.service`; `docs/PI_DEPLOYMENT_EVIDENCE.md:5-13` | لا شيء محلياً |
 | 9 | تأكيد إزالة أوبشنز الحالات الأربعة وبيانات الـ simulation | ✅ تم | أُزيلت أدوات المحاكاة من الداشبورد، ويوجد اختبار يمنع رجوعها | `public/index.html`; `tests/test_evaluation.py::TeamFollowUpTest::test_dashboard_has_no_simulation_controls` | لا شيء محلياً |
 | 10 | تجهيز جداول النتائج الإجمالية قبل المعرض | ✅ تم | §10 يحدد أماكن جداول Totals وطريقة إعادة إنتاجها | §10 أدناه; `ml/ai_report.md` §5.4–§5.5; `docs/CAPSTONE_MASTER_HANDBOOK.md` §5.3, §10 | لا شيء محلياً؛ النتائج صناعية فقط |
-| 11 | التيست الحقيقي على موتور ثم prediction/RUL (لينكي MathWorks) | ◐ جزئي | كُتب بروتوكول الاختبار؛ أُضيف benchmark على NASA C-MAPSS FD001 (محاكاة) وbenchmarks على محامل حقيقية من PRONOSTIA/FEMTO-ST وXJTU-SY (15 مساراً) وNASA IMS (أربعة محامل فاشلة موثّقة) مع validation بفصل المحمل؛ الداشبورد يعرض رقم XJTU-SY موسوماً `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`؛ مسار جاهز لموتورنا عبر `ml/rul_from_rig.py` لكن الـ RUL الميداني لسه متوقف على البيانات | §11 أدناه; `docs/REAL_MOTOR_READINESS.md`; `docs/DATA_PROVENANCE_LICENSES.md`; `ml/ai_report.md` §10–§14; `data/pronostia/README.md`; `data/xjtu_sy_mendeley/README.md`; `data/nasa_ims/README.md` | `[NEED: motor rig access, calibrated raw readings, run-to-failure series from our rig]`; `[NEED: operator-accepted failure endpoint and reviewed metric report]` |
+| 11 | التيست الحقيقي على موتور ثم prediction/RUL (لينكي MathWorks) | ◐ جزئي | كُتب بروتوكول الاختبار؛ العنوان الرئيسي دلوقتي benchmark على **موتور حقيقي 160 kW ثلاثي الأطوار** من Zenodo DOI `10.5281/zenodo.15637023` برخصة CC BY 4.0 وRUL بالساعات: **MAE 141.716 h** و**RMSE 204.069 h** ودقة إنذار 24 ساعة **0.677 (67.7%)** — أقل من 80% وأسوأ من baseline صفر/no-warning، ويتقال كما هو. benchmarks سابقة على PRONOSTIA وXJTU-SY وNASA IMS وC-MAPSS لسه موسومة؛ الداشبورد يعرض كلها تحت `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`؛ مسار جاهز لموتورنا عبر `ml/rul_from_rig.py` لكن الـ RUL الميداني لسه متوقف على البيانات | §11 أدناه; `docs/REAL_MOTOR_READINESS.md`; `docs/DATA_PROVENANCE_LICENSES.md`; `ml/ai_report.md` §10–§15; `data/fmcg_induction_rul/README.md`; `data/pronostia/README.md`; `data/xjtu_sy_mendeley/README.md`; `data/nasa_ims/README.md` | `[NEED: motor rig access, calibrated raw readings, run-to-failure series from our rig]`; `[NEED: operator-accepted failure endpoint and reviewed metric report]` |
 | 12 | الرد سريعاً لأن الشغل مكمل «بكرة» | — لا ينطبق | لا يوجد تاريخ قابل للتحقق؛ اعتُبر كأولوية لا كطلب هندسي | `/tmp/opencode/textinstinct_chat.txt:1258-1260` | `[NEED: actual exhibition date if a deadline must be quoted]` |
 | 13 | مخرجات أكثر تدرّجاً + مكان المشكلة وتكلفتها ومدة بقاء الموتور | ◐ جزئي | يوجد `response_plan` بأربع أولويات وإجراءات، لكن المدد ثابتة لكل فئة وليست تنبؤاً؛ لا تكلفة ولا زمن بقاء مقيسان. مسار `ml/rul_from_rig.py` جاهز لاستبدال ذلك بـ RUL متعلّم بعد بيانات ريجنا | `ml/rf_predictor.py:37-72`; `edge/edge_daq.py:604`; `ml/ai_report.md` §5.5; `docs/REAL_MOTOR_READINESS.md` | `[NEED: degradation curve, part prices, downtime cost and failure labels]` |
 
@@ -219,6 +219,20 @@ restating any resource-saving claim]`
   لموتورنا، ونهاية المسار المنشورة **مش** تأكيد مشغّل. بوابة NASA بتذكر
   `https://www.usa.gov/government-works` ومعروضة كمان كـ `other-license-specified`
   والرخصتين مقولتين كما هما في `docs/DATA_PROVENANCE_LICENSES.md`.
+- وبناءً على طلب استبدال ادعاء الـ 100% الصناعي بموتور حقيقي وRUL إلزامي، جُلب
+   سجل **FMCG لموتور حقيقي 160 kW ثلاثي الأطوار** من Zenodo DOI
+   `10.5281/zenodo.15637023` برخصة **CC BY 4.0** وورقة DOI `10.35784/acs_7299`
+   تعرّف RUL بعدد ساعات التشغيل من البدء حتى الإيقاف/التقاعد. الملف الأصلي
+   `data/fmcg_induction_rul/raw.csv` مطابق لـ MD5 المنشور، و`manifest.json` يحفظ
+   الهاشات وأربعة مسارات تنتهي بـ RUL=0 (582/312/552/193 صفاً).
+   `ml/rul_fmcg.py` يبني خصائص causal ويحجز مساراً كاملاً في كل اختبار،
+   فجاء على آخر 20% (334 صفاً): **MAE 141.716 ساعة** و**RMSE 204.069 ساعة**
+   ودقة إنذار `RUL <= 24 h` **0.677 (67.7%)** مع recall **0.029**.
+   الـ baseline بصفر جاء **69.185/106.164 ساعة** والـ no-warning **0.686**،
+   يعني الموديل أسوأ ويُقال الرقم الحقيقي حتى لو تحت 80%. الساعات دي لموتور
+   عام **مش ساعات بقاء لموتورنا**، والـ 24 ساعة bin لتقييم benchmark **مش**
+   حد إنذار معتمد من مشغّل. التقرير `ml/rul_fmcg_report.json` موسوم
+   `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`.
 - استجابةً لطلب «لو عندنا الموتور، المشروع هيبقى predictive maintenance كامل؟»
   أُضيف مسار جاهز على الجهاز المضيف فقط: `ml/rul_from_rig.py` يقرأ CSV من
   `edge/edge_daq.py` بعد إضافة `failure_timestamp` من المشغّل، يبني نوافذ

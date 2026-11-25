@@ -7,6 +7,7 @@ motor. Where an explicit licence is not published, the gap is written as
 
 | Source | What the official source states | Licence evidence | Limit |
 |---|---|---|---|
+| **FMCG induction-motor RUL dataset** — [Zenodo DOI 10.5281/zenodo.15637023](https://zenodo.org/records/15637023) | 160 kW three-phase induction motors in an FMCG company; accelerometer vibration, electrical/torque readings and an explicit `RUL (jam)` column. Companion paper DOI `10.35784/acs_7299` defines RUL as operating hours from startup to shutdown or retirement from SAP Plant Maintenance history. `data/fmcg_induction_rul/raw.csv` matches the published MD5 `52df07317901bdb7647c86df479d06c6`. | Zenodo metadata states **CC BY 4.0**; licence URL `https://creativecommons.org/licenses/by/4.0/`. This licence is explicit and is not extended to any other dataset. | Not our motor. The 24 h warning bin is a benchmark choice, not operator sign-off; the endpoint is a source RUL label, not a field-confirmed failure on our rig. |
 | **XJTU-SY bearing datasets** — [official page](https://biaowang.tech/xjtu-sy-bearing-datasets), [author mirror](https://github.com/WangBiaoXJTU/xjtu-sy-bearing-datasets) | 15 complete run-to-failure bearings from Xi'an Jiaotong University and Changxing Sumyoung Technology; three conditions; vibration only; "publicly available and anyone can use them to validate prognostics algorithms". Publications are asked to cite Wang, Lei, Li & Li, IEEE Trans. Reliability 69(1), 401-412, 2020, DOI `10.1109/TR.2018.2882682`. | Fetched explicit public-use permission: "anyone can use them to validate prognostics algorithms", with citation requested. `[NEED: SPDX-style licence identifier on the original page]` — no licence name is published. | Not our motor. No temperature and no acoustic channel. End of life is dataset-defined, not operator-confirmed on our rig. |
 | **Derived XJTU-SY feature record** — [Mendeley Data DOI 10.17632/mpn45f4gxc.1](https://data.mendeley.com/datasets/mpn45f4gxc/1) | `VelFeaturesB_1..15.mat`; 54 velocity-domain features per one-minute snapshot, derived from the original XJTU-SY CSVs. Files and hashes are checked in `data/xjtu_sy_mendeley/manifest.json`. | **CC BY 4.0** on the Mendeley record. | This is a derived repository, not the original publisher. The CC BY 4.0 grant applies to this record; it does not silently change the original dataset's terms. |
 | **Public combined copy of XJTU-SY + PRONOSTIA** — [figshare DOI 10.6084/m9.figshare.30595484.v1](https://doi.org/10.6084/m9.figshare.30595484.v1) | Figshare record titled "The XJTU-SY Dataset and the IEEE PHM 2012 Bearing Dataset (PRONOSTIA)", published 2025-11-12; API reports licence **CC BY 4.0**. | `https://api.figshare.com/v2/articles/30595484` returns `license.name = "CC BY 4.0"`. | A third-party public copy, useful as licence evidence for that copy only; not a replacement for the original publisher's terms. |
@@ -27,13 +28,20 @@ motor. Where an explicit licence is not published, the gap is written as
    choice, honest for review) or hide the unresolved rows from the hosted table.
    Hiding them is an alternative, not a fix.
 
+The short tokens used elsewhere in the repository are kept verbatim:
+`[NEED: explicit FEMTO-ST licence]`, `[NEED: explicit XJTU-SY reuse licence]` and
+`[NEED: explicit CWRU licence; exact catalogue number]`.
+
 ## How this evidence is used
 
-- `ml/rul_xjtu_sy.py` produces a labelled public-bearing benchmark only.
+- `ml/rul_fmcg.py` produces the headline labelled public induction-motor RUL
+  benchmark with explicit CC BY 4.0 metadata; `ml/rul_xjtu_sy.py` and the other
+  scripts remain separate public benchmarks only.
 - `docs/REAL_MOTOR_READINESS.md` keeps the exact contract and operator-owned
   failure endpoint required for any claim about our own rig.
-- The hosted dashboard shows the XJTU-SY benchmark beside a `BENCHMARK / NOT
-  OUR MOTOR / NOT FIELD-VALIDATED` label and this evidence panel.
+- The hosted dashboard shows the FMCG, XJTU-SY, PRONOSTIA and NASA IMS results
+  beside a `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED` label and this
+  evidence panel.
 
 No benchmark value is written to the live telemetry path, and no public
 licence is treated as acceptance of a failure on our motor.

@@ -466,3 +466,20 @@ model and Firebase state were not changed by this sync. The user wording
 and review pack; missing, null and stale dashboard values remain `NO DATA`,
 `AWAITING DATA` or `NOT REPORTED`. The unresolved licence `NEED` markers are
 still visible and no field-validated RUL claim is made.
+
+## FMCG induction-motor RUL benchmark — repository only, no Pi change
+
+A subsequent repository-only change added `data/fmcg_induction_rul/` and
+`ml/rul_fmcg.py` for the headline public RUL benchmark. The vendored Zenodo CSV
+matches published MD5 `52df07317901bdb7647c86df479d06c6`, with explicit
+CC BY 4.0 metadata and paper DOI `10.35784/acs_7299`. Four RUL-to-zero runs were
+evaluated leave-one-run-out on the last 20% of each held run: MAE **141.716 h**,
+RMSE **204.069 h** and 24-hour warning accuracy **0.677 (67.7%)**, with the
+constant-zero baseline better at **69.185 / 106.164 h** and the no-warning
+baseline better at **0.686**. These are measured benchmark values, not
+hours-to-failure for our motor and not operator alarm thresholds.
+
+No Pi sync, hosting deploy, runtime service, model, calibration artifact or
+Firebase state was changed by this FMCG step. The device-only telemetry rule
+`REMOVE SIMULATOR, ALL FROM DEVICE` and the `NO DATA` / `AWAITING DATA` /
+`NOT REPORTED` rendering rules remain exactly as verified above.

@@ -67,6 +67,21 @@
   Reliance evidence without inventing missing facts.
 - C9 Public dataset end-of-life labels are not operator acceptance on our rig;
   no benchmark value may be called hours-to-failure for our motor.
+- R34 Replace the headline synthetic accuracy claim with a public real
+  induction-motor RUL dataset that has an explicit RUL label; report the
+  measured accuracy/error even if it is below 80%.
+- R35 Vendor the Zenodo FMCG 160 kW three-phase induction-motor CSV with its
+  published MD5, SHA-256, DOI, explicit CC BY 4.0 metadata and companion-paper
+  RUL definition; do not invent a licence for any other source.
+- R36 Evaluate four complete RUL-to-zero runs with causal trailing features and
+  leave-one-run-out validation; report MAE/RMSE in hours plus 24-hour warning
+  accuracy/precision/recall/F1 and every baseline honestly.
+- R37 Show the measured FMCG result on the hosted benchmark panel and in README,
+  AI report, G12 register, Arabic review pack, provenance, file map and Pi
+  evidence log under `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`.
+- C10 Keep `REMOVE SIMULATOR, ALL FROM DEVICE`, device-only telemetry wording,
+  light-mode scope, calibration `REVIEW / UNVERIFIED`, all `[NEED: ...]` tokens
+  and the deployed runtime model unchanged; do not deploy or sync to the Pi.
 
 ## Checklist
 
@@ -104,3 +119,8 @@
 - [x] P31 Add a second trusted public run-to-failure benchmark (NASA IMS bearings, University of Cincinnati via NASA Open Data) with source hash, label, tests and honest metrics; keep NOT OUR MOTOR / NOT FIELD-VALIDATED
 - [x] P32 Fetch and quote explicit licence/public-use evidence for XJTU-SY, FEMTO-ST, CWRU and NASA IMS; keep `[NEED: ...]` for SPDX names and the Reliance catalogue number
 - [x] P33 User wording: "REMOVE SIMULATOR, ALL FROM DEVICE" — retire `edge/stream_live.py` so no simulator can write RTDB, label hosted telemetry as device-only (unknown/stale = `NO DATA`), guard with tests, then commit/push, deploy and apply to the Pi with backups
+- [x] P34 Verify and vendor the Zenodo FMCG induction-motor CSV with hashes, manifest, DOI, CC BY 4.0 metadata and paper RUL definition
+- [x] P35 Build and run `ml/rul_fmcg.py`; commit the measured report (MAE 141.716 h, RMSE 204.069 h, 24 h warning accuracy 0.677) with all baselines
+- [x] P36 Add tests for source hashes, RUL-to-zero run selection, causal features, run-disjoint scoring, report equality and CLI reproducibility
+- [x] P37 Update hosted panel, guide, README, AI report, G12 register, Arabic review pack, provenance, file map and Pi evidence with the labelled real-motor benchmark
+- [x] P38 Remove the unused Mehran exploration script, rerun full suite and `git diff --check`, commit and push; no deployment or Pi sync
