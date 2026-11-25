@@ -1278,7 +1278,7 @@
     const GATE_TEXT_IDLE = "Gate status from the last packet: NO DATA. The state above comes from fixed threshold rules on the Pi. The thresholds are not yet calibrated against this rig.";
     const RF_TEXT_IDLE = "Class from the last packet: NO DATA. The classifier is trained on generated data and has not been tested on real faults. No probability or confidence is shown, and it gives no remaining-life estimate.";
 
-    function setGates(gateText, rfText, knownState, isStale) {
+    function setGates(gateText, rfText, knownState, isStale, rfExecuted) {
       const pill1 = document.getElementById("pill-stage1");
       const pill2 = document.getElementById("pill-stage2");
       if (!knownState) {
@@ -1296,13 +1296,15 @@
         pill1.className = "gate-badge-tag " + (knownState === "Healthy" ? "active" : "dormant");
         pill1.innerText = knownState === "Healthy" ? "NO BREACH" : "RULE BREACHED";
         pill2.className = "gate-badge-tag pending";
-        pill2.innerText = gated ? "NOT RUN" : "UNVALIDATED";
+        pill2.innerText = rfExecuted === true ? "RAN, UNVALIDATED" : (rfExecuted === false ? "NOT RUN" : "NOT REPORTED");
       }
       document.getElementById("txt-gate").innerText = "Gate status from the last packet: " + (gateText || "NO DATA") + ". The state above comes from fixed threshold rules on the Pi. The thresholds are not yet calibrated against this rig.";
-      document.getElementById("txt-rf").innerText = (gated
-        ? "Random Forest was not run: the Stage 1 gate passed, so the packet's class is the gate's default, not a prediction. "
-        : "Class from the last packet: " + (rfText || "NO DATA") + ". ")
-        + "The classifier is trained on generated data and has not been tested on real faults. No probability or confidence is shown, and it gives no remaining-life estimate.";
+      const rfTail = "The classifier is trained on generated data and has not been tested on real faults. No probability or confidence is shown, and it gives no remaining-life estimate.";
+      let rfLead;
+      if (rfExecuted === true) rfLead = "Random Forest ran on this packet (class " + (rfText || "unknown") + "). Its class is used only when a threshold rule flags a warning or fault. ";
+      else if (rfExecuted === false) rfLead = "Random Forest was not run on this packet; the class shown is a default, not a prediction. ";
+      else rfLead = "This Pi build does not report whether Random Forest ran, so the class shown (" + (rfText || "NO DATA") + ") is not confirmed as a prediction. ";
+      document.getElementById("txt-rf").innerText = rfLead + rfTail;
     }
 
     function showAwaitingState() {
@@ -1349,10 +1351,18 @@
       lastData = data;
       const ageSec = dataTs === null ? null : Math.max(0, Date.now() / 1000 - dataTs);
       const isStaleTelemetry = ageSec === null || ageSec > 20;
-      const knownState = state && ["Healthy", "Warning", "Fault"].includes(state) ? state : null;
+      const invalidInput = data.input_valid === false || state === "Unknown";
+      const knownState = !invalidInput && state && ["Healthy", "Warning", "Fault"].includes(state) ? state : null;
       document.getElementById("main-status-card").dataset.stale = isStaleTelemetry ? "1" : "0";
       document.querySelector(".dashboard-layout").classList.toggle("is-stale", isStaleTelemetry);
 
+      if (invalidInput) {
+        const card = document.getElementById("main-status-card");
+        card.className = "scada-hero-panel awaiting";
+        document.getElementById("lamp-icon").className = "fa-solid fa-circle-question";
+        document.getElementById("status-title").innerText = "Sensor input invalid";
+        document.getElementById("status-sub").innerText = "A sensor value in the last packet was not a valid number. No health state is shown until valid readings return.";
+      }
       // Only a classified packet can change the state lamp. An old packet never shows a health state.
       if (knownState) {
         const card = document.getElementById("main-status-card");
@@ -1388,7 +1398,7 @@
         }
       }
 
-      setGates(textOrNull(data.ai?.gate_status), textOrNull(data.ai?.predicted_class), knownState, isStaleTelemetry);
+      setGates(textOrNull(data.ai?.gate_status), textOrNull(data.ai?.predicted_class), knownState, isStaleTelemetry, typeof data.rf_executed === 'boolean' ? data.rf_executed : (typeof data.ai?.rf_executed === 'boolean' ? data.ai.rf_executed : null));
 
       if (seq !== null) document.getElementById("badge-seq").innerText = "#" + seq;
       if (uptime !== null) {
