@@ -1380,8 +1380,8 @@
           card.className = "scada-hero-panel";
           if (knownState === "Healthy") {
             icon.className = "fa-solid fa-check";
-            title.innerText = displayFault;
-            sub.innerText = "No threshold rule breached in the last packet";
+            title.innerText = "No rule triggered";
+            sub.innerText = "No threshold rule fired in the last packet. This is a rule result, not validated motor health.";
           } else if (knownState === "Warning") {
             card.classList.add("warning");
             icon.className = "fa-solid fa-triangle-exclamation";
