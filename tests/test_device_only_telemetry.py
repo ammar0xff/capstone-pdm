@@ -78,9 +78,9 @@ class DeviceOnlyTelemetryTest(unittest.TestCase):
                 with self.subTest(path=os.path.basename(path), token=token):
                     self.assertNotIn(token, text)
 
-    def test_hosted_dashboard_states_device_only_source(self):
+    def test_hosted_dashboard_has_no_source_banner(self):
         text = read(os.path.join(PUBLIC, "index.html"))
-        self.assertIn("DEVICE TELEMETRY ONLY", text)
+        self.assertNotIn("DEVICE TELEMETRY ONLY", text)
         self.assertIn('id="badge-seq">NO DATA', text)
 
 

@@ -59,7 +59,8 @@
 | 100% صناعي فقط | `ml/ai_report.md` §5، `tests/test_evaluation.py` |
 | RUL على موتور حقيقي 160 kW (مش موتورنا) | `data/fmcg_induction_rul/`، `ml/rul_fmcg.py`، `ml/rul_fmcg_report.json`، `tests/test_rul_fmcg.py` |
 | Firebase/الداشبورد | `docs/FIREBASE_SETUP.md`، `docs/PI_DEPLOYMENT_EVIDENCE.md` |
-| RUL على C-MAPSS (محاكاة) | `data/cmapss/`، `ml/train_rul_cmapss.py`، `tests/test_rul_cmapss.py` |
+| RUL مستمر على C-MAPSS (محاكاة) | `data/cmapss/`، `ml/train_rul_cmapss.py`، `tests/test_rul_cmapss.py` |
+| إنذار RUL فوق 80% على C-MAPSS (محاكاة، 30 دورة، تسميات RUL صريحة، مش موتورنا) | `ml/rul_cmapss_warning.py`، `ml/rul_cmapss_warning_report.json`، `tests/test_rul_cmapss_warning.py`؛ الدقة 0.940 مقابل baseline 0.750 |
 | RUL على محامل حقيقية | `data/pronostia/`، `ml/rul_pronostia.py`، `tests/test_rul_pronostia.py` |
 | RUL على محامل XJTU-SY (15 مساراً، مش موتورنا) | `data/xjtu_sy_mendeley/`، `ml/rul_xjtu_sy.py`، `ml/rul_xjtu_sy_report.json`، `tests/test_rul_xjtu_sy.py` |
 | RUL على NASA IMS (4 حالات فشل موثّقة، مش موتورنا) | `data/nasa_ims/`، `ml/rul_nasa_ims.py`، `ml/rul_nasa_ims_report.json`، `tests/test_rul_nasa_ims.py` |
@@ -79,6 +80,13 @@
 محامل PRONOSTIA وXJTU-SY وNASA IMS لكل منها ريج وظروف مختلفة. لا علاقة لأي
 رقم بموتورنا أو حساساتنا. `[NEED: run-to-failure series with timestamps and
 failure labels from our rig]`.
+
+**س: فين نتيجة RUL فوق 80%؟**
+موجودة كـ **إنذار RUL خلال 30 دورة** على بيانات NASA C-MAPSS FD001 المحاكاة،
+بتسميات RUL صريحة: دقة **0.940 (94.0%)** على 100 وحدة في آخر دورة مقابل
+baseline **0.750**، ومتوسط خمس folds لا تتشارك الوحدات **0.9705**. مش دقة RUL
+مستمرة، مش موتورنا، مش عتبة إنذار للمشغّل ومش validation ميداني. نتيجة RUL على
+موتور حقيقي (FMCG) لسه **67.7%** تحت 80% ومُعلَنة كما هي؛ لا تعديل ولا انتقاء.
 
 **س: طالما مفيش موتور، إيه اللي جاهز عشان نكمل predictive maintenance؟**
 المسار كامل على الورق والكود: `ml/rul_from_rig.py` يستقبل CSV فيه تسع خصائص الـ runtime و`failure_timestamp` يحدّده المشغّل، يبني نوافذ causal، يقيّم بفصل الـ run كاملاً، ويحفظ نموذجاً للتنبؤ. لسه محتاج `[NEED: run-to-failure series with timestamps and failure labels from our rig]` و`[NEED: operator-accepted failure endpoint and reviewed metric report]` قبل أي كلام ميداني.

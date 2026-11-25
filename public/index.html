@@ -943,7 +943,6 @@
         </div>
         
         <div style="font-size: 11px; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 12px;">
-          <span>SOURCE: <b class="font-mono" style="color: var(--text-main);">DEVICE TELEMETRY ONLY</b></span>
           <span>SEQ: <b class="font-mono" style="color: var(--text-main);" id="badge-seq">NO DATA</b></span>
           <span>UPTIME: <b class="font-mono" style="color: var(--text-main);" id="badge-uptime">NO DATA</b></span>
         </div>
@@ -994,8 +993,6 @@
         <div class="protocol-advice-box">
           <i class="fa-solid fa-shield-halved"></i>
           <div>
-            <b style="color: var(--text-main); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em;">Operational Protocol:</b>
-            <span id="txt-advice" style="margin-left: 4px;">Awaiting classified telemetry.</span>
             <div class="decision-meta" aria-label="Operator decision from the classified fault">
               <span class="decision-chip" id="txt-decision-priority">AWAITING DATA</span>
               <span class="decision-field"><small>Timeframe</small><span class="font-mono" id="txt-decision-timeframe">NO DATA</span></span>
@@ -1008,10 +1005,6 @@
           <div class="kpi-cell">
             <div class="kpi-label">AI Confidence</div>
             <div class="kpi-value font-mono" id="badge-ai-conf">NO DATA</div>
-          </div>
-          <div class="kpi-cell">
-            <div class="kpi-label">SPC Gate</div>
-            <div class="kpi-value font-mono" id="badge-gate-status" style="font-size: 13px; color: var(--text-muted);">AWAITING DATA</div>
           </div>
         </div>
       </section>
@@ -1295,7 +1288,6 @@
             Electric induction motor: healthy, inner race, rolling element and
             outer race. These four bearing-condition classes are <b>not</b> the deployed runtime classes,
             and this is <b>not</b> RUL or a measurement from the capstone rig.
-            from the capstone rig.
           </p>
           <div class="benchmark-metrics">
             <div class="benchmark-metric">
@@ -1347,6 +1339,84 @@
             Full evidence: <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/ml/diagnosis_cwru.py" target="_blank">ml/diagnosis_cwru.py</a>
             &middot; <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/tests/test_diagnosis_cwru.py" target="_blank">tests/test_diagnosis_cwru.py</a>
             &middot; <a href="https://engineering.case.edu/bearingdatacenter/welcome" target="_blank">CWRU Bearing Data Center</a>.
+          </p>
+        </div>
+      </section>
+
+      <!-- Separate labelled public RUL warning benchmark: simulated turbofan, never live telemetry, never our motor -->
+      <section class="benchmark-panel" aria-label="Public simulated-turbofan RUL warning benchmark and data provenance">
+        <div>
+          <h2>RUL warning benchmark <span class="font-mono">/ NASA C-MAPSS FD001</span></h2>
+          <div class="benchmark-warning">
+            <span>BENCHMARK</span>
+            <span>SIMULATED TURBOFAN</span>
+            <span>NOT OUR MOTOR</span>
+            <span>NOT FIELD-VALIDATED</span>
+          </div>
+          <p>
+            Binary <b>30-cycle RUL warning</b> from explicit run-to-failure RUL
+            labels on NASA's public simulated turbofan benchmark: one decision
+            per unit's final recorded cycle, plus unit-disjoint folds over all
+            training windows. This is <b>not</b> continuous RUL accuracy,
+            <b>not</b> an induction-motor result, <b>not</b> a deployed alarm
+            threshold and <b>not</b> validation on our rig.
+          </p>
+          <div class="benchmark-metrics">
+            <div class="benchmark-metric">
+              <strong>94.0%</strong>
+              <small>last-cycle warning accuracy · 0.940</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>75.0%</strong>
+              <small>majority baseline · 0.750</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>0.9524</strong>
+              <small>warning precision · 100 units</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>0.800</strong>
+              <small>warning recall · 25 positive units</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>97.05%</strong>
+              <small>mean unit-disjoint CV accuracy · 0.9705</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>82.48%</strong>
+              <small>mean CV majority baseline · 0.8248</small>
+            </div>
+          </div>
+          <p style="margin-top:10px">
+            The 30-cycle horizon is a published short-horizon maintenance-planning
+            convention, fixed before scoring; no threshold was chosen from the
+            test result. The separate real-induction-motor FMCG RUL result below
+            remains <b>below 80%</b> and is shown unchanged.
+          </p>
+        </div>
+        <div>
+          <h2>Source &amp; licence evidence</h2>
+          <table class="provenance-table">
+            <thead>
+              <tr><th>Source</th><th>Evidence</th><th>Limit</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>NASA C-MAPSS FD001</th>
+                <td>Zenodo DOI <a href="https://zenodo.org/records/15346912" target="_blank">10.5281/zenodo.15346912</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>; three MD5-checked raw files; report <span class="font-mono">ml/rul_cmapss_warning_report.json</span>.</td>
+                <td>Simulated turbofan, not our motor and not field validation. No runtime or Firebase value is taken from this benchmark.</td>
+              </tr>
+              <tr>
+                <th>Fixed inputs</th>
+                <td class="font-mono">259f340bac32ce6fa8894815600fa757 · 62316d1dd70f88a9a43a1e2690765437 · 8f4a8b3d2692b2f7d8e72b344927bf4b</td>
+                <td>Five grouped folds on train; NASA's withheld last-cycle RUL labels used only for scoring.</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="margin-top:10px">
+            Full evidence: <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/ml/rul_cmapss_warning.py" target="_blank">ml/rul_cmapss_warning.py</a>
+            &middot; <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/tests/test_rul_cmapss_warning.py" target="_blank">tests/test_rul_cmapss_warning.py</a>
+            &middot; <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/data/cmapss/README.md" target="_blank">data/cmapss/README.md</a>.
           </p>
         </div>
       </section>
@@ -1704,8 +1774,6 @@
     }
 
     function setPendingGates() {
-      document.getElementById("badge-gate-status").innerText = "AWAITING DATA";
-      document.getElementById("badge-gate-status").style.color = "var(--text-muted)";
       for (const id of ["step-stage1", "step-stage2"]) {
         document.getElementById(id).classList.remove("active-gate");
       }
@@ -1722,7 +1790,6 @@
       document.getElementById("lamp-icon").className = "fa-solid fa-circle-question";
       document.getElementById("status-title").innerText = "Awaiting telemetry";
       document.getElementById("status-sub").innerText = "No classified packet received from the Raspberry Pi mirror yet";
-      document.getElementById("txt-advice").innerText = "Awaiting classified telemetry.";
       document.getElementById("txt-decision-priority").innerText = "AWAITING DATA";
       document.getElementById("txt-decision-priority").className = "decision-chip";
       document.getElementById("txt-decision-timeframe").innerText = "NO DATA";
@@ -1772,7 +1839,6 @@
       const slope = firstFinite(data.slope, data.temperature?.slope_c_per_min);
       const sound_db = firstFinite(data.sound_db, data.acoustic?.db_spl);
       const zcr = firstFinite(data.zcr, data.acoustic?.zcr);
-      const advice = textOrNull(data.advice);
       const responsePlan = data.ai?.response_plan || null;
       const seq = firstFinite(data.seq);
       const uptime = firstFinite(data.uptime_s);
@@ -1826,8 +1892,6 @@
           ? (uptime / 60).toFixed(1) + "m"
           : uptime.toFixed(0) + "s";
       }
-      if (advice) document.getElementById("txt-advice").innerText = advice;
-
       // Post-classification operator decision from the edge AI packet.
       const priorityEl = document.getElementById("txt-decision-priority");
       const timeframeEl = document.getElementById("txt-decision-timeframe");
@@ -1849,14 +1913,11 @@
       // Stage gating is only asserted when the packet has a recognised state.
       if (knownState) {
         const isStage2 = knownState !== "Healthy" || Boolean(data.ai?.gate_status?.includes("Stage 2"));
-        const gateBadge = document.getElementById("badge-gate-status");
         const step1 = document.getElementById("step-stage1");
         const step2 = document.getElementById("step-stage2");
         const pill1 = document.getElementById("pill-stage1");
         const pill2 = document.getElementById("pill-stage2");
         if (isStage2) {
-          gateBadge.innerText = "STAGE 2 (RF ACTIVE)";
-          gateBadge.style.color = "var(--status-alarm)";
           step1.classList.remove("active-gate");
           step2.classList.add("active-gate");
           pill1.className = "gate-badge-tag dormant";
@@ -1864,8 +1925,6 @@
           pill2.className = "gate-badge-tag active";
           pill2.innerText = "INFERENCE ACTIVE";
         } else {
-          gateBadge.innerText = "STAGE 1 (SPC OK)";
-          gateBadge.style.color = "var(--status-ok)";
           step1.classList.add("active-gate");
           step2.classList.remove("active-gate");
           pill1.className = "gate-badge-tag active";
@@ -2028,7 +2087,7 @@
         banner.className = "edge-alert-ribbon offline";
         bannerIcon.className = "fa-solid fa-plug-circle-xmark";
         bannerTitle.innerText = "Raspberry Pi Edge Rig Offline";
-        bannerDesc.innerText = `No updates received since ${timeAgoStr} (Frame #${seqLabel}). Chart buffer frozen; waiting for real telemetry.`;
+        bannerDesc.innerText = `No updates received since ${timeAgoStr} (Frame #${seqLabel}). Charts are holding the last received packet; waiting for fresh telemetry.`;
       }
     }
 

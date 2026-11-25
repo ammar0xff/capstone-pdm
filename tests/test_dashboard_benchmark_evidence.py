@@ -15,6 +15,7 @@ DASHBOARD = PAGES["index"]
 REPORT = os.path.join(ROOT, "ml", "rul_xjtu_sy_report.json")
 FMCG_REPORT = os.path.join(ROOT, "ml", "rul_fmcg_report.json")
 CWRU_REPORT = os.path.join(ROOT, "ml", "diagnosis_cwru_report.json")
+CMAPSS_REPORT = os.path.join(ROOT, "ml", "rul_cmapss_warning_report.json")
 
 
 class BenchmarkDisplayTest(unittest.TestCase):
@@ -215,6 +216,72 @@ class CwruDiagnosisDisplayTest(unittest.TestCase):
                 "100% on our motor",
                 "field-validated RUL complete",
                 "hours-to-failure for our motor",
+            ):
+                with self.subTest(page=page, forbidden=forbidden):
+                    self.assertNotIn(forbidden, text)
+
+
+class CmapssRulWarningDisplayTest(unittest.TestCase):
+    """The >80% RUL panel is labelled as a simulated short-horizon benchmark."""
+
+    @classmethod
+    def setUpClass(cls):
+        with open(DASHBOARD, encoding="utf-8") as handle:
+            cls.html = handle.read()
+        with open(PAGES["guide"], encoding="utf-8") as handle:
+            cls.guide = handle.read()
+        with open(CMAPSS_REPORT, encoding="utf-8") as handle:
+            cls.report = json.load(handle)
+
+    def test_dashboard_numbers_match_the_committed_report(self):
+        last = self.report["official_test_last_cycle"]
+        cv = self.report["grouped_unit_cv"]
+        self.assertGreater(last["accuracy"], 0.80)
+        self.assertGreater(cv["mean_accuracy"], 0.80)
+        for expected in (
+            "<strong>94.0%</strong>",
+            "<strong>75.0%</strong>",
+            f"<small>last-cycle warning accuracy · {last['accuracy']:.3f}</small>",
+            f"<small>majority baseline · {last['majority_baseline']:.3f}</small>",
+            f"<strong>{last['precision']}</strong>",
+            f"<small>warning recall · {last['positive_count']} positive units</small>",
+            "<strong>97.05%</strong>",
+            f"<small>mean unit-disjoint CV accuracy · {cv['mean_accuracy']}</small>",
+        ):
+            with self.subTest(expected=expected):
+                self.assertIn(expected, self.html)
+
+    def test_scope_and_provenance_are_visible_on_both_pages(self):
+        for token in (
+            "NASA C-MAPSS FD001",
+            "SIMULATED TURBOFAN",
+            "NOT OUR MOTOR",
+            "NOT FIELD-VALIDATED",
+            "30-cycle RUL warning",
+            "not</b> an induction-motor result",
+            "10.5281/zenodo.15346912",
+            "ml/rul_cmapss_warning_report.json",
+            "below 80%",
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, self.html)
+        for token in (
+            "C-MAPSS FD001",
+            "0.940",
+            "0.750",
+            "SIMULATED TURBOFAN",
+            "NOT OUR MOTOR",
+            "NOT FIELD-VALIDATED",
+        ):
+            with self.subTest(page="guide", token=token):
+                self.assertIn(token, self.guide)
+
+    def test_no_field_or_runtime_claim_is_introduced(self):
+        for page, text in (("index", self.html), ("guide", self.guide)):
+            for forbidden in (
+                "field-validated RUL complete",
+                "hours-to-failure for our motor",
+                "operator-approved alarm threshold of 30 cycles",
             ):
                 with self.subTest(page=page, forbidden=forbidden):
                     self.assertNotIn(forbidden, text)

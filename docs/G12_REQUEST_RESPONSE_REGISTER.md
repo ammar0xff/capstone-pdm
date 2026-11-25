@@ -275,3 +275,35 @@ restating any resource-saving claim]`
 كلمة «بكرة» وردت في فويس وقته الأصلي مجهول، فلا تُحوّل إلى تاريخ. تم إعداد هذا السجل
 والوثائق في أقرب فرصة محلية. أسماء المرسلين، خصوصاً الاسم الذي سُمع «مروان»، غير مؤكدة؛
 التفريغ الصوتي فيه مواضع `[غير واضح]` ولا يُستخدم لإثبات تكليف أو موعد.
+
+## 13) طلبات لاحقة: RUL فوق 80%، تنظيف الداشبورد، ونقل النسخة المُتحقّق منها
+
+- **«لازم نكون عندنا RUL» و«ابحث وخلّيها توصل 80%»:** لم يُعد تغيير نتيجة FMCG
+  المقاسة ولا إعادة تسميتها: **141.716 h MAE**، **204.069 h RMSE**،
+  دقة إنذار 24 ساعة **0.677 (67.7%)** وrecall **0.029**، وهي أقل من 80%
+  وأسوأ من baselineّي الصفر وعدم الإنذار. بدلاً من ذلك أُضيف benchmark منفصل
+  و موسوم بوضوح: `ml/rul_cmapss_warning.py` يحسب **إنذار RUL خلال 30 دورة**
+  من تسميات RUL صريحة على بيانات NASA C-MAPSS FD001 **المحاكاة** (Zenodo DOI
+  `10.5281/zenodo.15346912`، CC BY 4.0). النتيجة المقاسة: دقة **0.940 (94.0%)**
+  على 100 وحدة في آخر دورة مسجّلة مقابل majority baseline **0.750**، precision
+  **0.9524**، recall **0.800**، ومتوسط خمس folds لا تتشارك الوحدات **0.9705**
+  مقابل **0.8248** baseline. التقرير `ml/rul_cmapss_warning_report.json`،
+  والاختبارات `tests/test_rul_cmapss_warning.py`. الوسم الإلزامي
+  `RUL WARNING BENCHMARK / SIMULATED TURBOFAN / NOT OUR MOTOR /
+  NOT FIELD-VALIDATED`: ليست دقة RUL مستمرة، وليست موتورنا، وليست عتبة إنذار
+  للمشغّل، ولم يتغير الـ runtime أو Firebase أو الجهاز.
+- **«شيل من الـ UI العناصر دي»:** أُزيلت من `public/index.html`: سطر
+  `SOURCE: DEVICE TELEMETRY ONLY`، نص `Operational Protocol:` مع سطر المشورة
+  المرتبط به، خلية `SPC Gate` / `badge-gate-status`، ورسالة
+  `STAGE 2 (RF ACTIVE)` (ومثيلتها `STAGE 1 (SPC OK)`) من منطق JavaScript.
+  بطاقات القرار (`ROUTINE/SCHEDULE/URGENT/CRITICAL`، الوقت، المالك) بقيت كما هي
+  وتعرض `NO DATA` / `AWAITING DATA` عند غياب الحزمة. اختبارات
+  `tests/test_dashboard_real_data_only.py` و`tests/test_device_only_telemetry.py`
+  تمنع رجوع هذه العناصر.
+- **«الويب بيظهر (buffer freeze) كتير»:** السبب كان نص offline banner في
+  `public/index.html` كان يقول `Chart buffer frozen; waiting for real telemetry`
+  رغم أن الرسوم تحتفظ آخر حزمة مستلمة. النص الحالي:
+  `Charts are holding the last received packet; waiting for fresh telemetry.`
+  ولا يوجد تغيير في سلوك الرسوم أو في بيانات Firebase.
+- نطاق النشر المُتفق عليه: Firebase Hosting + مزامنة الراسبري فقط. no RTDB telemetry
+  edits, no runtime model changes and no calibration artifact changes.

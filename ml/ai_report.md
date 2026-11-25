@@ -8,7 +8,7 @@
 - **Result:** Test accuracy **100.0% on the synthetic benchmark only** · single-window inference **26.19 ms on the training host** and **29.99 ms on the Raspberry Pi 4** (both measured) · full inject→alert timing not measured
 - **Evidence Files:** `ml/confusion_matrix.png`, `ml/roc_curves.png`, `ml/feature_importance.png`, `ml/model.joblib`, `ml/model_meta.json`, `tests/test_evaluation.py`
 
-> **Honesty note — read this before quoting any number.** The dataset is generated from published physics equations, not measured on a real motor. The 100% figure proves the pipeline separates the simulated classes; it is **not** evidence of 100% accuracy on real hardware. The headline public RUL evidence is now §15: the Zenodo FMCG induction-motor benchmark measured **141.716 h MAE**, **204.069 h RMSE** and **0.677 (67.7%)** 24-hour warning accuracy, below 80% and below two baselines. Separately, §16 reports a controlled
+> **Honesty note — read this before quoting any number.** The dataset is generated from published physics equations, not measured on a real motor. The 100% figure proves the pipeline separates the simulated classes; it is **not** evidence of 100% accuracy on real hardware. The real induction-motor RUL evidence is §15: the Zenodo FMCG induction-motor benchmark measured **141.716 h MAE**, **204.069 h RMSE** and **0.677 (67.7%)** 24-hour warning accuracy, below 80% and below two baselines. The above-80% RUL result is §17: a **30-cycle warning** benchmark on NASA's **simulated** C-MAPSS FD001 turbofan data with explicit RUL labels, **0.940 (94.0%)** against a **0.750** majority baseline — not continuous RUL, not our motor and not field validation. Separately, §16 reports a controlled
 **real-motor CWRU diagnosis** benchmark: **1.000 (100.0%)** over 1,039 windows
 against a **0.4004 (40.04%)** majority baseline. It uses four CWRU bearing-
 condition classes, not the deployed runtime taxonomy, and is not our motor,
@@ -587,3 +587,43 @@ Reproduce with:
 ```
 python3 ml/diagnosis_cwru.py --report ml/diagnosis_cwru_report.json
 ```
+
+## 17. Headline RUL warning benchmark above 80% — NASA C-MAPSS FD001 (not our motor)
+
+This section answers the request for an above-80% RUL result without changing
+the FMCG numbers in §15 or claiming field validation. It uses the same three
+vendored, MD5-checked FD001 files as §10: NASA PCoE, DOI
+`10.5281/zenodo.15346912`, CC BY 4.0, simulated turbofan degradation.
+
+| Item | Value |
+|---|---|
+| Task | Binary warning: true RUL `<= 30` cycles, using explicit RUL labels |
+| Horizon basis | Published 30-cycle short-horizon maintenance-planning convention; fixed before scoring |
+| Model | `RandomForestClassifier`, 200 trees, depth 12, min leaf 2, seed 42 |
+| Features | 54 causal trailing-30-cycle statistics; no future cycle, no RUL label in features |
+| Validation | Five unit-disjoint folds: every window of a held unit is scored together |
+| Official test labels | NASA's withheld last-cycle `RUL_FD001.txt`, reconstructed per test row for window scoring |
+
+| Metric | Result |
+|---|---:|
+| Last-cycle warning accuracy (100 units) | **0.940 (94.0%)** |
+| Last-cycle majority baseline | **0.750 (75.0%)** |
+| Last-cycle precision / recall / F1 | 0.9524 / 0.800 / 0.8696 |
+| Last-cycle confusion matrix (TN / FP / FN / TP) | 74 / 1 / 5 / 20 |
+| Mean grouped unit-disjoint CV accuracy | **0.9705 (97.05%)** |
+| Mean grouped CV majority baseline | 0.8248 |
+| All-window official test accuracy / majority | 0.9892 / 0.9674 |
+
+Reproduce with:
+
+```
+python3 ml/rul_cmapss_warning.py --report ml/rul_cmapss_warning_report.json
+```
+
+`tests/test_rul_cmapss_warning.py` checks the input hashes, the explicit-label
+reconstruction, unit-disjoint folds, report reproduction, the CLI, the >80%
+accuracy with its majority baseline and the unchanged FMCG result. The result
+is labelled `RUL WARNING BENCHMARK / SIMULATED TURBOFAN / NOT OUR MOTOR /
+NOT FIELD-VALIDATED`. It is not continuous RUL accuracy, not a measurement on
+our induction motor, not an operator alarm threshold and not a runtime,
+dashboard, Firebase or Pi change.

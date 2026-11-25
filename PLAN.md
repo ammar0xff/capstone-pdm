@@ -92,6 +92,26 @@
   deployed runtime, dashboard or Firebase state.
 - C11 Keep the honest FMCG RUL result (67.7%, below 80%) unchanged; no tuning,
   relabelling or selective reporting to force an RUL success claim.
+- R42 Remove from the hosted UI: `SPC Gate`, `STAGE 2 (RF ACTIVE)`, the
+  `Operational Protocol: Machine operating within nominal limits...` line and
+  `SOURCE: DEVICE TELEMETRY ONLY`; keep the operator decision chips and the
+  `NO DATA` / `AWAITING DATA` / `NOT REPORTED` rendering of missing telemetry.
+- R43 Replace the misleading `Chart buffer frozen` offline text with an accurate
+  statement that charts hold the last received packet while waiting for fresh
+  telemetry; change no chart or Firebase behaviour.
+- R44 Add a reproducible above-80% RUL warning benchmark using explicit RUL
+  labels on public NASA C-MAPSS FD001 (30-cycle horizon, unit-disjoint folds,
+  majority baseline), labelled simulated/not our motor/not field-validated;
+  never present it as continuous RUL, an operator alarm or our rig result.
+- R45 Show the C-MAPSS warning result and the unchanged below-80 FMCG result on
+  the hosted dashboard, guide, README, AI report, register, provenance and Pi
+  evidence, keeping the exact `[NEED: ...]` licence gaps.
+- R46 After focused/full tests, `git diff --check` and deterministic webcheck
+  pass, commit the changes, deploy Firebase Hosting and sync the committed tree
+  to the Pi `/home/renad/pdm` with backups; report exact commands and output.
+- C12 User approved scope `all` for this round: Firebase Hosting + Pi sync only.
+  Make no RTDB telemetry edits, runtime model changes or calibration artifact
+  changes; keep light mode and calibration `REVIEW / UNVERIFIED`.
 
 ## Checklist
 
@@ -138,3 +158,8 @@
 - [x] P40 Add `tests/test_diagnosis_cwru.py` for source integrity, hashes, manifest reuse, group separation, reproduction, >80% accuracy and honest wording
 - [x] P41 Update the hosted benchmark panel, guide, README, AI report, Arabic review pack, register, provenance, file map and Pi evidence with the labelled CWRU result
 - [x] P42 Rerun focused/full tests, `git diff --check` and webcheck, then commit and push; no deployment or Pi sync
+- [x] P43 Remove the four requested UI elements and the misleading buffer-freeze wording; guard with tests
+- [x] P44 Build/run `ml/rul_cmapss_warning.py`, commit the measured report and add provenance/leakage/fold/baseline tests
+- [x] P45 Add the labelled C-MAPSS warning panel and FMCG context to dashboard, guide, README, AI report, register, provenance and plan
+- [x] P46 Rerun focused/full suite, `git diff --check` and deterministic webcheck at three widths
+- [ ] P47 Commit, deploy Firebase Hosting, sync the committed tree to Pi with backups and record exact evidence

@@ -36,7 +36,7 @@ files just because they look stale; confirm with the owner first.
 | `G12_REQUEST_RESPONSE_REGISTER.md` | All 13 G12 requests with status and evidence |
 | `EXHIBITION_REVIEW_PACK.md` | Arabic one-page defence sheet, demo sequence, evidence index, Q&A and forbidden claims |
 | `REAL_MOTOR_READINESS.md` | Exact target-rig RUL CSV contract, commands, tests and acceptance gate; not field-validated |
-| `DATA_PROVENANCE_LICENSES.md` | Fetched source/licence evidence for FMCG, XJTU-SY, its derived record, FEMTO-ST, CWRU, NASA IMS and the Reliance motor; unresolved facts stay `[NEED: ...]` |
+| `DATA_PROVENANCE_LICENSES.md` | Fetched source/licence evidence for FMCG, NASA C-MAPSS FD001, XJTU-SY, its derived record, FEMTO-ST, CWRU, NASA IMS and the Reliance motor; unresolved facts stay `[NEED: ...]` |
 | `CAPSTONE_MASTER_HANDBOOK.md` | Engineering handbook and theory |
 | `PROJECT_COMPLETE_TUTORIAL.md` | End-to-end tutorial |
 | `STUDENT_MASTER_GUIDE.md` | Student-facing build and presentation guide |
@@ -77,7 +77,8 @@ The dashboard exposes only read-only JSON endpoints and page rendering. The old
 | `rf_predictor.py` | Runtime classifier wrapper and response plans |
 | `benchmark_latency.py` | Single-window latency measurement helper |
 | `degradation_rul.py` | Offline trend-to-threshold estimator (operator threshold; not field-validated) |
-| `train_rul_cmapss.py` | Public FD001 RUL benchmark; simulated turbofan, not our motor, not field-validated |
+| `train_rul_cmapss.py` | Public FD001 continuous-RUL benchmark; simulated turbofan, not our motor, not field-validated |
+| `rul_cmapss_warning.py`, `rul_cmapss_warning_report.json` | Above-80% RUL **warning** benchmark on the same public simulated FD001 data: explicit RUL labels, fixed 30-cycle horizon, unit-disjoint folds and majority baseline; not our motor, not field-validated |
 | `rul_pronostia.py` | Real bearing run-to-failure RUL benchmark; leave-one-bearing-out, not our motor, not field-validated |
 | `rul_pronostia_report.json` | Committed measured metrics for the PRONOSTIA benchmark |
 | `rul_xjtu_sy.py`, `rul_xjtu_sy_report.json` | Second real-bearing RUL benchmark on 15 XJTU-SY bearings; labelled benchmark, not our motor, baseline gap reported honestly |
@@ -117,7 +118,7 @@ The dashboard exposes only read-only JSON endpoints and page rendering. The old
 
 | Path | Role |
 |---|---|
-| `index.html` | Live presentation dashboard; reads state from Firebase |
+| `index.html` | Live presentation dashboard; reads state from Firebase. Benchmark panels are labelled and separate from telemetry; no source banner, SPC Gate KPI, Operational Protocol line or `STAGE 2 (RF ACTIVE)` badge |
 | `guide.html` | Exhibition slide deck |
 | `calibration.html` | Calibration explainer page for visitors |
 | `*.png` | Copies of report charts for the hosted site |

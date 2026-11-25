@@ -62,7 +62,6 @@ class HostedDashboardRealDataOnlyTest(unittest.TestCase):
     def test_initial_metric_cells_contain_no_fabricated_numbers(self):
         metric_ids = (
             "badge-ai-conf",
-            "badge-gate-status",
             "badge-seq",
             "badge-uptime",
             "val-rms",
@@ -99,12 +98,29 @@ class HostedDashboardRealDataOnlyTest(unittest.TestCase):
     def test_initial_status_and_decision_text_waits_for_telemetry(self):
         self.assertEqual(text_for(self.html, "txt-cloud-status"), "AWAITING DATA")
         self.assertEqual(text_for(self.html, "status-title"), "Awaiting telemetry")
-        for element_id in ("status-sub", "txt-advice", "txt-decision-timeframe"):
+        for element_id in ("status-sub", "txt-decision-timeframe"):
             with self.subTest(element_id=element_id):
                 self.assertIsNone(re.search(r"\d", text_for(self.html, element_id)))
         self.assertEqual(text_for(self.html, "txt-decision-priority"), "AWAITING DATA")
         for element_id in ("txt-decision-owner",):
             self.assertNotRegex(text_for(self.html, element_id), r"\d")
+
+    def test_removed_ui_elements_are_absent(self):
+        for token in (
+            "SOURCE: DEVICE TELEMETRY ONLY",
+            "Operational Protocol:",
+            "SPC Gate",
+            "STAGE 2 (RF ACTIVE)",
+            "badge-gate-status",
+            "txt-advice",
+            "Chart buffer frozen",
+        ):
+            with self.subTest(token=token):
+                self.assertNotIn(token, self.html)
+        self.assertIn(
+            "Charts are holding the last received packet; waiting for fresh telemetry.",
+            self.html,
+        )
 
     def test_initial_worked_equations_are_not_fake_results(self):
         for element_id in (

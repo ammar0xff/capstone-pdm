@@ -15,7 +15,14 @@ sample-disjoint contiguous-block folds, against a **0.4004 (40.04%)**
 majority-class baseline. Those four classes (healthy / inner race / ball /
 outer race) are **not** the deployed runtime taxonomy, and the result is
 `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED` — not "on our motor".
-The separate headline RUL evidence remains a real 160 kW three-phase
+The above-80% RUL evidence is a separate **30-cycle RUL warning** benchmark on
+NASA's simulated C-MAPSS FD001 turbofan data (DOI
+`10.5281/zenodo.15346912`, CC BY 4.0): **0.940 (94.0%)** accuracy on the 100
+official last-cycle units against a **0.750** majority baseline, precision
+**0.9524**, recall **0.800** and five unit-disjoint folds averaging **0.9705**.
+It uses explicit RUL labels, but it is a simulated short-horizon warning task,
+not continuous RUL, not our induction motor, not an operator alarm and not field
+validation. The separate real induction-motor RUL evidence remains a real 160 kW three-phase
 induction-motor dataset with an explicit operating-hours RUL label (Zenodo DOI
 `10.5281/zenodo.15637023`, CC BY 4.0). Four leave-one-run-out RUL-to-zero trials
 measured MAE **141.716 h**, RMSE **204.069 h** and 24-hour warning accuracy
@@ -76,9 +83,13 @@ INMP441 (I2S) ─┘          │                       │
 - `ml/degradation_rul.py` is an **offline** trend-to-threshold estimator. It is
   not part of the runtime diagnosis, needs an operator threshold, and is
   labelled "not field-validated" in every result.
-- `ml/train_rul_cmapss.py` reproduces a public RUL benchmark on simulated
-  turbofan run-to-failure data. It is a pipeline check only, never a life
-  prediction for our induction motor.
+- `ml/train_rul_cmapss.py` reproduces a public continuous-RUL benchmark on
+  simulated turbofan run-to-failure data. It is a pipeline check only, never a
+  life prediction for our induction motor.
+- `ml/rul_cmapss_warning.py` reproduces the above-80% RUL **warning** benchmark
+  on the same public simulated turbofan data with explicit RUL labels and a
+  fixed 30-cycle horizon. It is not our motor, not field validation and not a
+  runtime alarm.
 - `ml/rul_pronostia.py` reproduces RUL on six real PRONOSTIA bearing
   run-to-failure experiments with leave-one-bearing-out validation. It is
   genuine bearing data, still not our motor and not field validation.
@@ -200,7 +211,8 @@ See `docs/FIREBASE_SETUP.md` before altering the rules or client behavior.
 | Pi services and model deployment | `docs/PI_DEPLOYMENT_EVIDENCE.md` | Verified on 2026-11-23 |
 | Pi latency | 26.19 ms host / 29.99 ms Pi, single-window inference | Measured; full inject→alert timing not measured |
 | Offline degradation estimator | `ml/degradation_rul.py`, `tests/test_degradation_rul.py` | Implemented; operator threshold required; not field-validated |
-| Public RUL benchmark | `ml/train_rul_cmapss.py`, `data/cmapss/`, `tests/test_rul_cmapss.py` | Complete on NASA C-MAPSS FD001 (simulated turbofan); not our motor |
+| Public continuous-RUL benchmark | `ml/train_rul_cmapss.py`, `data/cmapss/`, `tests/test_rul_cmapss.py` | Complete on NASA C-MAPSS FD001 (simulated turbofan); not our motor |
+| Above-80% public RUL warning benchmark | `ml/rul_cmapss_warning.py`, `ml/rul_cmapss_warning_report.json`, `tests/test_rul_cmapss_warning.py` | 0.940 (94.0%) at 100 official last-cycle units vs 0.750 majority; precision 0.9524, recall 0.800; five unit-disjoint folds mean 0.9705; simulated turbofan, not our motor or field validation |
 | Real-bearing RUL benchmark | `ml/rul_pronostia.py`, `data/pronostia/`, `tests/test_rul_pronostia.py` | Complete on six PRONOSTIA run-to-failure bearings; not our motor, not field-validated |
 | Second real-bearing RUL benchmark | `ml/rul_xjtu_sy.py`, `data/xjtu_sy_mendeley/`, `tests/test_rul_xjtu_sy.py` | Complete on 15 XJTU-SY bearings; labelled benchmark, baseline comparison reported honestly; not our motor |
 | Third public RUL benchmark | `ml/rul_nasa_ims.py`, `data/nasa_ims/`, `tests/test_rul_nasa_ims.py` | Four documented NASA IMS failed bearings; benchmark only, nominal recorded minutes, not field-validated |
@@ -232,7 +244,40 @@ Every result carries `"threshold_source": "operator-supplied"` and a
 `[NEED: run-to-failure series with timestamps and failure labels]` remain
 before this can be presented as real RUL.
 
-## Public RUL benchmark (not our motor)
+## Above-80% RUL warning benchmark — C-MAPSS FD001 (not our motor)
+
+The above-80% **RUL** result is a short-horizon warning benchmark on NASA's
+public simulated turbofan dataset. It does not relabel the FMCG result below and
+does not change the runtime, dashboard telemetry, Firebase state or Pi.
+
+```sh
+python3 ml/rul_cmapss_warning.py --report ml/rul_cmapss_warning_report.json
+```
+
+The evaluator verifies the three raw file MD5s, trains only on train windows,
+labels the warning task from the explicit train regression target
+(`true RUL <= 30 cycles`) and reconstructs each withheld test row's RUL from
+NASA's last-cycle `RUL_FD001.txt` labels. The 30-cycle horizon is a published
+maintenance-planning convention fixed before scoring, not tuned on test data.
+It scores one decision per unit at its final recorded cycle and also reports
+five unit-disjoint grouped folds where every window of a held-out unit stays
+together:
+
+| Metric | Result |
+|---|---:|
+| Last-cycle warning accuracy | **0.940 (94.0%)** |
+| Last-cycle majority baseline | **0.750 (75.0%)** |
+| Last-cycle precision / recall / F1 | 0.9524 / 0.800 / 0.8696 |
+| Mean grouped unit-disjoint CV accuracy | **0.9705 (97.05%)** |
+| Mean grouped CV majority baseline | 0.8248 |
+
+This is `RUL WARNING BENCHMARK / SIMULATED TURBOFAN / NOT OUR MOTOR /
+NOT FIELD-VALIDATED`. It is not continuous RUL accuracy, not a measurement from
+our induction motor, not an operator-approved alarm threshold and not evidence
+that the capstone rig predicts remaining life. The separate FMCG real-motor
+result below stays at 67.7% and is reported unchanged.
+
+## Public continuous-RUL benchmark (not our motor)
 
 To validate the RUL pipeline on trusted run-to-failure data, use NASA C-MAPSS
 FD001. The three raw text files are vendored in `data/cmapss/` with their MD5
