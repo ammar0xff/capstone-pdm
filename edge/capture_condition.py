@@ -13,7 +13,7 @@ so. With --pause-service it stops pdm-daq, records, and starts pdm-daq again in
 a finally block, even on error or Ctrl-C. Nothing is changed otherwise. It restarts the service only if it was active before.
 Use ARECORD and SYSTEMCTL env vars to substitute test doubles.
 """
-import argparse, json, os, subprocess, sys, time
+import argparse, json, os, signal, subprocess, sys, time
 from datetime import datetime, timezone
 
 DEVICE = "plughw:1,0"
@@ -40,8 +40,9 @@ def main(argv=None):
     systemctl = os.environ.get("SYSTEMCTL", "systemctl")
     fuser = os.environ.get("FUSER", "fuser")
     os.makedirs(a.outdir, exist_ok=True)
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     path = os.path.join(a.outdir, "%s_%s.wav" % (a.label, stamp))
+    signal.signal(signal.SIGTERM, lambda *_: sys.exit(143))  # run the finally block
     paused = False
     was_active = subprocess.run([systemctl, "is-active", "pdm-daq"], capture_output=True, text=True).stdout.strip() == "active"
     try:
@@ -52,9 +53,28 @@ def main(argv=None):
         if mic_busy(fuser):
             print("Microphone is busy (another reader holds it). Not recording. Use --pause-service.")
             return 2
+        if os.path.exists(path):
+            print("Refusing to overwrite", path)
+            return 3
         cmd = [arecord, "-D", DEVICE, "-c", "2", "-r", str(RATE), "-f", "S32_LE",
                "-d", str(a.seconds), "-t", "wav", path]
-        r = subprocess.run(cmd, capture_output=True, text=True)
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        try:
+            out, err = proc.communicate()
+        finally:
+            # On SIGTERM/SIGINT/SystemExit the child must not keep the mic.
+            if proc.poll() is None:
+                proc.terminate()
+                try:
+                    proc.wait(timeout=3)
+                except subprocess.TimeoutExpired:
+                    proc.kill()
+                    proc.wait()
+
+        class _R:  # keep the later code simple
+            returncode = proc.returncode
+            stderr = err or ""
+        r = _R
         if r.returncode != 0:
             print("arecord failed:", r.stderr.strip())
             return 1

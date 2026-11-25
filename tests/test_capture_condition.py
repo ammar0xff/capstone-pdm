@@ -38,6 +38,22 @@ class T(unittest.TestCase):
         r, log, _ = self.run_script(["both", "10", "--pause-service"], busy=False, inactive=True)
         self.assertEqual(r.returncode, 0); self.assertNotIn("start pdm-daq", log); self.assertNotIn("stop pdm-daq", log)
 
+    def test_sigterm_during_recording_restarts_service(self):
+        import signal, time
+        d = tempfile.mkdtemp(); log = os.path.join(d, "log")
+        env = dict(os.environ,
+                   ARECORD=fake(d, "arecord", "sleep 30"),
+                   SYSTEMCTL=fake(d, "systemctl", 'echo "$@" >> %s; if [ "$1" = is-active ]; then echo active; fi; exit 0' % log),
+                   FUSER=fake(d, "fuser", "exit 1"))
+        fake(d, "sudo", '"$@"')
+        env["PATH"] = d + os.pathsep + env["PATH"]
+        p = subprocess.Popen([sys.executable, SCRIPT, "both", "10", "--pause-service", "--outdir", os.path.join(d, "a")], env=env)
+        time.sleep(3.5); p.send_signal(signal.SIGTERM); p.wait(timeout=10)
+        self.assertEqual(p.returncode, 143)
+        self.assertIn("start pdm-daq", open(log).read())
+        time.sleep(0.5)
+        self.assertEqual(subprocess.run(["pgrep", "-f", os.path.join(d, "arecord")], capture_output=True).returncode, 1)
+
     def test_failure_still_restarts(self):
         r, log, _ = self.run_script(["both", "10", "--pause-service"], busy=False, fail=True)
         self.assertEqual(r.returncode, 1); self.assertIn("start pdm-daq", log)
