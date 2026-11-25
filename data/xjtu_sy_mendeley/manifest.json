@@ -1,0 +1,122 @@
+{
+  "VelFeaturesB_1.mat": {
+    "bytes": 50181,
+    "columns": 54,
+    "csv": "bearing1.csv",
+    "csv_sha256": "1740785a8f627674bca46dd3b20d3f656df0477cbd451cc3afd643fe6d2cab50",
+    "rows": 123,
+    "sha256": "442b732cecccb082c88d65fc700f67a4295c6b73f04c63b960a4169ef2a43963"
+  },
+  "VelFeaturesB_10.mat": {
+    "bytes": 138926,
+    "columns": 54,
+    "csv": "bearing10.csv",
+    "csv_sha256": "7be0de9b951010fecb2d78eb73738b41bc2a2ff1b63e0887bb07ef4e106d59f3",
+    "rows": 339,
+    "sha256": "978917d411819772ab7954a32b604489071f18a6587cd3e391699dc7acd289d0"
+  },
+  "VelFeaturesB_11.mat": {
+    "bytes": 1030991,
+    "columns": 54,
+    "csv": "bearing11.csv",
+    "csv_sha256": "f56e8cc6e0046203e30c359f372c7e03f3ed581fd70d950c82ec8a6f419a9ffe",
+    "rows": 2538,
+    "sha256": "eac3d5989269f7e3d8f0c6d24a3514dfa62bf6b0ab3f07ee7c1edabe72b910a1"
+  },
+  "VelFeaturesB_12.mat": {
+    "bytes": 1013533,
+    "columns": 54,
+    "csv": "bearing12.csv",
+    "csv_sha256": "ac626ef84e6dc931b8b73d4c9a792fc8a188bb0eca01e172b2e199c815fb2299",
+    "rows": 2496,
+    "sha256": "078b91a2a1114936011262b2321b1442a226bf0937f0b55a4fccb248b33ced64"
+  },
+  "VelFeaturesB_13.mat": {
+    "bytes": 151505,
+    "columns": 54,
+    "csv": "bearing13.csv",
+    "csv_sha256": "b5e7b572c1f4af64fb83385f13c9bb4ff4aba10ac584fc514b3dfffd05962dd3",
+    "rows": 371,
+    "sha256": "65e09d796bddb34ebbbeadfee41ab61f8b752c6af46bc6f1f3109c7d0ad1d6c5"
+  },
+  "VelFeaturesB_14.mat": {
+    "bytes": 615406,
+    "columns": 54,
+    "csv": "bearing14.csv",
+    "csv_sha256": "70aeb217c3d9c23aacd86240efcfcf62b16a4b68f687e857a6b04ff2e96042ec",
+    "rows": 1515,
+    "sha256": "7b9f5f93813ea6703058089180de0c7ff9a358509ca3011f397beecfa1eb6797"
+  },
+  "VelFeaturesB_15.mat": {
+    "bytes": 46988,
+    "columns": 54,
+    "csv": "bearing15.csv",
+    "csv_sha256": "29ce2baf24d00d65bfcbae77d226ef9e4fe237712730167605503a5920e1ea42",
+    "rows": 114,
+    "sha256": "ca2aa46c78abc1fe4a59f4926b10b583d0b1df0b0b8a96cadc89030453a7d7d5"
+  },
+  "VelFeaturesB_2.mat": {
+    "bytes": 66213,
+    "columns": 54,
+    "csv": "bearing2.csv",
+    "csv_sha256": "f6f362bb43026849b17f1db357995779dfe5b5357a696c08cebd981b0bd751e6",
+    "rows": 161,
+    "sha256": "22e047edf350a3722e65c26b6671eff6312a1d418082bcdd63dbd8678fa25c7d"
+  },
+  "VelFeaturesB_3.mat": {
+    "bytes": 63857,
+    "columns": 54,
+    "csv": "bearing3.csv",
+    "csv_sha256": "d6b0e41757a3e2a7ce9c51bab2453568a1990a3def6879951399d227c1fd3e3e",
+    "rows": 158,
+    "sha256": "8ae0d239c3b6e9cc710d675dba7e5bf43b5b00f1a07b21c4a87b89c90be2f18b"
+  },
+  "VelFeaturesB_4.mat": {
+    "bytes": 50178,
+    "columns": 54,
+    "csv": "bearing4.csv",
+    "csv_sha256": "e3c92fbbe122831a919855ccc59945a985388764ca312167be3d1b0d1992a342",
+    "rows": 122,
+    "sha256": "dc1181d4037437ecd6be3c81275c674651a3c5986336f475fd3aa0cf79a8a41f"
+  },
+  "VelFeaturesB_5.mat": {
+    "bytes": 20962,
+    "columns": 54,
+    "csv": "bearing5.csv",
+    "csv_sha256": "88b94ce3f2ebad262d21d9a2b9c1b163a83549f03ee5383da8bf3b085d669723",
+    "rows": 52,
+    "sha256": "b31f15117cac7bc33f24de0dfb723fa3ee6c1da9d3fd1f8b43837319c9355522"
+  },
+  "VelFeaturesB_6.mat": {
+    "bytes": 200000,
+    "columns": 54,
+    "csv": "bearing6.csv",
+    "csv_sha256": "097f18ed0bbd0e491e9a80d10c1dc610cb5a7cf93c6367f72aa52e17ca77877d",
+    "rows": 491,
+    "sha256": "6f3e0cb49af208ed7731f6f02035032c95fe5d962dcef6468f21778e4a21f814"
+  },
+  "VelFeaturesB_7.mat": {
+    "bytes": 65452,
+    "columns": 54,
+    "csv": "bearing7.csv",
+    "csv_sha256": "178fe14a507542f10ff7a9f2631ce5631fab1fdf391aae427bcb5293f6ca838b",
+    "rows": 161,
+    "sha256": "211cec149d4de5ce270eb8f4363afba380c6545c63e7c307f9e5dc10fb1fde46"
+  },
+  "VelFeaturesB_8.mat": {
+    "bytes": 218047,
+    "columns": 54,
+    "csv": "bearing8.csv",
+    "csv_sha256": "b86f74a8b6b50b574cf4b90489b6cc583037cedebbf095742501b3a0a37733dc",
+    "rows": 533,
+    "sha256": "fe27260d50685ada3a4b0ffe1ddd4f3426c3b706e9b0a59fb772fd47613b61fc"
+  },
+  "VelFeaturesB_9.mat": {
+    "bytes": 16812,
+    "columns": 54,
+    "csv": "bearing9.csv",
+    "csv_sha256": "b7301217523dae9f4d63f86644ef9955335b0f0b9e747f886107a302496e28ee",
+    "rows": 42,
+    "sha256": "1e8cb8fd2c29febba01156c116040e08f419b394dafed225800aad649518c5a8"
+  }
+}

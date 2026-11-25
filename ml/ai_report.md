@@ -349,3 +349,75 @@ on the capstone rig and not an hours-to-failure claim for our motor. Runtime
 diagnosis, the dashboard and Firebase state are unchanged. The field case
 still needs `[NEED: run-to-failure series with timestamps and failure labels
 from our rig]`.
+
+## 12) Target-rig predictive-maintenance readiness (not field-validated)
+
+The user asked for evidence that, if the real motor becomes available, the
+project is a complete predictive-maintenance system rather than diagnosis only.
+`ml/rul_from_rig.py` is that offline path. It accepts a CSV with `run_id`,
+Unix-second `timestamp`, operator-accepted `failure_timestamp`, and the same
+nine runtime features used by `ml/rf_predictor.py`. It rejects missing or
+non-finite values, duplicate/backwards timestamps, inconsistent or early
+failure endpoints, clamped `sound_db` when `sound_rms` must be derived, and a
+single-run dataset. It then builds 10-row trailing mean/std/trend features,
+labels seconds to the accepted endpoint, evaluates leave-one-run-out, and can
+fit/save a final regressor plus predict RUL from one current partial run.
+
+`tests/test_rul_from_rig.py` uses generated fixtures only. It proves the data
+contract, causality, run-disjoint evaluation, honest `not field-validated`
+labels, CLI report/model writing and CLI prediction; it does **not** report a
+life measurement from our motor. The exact CSV header, commands, tests and
+acceptance gate are in `docs/REAL_MOTOR_READINESS.md`.
+
+`[NEED: run-to-failure series with timestamps and failure labels from our rig]`
+and `[NEED: operator-accepted failure endpoint and reviewed metric report]` are
+still required before any field-validated claim. No runtime classifier,
+dashboard, Firebase state, Pi service or dependency was changed by this step.
+
+## 13. Second real-bearing RUL benchmark — XJTU-SY (not our motor)
+
+The user asked for a different trusted public run-to-failure dataset after the
+PRONOSTIA work. XJTU-SY contains 15 complete bearing run-to-failure experiments
+under three shaft frequencies (35, 37.5 and 40 Hz). The data used here are the
+derived `VelFeaturesB_*.mat` feature matrices from Mendeley Data DOI
+`10.17632/mpn45f4gxc.1` (CC BY 4.0), not the original publisher archive.
+
+| Item | Value |
+|---|---|
+| Original source | `https://biaowang.tech/xjtu-sy-bearing-datasets` (also the author mirror on GitHub) |
+| Required citation | Wang, Lei, Li and Li, IEEE Trans. Reliability 69(1), 401-412, 2020, DOI `10.1109/TR.2018.2882682` |
+| Derived record | Mendeley DOI `10.17632/mpn45f4gxc.1`, CC BY 4.0; 15 source SHA-256 hashes checked against the Mendeley API |
+| Local data | `data/xjtu_sy_mendeley/` — 15 unmodified `.mat` files, 15 derived CSVs, 9,216 one-minute snapshots, 54 features per snapshot |
+| Licence gaps | `[NEED: explicit XJTU-SY reuse licence]` — the publisher asks for citation but names no licence; the CC BY 4.0 grant applies only to the derived record |
+
+The benchmark uses three horizontal time-domain features (peak, RMS and
+kurtosis) that exist in every record. For each held-out bearing it fits a line
+to the last 40 snapshots of a mean log-health indicator, extrapolates to the
+75th-percentile terminal health of the other 14 bearings, and caps the estimate
+at twice the median training duration. Every prediction at snapshot *i* reads
+only snapshots 0..i. The endpoint is the dataset's last snapshot, not operator
+sign-off. The last 20% of each held bearing (1,861 windows) is scored.
+
+| Result | Value |
+|---|---:|
+| Tail-window MAE | **134.924 min** |
+| Tail-window RMSE | **171.776 min** |
+| Constant-baseline tail-window MAE | 136.558 min |
+| Constant-baseline tail-window RMSE | 160.859 min |
+
+The trend model's RMSE is slightly **worse** than the constant baseline on this
+benchmark; the result is kept and shown as measured rather than tuned away or
+hidden. `tests/test_rul_xjtu_sy.py` checks hashes, feature shape, causality,
+validation, CLI output and the honest label. Reproduce with:
+
+```
+python3 ml/rul_xjtu_sy.py --report /tmp/rul_xjtu_sy_report.json
+```
+
+**Scope limit.** These are public bearing minutes, not hours-to-failure for our
+motor. `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED` is printed in the
+report and shown beside the numbers on the hosted dashboard. No temperature
+or acoustic channel exists in this record, so it cannot validate those sensors.
+Runtime diagnosis, Stage-1/Stage-2 behaviour, Firebase state, Pi files and
+dependencies are unchanged. Source and licence evidence for XJTU-SY, FEMTO-ST,
+CWRU and the Reliance motor is in `docs/DATA_PROVENANCE_LICENSES.md`.

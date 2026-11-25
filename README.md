@@ -19,7 +19,16 @@ on six **real bearing run-to-failure experiments** from IEEE PHM 2012
 PRONOSTIA/FEMTO-ST is complete: leave-one-bearing-out last-window MAE
 **182.91 s** and RMSE **335.26 s** (constant baseline RMSE **8902.25 s**).
 Those are genuine bearing trajectories, but they are not our motor and are not
-field validation. See `docs/G12_REQUEST_RESPONSE_REGISTER.md` for
+field validation. A second, larger public benchmark on 15 XJTU-SY bearings is
+also complete: last-20% tail MAE **134.924 min** and RMSE **171.776 min**,
+versus **160.859 min** constant-baseline RMSE (the trend model is honestly
+slightly worse than the baseline on this metric). It is `BENCHMARK / NOT OUR
+MOTOR / NOT FIELD-VALIDATED`, with source and licence evidence in
+`docs/DATA_PROVENANCE_LICENSES.md`. A target-rig readiness path is also in place: once the
+operator supplies real run-to-failure CSVs from our motor, `ml/rul_from_rig.py`
+can evaluate, fit and predict RUL; it is not field-validated until that data and
+the failure endpoint are accepted. See `docs/REAL_MOTOR_READINESS.md`,
+`docs/G12_REQUEST_RESPONSE_REGISTER.md` for
 request-by-request evidence and `docs/EXHIBITION_REVIEW_PACK.md` for the
 Arabic review/demo sheet.
 
@@ -36,6 +45,8 @@ Arabic review/demo sheet.
 | AI design, training and measured results | `ml/ai_report.md` |
 | Pi deployment evidence and latency | `docs/PI_DEPLOYMENT_EVIDENCE.md` |
 | Arabic exhibition/review sheet, demo and Q&A | `docs/EXHIBITION_REVIEW_PACK.md` |
+| What is ready for RUL on our rig, and what evidence is still missing | `docs/REAL_MOTOR_READINESS.md` |
+| Dataset sources, DOI and licence evidence (including `[NEED: ...]` gaps) | `docs/DATA_PROVENANCE_LICENSES.md` |
 | Requirements and scope | `PRD.md` |
 
 ## System at a glance
@@ -65,6 +76,14 @@ INMP441 (I2S) ─┘          │                       │
 - `ml/rul_pronostia.py` reproduces RUL on six real PRONOSTIA bearing
   run-to-failure experiments with leave-one-bearing-out validation. It is
   genuine bearing data, still not our motor and not field validation.
+- `ml/rul_xjtu_sy.py` evaluates a second public bearing benchmark (XJTU-SY,
+  15 run-to-failure bearings) from a CC BY 4.0 derived feature record. Its
+  result is labelled `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED` and is
+  displayed as such on the hosted dashboard.
+- `ml/rul_from_rig.py` is the offline target-rig readiness path: it validates
+  operator-supplied run-to-failure CSVs, evaluates causally and run-disjointly,
+  fits a final RUL regressor and predicts from a current run. No field result is
+  claimed and no runtime behaviour is changed.
 
 ## First-time setup
 
@@ -159,6 +178,8 @@ See `docs/FIREBASE_SETUP.md` before altering the rules or client behavior.
 | Offline degradation estimator | `ml/degradation_rul.py`, `tests/test_degradation_rul.py` | Implemented; operator threshold required; not field-validated |
 | Public RUL benchmark | `ml/train_rul_cmapss.py`, `data/cmapss/`, `tests/test_rul_cmapss.py` | Complete on NASA C-MAPSS FD001 (simulated turbofan); not our motor |
 | Real-bearing RUL benchmark | `ml/rul_pronostia.py`, `data/pronostia/`, `tests/test_rul_pronostia.py` | Complete on six PRONOSTIA run-to-failure bearings; not our motor, not field-validated |
+| Second real-bearing RUL benchmark | `ml/rul_xjtu_sy.py`, `data/xjtu_sy_mendeley/`, `tests/test_rul_xjtu_sy.py` | Complete on 15 XJTU-SY bearings; labelled benchmark, baseline comparison reported honestly; not our motor |
+| Dataset provenance and licences | `docs/DATA_PROVENANCE_LICENSES.md`, `tests/test_rul_xjtu_sy.py` | CC BY 4.0 derived record; original XJTU-SY, FEMTO-ST, CWRU licences and Reliance catalogue number remain `[NEED: ...]` |
 | Real-motor sample | `data/cwru/`, `tests/test_cwru_data.py` | CWRU 2 hp Reliance Electric; seeded faults, no run-to-failure |
 | Real-motor accuracy, field-validated RUL, cost savings | — | `[NEED: physical run data]` |
 | Sensor calibration certificate | `edge/calibrate.py` and runbook | Procedure ready; `[NEED: signed run record]` |
@@ -243,6 +264,62 @@ benchmark only**: PRONOSTIA used a 250 W motor/gearbox, not our induction rig;
 no result here is a remaining-life estimate for our motor. Field RUL still
 requires `[NEED: run-to-failure series with timestamps and failure labels from
 our rig]`. Full write-up: `ml/ai_report.md` §11.
+
+## Second real-bearing RUL benchmark — XJTU-SY (not our motor)
+
+The user asked for a different trusted public run-to-failure dataset. The
+XJTU-SY collection has 15 complete bearing runs; the benchmark uses the
+CC BY 4.0 Mendeley derived feature record DOI `10.17632/mpn45f4gxc.1`, whose
+15 `.mat` file hashes were checked against the Mendeley API. The vendored
+`data/xjtu_sy_mendeley/csv/` files hold 9,216 one-minute snapshots. The
+original XJTU-SY page requests citation but states no reuse licence:
+`[NEED: explicit XJTU-SY reuse licence]`. Full evidence for XJTU-SY, FEMTO-ST,
+CWRU and the Reliance motor is in `docs/DATA_PROVENANCE_LICENSES.md`.
+
+```
+python3 ml/rul_xjtu_sy.py --report /tmp/rul_xjtu_sy_report.json
+```
+
+The script uses three causal horizontal time-domain features, extrapolates the
+trailing 40-snapshot log-health trend to the 75th-percentile terminal health
+of the other bearings, and validates by leaving one whole bearing out. It
+scores the last 20% of each held bearing (1,861 windows):
+
+| Metric | Result |
+|---|---:|
+| Tail-window MAE | **134.924 min** |
+| Tail-window RMSE | **171.776 min** |
+| Constant-baseline tail-window RMSE | 160.859 min |
+
+The trend model's RMSE is **worse** than the constant baseline here; that is
+reported as measured, not hidden. All values are public bearing minutes, never
+hours-to-failure for our motor. The hosted dashboard shows them only under
+`BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`. Dataset-defined run ends are
+**not** operator confirmation of a failure on our rig. No temperature or
+acoustic channel exists in this record, so it cannot validate those sensors.
+
+## Target-rig readiness (not field-validated)
+
+`ml/rul_from_rig.py` is the last offline code path. It accepts the same nine
+features used by the deployed Stage-2 classifier, requires operator-labelled
+`failure_timestamp` values from our rig, builds causal 10-row trailing windows,
+evaluates by leaving one whole run out, and can fit/save a model for a current
+run. It does not touch the classifier, dashboard, Firebase or the Pi.
+
+```
+python3 ml/rul_from_rig.py --history /path/to/rig_runs.csv \
+  --report /tmp/rul_from_rig_report.json \
+  --model-out /tmp/rul_from_rig_model.joblib
+
+python3 ml/rul_from_rig.py --mode predict --history /path/to/current_run.csv \
+  --model /tmp/rul_from_rig_model.joblib
+```
+
+The CSV contract, validation rules, tests and acceptance gate are in
+`docs/REAL_MOTOR_READINESS.md`. Tests use generated fixtures only; they prove
+the code path, not a measured life for our motor. Remaining evidence:
+`[NEED: run-to-failure series with timestamps and failure labels from our rig]`
+and `[NEED: operator-accepted failure endpoint and reviewed metric report]`.
 
 ## Budget
 

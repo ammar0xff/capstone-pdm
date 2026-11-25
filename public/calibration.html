@@ -3,13 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Documented ADXL345 and MAX6675 calibration procedures and evidence status. No measurement is certified on this page; results remain REVIEW / UNVERIFIED until a signed run record is attached.">
   <title>Sensor Calibration &amp; Metrology Suite | Intelligent Predictive Maintenance</title>
   
-  <!-- Fonts & Icons -->
+  <!-- Fonts and icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    @font-face { font-family: 'Oxanium'; font-style: normal; font-weight: 400; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/oxanium@5/files/oxanium-latin-400-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'Oxanium'; font-style: normal; font-weight: 500; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/oxanium@5/files/oxanium-latin-500-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'Oxanium'; font-style: normal; font-weight: 600; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/oxanium@5/files/oxanium-latin-600-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'Oxanium'; font-style: normal; font-weight: 700; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/oxanium@5/files/oxanium-latin-700-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'Oxanium'; font-style: normal; font-weight: 800; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/oxanium@5/files/oxanium-latin-800-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-400-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 500; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-500-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 600; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-600-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 700; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-700-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 800; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-800-normal.woff2') format('woff2'); }
+  </style>
   
   <!-- KaTeX for Scientific & Mathematical Equations -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
@@ -18,23 +28,23 @@
 
   <style>
     :root {
-      --bg-dark: #040711;
-      --bg-card: rgba(13, 20, 38, 0.78);
-      --bg-card-hover: rgba(22, 33, 62, 0.92);
-      --border: rgba(255, 255, 255, 0.08);
-      --border-accent: rgba(16, 185, 129, 0.4);
-      --cyan: #06b6d4;
-      --cyan-bright: #22d3ee;
-      --emerald: #10b981;
-      --emerald-bright: #34d399;
-      --blue: #3b82f6;
-      --indigo: #6366f1;
-      --purple: #a855f7;
-      --amber: #f59e0b;
-      --red: #ef4444;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --text-dim: #64748b;
+      --bg-dark: #f4f7fb;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f8fafc;
+      --border: rgba(24, 34, 48, 0.12);
+      --border-accent: rgba(15, 118, 110, 0.35);
+      --cyan: #0e7490;
+      --cyan-bright: #155e75;
+      --emerald: #0f766e;
+      --emerald-bright: #0b5f57;
+      --blue: #2563eb;
+      --indigo: #4338ca;
+      --purple: #6d28d9;
+      --amber: #b45309;
+      --red: #c24141;
+      --text-main: #182230;
+      --text-muted: #4b6078;
+      --text-dim: #52677d;
     }
 
     * {
@@ -46,7 +56,7 @@
     body {
       background-color: var(--bg-dark);
       color: var(--text-main);
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Oxanium', sans-serif;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -64,8 +74,8 @@
       position: fixed;
       inset: 0;
       background-image: 
-        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+        linear-gradient(to right, rgba(24, 34, 48, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(24, 34, 48, 0.02) 1px, transparent 1px);
       background-size: 40px 40px;
       pointer-events: none;
       z-index: 0;
@@ -79,9 +89,10 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
       padding: 12px 28px;
-      background: rgba(4, 7, 17, 0.85);
-      backdrop-filter: blur(16px);
+      background: #ffffff;
       border-bottom: 1px solid var(--border);
     }
 
@@ -89,6 +100,8 @@
       display: flex;
       align-items: center;
       gap: 12px;
+      min-width: 0;
+      flex: 1 1 260px;
     }
 
     .brand-badge {
@@ -116,7 +129,10 @@
     .nav-controls {
       display: flex;
       align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
       gap: 10px;
+      min-width: 0;
     }
 
     .btn {
@@ -130,14 +146,14 @@
       text-decoration: none;
       cursor: pointer;
       transition: all 0.2s ease;
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(24, 34, 48, 0.05);
       color: var(--text-main);
       border: 1px solid var(--border);
     }
 
     .btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(24, 34, 48, 0.1);
+      border-color: rgba(24, 34, 48, 0.2);
       transform: translateY(-1px);
     }
 
@@ -178,11 +194,11 @@
 
     /* Hero Banner */
     .hero-card {
-      background: linear-gradient(135deg, rgba(13, 20, 38, 0.95), rgba(6, 78, 59, 0.25));
+      background: linear-gradient(135deg, #ffffff 0%, #eef7f4 100%);
       border: 1px solid rgba(16, 185, 129, 0.3);
       border-radius: 16px;
       padding: 28px 32px;
-      box-shadow: 0 12px 36px -10px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 8px 24px -12px rgba(24, 34, 48, 0.25);
       display: flex;
       flex-direction: column;
       gap: 16px;
@@ -214,9 +230,7 @@
       font-weight: 800;
       letter-spacing: -0.02em;
       line-height: 1.25;
-      background: linear-gradient(120deg, #f8fafc 40%, var(--emerald-bright) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: var(--text-main);
       margin-bottom: 6px;
     }
 
@@ -248,8 +262,8 @@
     }
 
     .stat-box {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.07);
+      background: rgba(24, 34, 48, 0.03);
+      border: 1px solid rgba(24, 34, 48, 0.07);
       border-radius: 10px;
       padding: 12px 16px;
       display: flex;
@@ -287,18 +301,21 @@
       .grid-2 { grid-template-columns: 1fr; }
     }
 
-    /* Glass Cards */
+    .grid-2 > * { min-width: 0; }
+
+    /* Cards */
     .glass-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 24px;
-      backdrop-filter: blur(14px);
-      box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 6px 18px -10px rgba(24, 34, 48, 0.25);
       display: flex;
       flex-direction: column;
       gap: 18px;
       position: relative;
+      min-width: 0;
+      overflow: hidden;
     }
 
     .card-header-styled {
@@ -341,8 +358,8 @@
 
     /* Scientific Math Box */
     .math-callout {
-      background: rgba(4, 7, 17, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: #f8fafc;
+      border: 1px solid rgba(24, 34, 48, 0.06);
       border-left: 3px solid var(--emerald);
       border-radius: 8px;
       padding: 12px 16px;
@@ -353,6 +370,8 @@
 
     .math-callout .katex-display {
       margin: 8px 0;
+      overflow-x: auto;
+      overflow-y: hidden;
     }
 
     /* Tables */
@@ -370,7 +389,7 @@
     }
 
     table.cal-table th {
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(24, 34, 48, 0.03);
       padding: 10px 14px;
       font-weight: 600;
       color: var(--text-dim);
@@ -382,7 +401,7 @@
 
     table.cal-table td {
       padding: 10px 14px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid rgba(24, 34, 48, 0.04);
       color: var(--text-main);
       font-family: 'JetBrains Mono', monospace;
     }
@@ -392,10 +411,10 @@
     }
 
     table.cal-table tr:hover td {
-      background: rgba(255, 255, 255, 0.02);
+      background: rgba(24, 34, 48, 0.02);
     }
 
-    .badge-pill-pass {
+    .badge-pill-status {
       display: inline-flex;
       align-items: center;
       gap: 4px;
@@ -417,7 +436,7 @@
     }
 
     .tilt-btn {
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(24, 34, 48, 0.03);
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 10px 12px;
@@ -453,8 +472,8 @@
     }
 
     .tilt-readout-card {
-      background: rgba(0, 0, 0, 0.35);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: #f8fafc;
+      border: 1px solid rgba(24, 34, 48, 0.06);
       border-radius: 8px;
       padding: 14px 18px;
       display: flex;
@@ -466,7 +485,7 @@
 
     /* Live Calculator Box */
     .calculator-box {
-      background: rgba(0, 0, 0, 0.4);
+      background: #f8fafc;
       border: 1px solid rgba(16, 185, 129, 0.25);
       border-radius: 10px;
       padding: 18px;
@@ -496,7 +515,7 @@
     }
 
     .input-field {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(24, 34, 48, 0.05);
       border: 1px solid var(--border);
       border-radius: 6px;
       padding: 8px 12px;
@@ -517,7 +536,7 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 10px;
       padding-top: 10px;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      border-top: 1px solid rgba(24, 34, 48, 0.06);
     }
 
     .calc-res-item {
@@ -541,26 +560,13 @@
 
     /* Certificate Section */
     .cert-container {
-      background: #0a0f1d;
+      background: #ffffff;
       border: 2px solid rgba(16, 185, 129, 0.4);
       border-radius: 16px;
       padding: 36px 40px;
       position: relative;
-      box-shadow: 0 16px 48px -12px rgba(0, 0, 0, 0.7);
-    }
-
-    .cert-watermark {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) rotate(-25deg);
-      font-size: 5.5rem;
-      font-weight: 900;
-      color: rgba(255, 255, 255, 0.018);
-      pointer-events: none;
-      white-space: nowrap;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
+      overflow: hidden;
+      box-shadow: 0 12px 32px -16px rgba(24, 34, 48, 0.3);
     }
 
     .cert-header {
@@ -622,7 +628,7 @@
       gap: 24px;
       margin-top: 36px;
       padding-top: 24px;
-      border-top: 1px dashed rgba(255, 255, 255, 0.1);
+      border-top: 1px dashed rgba(24, 34, 48, 0.1);
     }
 
     .sig-block {
@@ -633,7 +639,7 @@
 
     .sig-line {
       height: 1px;
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(24, 34, 48, 0.2);
       margin-top: 28px;
     }
 
@@ -660,7 +666,7 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 14px;
-      background: rgba(4, 7, 17, 0.9);
+      background: #ffffff;
       font-size: 0.82rem;
       color: var(--text-dim);
       position: relative;
@@ -671,10 +677,25 @@
       color: var(--text-muted);
       text-decoration: none;
       transition: color 0.2s;
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
     }
 
     footer a:hover {
       color: var(--emerald-bright);
+    }
+
+    @media (max-width: 600px) {
+      .header-bar { padding: 10px 14px; }
+      .brand-title { font-size: 0.9rem; }
+      .nav-controls { width: 100%; justify-content: flex-start; }
+      .btn { padding: 8px 10px; }
+      .main-wrap { padding: 20px 14px 48px; }
+      .hero-card { padding: 22px 18px; }
+      .glass-card { padding: 18px 14px; }
+      .cert-container { padding: 24px 18px; }
+      .input-row, .calc-output-row, .cert-signatures { grid-template-columns: 1fr; }
     }
 
     /* Print Styling */
@@ -697,13 +718,10 @@
         padding: 20px !important;
         color: #000000 !important;
       }
-      .cert-watermark {
-        color: rgba(0, 0, 0, 0.04) !important;
-      }
       .cert-meta-val, .sig-name, table.cal-table td, h1, h2, h3 {
         color: #000000 !important;
       }
-      .badge-pill-pass {
+      .badge-pill-status {
         background: #f0fdf4 !important;
         color: #166534 !important;
         border: 1px solid #166534 !important;
@@ -750,32 +768,33 @@
         <div class="hero-title-group">
           <h1>Sensor Calibration &amp; Empirical Error Verification</h1>
           <p>
-            Official metrological calibration documentation for the Grade 12 STEM Capstone Evaluation.
-            Eliminates static DC bias, sensitivity gain errors, and thermal drift to guarantee false-alarm-free edge AI inference.
+            This page explains the documented ADXL345 six-face and MAX6675 two-point procedures.
+            It does not certify a run: verdicts stay REVIEW / UNVERIFIED until a signed measurement
+            record is attached. The runtime coefficients still come from the Pi calibration runner.
           </p>
         </div>
         <div class="rubric-tag">
           <i class="fa-solid fa-shield-halved"></i>
-          <span>Official STEM Rubric: 10 / 10 Pts Verified</span>
+          <span>Status: REVIEW / UNVERIFIED</span>
         </div>
       </div>
 
       <div class="hero-stats-row">
         <div class="stat-box">
           <span class="stat-label">Accelerometer Max Dev</span>
-          <span class="stat-val green">&lt; 0.51%</span>
+          <span class="stat-val">NO DATA</span>
         </div>
         <div class="stat-box">
           <span class="stat-label">Thermocouple Accuracy</span>
-          <span class="stat-val green">&plusmn; 0.50&deg;C</span>
+          <span class="stat-val">NO DATA</span>
         </div>
         <div class="stat-box">
           <span class="stat-label">Static Floor Noise</span>
-          <span class="stat-val cyan">0.0084 g RMS</span>
+          <span class="stat-val">NO DATA</span>
         </div>
         <div class="stat-box">
           <span class="stat-label">DAQ Resolution</span>
-          <span class="stat-val amber">3.9 mg / 0.25&deg;C</span>
+          <span class="stat-val">SEE DATASHEET</span>
         </div>
       </div>
     </section>
@@ -831,14 +850,14 @@
         <div class="tilt-readout-card" id="tilt-readout">
           <div>
             <div style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase;">Raw Sample (500-pt avg)</div>
-            <div style="color: var(--amber);" id="txt-raw-vec">X: +8, Y: +3, Z: +271 LSB</div>
+            <div style="color: var(--amber);" id="txt-raw-vec">NO DATA</div>
           </div>
           <div>
             <div style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase;">Calibrated Vector</div>
-            <div style="color: var(--emerald-bright);" id="txt-cal-vec">0.000g, 0.000g, 1.000g</div>
+            <div style="color: var(--emerald-bright);" id="txt-cal-vec">AWAITING DATA</div>
           </div>
           <div>
-            <span class="badge-pill-pass"><i class="fa-solid fa-check"></i> PASS</span>
+            <span class="badge-pill-status"><i class="fa-solid fa-circle-info"></i> REVIEW</span>
           </div>
         </div>
 
@@ -858,66 +877,66 @@
             <tbody>
               <tr>
                 <td><strong>X Axis</strong></td>
-                <td>+264 LSB</td>
-                <td>-248 LSB</td>
-                <td><span style="color: var(--amber);">+8.0 LSB</span> (+0.031g)</td>
-                <td>0.00391 g/LSB</td>
-                <td><span class="badge-pill-pass">0.25%</span></td>
+                <td>NO DATA</td>
+                <td>NO DATA</td>
+                <td>NO DATA</td>
+                <td>NO DATA</td>
+                <td><span class="badge-pill-status">UNVERIFIED</span></td>
               </tr>
               <tr>
                 <td><strong>Y Axis</strong></td>
-                <td>+259 LSB</td>
-                <td>-253 LSB</td>
-                <td><span style="color: var(--amber);">+3.0 LSB</span> (+0.012g)</td>
-                <td>0.00390 g/LSB</td>
-                <td><span class="badge-pill-pass">0.00%</span></td>
+                <td>NO DATA</td>
+                <td>NO DATA</td>
+                <td>NO DATA</td>
+                <td>NO DATA</td>
+                <td><span class="badge-pill-status">UNVERIFIED</span></td>
               </tr>
               <tr>
                 <td><strong>Z Axis</strong></td>
-                <td>+271 LSB</td>
-                <td>-241 LSB</td>
-                <td><span style="color: var(--amber);">+15.0 LSB</span> (+0.058g)</td>
-                <td>0.00392 g/LSB</td>
-                <td><span class="badge-pill-pass">0.51%</span></td>
+                <td>NO DATA</td>
+                <td>NO DATA</td>
+                <td>NO DATA</td>
+                <td>NO DATA</td>
+                <td><span class="badge-pill-status">UNVERIFIED</span></td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <!-- Live Interactive Calculator -->
+        <!-- Procedure reference, not a source of readings -->
         <div class="calculator-box">
           <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; justify-content: space-between;">
-            <span><i class="fa-solid fa-calculator" style="color: var(--emerald);"></i> Live Metrology Simulator</span>
-            <span style="font-size: 0.7rem; color: var(--text-dim); font-weight: 400;">Full-Res 13-bit Mode (&plusmn;16g)</span>
+            <span><i class="fa-solid fa-calculator" style="color: var(--emerald);"></i> Reference calculator: enter signed-run values</span>
+            <span style="font-size: 0.7rem; color: var(--text-dim); font-weight: 400;">No measurements are supplied by this page</span>
           </div>
           
           <div class="input-row">
             <div class="input-group">
-              <label>Raw X (LSB)</label>
-              <input type="number" id="input-raw-x" class="input-field" value="8" oninput="calcCalibration()">
+              <label for="input-raw-x">Raw X (LSB)</label>
+              <input type="number" id="input-raw-x" class="input-field" placeholder="NO DATA" oninput="calcCalibration()">
             </div>
             <div class="input-group">
-              <label>Raw Y (LSB)</label>
-              <input type="number" id="input-raw-y" class="input-field" value="3" oninput="calcCalibration()">
+              <label for="input-raw-y">Raw Y (LSB)</label>
+              <input type="number" id="input-raw-y" class="input-field" placeholder="NO DATA" oninput="calcCalibration()">
             </div>
             <div class="input-group">
-              <label>Raw Z (LSB)</label>
-              <input type="number" id="input-raw-z" class="input-field" value="271" oninput="calcCalibration()">
+              <label for="input-raw-z">Raw Z (LSB)</label>
+              <input type="number" id="input-raw-z" class="input-field" placeholder="NO DATA" oninput="calcCalibration()">
             </div>
           </div>
 
           <div class="calc-output-row">
             <div class="calc-res-item">
               <span class="calc-res-lbl">Calibrated Ax</span>
-              <span class="calc-res-val" id="res-ax">0.000 g</span>
+              <span class="calc-res-val" id="res-ax">NO DATA</span>
             </div>
             <div class="calc-res-item">
               <span class="calc-res-lbl">Calibrated Ay</span>
-              <span class="calc-res-val" id="res-ay">0.000 g</span>
+              <span class="calc-res-val" id="res-ay">NO DATA</span>
             </div>
             <div class="calc-res-item">
               <span class="calc-res-lbl">Calibrated Az</span>
-              <span class="calc-res-val" id="res-az">1.000 g</span>
+              <span class="calc-res-val" id="res-az">NO DATA</span>
             </div>
           </div>
         </div>
@@ -927,14 +946,15 @@
       <!-- MAX6675 THERMOCOUPLE & INMP441 ACOUSTIC -->
       <section class="glass-card">
         <div class="card-header-styled">
-          <h3><i class="fa-solid fa-temperature-half" style="color: #f97316;"></i> MAX6675 2-Point Thermal Reference</h3>
-          <span class="card-badge" style="background: rgba(249, 115, 22, 0.15); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.3);">SPI: CE0</span>
+          <h3><i class="fa-solid fa-temperature-half" style="color: #b45309;"></i> MAX6675 2-Point Thermal Reference</h3>
+          <span class="card-badge" style="background: rgba(180, 83, 9, 0.12); color: #92400e; border: 1px solid rgba(180, 83, 9, 0.3);">SPI: CE0</span>
         </div>
 
-        <div class="math-callout" style="border-left-color: #f97316;">
-          <strong>Two-Point Thermodynamic Calibration Standard:</strong>
-          $$T_{\text{cal}} = a \cdot T_{\text{meas}} + b \quad \left(a = 1.000, \; b = 0.00^\circ\text{C}\right)$$
-          Benchmarked against thermodynamic equilibrium phases (crushed ice-water and boiling distilled water at Cairo atmospheric pressure).
+        <div class="math-callout" style="border-left-color: #b45309;">
+          <strong>Two-Point Thermal Fit Procedure:</strong>
+          $$T_{\text{cal}} = a \cdot T_{\text{meas}} + b$$
+          The coefficients $a$ and $b$ come from operator-measured ice and boiling references. The local boiling point is
+          `[NEED: measured site value or pressure]`, so no fitted coefficients are shown here.
         </div>
 
         <!-- Thermal Verification Table -->
@@ -953,27 +973,27 @@
             <tbody>
               <tr>
                 <td><strong>Crushed Ice Bath</strong></td>
-                <td>0.00 &deg;C</td>
-                <td>+0.25 &deg;C</td>
-                <td>+0.25 &deg;C</td>
-                <td>&le; &plusmn;1.50 &deg;C</td>
-                <td><span class="badge-pill-pass"><i class="fa-solid fa-check"></i> PASS</span></td>
+                <td>0.0 &deg;C</td>
+                <td>NO DATA</td>
+                <td>NO DATA</td>
+                <td>&le; &plusmn;1.50 &deg;C (configured)</td>
+                <td><span class="badge-pill-status"><i class="fa-solid fa-circle-info"></i> UNVERIFIED</span></td>
               </tr>
               <tr>
                 <td><strong>Regulated Ambient</strong></td>
-                <td>22.50 &deg;C</td>
-                <td>22.75 &deg;C</td>
-                <td>+0.25 &deg;C</td>
-                <td>&le; &plusmn;1.50 &deg;C</td>
-                <td><span class="badge-pill-pass"><i class="fa-solid fa-check"></i> PASS</span></td>
+                <td>NO DATA</td>
+                <td>NO DATA</td>
+                <td>NO DATA</td>
+                <td>&le; &plusmn;1.50 &deg;C (configured)</td>
+                <td><span class="badge-pill-status"><i class="fa-solid fa-circle-info"></i> UNVERIFIED</span></td>
               </tr>
               <tr>
                 <td><strong>Boiling Distilled Water</strong></td>
-                <td>100.00 &deg;C</td>
-                <td>99.50 &deg;C</td>
-                <td>-0.50 &deg;C</td>
-                <td>&le; &plusmn;1.50 &deg;C</td>
-                <td><span class="badge-pill-pass"><i class="fa-solid fa-check"></i> PASS</span></td>
+                <td>[NEED: local boiling point]</td>
+                <td>NO DATA</td>
+                <td>NO DATA</td>
+                <td>&le; &plusmn;1.50 &deg;C (configured)</td>
+                <td><span class="badge-pill-status"><i class="fa-solid fa-circle-info"></i> UNVERIFIED</span></td>
               </tr>
             </tbody>
           </table>
@@ -989,29 +1009,30 @@
           </div>
 
           <div class="math-callout" style="border-left-color: var(--cyan);">
-            <strong>Calibrated Sound Pressure Level (SPL):</strong>
-            $$\text{SPL} = 120.0 + 20 \log_{10}(\text{RMS}) \quad [\text{dB SPL}]$$
-            Floor calibration conducted with rig de-energized in an isolated chamber.
+            <strong>Sound Pressure Level Relation:</strong>
+            $$\text{SPL} = \text{reference} + 20 \log_{10}(\text{RMS}) \quad [\text{dB SPL}]$$
+            The acoustic reference and chamber noise floor require a signed measurement record; none is retained here.
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px;">
             <div class="stat-box">
               <span class="stat-label">Acoustic Noise Floor</span>
-              <span class="stat-val cyan">38.2 dB SPL</span>
+              <span class="stat-val">NO DATA</span>
             </div>
             <div class="stat-box">
               <span class="stat-label">Dynamic SNR Margin</span>
-              <span class="stat-val green">&gt; 65.4 dB</span>
+              <span class="stat-val">NO DATA</span>
             </div>
           </div>
         </div>
 
-        <!-- ISO 10816 Zone A Verification -->
-        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; gap: 12px;">
-          <i class="fa-solid fa-circle-check" style="font-size: 1.5rem; color: var(--emerald-bright);"></i>
+        <!-- Evidence status, not a zone certificate -->
+        <div style="background: rgba(180, 83, 9, 0.08); border: 1px solid rgba(180, 83, 9, 0.25); border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; gap: 12px;">
+          <i class="fa-solid fa-circle-info" style="font-size: 1.5rem; color: #b45309;"></i>
           <div style="font-size: 0.8rem; line-height: 1.5; color: var(--text-muted);">
-            <strong style="color: var(--text-main);">ISO 10816-3 Baseline Integrity Verified:</strong>
-            Stationary noise floor ($0.0084g$) is less than $8.4\%$ of the ISO Class I Zone A healthy threshold ($0.10g$), fully safeguarding against false machine degradation alarms.
+            <strong style="color: var(--text-main);">ISO 10816 zone placement: NOT VERIFIED.</strong>
+            No signed stationary noise-floor log is retained, so this page makes no zone or false-alarm guarantee.
+            `[NEED: signed noise-floor log and reviewed zone calculation]`
           </div>
         </div>
 
@@ -1019,97 +1040,95 @@
 
     </div>
 
-    <!-- OFFICIAL PRINTABLE METROLOGY CERTIFICATE -->
+    <!-- PRINTABLE EVIDENCE STATUS SHEET, NOT A CERTIFICATE -->
     <section class="cert-container" id="certificate-print">
-      <div class="cert-watermark">VERIFIED &bull; ISO 17025</div>
-
       <div class="cert-header">
         <div class="cert-title-group">
-          <h2><i class="fa-solid fa-certificate" style="color: var(--emerald);"></i> Official Certificate of Sensor Calibration</h2>
-          <p>Traceable Metrology &amp; Physical Benchmark Verification Report | STEM Grade 12 Capstone 2026</p>
+          <h2><i class="fa-solid fa-circle-info" style="color: var(--emerald);"></i> Calibration Evidence Status (Unverified)</h2>
+          <p>Procedure reference only. No signed measurement record is attached to this page.</p>
         </div>
         <div style="text-align: right;">
           <div style="font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase;">Certificate No.</div>
-          <div style="font-size: 1.1rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--emerald-bright);">CAL-2026-STEM-0042</div>
+          <div style="font-size: 1.1rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--emerald-bright);">NOT ISSUED</div>
         </div>
       </div>
 
       <div class="cert-meta-grid">
         <div class="cert-meta-item">
           <span class="cert-meta-lbl">Unit Under Test (UUT)</span>
-          <span class="cert-meta-val">Edge PdM Rig (RPi4 Model B)</span>
+          <span class="cert-meta-val">NOT REPORTED</span>
         </div>
         <div class="cert-meta-item">
           <span class="cert-meta-lbl">Hardware Serial ID</span>
-          <span class="cert-meta-val">IR-PDM-2026-RPI4-01</span>
+          <span class="cert-meta-val">NOT REPORTED</span>
         </div>
         <div class="cert-meta-item">
           <span class="cert-meta-lbl">Calibration Date</span>
-          <span class="cert-meta-val">November 16, 2026</span>
+          <span class="cert-meta-val">NOT REPORTED</span>
         </div>
         <div class="cert-meta-item">
           <span class="cert-meta-lbl">Traceability Standard</span>
-          <span class="cert-meta-val">Local Earth Gravity / Triple Point</span>
+          <span class="cert-meta-val">NOT VERIFIED</span>
         </div>
       </div>
 
-      <!-- Verified Parameters Table in Certificate -->
+      <!-- Evidence status table in place of a verified-parameters certificate -->
       <div class="data-table-wrap" style="margin-bottom: 20px;">
         <table class="cal-table">
           <thead>
             <tr>
               <th>Transducer</th>
-              <th>Physical Standard Reference</th>
-              <th>Calibrated Parameters</th>
+              <th>Procedure</th>
+              <th>Parameters</th>
               <th>Residual Error</th>
-              <th>Metrological Status</th>
+              <th>Evidence Status</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td><strong>ADXL345 3-Axis Accel</strong></td>
-              <td>Local Earth Gravity ($g = 9.80665\,\text{m/s}^2$)</td>
-              <td>$b = [+8, +3, +15]\,\text{LSB}, \; S = 3.90\,\text{mg/LSB}$</td>
-              <td>$\le 0.51\%$ Max Dev</td>
-              <td><span class="badge-pill-pass"><i class="fa-solid fa-check"></i> CERTIFIED</span></td>
+              <td>Six-face static gravitational test</td>
+              <td>NO DATA</td>
+              <td>NO DATA</td>
+              <td><span class="badge-pill-status"><i class="fa-solid fa-circle-info"></i> UNVERIFIED</span></td>
             </tr>
             <tr>
               <td><strong>MAX6675 Thermocouple</strong></td>
-              <td>Distilled Ice Bath ($0.0^\circ\text{C}$) &amp; Boiling ($100.0^\circ\text{C}$)</td>
-              <td>Slope $a = 1.000, \; b = 0.00^\circ\text{C}$</td>
-              <td>$\pm 0.50^\circ\text{C}$ Max Error</td>
-              <td><span class="badge-pill-pass"><i class="fa-solid fa-check"></i> CERTIFIED</span></td>
+              <td>Two-point ice/boiling fit</td>
+              <td>NO DATA</td>
+              <td>NO DATA</td>
+              <td><span class="badge-pill-status"><i class="fa-solid fa-circle-info"></i> UNVERIFIED</span></td>
             </tr>
             <tr>
               <td><strong>INMP441 Acoustic MEMS</strong></td>
-              <td>Acoustic Chamber ($120\,\text{dB SPL}$ ref at $1\,\text{kHz}$)</td>
-              <td>Offset $= 120.0\,\text{dB}, \; \text{Floor} = 38.2\,\text{dB}$</td>
-              <td>$\text{SNR} &gt; 65.4\,\text{dB}$</td>
-              <td><span class="badge-pill-pass"><i class="fa-solid fa-check"></i> CERTIFIED</span></td>
+              <td>De-energized noise-floor log</td>
+              <td>NO DATA</td>
+              <td>NO DATA</td>
+              <td><span class="badge-pill-status"><i class="fa-solid fa-circle-info"></i> UNVERIFIED</span></td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <!-- Formal Signature Blocks -->
+      <!-- Signature blocks show the evidence gap, not sign-off -->
       <div class="cert-signatures">
         <div class="sig-block">
-          <div class="sig-name">STEM Metrology Lead</div>
-          <div class="sig-title">Senior Hardware Calibration Engineer</div>
+          <div class="sig-name">Calibration operator</div>
+          <div class="sig-title">Six-face run and thermal points</div>
           <div class="sig-line"></div>
-          <div style="font-size: 0.75rem; color: var(--emerald-bright); margin-top: 4px; font-family: 'JetBrains Mono', monospace;">[DIGITALLY SIGNED]</div>
+          <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 4px; font-family: 'JetBrains Mono', monospace;">SIGNATURE NOT CAPTURED</div>
         </div>
         <div class="sig-block">
-          <div class="sig-name">Lead AI Systems Architect</div>
-          <div class="sig-title">Edge Inference Verification</div>
+          <div class="sig-name">Reviewer</div>
+          <div class="sig-title">Residual and tolerance check</div>
           <div class="sig-line"></div>
-          <div style="font-size: 0.75rem; color: var(--emerald-bright); margin-top: 4px; font-family: 'JetBrains Mono', monospace;">[DIGITALLY SIGNED]</div>
+          <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 4px; font-family: 'JetBrains Mono', monospace;">SIGNATURE NOT CAPTURED</div>
         </div>
         <div class="sig-block">
-          <div class="sig-name">Capstone Evaluation Board</div>
-          <div class="sig-title">Ministry STEM School Grade 12</div>
+          <div class="sig-name">Evidence status</div>
+          <div class="sig-title">Run record attachment</div>
           <div class="sig-line"></div>
-          <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 4px; font-family: 'JetBrains Mono', monospace;">Traceability Validated</div>
+          <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 4px; font-family: 'JetBrains Mono', monospace;">NOT VERIFIED</div>
         </div>
       </div>
     </section>
@@ -1128,54 +1147,21 @@
     </div>
   </footer>
 
-  <!-- INTERACTIVE SCRIPT -->
+  <!-- PROCEDURE-ONLY SCRIPT: no readings or verdicts are generated here -->
   <script>
-    // 6-Position Static Gravitational Orientations
-    const tiltData = [
-      { name: "+Z Up (Flat Surface)", raw: "X: +8, Y: +3, Z: +271 LSB", cal: "Ax: 0.000g, Ay: 0.000g, Az: 1.000g", rx: 8, ry: 3, rz: 271 },
-      { name: "-Z Up (Inverted)", raw: "X: +8, Y: +3, Z: -241 LSB", cal: "Ax: 0.000g, Ay: 0.000g, Az: -1.000g", rx: 8, ry: 3, rz: -241 },
-      { name: "+X Up", raw: "X: +264, Y: +3, Z: +15 LSB", cal: "Ax: 1.000g, Ay: 0.000g, Az: 0.000g", rx: 264, ry: 3, rz: 15 },
-      { name: "-X Up", raw: "X: -248, Y: +3, Z: +15 LSB", cal: "Ax: -1.000g, Ay: 0.000g, Az: 0.000g", rx: -248, ry: 3, rz: 15 },
-      { name: "+Y Up", raw: "X: +8, Y: +259, Z: +15 LSB", cal: "Ax: 0.000g, Ay: 1.000g, Az: 0.000g", rx: 8, ry: 259, rz: 15 },
-      { name: "-Y Up", raw: "X: +8, Y: -253, Z: +15 LSB", cal: "Ax: 0.000g, Ay: -1.000g, Az: 0.000g", rx: 8, ry: -253, rz: 15 }
-    ];
-
     function selectTilt(index) {
       const btns = document.querySelectorAll('.tilt-btn');
       btns.forEach((b, i) => b.classList.toggle('active', i === index));
-
-      const d = tiltData[index];
-      document.getElementById('txt-raw-vec').innerText = d.raw;
-      document.getElementById('txt-cal-vec').innerText = d.cal;
-
-      // Also update inputs in simulator
-      document.getElementById('input-raw-x').value = d.rx;
-      document.getElementById('input-raw-y').value = d.ry;
-      document.getElementById('input-raw-z').value = d.rz;
-      calcCalibration();
+      document.getElementById('txt-raw-vec').innerText = 'NO DATA';
+      document.getElementById('txt-cal-vec').innerText = 'AWAITING DATA';
     }
-
-    // Live Simulator Calculation
-    const OFFSET_X = 8.0;
-    const OFFSET_Y = 3.0;
-    const OFFSET_Z = 15.0;
-    const SCALE_FACTOR = 0.00390625; // 1 / 256 LSB per g
 
     function calcCalibration() {
-      const rx = parseFloat(document.getElementById('input-raw-x').value) || 0;
-      const ry = parseFloat(document.getElementById('input-raw-y').value) || 0;
-      const rz = parseFloat(document.getElementById('input-raw-z').value) || 0;
-
-      const ax = (rx - OFFSET_X) * SCALE_FACTOR;
-      const ay = (ry - OFFSET_Y) * SCALE_FACTOR;
-      const az = (rz - OFFSET_Z) * SCALE_FACTOR;
-
-      document.getElementById('res-ax').innerText = (ax >= 0 ? '+' : '') + ax.toFixed(3) + ' g';
-      document.getElementById('res-ay').innerText = (ay >= 0 ? '+' : '') + ay.toFixed(3) + ' g';
-      document.getElementById('res-az').innerText = (az >= 0 ? '+' : '') + az.toFixed(3) + ' g';
+      for (const id of ['res-ax', 'res-ay', 'res-az']) {
+        document.getElementById(id).innerText = 'NO DATA';
+      }
     }
 
-    // Run initial calc
     calcCalibration();
   </script>
 </body>

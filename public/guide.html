@@ -6,11 +6,21 @@
   <meta name="description" content="G12 capstone exhibition deck: Raspberry Pi condition monitoring, honest four-class diagnosis and public real-bearing RUL benchmarks.">
   <title>STEM Exhibition Presentation | Intelligent Industrial Predictive Maintenance</title>
   
-  <!-- Fonts & Typography -->
+  <!-- Fonts and icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    @font-face { font-family: 'Oxanium'; font-style: normal; font-weight: 300; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/oxanium@5/files/oxanium-latin-300-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'Oxanium'; font-style: normal; font-weight: 400; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/oxanium@5/files/oxanium-latin-400-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'Oxanium'; font-style: normal; font-weight: 500; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/oxanium@5/files/oxanium-latin-500-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'Oxanium'; font-style: normal; font-weight: 600; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/oxanium@5/files/oxanium-latin-600-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'Oxanium'; font-style: normal; font-weight: 700; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/oxanium@5/files/oxanium-latin-700-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'Oxanium'; font-style: normal; font-weight: 800; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/oxanium@5/files/oxanium-latin-800-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-400-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 500; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-500-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 600; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-600-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 700; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-700-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 800; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-800-normal.woff2') format('woff2'); }
+  </style>
   
   <!-- KaTeX for Scientific & Mathematical Equations -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
@@ -19,22 +29,22 @@
 
   <style>
     :root {
-      --bg-dark: #040711;
-      --bg-card: rgba(13, 20, 38, 0.96);
-      --bg-card-hover: rgba(22, 33, 62, 0.88);
-      --border: rgba(255, 255, 255, 0.08);
-      --border-accent: rgba(6, 182, 212, 0.45);
-      --cyan: #06b6d4;
-      --cyan-bright: #22d3ee;
-      --blue: #3b82f6;
-      --indigo: #6366f1;
-      --green: #10b981;
-      --amber: #f59e0b;
-      --red: #ef4444;
-      --purple: #a855f7;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --text-dim: #64748b;
+      --bg-dark: #f4f7fb;
+      --bg-card: rgba(24, 34, 48, 0.96);
+      --bg-card-hover: rgba(244, 249, 253, 0.96);
+      --border: rgba(24, 34, 48, 0.12);
+      --border-accent: rgba(14, 116, 144, 0.35);
+      --cyan: #0e7490;
+      --cyan-bright: #155e75;
+      --blue: #2563eb;
+      --indigo: #4338ca;
+      --green: #0f766e;
+      --amber: #b45309;
+      --red: #c24141;
+      --purple: #6d28d9;
+      --text-main: #182230;
+      --text-muted: #4b6078;
+      --text-dim: #64798f;
     }
 
     * {
@@ -82,7 +92,7 @@
       left: 0;
       right: 0;
       height: 56px;
-      background: rgba(8, 14, 28, 0.97);
+      background: rgba(255, 255, 255, 0.97);
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
@@ -102,7 +112,7 @@
 
     .brand-badge {
       background: linear-gradient(135deg, var(--cyan), var(--blue));
-      color: #040711;
+      color: #ffffff;
       font-size: 10px;
       font-weight: 900;
       padding: 3px 8px;
@@ -146,7 +156,7 @@
     }
 
     .btn {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(24, 34, 48, 0.05);
       border: 1px solid var(--border);
       color: var(--text-main);
       padding: 6px 12px;
@@ -163,7 +173,7 @@
     }
 
     .btn:hover {
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(24, 34, 48, 0.12);
       border-color: var(--cyan);
       color: var(--cyan);
       transform: translateY(-1px);
@@ -171,7 +181,7 @@
 
     .btn-primary {
       background: linear-gradient(135deg, var(--cyan), var(--blue));
-      color: #040711;
+      color: #ffffff;
       border: none;
       font-weight: 800;
       box-shadow: 0 4px 14px rgba(6, 182, 212, 0.35);
@@ -179,7 +189,7 @@
 
     .btn-primary:hover {
       opacity: 0.94;
-      color: #040711;
+      color: #ffffff;
       box-shadow: 0 6px 20px rgba(6, 182, 212, 0.6);
     }
 
@@ -201,7 +211,7 @@
       left: 0;
       right: 0;
       height: 3px;
-      background: rgba(255, 255, 255, 0.04);
+      background: rgba(24, 34, 48, 0.04);
       z-index: 999;
     }
 
@@ -247,10 +257,10 @@
       width: 100%;
       max-height: 100%;
       background: var(--bg-card);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(24, 34, 48, 0.1);
       border-radius: clamp(14px, 2vh, 22px);
       padding: clamp(14px, 2.6vh, 32px) clamp(18px, 2.8vw, 42px);
-      box-shadow: 0 24px 56px -12px rgba(0,0,0,0.7), inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+      box-shadow: 0 24px 56px -12px rgba(24,34,48,0.10), inset 0 1px 1px 0 rgba(24, 34, 48, 0.15);
       position: relative;
       display: none;
       flex-direction: column;
@@ -322,8 +332,8 @@
 
     /* Feature Cards */
     .feature-card {
-      background: rgba(255, 255, 255, 0.028);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(24, 34, 48, 0.028);
+      border: 1px solid rgba(24, 34, 48, 0.08);
       border-radius: clamp(10px, 1.4vh, 14px);
       padding: clamp(10px, 1.6vh, 18px);
       transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -360,8 +370,8 @@
 
     /* Metric Display Units */
     .stat-box {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(24, 34, 48, 0.02);
+      border: 1px solid rgba(24, 34, 48, 0.1);
       border-radius: clamp(10px, 1.4vh, 14px);
       padding: clamp(10px, 1.5vh, 16px) 8px;
       text-align: center;
@@ -417,8 +427,8 @@
       border-radius: 4px;
       margin-top: 3px;
       font-family: 'JetBrains Mono', monospace;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(24, 34, 48, 0.05);
+      border: 1px solid rgba(24, 34, 48, 0.12);
       color: #cbd5e1;
     }
 
@@ -445,7 +455,7 @@
     }
 
     .flow-step {
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(24, 34, 48, 0.03);
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: clamp(8px, 1.2vh, 12px) clamp(10px, 1vw, 14px);
@@ -455,7 +465,7 @@
     }
 
     .flow-step:hover {
-      background: rgba(255, 255, 255, 0.07);
+      background: rgba(24, 34, 48, 0.07);
       border-color: var(--border-accent);
       transform: translateY(-1px);
     }
@@ -488,7 +498,7 @@
     }
 
     .pdm-table th {
-      background: rgba(255, 255, 255, 0.04);
+      background: rgba(24, 34, 48, 0.04);
       color: var(--cyan-bright);
       font-weight: 800;
       font-size: clamp(9.5px, 1.1vh, 11px);
@@ -497,7 +507,7 @@
     }
 
     .pdm-table tr:hover td {
-      background: rgba(255, 255, 255, 0.025);
+      background: rgba(24, 34, 48, 0.025);
     }
 
     /* Badges */
@@ -545,7 +555,7 @@
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.22);
+      background: rgba(24, 34, 48, 0.22);
       cursor: pointer;
       transition: all 0.25s ease;
     }
@@ -705,6 +715,17 @@
       .waveform-card svg { height: 24px !important; }
     }
 
+    @media (max-height: 680px) {
+      body:not(.scroll-mode) .slide { overflow-y: auto; justify-content: flex-start; }
+      body:not(.scroll-mode) .slide > * { flex-shrink: 0; }
+      /* The six-answer slide needs a compact fit on short projector/laptop viewports. */
+      body:not(.scroll-mode) .slide[data-slide="12"] { padding: 8px !important; }
+      body:not(.scroll-mode) .slide[data-slide="12"] .slide-title { font-size: 26px !important; }
+      body:not(.scroll-mode) .slide[data-slide="12"] .grid-2 { gap: 7px !important; }
+      body:not(.scroll-mode) .slide[data-slide="12"] .feature-card { padding: 7px 12px !important; }
+      body:not(.scroll-mode) .slide[data-slide="12"] .card-desc { font-size: 11.5px !important; line-height: 15.5px !important; }
+    }
+
     @media (max-width: 860px) {
       .grid-2, .grid-3 { grid-template-columns: 1fr; }
       .grid-4 { grid-template-columns: repeat(2, 1fr); }
@@ -806,7 +827,7 @@
       </button>
       <div class="slide-counter" id="slideCounter">01 / 12</div>
       <a href="calibration.html" class="btn chrome-only" title="Open Sensor Calibration Suite">
-        <i class="fa-solid fa-compass-drafting" style="color: #10b981;"></i> Calibration
+        <i class="fa-solid fa-compass-drafting" style="color: #0f766e;"></i> Calibration
       </a>
       <a href="/" class="btn btn-primary" target="_blank" title="Open live machine telemetry">
         <i class="fa-solid fa-gauge-high"></i> Telemetry
@@ -1173,6 +1194,11 @@
                 <td>Last-window MAE <b>182.91 s</b>, RMSE <b>335.26 s</b></td>
                 <td><span class="badge badge-amber">Real bearings, not our motor</span></td>
               </tr>
+              <tr>
+                <td><b>XJTU-SY RUL</b></td>
+                <td>Last-20% MAE <b>134.924 min</b>, RMSE <b>171.776 min</b>; baseline RMSE 160.859 min</td>
+                <td><span class="badge badge-amber">BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED</span></td>
+              </tr>
             </tbody>
           </table>
 
@@ -1360,14 +1386,14 @@
           <div class="feature-card">
             <b style="color: var(--green);"><i class="fa-solid fa-hourglass-half"></i> Q5: Is remaining useful life working?</b>
             <p class="card-desc">
-              <i>"Yes on a public real-bearing benchmark, no on our motor. On six PRONOSTIA/FEMTO-ST run-to-failure bearings, leave-one-bearing-out last-window MAE is 182.91 s and RMSE 335.26 s, against 8902.25 s constant baseline. Those are other bearings, not our rig; field RUL needs our own run-to-failure series."</i>
+              <i>"Yes on public real-bearing benchmarks, no on our motor. On six PRONOSTIA/FEMTO-ST bearings, leave-one-bearing-out last-window MAE is 182.91 s and RMSE 335.26 s. On 15 XJTU-SY bearings the last-20% MAE is 134.924 min and RMSE 171.776 min, slightly worse than the 160.859 min constant baseline; that gap is reported honestly. Both are BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED, never hours-to-failure for our rig. Field RUL needs our own run-to-failure series and operator-confirmed failure times. ml/rul_from_rig.py is the ready path, not a result today."</i>
             </p>
           </div>
 
           <div class="feature-card">
             <b style="color: var(--amber);"><i class="fa-solid fa-database"></i> Q6: Which data is actually real?</b>
             <p class="card-desc">
-              <i>"CWRU is a real 2 hp induction motor with seeded faults; PRONOSTIA has six real bearing run-to-failure trajectories; our 100% result is synthetic only. None of these datasets came from our capstone rig, and no result is presented as field validation."</i>
+              <i>"CWRU is a real 2 hp Reliance Electric motor with seeded faults; PRONOSTIA has six and XJTU-SY has fifteen real bearing run-to-failure trajectories; our 100% result is synthetic only. None of these datasets came from our capstone rig, and no result is presented as field validation. Source and licence evidence is on the dashboard; explicit reuse licences that could not be verified stay marked [NEED: ...]."</i>
             </p>
           </div>
         </div>

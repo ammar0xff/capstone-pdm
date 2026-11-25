@@ -6,10 +6,17 @@
   <title>Industrial Predictive Maintenance SCADA | Motor-01 Cloud Mirror</title>
   <meta name="description" content="Live vibration, thermal and acoustic telemetry from a Raspberry Pi industrial motor monitor, with two-stage SPC and Random Forest fault classification.">
   
-  <!-- Font & Icons -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Fonts and icons -->
+  <style>
+    @font-face { font-family: 'Inter'; font-style: normal; font-weight: 400; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-400-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'Inter'; font-style: normal; font-weight: 500; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-500-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'Inter'; font-style: normal; font-weight: 600; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-600-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'Inter'; font-style: normal; font-weight: 700; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-700-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-400-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 500; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-500-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 600; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-600-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 700; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-700-normal.woff2') format('woff2'); }
+  </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
   <!-- Chart.js -->
@@ -17,39 +24,40 @@
 
   <style>
     :root {
-      --bg-base: #090d16;
-      --bg-surface: #0e1526;
-      --bg-surface-elevated: #131d33;
-      --bg-subtle: #17223b;
-      --border-subtle: #1e293b;
-      --border-strong: #334155;
-      
-      --text-main: #f8fafc;
-      --text-secondary: #94a3b8;
-      --text-muted: #7f90a7;
-      
-      --status-ok: #10b981;
-      --status-ok-bg: rgba(16, 185, 129, 0.1);
-      --status-ok-border: rgba(16, 185, 129, 0.3);
-      
-      --status-warn: #f59e0b;
-      --status-warn-bg: rgba(245, 158, 11, 0.1);
-      --status-warn-border: rgba(245, 158, 11, 0.3);
-      
-      --status-alarm: #ef4444;
-      --status-alarm-bg: rgba(239, 68, 68, 0.1);
-      --status-alarm-border: rgba(239, 68, 68, 0.3);
-      
-      --accent-blue: #3b82f6;
-      --accent-cyan: #0284c7;
-      --accent-purple: #8b5cf6;
+      --bg-base: #f4f7fb;
+      --bg-surface: #ffffff;
+      --bg-surface-elevated: #f8fafc;
+      --bg-subtle: #eef3f8;
+      --border-subtle: #dbe4ee;
+      --border-strong: #b8c7d9;
+
+      --text-main: #182230;
+      --text-secondary: #4b6078;
+      --text-muted: #52677d;
+
+      --status-ok: #0f766e;
+      --status-ok-bg: #ecfdf7;
+      --status-ok-border: #99d5c5;
+
+      --status-warn: #b45309;
+      --status-warn-bg: #fff8eb;
+      --status-warn-border: #f0cf93;
+
+      --status-alarm: #c24141;
+      --status-alarm-bg: #fff1f1;
+      --status-alarm-border: #f0b5b5;
+
+      --accent-blue: #2563eb;
+      --accent-cyan: #0f766e;
+      --accent-purple: #6d28d9;
+      --shadow-card: 0 1px 2px rgba(24, 34, 48, 0.04), 0 8px 24px rgba(24, 34, 48, 0.04);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: var(--bg-base);
+      background: linear-gradient(180deg, #f7fafc 0%, var(--bg-base) 100%);
       color: var(--text-main);
       min-height: 100vh;
       line-height: 1.45;
@@ -151,7 +159,7 @@
 
     .status-indicator-pill.offline {
       background: var(--status-alarm-bg);
-      color: #fca5a5;
+      color: var(--status-alarm);
       border-color: var(--status-alarm-border);
     }
 
@@ -211,13 +219,13 @@
     .edge-alert-ribbon.offline {
       background: var(--status-alarm-bg);
       border-color: var(--status-alarm-border);
-      color: #fca5a5;
+      color: #991b1b;
     }
 
     .edge-alert-ribbon.stale {
       background: var(--status-warn-bg);
       border-color: var(--status-warn-border);
-      color: #fde68a;
+      color: #92400e;
     }
 
     .ribbon-info {
@@ -255,6 +263,12 @@
 
     .scada-hero-panel.warning { border-left-color: var(--status-warn); }
     .scada-hero-panel.fault { border-left-color: var(--status-alarm); }
+    .scada-hero-panel.awaiting { border-left-color: var(--border-strong); }
+    .scada-hero-panel.awaiting .state-icon-box {
+      background: var(--bg-subtle);
+      border-color: var(--border-strong);
+      color: var(--text-muted);
+    }
 
     .state-indicator-block {
       display: flex;
@@ -356,7 +370,7 @@
     }
 
     .decision-chip.schedule {
-      color: #38bdf8;
+      color: #0369a1;
       border-color: rgba(56, 189, 248, 0.4);
       background: rgba(56, 189, 248, 0.1);
     }
@@ -544,6 +558,8 @@
       left: 8%;
     }
 
+    .iso-indicator-pointer.is-unavailable { display: none; }
+
     .iso-labels {
       display: flex;
       justify-content: space-between;
@@ -633,14 +649,15 @@
       text-transform: uppercase;
     }
 
-    .gate-badge-tag.dormant {
+    .gate-badge-tag.dormant,
+    .gate-badge-tag.pending {
       background: var(--bg-subtle);
       color: var(--text-muted);
     }
 
     .gate-badge-tag.active {
       background: rgba(139, 92, 246, 0.2);
-      color: #c4b5fd;
+      color: #5b21b6;
       border: 1px solid rgba(139, 92, 246, 0.4);
     }
 
@@ -751,7 +768,7 @@
     }
 
     .scada-footer a:hover {
-      color: #93c5fd;
+      color: var(--accent-blue);
     }
 
     .scada-footer a:focus-visible {
@@ -761,6 +778,121 @@
 
     .chart-panel-box.no-data {
       height: 96px;
+    }
+
+    /* Benchmark and provenance evidence - never live telemetry */
+    .benchmark-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      box-shadow: var(--shadow-card);
+      padding: 16px 18px;
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) minmax(260px, 1.4fr);
+      gap: 18px;
+    }
+
+    .benchmark-panel h2 {
+      font-size: 14px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .benchmark-panel p {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      margin-bottom: 8px;
+    }
+
+    .benchmark-warning {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .benchmark-warning span {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 3px 7px;
+      border-radius: 3px;
+      background: var(--status-warn-bg);
+      color: #92400e;
+      border: 1px solid var(--status-warn-border);
+    }
+
+    .benchmark-metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+    }
+
+    .benchmark-metric {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 10px 12px;
+    }
+
+    .benchmark-metric strong {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      font-variant-numeric: tabular-nums;
+      color: var(--accent-blue);
+    }
+
+    .benchmark-metric small {
+      display: block;
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      line-height: 1.35;
+    }
+
+    .provenance-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .provenance-table th,
+    .provenance-table td {
+      text-align: left;
+      vertical-align: top;
+      padding: 7px 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.45;
+    }
+
+    .provenance-table th {
+      color: var(--text-main);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .provenance-table a {
+      color: var(--accent-blue);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+    }
+
+    .provenance-need {
+      color: #92400e;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+    }
+
+    @media (max-width: 860px) {
+      .benchmark-panel { grid-template-columns: 1fr; }
+      .provenance-table th, .provenance-table td { padding: 6px; }
     }
 
     @media (max-width: 480px) {
@@ -800,12 +932,12 @@
       <div class="telemetry-meta">
         <div class="status-indicator-pill offline" id="cloud-indicator">
           <span class="status-dot" id="cloud-dot"></span>
-          <span id="txt-cloud-status" class="font-mono">INITIALIZING...</span>
+          <span id="txt-cloud-status" class="font-mono">AWAITING DATA</span>
         </div>
         
         <div style="font-size: 11px; color: var(--text-muted); display: flex; gap: 12px;">
-          <span>SEQ: <b class="font-mono" style="color: var(--text-main);" id="badge-seq">#0</b></span>
-          <span>UPTIME: <b class="font-mono" style="color: var(--text-main);" id="badge-uptime">0.0s</b></span>
+          <span>SEQ: <b class="font-mono" style="color: var(--text-main);" id="badge-seq">NO DATA</b></span>
+          <span>UPTIME: <b class="font-mono" style="color: var(--text-main);" id="badge-uptime">NO DATA</b></span>
         </div>
       </div>
 
@@ -840,14 +972,14 @@
     <main class="dashboard-layout">
       
       <!-- Primary Machine State Banner -->
-      <section class="scada-hero-panel" id="main-status-card">
+      <section class="scada-hero-panel awaiting" id="main-status-card">
         <div class="state-indicator-block">
           <div class="state-icon-box" id="status-lamp">
-            <i class="fa-solid fa-check" id="lamp-icon"></i>
+            <i class="fa-solid fa-circle-question" id="lamp-icon"></i>
           </div>
           <div class="state-title-text">
-            <h2 id="status-title">Normal Operation</h2>
-            <p id="status-sub">Vibration, thermal gradient, and acoustic sound pressure within ISO baseline</p>
+            <h2 id="status-title">Awaiting telemetry</h2>
+            <p id="status-sub">No classified packet received from the Raspberry Pi mirror yet</p>
           </div>
         </div>
 
@@ -855,11 +987,11 @@
           <i class="fa-solid fa-shield-halved"></i>
           <div>
             <b style="color: var(--text-main); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em;">Operational Protocol:</b>
-            <span id="txt-advice" style="margin-left: 4px;">Continuous statistical baseline monitoring active. No operator intervention required.</span>
+            <span id="txt-advice" style="margin-left: 4px;">Awaiting classified telemetry.</span>
             <div class="decision-meta" aria-label="Operator decision from the classified fault">
-              <span class="decision-chip" id="txt-decision-priority">ROUTINE</span>
-              <span class="decision-field"><small>Timeframe</small><span class="font-mono" id="txt-decision-timeframe">Next scheduled inspection</span></span>
-              <span class="decision-field"><small>Owner</small><span id="txt-decision-owner">Operations operator</span></span>
+              <span class="decision-chip" id="txt-decision-priority">AWAITING DATA</span>
+              <span class="decision-field"><small>Timeframe</small><span class="font-mono" id="txt-decision-timeframe">NO DATA</span></span>
+              <span class="decision-field"><small>Owner</small><span id="txt-decision-owner">NO DATA</span></span>
             </div>
           </div>
         </div>
@@ -867,11 +999,11 @@
         <div class="telemetry-kpis">
           <div class="kpi-cell">
             <div class="kpi-label">AI Confidence</div>
-            <div class="kpi-value font-mono" id="badge-ai-conf" style="color: var(--status-ok);">&mdash;</div>
+            <div class="kpi-value font-mono" id="badge-ai-conf">NO DATA</div>
           </div>
           <div class="kpi-cell">
             <div class="kpi-label">SPC Gate</div>
-            <div class="kpi-value font-mono" id="badge-gate-status" style="font-size: 13px; color: #a78bfa;">STAGE 1</div>
+            <div class="kpi-value font-mono" id="badge-gate-status" style="font-size: 13px; color: var(--text-muted);">AWAITING DATA</div>
           </div>
         </div>
       </section>
@@ -883,7 +1015,7 @@
         <article class="sensor-panel">
           <div class="sensor-panel-header">
             <div class="sensor-name">
-              <i class="fa-solid fa-wave-square" style="color: #38bdf8;"></i>
+              <i class="fa-solid fa-wave-square" style="color: #0369a1;"></i>
               Vibration Kinematics
             </div>
             <span class="sensor-bus-spec">ADXL345 &bull; I2C 0x53</span>
@@ -892,19 +1024,19 @@
           <div class="metrics-2x2">
             <div class="metric-data-card">
               <div class="name">Dynamic RMS</div>
-              <div class="value-display font-mono" id="val-rms">0.0094<span class="unit">g</span></div>
+              <div class="value-display font-mono" id="val-rms">NO DATA</div>
             </div>
             <div class="metric-data-card">
               <div class="name">Peak Acceleration</div>
-              <div class="value-display font-mono" id="val-peak">0.0280<span class="unit">g</span></div>
+              <div class="value-display font-mono" id="val-peak">NO DATA</div>
             </div>
             <div class="metric-data-card">
               <div class="name">Kurtosis (&kappa;)</div>
-              <div class="value-display font-mono" id="val-kurt">4.53<span class="unit">&kappa;</span></div>
+              <div class="value-display font-mono" id="val-kurt">NO DATA</div>
             </div>
             <div class="metric-data-card">
               <div class="name">Crest Factor</div>
-              <div class="value-display font-mono" id="val-cf">2.98<span class="unit">CF</span></div>
+              <div class="value-display font-mono" id="val-cf">NO DATA</div>
             </div>
           </div>
 
@@ -912,14 +1044,14 @@
           <div class="iso-severity-widget">
             <div class="widget-title">
               <span>ISO 10816-3 Severity Zone</span>
-              <span id="txt-iso-zone" class="font-mono" style="color: var(--status-ok);">Zone A (Good)</span>
+              <span id="txt-iso-zone" class="font-mono" style="color: var(--text-muted);">AWAITING DATA</span>
             </div>
             <div class="iso-track">
               <div class="iso-segment iso-seg-a" title="Zone A: Good"></div>
               <div class="iso-segment iso-seg-b" title="Zone B: Satisfactory"></div>
               <div class="iso-segment iso-seg-c" title="Zone C: Unsatisfactory"></div>
               <div class="iso-segment iso-seg-d" title="Zone D: Unacceptable"></div>
-              <div class="iso-indicator-pointer" id="iso-pointer" style="left: 12%;"></div>
+              <div class="iso-indicator-pointer is-unavailable" id="iso-pointer"></div>
             </div>
             <div class="iso-labels">
               <span>0.0g</span>
@@ -938,7 +1070,7 @@
         <article class="sensor-panel">
           <div class="sensor-panel-header">
             <div class="sensor-name">
-              <i class="fa-solid fa-temperature-half" style="color: #fbbf24;"></i>
+              <i class="fa-solid fa-temperature-half" style="color: #92400e;"></i>
               Thermal Dynamics
             </div>
             <span class="sensor-bus-spec">MAX6675 &bull; SPI0.0 &bull; Class-1 K</span>
@@ -947,19 +1079,19 @@
           <div class="metrics-2x2">
             <div class="metric-data-card">
               <div class="name">Casing Temp</div>
-              <div class="value-display font-mono" id="val-temp" style="color: #fbbf24;">24.25<span class="unit">&deg;C</span></div>
+              <div class="value-display font-mono" id="val-temp">NO DATA</div>
             </div>
             <div class="metric-data-card">
               <div class="name">Thermal Slope</div>
-              <div class="value-display font-mono" id="val-slope">-0.40<span class="unit">&deg;C/m</span></div>
+              <div class="value-display font-mono" id="val-slope">NO DATA</div>
             </div>
             <div class="metric-data-card">
               <div class="name">Cold Junction</div>
-              <div class="value-display font-mono" id="val-coldj" style="color: var(--status-ok); font-size: 15px;">COMPENSATED</div>
+              <div class="value-display font-mono" id="val-coldj" style="font-size: 15px; color: var(--text-muted);">NOT REPORTED</div>
             </div>
             <div class="metric-data-card">
               <div class="name">ADC Resolution</div>
-              <div class="value-display font-mono" id="val-res">0.25<span class="unit">&deg;C</span></div>
+              <div class="value-display font-mono" id="val-res">NO DATA</div>
             </div>
           </div>
 
@@ -967,13 +1099,13 @@
           <div class="iso-severity-widget">
             <div class="widget-title">
               <span>Runaway Threshold (Blok ODE)</span>
-              <span id="txt-thermal-zone" class="font-mono" style="color: var(--status-ok);">Nominal Drift</span>
+              <span id="txt-thermal-zone" class="font-mono" style="color: var(--text-muted);">AWAITING DATA</span>
             </div>
             <div class="iso-track">
               <div class="iso-segment iso-seg-a" style="width: 40%;" title="Nominal (<45°C)"></div>
               <div class="iso-segment iso-seg-c" style="width: 35%;" title="Warning (45-65°C)"></div>
               <div class="iso-segment iso-seg-d" style="width: 25%;" title="Trip (>65°C)"></div>
-              <div class="iso-indicator-pointer" id="temp-pointer" style="left: 18%;"></div>
+              <div class="iso-indicator-pointer is-unavailable" id="temp-pointer"></div>
             </div>
             <div class="iso-labels">
               <span>Ambient</span>
@@ -1000,19 +1132,19 @@
           <div class="metrics-2x2">
             <div class="metric-data-card">
               <div class="name">Sound Pressure</div>
-              <div class="value-display font-mono" id="val-sound-db" style="color: #c084fc;">66.8<span class="unit">dB SPL</span></div>
+              <div class="value-display font-mono" id="val-sound-db">NO DATA</div>
             </div>
             <div class="metric-data-card">
               <div class="name">Zero-Crossing Rate</div>
-              <div class="value-display font-mono" id="val-sound-zcr">0.000<span class="unit">cross/sample</span></div>
+              <div class="value-display font-mono" id="val-sound-zcr">NO DATA</div>
             </div>
             <div class="metric-data-card">
               <div class="name">Gate Z-Score (vibration)</div>
-              <div class="value-display font-mono" id="val-spc-z">-2.82<span class="unit">&sigma;</span></div>
+              <div class="value-display font-mono" id="val-spc-z">NO DATA</div>
             </div>
             <div class="metric-data-card">
               <div class="name">DMA Stream Health</div>
-              <div class="value-display font-mono" id="val-sound-status" style="color: var(--status-ok); font-size: 15px;">SYNCHRONIZED</div>
+              <div class="value-display font-mono" id="val-sound-status" style="font-size: 15px; color: var(--text-muted);">NOT REPORTED</div>
             </div>
           </div>
 
@@ -1020,13 +1152,13 @@
           <div class="iso-severity-widget">
             <div class="widget-title">
               <span>Acoustic Pressure Level</span>
-              <span id="txt-sound-zone" class="font-mono" style="color: var(--status-ok);">Ambient Baseline</span>
+              <span id="txt-sound-zone" class="font-mono" style="color: var(--text-muted);">AWAITING DATA</span>
             </div>
             <div class="iso-track">
               <div class="iso-segment iso-seg-a" style="width: 50%;" title="Quiet (<70dB)"></div>
               <div class="iso-segment iso-seg-c" style="width: 30%;" title="Elevated (70-85dB)"></div>
               <div class="iso-segment iso-seg-d" style="width: 20%;" title="Severe Rubbing (>85dB)"></div>
-              <div class="iso-indicator-pointer" id="sound-pointer" style="left: 22%;"></div>
+              <div class="iso-indicator-pointer is-unavailable" id="sound-pointer"></div>
             </div>
             <div class="iso-labels">
               <span>50 dB</span>
@@ -1048,7 +1180,7 @@
         <div class="architecture-column active-gate" id="step-stage1">
           <h3>
             <span>Stage 1: Statistical Process Control (SPC)</span>
-            <span class="gate-badge-tag active" id="pill-stage1">ACTIVE GATE</span>
+            <span class="gate-badge-tag pending" id="pill-stage1">AWAITING DATA</span>
           </h3>
           <p>
             Continuous statistical check on vibration RMS and temperature rise. On a nominal window the classifier wrapper returns without running the Random Forest, so no fault class is produced while the machine is quiet.
@@ -1058,7 +1190,7 @@
         <div class="architecture-column" id="step-stage2">
           <h3>
             <span>Stage 2: 300-Tree Random Forest Classifier</span>
-            <span class="gate-badge-tag dormant" id="pill-stage2">STANDBY</span>
+            <span class="gate-badge-tag pending" id="pill-stage2">AWAITING DATA</span>
           </h3>
           <p>
             Runs on an anomaly breach and classifies the current state into Healthy, Mechanical Imbalance, Bearing Defect or Thermal Runaway. The result is a four-class diagnosis plus an operator action, not a remaining-life prediction.
@@ -1073,7 +1205,7 @@
             <i class="fa-solid fa-microchip"></i>
             Mathematical Formulations &amp; In-Place Physics Verification
           </h2>
-          <span class="sensor-bus-spec">LIVE NUMERICAL EVALUATION</span>
+          <span class="sensor-bus-spec">VALUES FROM CURRENT PACKET</span>
         </div>
 
         <div class="math-grid">
@@ -1084,7 +1216,7 @@
               <span class="font-mono">ISO 20816</span>
             </div>
             <div class="math-code-block font-mono">RMS = &radic;[ &Sigma;(a<sub>dyn</sub>[i])<sup>2</sup> / N ]</div>
-            <div class="math-live-eval font-mono" id="calc-rms">RMS = &radic;(0.000088 / 256) = <b>0.0094 g</b></div>
+            <div class="math-live-eval font-mono" id="calc-rms">Awaiting telemetry</div>
             <div class="math-rationale">Quantifies continuous kinetic mechanical stress. Rises proportionally with rotating unbalance and misalignment forces (F = m &middot; r &middot; &omega;<sup>2</sup>).</div>
           </div>
 
@@ -1094,7 +1226,7 @@
               <span class="font-mono">4th Standardized Moment</span>
             </div>
             <div class="math-code-block font-mono">&kappa; = &mu;<sub>4</sub> / &sigma;<sup>4</sup> = [ &Sigma;(a - &mu;)<sup>4</sup> / N ] / &sigma;<sup>4</sup></div>
-            <div class="math-live-eval font-mono" id="calc-kurt">&kappa; = 0.00000002 / (0.000088)&sup2; = <b>4.53</b></div>
+            <div class="math-live-eval font-mono" id="calc-kurt">Awaiting telemetry</div>
             <div class="math-rationale">Measures heavy-tailed shocks. Bearing-fault theory links spall impacts to high kurtosis before RMS rises; no real-motor lead time has been measured on this rig.</div>
           </div>
 
@@ -1104,7 +1236,7 @@
               <span class="font-mono">Shock-to-RMS Ratio</span>
             </div>
             <div class="math-code-block font-mono">CF = Peak<sub>dyn</sub> / RMS<sub>dyn</sub></div>
-            <div class="math-live-eval font-mono" id="calc-cf">CF = 0.0280 g / 0.0094 g = <b>2.98</b></div>
+            <div class="math-live-eval font-mono" id="calc-cf">Awaiting telemetry</div>
             <div class="math-rationale">Ratio of localized impact amplitude to background mechanical energy. Distinguishes impulsive spall clicks from steady distributed vibration.</div>
           </div>
 
@@ -1114,7 +1246,7 @@
               <span class="font-mono">Stage 1 Gating</span>
             </div>
             <div class="math-code-block font-mono">Z = (RMS<sub>dyn</sub> - &mu;<sub>0</sub>) / &sigma;<sub>0</sub></div>
-            <div class="math-live-eval font-mono" id="calc-spc">Z = (0.0094 - 0.080) / 0.025 = <b>-2.82 &sigma;</b></div>
+            <div class="math-live-eval font-mono" id="calc-spc">Awaiting telemetry</div>
             <div class="math-rationale">Shewhart check on dynamic RMS. A nominal window skips the Random Forest; CPU savings from that skip have not been measured.</div>
           </div>
 
@@ -1124,7 +1256,7 @@
               <span class="font-mono">Runaway Rate (dT/dt)</span>
             </div>
             <div class="math-code-block font-mono">&Delta;T/&Delta;t = (T<sub>now</sub> - T<sub>past</sub>) / (&Delta;t / 60) [&deg;C/min]</div>
-            <div class="math-live-eval font-mono" id="calc-slope">&Delta;T = -0.10 &deg;C over 15.0 s &rarr; <b>-0.40 &deg;C/min</b></div>
+            <div class="math-live-eval font-mono" id="calc-slope">Awaiting telemetry</div>
             <div class="math-rationale">Detects a rapid temperature rise. It is one input to the thermal-fault class; no warning lead time has been measured on a real motor.</div>
           </div>
 
@@ -1134,10 +1266,85 @@
               <span class="font-mono">High-Frequency Friction</span>
             </div>
             <div class="math-code-block font-mono">SPL = 120 + 20&middot;log<sub>10</sub>(RMS) | ZCR = &Sigma;|sgn(&Delta;s)| / 2M</div>
-            <div class="math-live-eval font-mono" id="calc-sound">SPL = <b>66.8 dB</b> | ZCR = <b>0.000</b></div>
+            <div class="math-live-eval font-mono" id="calc-sound">Awaiting telemetry</div>
             <div class="math-rationale">Airborne acoustic emissions capture metal-on-metal rubbing and friction squeal in audible/ultrasonic spectra, driving high zero-crossing rates.</div>
           </div>
 
+        </div>
+      </section>
+
+      <!-- Labelled public benchmark: never live telemetry, never our motor -->
+      <section class="benchmark-panel" aria-label="Public bearing RUL benchmark and data provenance">
+        <div>
+          <h2>RUL benchmark <span class="font-mono">/ XJTU-SY</span></h2>
+          <div class="benchmark-warning">
+            <span>BENCHMARK</span>
+            <span>NOT OUR MOTOR</span>
+            <span>NOT FIELD-VALIDATED</span>
+          </div>
+          <p>
+            Leave-one-bearing-out evaluation on 15 public run-to-failure bearings,
+            using the last 20% of each held-out run. These are public bearing
+            minutes, <b>not</b> hours-to-failure for the capstone motor. A public
+            dataset's end-of-life rule is not operator confirmation on our rig.
+          </p>
+          <div class="benchmark-metrics">
+            <div class="benchmark-metric">
+              <strong>134.924</strong>
+              <small>min MAE · tail windows</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>171.776</strong>
+              <small>min RMSE · tail windows</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>160.859</strong>
+              <small>min RMSE · constant baseline</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>15 / 9,216</strong>
+              <small>bearings / one-minute snapshots</small>
+            </div>
+          </div>
+          <p style="margin-top:10px">
+            Source: <a href="https://biaowang.tech/xjtu-sy-bearing-datasets" target="_blank">XJTU-SY official page</a>
+            &middot; <a href="https://data.mendeley.com/datasets/mpn45f4gxc/1" target="_blank">CC BY 4.0 derived feature record</a>
+            &middot; <a href="https://doi.org/10.1109/TR.2018.2882682" target="_blank">Wang et al., IEEE TR 2020</a>
+          </p>
+        </div>
+        <div>
+          <h2>Source &amp; licence evidence</h2>
+          <table class="provenance-table">
+            <thead>
+              <tr><th>Source</th><th>Evidence</th><th>Limit</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>XJTU-SY</th>
+                <td>Public run-to-failure bearings; citation requested by the publisher.</td>
+                <td><span class="provenance-need">[NEED: explicit reuse licence]</span>; no temperature or acoustic channels.</td>
+              </tr>
+              <tr>
+                <th>Derived features</th>
+                <td><a href="https://data.mendeley.com/datasets/mpn45f4gxc/1" target="_blank">Mendeley DOI 10.17632/mpn45f4gxc.1</a>: CC BY 4.0; hashes checked.</td>
+                <td>Derived record only; does not replace the original publisher's terms.</td>
+              </tr>
+              <tr>
+                <th>FEMTO / PRONOSTIA</th>
+                <td><a href="https://doi.org/10.6084/m9.figshare.30595484.v1" target="_blank">Public combined copy</a> reported CC BY 4.0 by the figshare API.</td>
+                <td><span class="provenance-need">[NEED: explicit FEMTO-ST licence]</span>; 20 g stop rule is challenge-defined.</td>
+              </tr>
+              <tr>
+                <th>CWRU / Reliance</th>
+                <td><a href="https://engineering.case.edu/bearingdatacenter" target="_blank">Bearing Data Center</a>: 2 hp Reliance Electric motor; EDM-seeded faults; site terms "AS IS".</td>
+                <td><span class="provenance-need">[NEED: CWRU licence; exact catalogue number]</span>; no run-to-failure endpoint.</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="margin-top:10px">
+            Full evidence: <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/docs/DATA_PROVENANCE_LICENSES.md" target="_blank">DATA_PROVENANCE_LICENSES.md</a>
+            &middot; <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/docs/REAL_MOTOR_READINESS.md" target="_blank">REAL_MOTOR_READINESS.md</a>
+          </p>
         </div>
       </section>
 
@@ -1175,6 +1382,7 @@
     };
 
     function initCharts() {
+      if (typeof Chart === "undefined") return;
       const commonOptions = {
         responsive: true,
         maintainAspectRatio: false,
@@ -1183,20 +1391,20 @@
           legend: { 
             position: 'top',
             align: 'end',
-            labels: { 
-              color: '#94a3b8', 
-              boxWidth: 8, 
-              boxHeight: 8, 
-              font: { size: 10, family: 'Inter' } 
-            } 
+            labels: {
+              color: '#4b6078',
+              boxWidth: 8,
+              boxHeight: 8,
+              font: { size: 10, family: 'Inter' }
+            }
           } 
         },
         scales: {
           x: { display: false },
-          y: { 
-            grid: { color: 'rgba(255,255,255,0.04)' },
-            ticks: { 
-              color: '#64748b', 
+          y: {
+            grid: { color: 'rgba(24, 34, 48, 0.08)' },
+            ticks: {
+              color: '#52677d',
               font: { size: 9, family: 'JetBrains Mono' },
               maxTicksLimit: 4
             }
@@ -1210,8 +1418,8 @@
         data: {
           labels: historyData.labels,
           datasets: [
-            { label: 'RMS (g)', data: historyData.rms, borderColor: '#38bdf8', borderWidth: 1.5, pointRadius: 0, tension: 0.2 },
-            { label: 'Peak (g)', data: historyData.peak, borderColor: '#64748b', borderWidth: 1, borderDash: [3, 3], pointRadius: 0, tension: 0.2 }
+            { label: 'RMS (g)', data: historyData.rms, borderColor: '#0369a1', borderWidth: 1.5, pointRadius: 0, tension: 0.2 },
+            { label: 'Peak (g)', data: historyData.peak, borderColor: '#52677d', borderWidth: 1, borderDash: [3, 3], pointRadius: 0, tension: 0.2 }
           ]
         },
         options: commonOptions
@@ -1223,7 +1431,7 @@
         data: {
           labels: historyData.labels,
           datasets: [
-            { label: 'Temp (°C)', data: historyData.temp, borderColor: '#fbbf24', borderWidth: 1.5, pointRadius: 0, tension: 0.2 }
+            { label: 'Temp (°C)', data: historyData.temp, borderColor: '#b45309', borderWidth: 1.5, pointRadius: 0, tension: 0.2 }
           ]
         },
         options: commonOptions
@@ -1235,7 +1443,7 @@
         data: {
           labels: historyData.labels,
           datasets: [
-            { label: 'Sound (dB)', data: historyData.sound_db, borderColor: '#c084fc', borderWidth: 1.5, pointRadius: 0, tension: 0.2 }
+            { label: 'Sound (dB)', data: historyData.sound_db, borderColor: '#6d28d9', borderWidth: 1.5, pointRadius: 0, tension: 0.2 }
           ]
         },
         options: commonOptions
@@ -1264,73 +1472,186 @@
       document.getElementById('sound-icon').className = isMuted ? "fa-solid fa-volume-xmark" : "fa-solid fa-volume-high";
     }
 
+    function readFinite(value) {
+      if (value === null || value === undefined || value === "" || typeof value === "boolean") return null;
+      const number = typeof value === "number" ? value : Number(String(value).trim());
+      return Number.isFinite(number) ? number : null;
+    }
+
+    function firstFinite(...values) {
+      for (const value of values) {
+        const number = readFinite(value);
+        if (number !== null) return number;
+      }
+      return null;
+    }
+
+    function textOrNull(value) {
+      if (typeof value !== "string") return null;
+      const text = value.trim();
+      return text || null;
+    }
+
+    function formatValue(value, digits, unit, signed = false) {
+      const suffix = unit ? `<span class="unit">${unit}</span>` : "";
+      if (value === null) return "NO DATA";
+      const prefix = signed && value >= 0 ? "+" : "";
+      return `${prefix}${value.toFixed(digits)}${suffix}`;
+    }
+
+    function renderValue(id, value, digits, unit, signed = false, color = null) {
+      const element = document.getElementById(id);
+      element.innerHTML = formatValue(value, digits, unit, signed);
+      if (value === null) element.style.removeProperty("color");
+      else if (color) element.style.color = color;
+    }
+
+    function setZone(id, text, color) {
+      const element = document.getElementById(id);
+      element.innerText = text;
+      element.style.color = color;
+    }
+
+    function setPointer(id, value, min, max) {
+      const pointer = document.getElementById(id);
+      pointer.classList.toggle("is-unavailable", value === null);
+      if (value === null) {
+        pointer.style.removeProperty("left");
+        return;
+      }
+      const percent = Math.min(98, Math.max(2, ((value - min) / (max - min)) * 100));
+      pointer.style.left = `${percent}%`;
+    }
+
+    function setPendingGates() {
+      document.getElementById("badge-gate-status").innerText = "AWAITING DATA";
+      document.getElementById("badge-gate-status").style.color = "var(--text-muted)";
+      for (const id of ["step-stage1", "step-stage2"]) {
+        document.getElementById(id).classList.remove("active-gate");
+      }
+      for (const id of ["pill-stage1", "pill-stage2"]) {
+        const pill = document.getElementById(id);
+        pill.className = "gate-badge-tag pending";
+        pill.innerText = "AWAITING DATA";
+      }
+    }
+
+    function showAwaitingState() {
+      const card = document.getElementById("main-status-card");
+      card.className = "scada-hero-panel awaiting";
+      document.getElementById("lamp-icon").className = "fa-solid fa-circle-question";
+      document.getElementById("status-title").innerText = "Awaiting telemetry";
+      document.getElementById("status-sub").innerText = "No classified packet received from the Raspberry Pi mirror yet";
+      document.getElementById("txt-advice").innerText = "Awaiting classified telemetry.";
+      document.getElementById("txt-decision-priority").innerText = "AWAITING DATA";
+      document.getElementById("txt-decision-priority").className = "decision-chip";
+      document.getElementById("txt-decision-timeframe").innerText = "NO DATA";
+      document.getElementById("txt-decision-owner").innerText = "NO DATA";
+      document.getElementById("badge-ai-conf").innerText = "NO DATA";
+      document.getElementById("badge-ai-conf").style.removeProperty("color");
+      document.getElementById("badge-seq").innerText = "NO DATA";
+      document.getElementById("badge-uptime").innerText = "NO DATA";
+
+      for (const id of [
+        "val-rms", "val-peak", "val-kurt", "val-cf", "val-temp",
+        "val-slope", "val-res", "val-sound-db", "val-sound-zcr", "val-spc-z"
+      ]) renderValue(id, null, 0, "");
+      document.getElementById("val-coldj").innerText = "NOT REPORTED";
+      document.getElementById("val-coldj").style.color = "var(--text-muted)";
+      document.getElementById("val-sound-status").innerText = "NOT REPORTED";
+      document.getElementById("val-sound-status").style.color = "var(--text-muted)";
+
+      setZone("txt-iso-zone", "AWAITING DATA", "var(--text-muted)");
+      setZone("txt-thermal-zone", "AWAITING DATA", "var(--text-muted)");
+      setZone("txt-sound-zone", "AWAITING DATA", "var(--text-muted)");
+      setPointer("iso-pointer", null, 0, 0.30);
+      setPointer("temp-pointer", null, 20, 80);
+      setPointer("sound-pointer", null, 50, 100);
+
+      for (const id of ["calc-rms", "calc-kurt", "calc-cf", "calc-spc", "calc-slope", "calc-sound"]) {
+        document.getElementById(id).innerText = "Awaiting telemetry";
+      }
+      setPendingGates();
+    }
+
     function updateDashboard(data) {
-      if (!data) return;
+      if (!data || typeof data !== "object") {
+        showAwaitingState();
+        return;
+      }
+      showAwaitingState();
 
-      const state = data.state || "Healthy";
-      const fault = data.fault || data.fault_label || "Normal Operation";
-      const proba = data.proba !== undefined ? data.proba : (data.fault_proba || 0.05);
-      const rms = data.rms !== undefined ? data.rms : (data.vibration?.rms_dyn || 0.0094);
-      const peak = data.peak !== undefined ? data.peak : (data.vibration?.peak_dyn || 0.028);
-      const kurt = data.kurt !== undefined ? data.kurt : (data.vibration?.kurtosis || 3.0);
-      const cf = data.cf !== undefined ? data.cf : (data.vibration?.crest_factor || 2.0);
-      const temp = data.temp !== undefined ? data.temp : (data.temperature?.temp_c || 24.25);
-      const slope = data.slope !== undefined ? data.slope : (data.temperature?.slope_c_per_min || 0.0);
-      const sound_db = data.sound_db !== undefined ? data.sound_db : (data.acoustic?.db_spl || 65.0);
-      const zcr = data.zcr !== undefined ? data.zcr : (data.acoustic?.zcr || 0.01);
-      const advice = data.advice || "Machine operating within nominal limits.";
+      const state = textOrNull(data.state);
+      const fault = textOrNull(data.fault) || textOrNull(data.fault_label);
+      const proba = firstFinite(data.proba, data.fault_proba);
+      const rms = firstFinite(data.rms, data.vibration?.rms_dyn);
+      const peak = firstFinite(data.peak, data.vibration?.peak_dyn);
+      const kurt = firstFinite(data.kurt, data.vibration?.kurtosis);
+      const cf = firstFinite(data.cf, data.vibration?.crest_factor);
+      const temp = firstFinite(data.temp, data.temperature?.temp_c);
+      const slope = firstFinite(data.slope, data.temperature?.slope_c_per_min);
+      const sound_db = firstFinite(data.sound_db, data.acoustic?.db_spl);
+      const zcr = firstFinite(data.zcr, data.acoustic?.zcr);
+      const advice = textOrNull(data.advice);
       const responsePlan = data.ai?.response_plan || null;
-      const seq = data.seq || 0;
-      const uptime = data.uptime_s || 0;
+      const seq = firstFinite(data.seq);
+      const uptime = firstFinite(data.uptime_s);
+      const dataTs = firstFinite(data.ts);
+      const ageSec = dataTs === null ? null : Math.max(0, Date.now() / 1000 - dataTs);
+      const isStaleTelemetry = ageSec === null || ageSec > 20;
+      const knownState = state && ["Healthy", "Warning", "Fault"].includes(state) ? state : null;
 
-      const nowSec = Date.now() / 1000;
-      const dataTs = typeof data.ts === 'number' ? data.ts : (parseFloat(data.ts) || 0);
-      const ageSec = dataTs > 0 ? Math.max(0, nowSec - dataTs) : 999999;
-      const isStaleTelemetry = ageSec > 20;
+      // Only a classified packet can change the state lamp.
+      if (knownState) {
+        const card = document.getElementById("main-status-card");
+        const icon = document.getElementById("lamp-icon");
+        const title = document.getElementById("status-title");
+        const sub = document.getElementById("status-sub");
+        const displayFault = fault || "Classified telemetry";
+        const stalePrefix = isStaleTelemetry ? "Last known: " : "";
 
-      // Update Top Status Lamp
-      const card = document.getElementById('main-status-card');
-      const icon = document.getElementById('lamp-icon');
-      const title = document.getElementById('status-title');
-      const sub = document.getElementById('status-sub');
-
-      card.className = "scada-hero-panel";
-
-      const stalePrefix = isStaleTelemetry ? "Last known: " : "";
-      if (state === "Healthy") {
-        icon.className = "fa-solid fa-check";
-        title.innerText = `${stalePrefix}${fault}`;
-        sub.innerText = isStaleTelemetry
-          ? "Historical packet only - verify live Pi telemetry before acting"
-          : "Nominal baseline operation within ISO 10816 limits";
-      } else if (state === "Warning") {
-        card.classList.add("warning");
-        icon.className = "fa-solid fa-triangle-exclamation";
-        title.innerText = `${stalePrefix}Warning: ${fault}`;
-        sub.innerText = "Incipient mechanical or thermal anomaly detected (Stage 1 threshold breach)";
-        if (!isStaleTelemetry && Date.now() - lastAlertTime > 5000) { playBeep(660, 0.3); lastAlertTime = Date.now(); }
-      } else {
-        card.classList.add("fault");
-        icon.className = "fa-solid fa-triangle-exclamation";
-        title.innerText = `${stalePrefix}CRITICAL FAULT: ${fault}`;
-        sub.innerText = "Immediate machine maintenance protocol required - trip risk active";
-        if (!isStaleTelemetry && Date.now() - lastAlertTime > 2000) { playBeep(980, 0.4); lastAlertTime = Date.now(); }
+        card.className = "scada-hero-panel";
+        if (knownState === "Healthy") {
+          icon.className = "fa-solid fa-check";
+          title.innerText = `${stalePrefix}${displayFault}`;
+          sub.innerText = isStaleTelemetry
+            ? "Historical packet only - verify live Pi telemetry before acting"
+            : "Nominal baseline operation within ISO 10816 limits";
+        } else if (knownState === "Warning") {
+          card.classList.add("warning");
+          icon.className = "fa-solid fa-triangle-exclamation";
+          title.innerText = `${stalePrefix}Warning: ${displayFault}`;
+          sub.innerText = "Incipient mechanical or thermal anomaly detected (Stage 1 threshold breach)";
+          if (!isStaleTelemetry && Date.now() - lastAlertTime > 5000) { playBeep(660, 0.3); lastAlertTime = Date.now(); }
+        } else {
+          card.classList.add("fault");
+          icon.className = "fa-solid fa-triangle-exclamation";
+          title.innerText = `${stalePrefix}CRITICAL FAULT: ${displayFault}`;
+          sub.innerText = "Immediate machine maintenance protocol required - trip risk active";
+          if (!isStaleTelemetry && Date.now() - lastAlertTime > 2000) { playBeep(980, 0.4); lastAlertTime = Date.now(); }
+        }
       }
 
-      // Badges
-      const confPercent = Math.round((state === "Healthy" ? (1.0 - proba) : proba) * 100);
-      const confEl = document.getElementById('badge-ai-conf');
-      confEl.innerText = confPercent + "%";
-      confEl.style.color = state === "Healthy" ? "var(--status-ok)" : (state === "Warning" ? "var(--status-warn)" : "var(--status-alarm)");
+      // Confidence uses only the probability in the packet, never a derived default.
+      if (proba !== null && knownState) {
+        const confPercent = Math.max(0, Math.min(100, Math.round((knownState === "Healthy" ? 1 - proba : proba) * 100)));
+        const confEl = document.getElementById("badge-ai-conf");
+        confEl.innerText = confPercent + "%";
+        confEl.style.color = knownState === "Healthy" ? "var(--status-ok)" : (knownState === "Warning" ? "var(--status-warn)" : "var(--status-alarm)");
+      }
 
-      document.getElementById('badge-seq').innerText = "#" + seq;
-      document.getElementById('badge-uptime').innerText = (uptime >= 60 ? (uptime/60).toFixed(1) + "m" : uptime.toFixed(0) + "s");
-      document.getElementById('txt-advice').innerText = advice;
+      if (seq !== null) document.getElementById("badge-seq").innerText = "#" + seq;
+      if (uptime !== null) {
+        document.getElementById("badge-uptime").innerText = uptime >= 60
+          ? (uptime / 60).toFixed(1) + "m"
+          : uptime.toFixed(0) + "s";
+      }
+      if (advice) document.getElementById("txt-advice").innerText = advice;
 
-      // Post-classification operator decision from the edge AI packet
-      const priorityEl = document.getElementById('txt-decision-priority');
-      const timeframeEl = document.getElementById('txt-decision-timeframe');
-      const ownerEl = document.getElementById('txt-decision-owner');
+      // Post-classification operator decision from the edge AI packet.
+      const priorityEl = document.getElementById("txt-decision-priority");
+      const timeframeEl = document.getElementById("txt-decision-timeframe");
+      const ownerEl = document.getElementById("txt-decision-owner");
       const allowedPriorities = ["ROUTINE", "SCHEDULE", "URGENT", "CRITICAL"];
       if (responsePlan && allowedPriorities.includes(responsePlan.priority)) {
         const priority = responsePlan.priority;
@@ -1342,113 +1663,111 @@
         priorityEl.innerText = "NO DECISION PACKET";
         priorityEl.className = "decision-chip";
         timeframeEl.innerText = "Awaiting classified telemetry";
-        ownerEl.innerText = "--";
+        ownerEl.innerText = "NO DATA";
       }
 
-      // Stage Gating Status
-      const isStage2 = (state !== "Healthy") || (data.ai?.gate_status?.includes("Stage 2"));
-      const gateBadge = document.getElementById('badge-gate-status');
-      const step1 = document.getElementById('step-stage1');
-      const step2 = document.getElementById('step-stage2');
-      const pill1 = document.getElementById('pill-stage1');
-      const pill2 = document.getElementById('pill-stage2');
-
-      if (isStage2) {
-        gateBadge.innerText = "STAGE 2 (RF ACTIVE)";
-        gateBadge.style.color = "#ef4444";
-        step1.classList.remove('active-gate');
-        step2.classList.add('active-gate');
-        pill1.className = "gate-badge-tag dormant";
-        pill1.innerText = "BREACHED";
-        pill2.className = "gate-badge-tag active";
-        pill2.innerText = "INFERENCE ACTIVE";
-      } else {
-        gateBadge.innerText = "STAGE 1 (SPC OK)";
-        gateBadge.style.color = "#10b981";
-        step1.classList.add('active-gate');
-        step2.classList.remove('active-gate');
-        pill1.className = "gate-badge-tag active";
-        pill1.innerText = "ACTIVE GATE";
-        pill2.className = "gate-badge-tag dormant";
-        pill2.innerText = "STANDBY";
+      // Stage gating is only asserted when the packet has a recognised state.
+      if (knownState) {
+        const isStage2 = knownState !== "Healthy" || Boolean(data.ai?.gate_status?.includes("Stage 2"));
+        const gateBadge = document.getElementById("badge-gate-status");
+        const step1 = document.getElementById("step-stage1");
+        const step2 = document.getElementById("step-stage2");
+        const pill1 = document.getElementById("pill-stage1");
+        const pill2 = document.getElementById("pill-stage2");
+        if (isStage2) {
+          gateBadge.innerText = "STAGE 2 (RF ACTIVE)";
+          gateBadge.style.color = "var(--status-alarm)";
+          step1.classList.remove("active-gate");
+          step2.classList.add("active-gate");
+          pill1.className = "gate-badge-tag dormant";
+          pill1.innerText = "BREACHED";
+          pill2.className = "gate-badge-tag active";
+          pill2.innerText = "INFERENCE ACTIVE";
+        } else {
+          gateBadge.innerText = "STAGE 1 (SPC OK)";
+          gateBadge.style.color = "var(--status-ok)";
+          step1.classList.add("active-gate");
+          step2.classList.remove("active-gate");
+          pill1.className = "gate-badge-tag active";
+          pill1.innerText = "ACTIVE GATE";
+          pill2.className = "gate-badge-tag dormant";
+          pill2.innerText = "STANDBY";
+        }
       }
 
-      // Gauges
-      document.getElementById('val-rms').innerHTML = `${rms.toFixed(4)}<span class="unit">g</span>`;
-      document.getElementById('val-peak').innerHTML = `${peak.toFixed(4)}<span class="unit">g</span>`;
-      document.getElementById('val-kurt').innerHTML = `${kurt.toFixed(2)}<span class="unit">&kappa;</span>`;
-      document.getElementById('val-cf').innerHTML = `${cf.toFixed(2)}<span class="unit">CF</span>`;
+      // Gauges: a missing or non-finite field is shown as unavailable, not filled in.
+      renderValue("val-rms", rms, 4, "g");
+      renderValue("val-peak", peak, 4, "g");
+      renderValue("val-kurt", kurt, 2, "&kappa;");
+      renderValue("val-cf", cf, 2, "CF");
+      renderValue("val-temp", temp, 2, "&deg;C", false, "#92400e");
+      renderValue("val-slope", slope, 2, "&deg;C/m", true);
+      renderValue("val-sound-db", sound_db, 1, "dB");
+      renderValue("val-sound-zcr", zcr, 4, "cross/sample");
 
-      document.getElementById('val-temp').innerHTML = `${temp.toFixed(2)}<span class="unit">&deg;C</span>`;
-      document.getElementById('val-slope').innerHTML = `${slope >= 0 ? '+' : ''}${slope.toFixed(2)}<span class="unit">&deg;C/m</span>`;
+      const zScore = rms === null ? null : (rms - 0.080) / 0.025;
+      renderValue("val-spc-z", zScore, 2, "&sigma;", true);
 
-      document.getElementById('val-sound-db').innerHTML = `${sound_db.toFixed(1)}<span class="unit">dB</span>`;
-      document.getElementById('val-sound-zcr').innerHTML = `${zcr.toFixed(4)}<span class="unit">cross/sample</span>`;
-
-      const z_score = ((rms - 0.080) / 0.025);
-      document.getElementById('val-spc-z').innerHTML = `${z_score >= 0 ? '+' : ''}${z_score.toFixed(2)}<span class="unit">&sigma;</span>`;
-
-      // ISO 10816 Severity Pointer Positioning (0 to 0.35g range mapped to 0%..100%)
-      const isoPercent = Math.min(98, Math.max(2, (rms / 0.30) * 100));
-      document.getElementById('iso-pointer').style.left = `${isoPercent}%`;
-      const txtIso = document.getElementById('txt-iso-zone');
-      if (rms < 0.075) {
-        txtIso.innerText = "Zone A (Good)";
-        txtIso.style.color = "var(--status-ok)";
-      } else if (rms < 0.165) {
-        txtIso.innerText = "Zone B (Acceptable)";
-        txtIso.style.color = "#38bdf8";
-      } else if (rms < 0.24) {
-        txtIso.innerText = "Zone C (Unsatisfactory)";
-        txtIso.style.color = "var(--status-warn)";
-      } else {
-        txtIso.innerText = "Zone D (Unacceptable)";
-        txtIso.style.color = "var(--status-alarm)";
+      // Severity pointers stay hidden until their own measured value exists.
+      if (rms !== null) {
+        setPointer("iso-pointer", rms, 0, 0.30);
+        if (rms < 0.075) setZone("txt-iso-zone", "Zone A (Good)", "var(--status-ok)");
+        else if (rms < 0.165) setZone("txt-iso-zone", "Zone B (Acceptable)", "#0369a1");
+        else if (rms < 0.24) setZone("txt-iso-zone", "Zone C (Unsatisfactory)", "var(--status-warn)");
+        else setZone("txt-iso-zone", "Zone D (Unacceptable)", "var(--status-alarm)");
       }
 
-      // Thermal Pointer Positioning (20°C to 80°C mapped to 0%..100%)
-      const tempPercent = Math.min(98, Math.max(2, ((temp - 20) / 60) * 100));
-      document.getElementById('temp-pointer').style.left = `${tempPercent}%`;
-      const txtTemp = document.getElementById('txt-thermal-zone');
-      if (temp < 45) {
-        txtTemp.innerText = "Nominal Temperature";
-        txtTemp.style.color = "var(--status-ok)";
-      } else if (temp < 65) {
-        txtTemp.innerText = "Warning (High Drift)";
-        txtTemp.style.color = "var(--status-warn)";
-      } else {
-        txtTemp.innerText = "Trip Threshold Exceeded";
-        txtTemp.style.color = "var(--status-alarm)";
+      if (temp !== null) {
+        setPointer("temp-pointer", temp, 20, 80);
+        if (temp < 45) setZone("txt-thermal-zone", "Nominal Temperature", "var(--status-ok)");
+        else if (temp < 65) setZone("txt-thermal-zone", "Warning (High Drift)", "var(--status-warn)");
+        else setZone("txt-thermal-zone", "Trip Threshold Exceeded", "var(--status-alarm)");
       }
 
-      // Sound Pointer Positioning (50dB to 100dB mapped to 0%..100%)
-      const soundPercent = Math.min(98, Math.max(2, ((sound_db - 50) / 50) * 100));
-      document.getElementById('sound-pointer').style.left = `${soundPercent}%`;
+      if (sound_db !== null) {
+        setPointer("sound-pointer", sound_db, 50, 100);
+        if (sound_db < 70) setZone("txt-sound-zone", "Quiet", "var(--status-ok)");
+        else if (sound_db < 85) setZone("txt-sound-zone", "Elevated", "var(--status-warn)");
+        else setZone("txt-sound-zone", "Severe Rubbing", "var(--status-alarm)");
+      }
 
-      // Live In-Place Equation Substitution
-      document.getElementById('calc-rms').innerHTML = 
-        `RMS = &radic;(${((rms**2)*256).toFixed(6)} / 256) = <b>${rms.toFixed(4)} g</b>`;
-      document.getElementById('calc-kurt').innerHTML = 
-        `&kappa; = <b>${kurt.toFixed(2)}</b> (Gaussian Baseline &sim; 3.0)`;
-      document.getElementById('calc-cf').innerHTML = 
-        `CF = ${peak.toFixed(4)} g / ${rms.toFixed(4)} g = <b>${cf.toFixed(2)}</b>`;
-      document.getElementById('calc-spc').innerHTML = 
-        `Z = (${rms.toFixed(4)} - 0.080) / 0.025 = <b>${z_score >= 0 ? '+' : ''}${z_score.toFixed(2)} &sigma;</b> (Threshold: &gt; 2.0 &sigma;)`;
-      document.getElementById('calc-slope').innerHTML = 
-        `&Delta;T/&Delta;t = <b>${slope >= 0 ? '+' : ''}${slope.toFixed(2)} &deg;C/min</b> (Threshold: &gt; 5.0 &deg;C/min)`;
-      document.getElementById('calc-sound').innerHTML = 
-        `SPL = <b>${sound_db.toFixed(1)} dB</b> | ZCR = <b>${zcr.toFixed(4)}</b> (${zcr > 0.20 ? 'High Friction' : 'Nominal Hum'})`;
+      // Worked equations are substituted only when their inputs are present.
+      if (rms !== null) {
+        document.getElementById("calc-rms").innerHTML =
+          `RMS = &radic;(${((rms ** 2) * 256).toFixed(6)} / 256) = <b>${rms.toFixed(4)} g</b>`;
+      }
+      if (kurt !== null) {
+        document.getElementById("calc-kurt").innerHTML =
+          `&kappa; = <b>${kurt.toFixed(2)}</b> (Gaussian Baseline &sim; 3.0)`;
+      }
+      if (cf !== null && peak !== null && rms !== null) {
+        document.getElementById("calc-cf").innerHTML =
+          `CF = ${peak.toFixed(4)} g / ${rms.toFixed(4)} g = <b>${cf.toFixed(2)}</b>`;
+      }
+      if (rms !== null && zScore !== null) {
+        document.getElementById("calc-spc").innerHTML =
+          `Z = (${rms.toFixed(4)} - 0.080) / 0.025 = <b>${zScore >= 0 ? "+" : ""}${zScore.toFixed(2)} &sigma;</b> (Threshold: &gt; 2.0 &sigma;)`;
+      }
+      if (slope !== null) {
+        document.getElementById("calc-slope").innerHTML =
+          `&Delta;T/&Delta;t = <b>${slope >= 0 ? "+" : ""}${slope.toFixed(2)} &deg;C/min</b> (Threshold: &gt; 5.0 &deg;C/min)`;
+      }
+      if (sound_db !== null && zcr !== null) {
+        document.getElementById("calc-sound").innerHTML =
+          `SPL = <b>${sound_db.toFixed(1)} dB</b> | ZCR = <b>${zcr.toFixed(4)}</b> (${zcr > 0.20 ? "High Friction" : "Nominal Hum"})`;
+      }
 
-      // Check sequence & freshness to prevent false continuous chart scrolling when Pi is offline
-      const isFreshHardwareData = (lastProcessedSeq !== seq && ageSec < 60);
-      const shouldPushChart = isFreshHardwareData;
+      // Charts advance only on a fresh sequence with all plotted values present.
+      const isFreshHardwareData = seq !== null && dataTs !== null && lastProcessedSeq !== seq && ageSec < 60;
+      const hasChartValues = rms !== null && peak !== null && temp !== null && sound_db !== null;
+      const shouldPushChart = isFreshHardwareData && hasChartValues;
 
-      document.querySelectorAll('.chart-panel-box').forEach(box => {
+      document.querySelectorAll(".chart-panel-box").forEach(box => {
         box.dataset.emptyLabel = lastProcessedSeq === null ? "NO TELEMETRY" : "BUFFER FROZEN";
-        box.classList.toggle('no-data', !isFreshHardwareData);
+        box.classList.toggle("no-data", !shouldPushChart);
       });
 
-      if (shouldPushChart) {
+      if (shouldPushChart && chartVib && chartTemp && chartSound) {
         lastProcessedSeq = seq;
         const timeLabel = new Date().toLocaleTimeString();
         historyData.labels.push(timeLabel);
@@ -1474,7 +1793,7 @@
     }
 
     function formatTimeAgo(seconds) {
-      if (isNaN(seconds) || seconds < 0) return "just now";
+      if (seconds === null || isNaN(seconds) || seconds < 0) return "unknown time";
       if (seconds < 60) return `${Math.max(1, Math.round(seconds))}s ago`;
       const mins = Math.floor(seconds / 60);
       if (mins < 60) return `${mins}m ago`;
@@ -1504,22 +1823,24 @@
       }
 
       const nowSec = Date.now() / 1000;
-      const dataTs = typeof data.ts === 'number' ? data.ts : (parseFloat(data.ts) || 0);
-      const ageSec = dataTs > 0 ? Math.max(0, nowSec - dataTs) : 999999;
+      const dataTs = firstFinite(data.ts);
+      const ageSec = dataTs === null ? null : Math.max(0, nowSec - dataTs);
       const timeAgoStr = formatTimeAgo(ageSec);
+      const seq = firstFinite(data.seq);
+      const seqLabel = seq === null ? "NO DATA" : seq;
 
-      if (ageSec <= 20) {
+      if (ageSec !== null && ageSec <= 20) {
         indicator.className = "status-indicator-pill online";
         txtStatus.innerText = `STREAMING (< ${Math.max(1, Math.round(ageSec))}s)`;
         banner.style.display = "none";
-      } else if (ageSec < 90) {
+      } else if (ageSec !== null && ageSec < 90) {
         indicator.className = "status-indicator-pill stale";
         txtStatus.innerText = `STALE (${timeAgoStr})`;
         banner.style.display = "flex";
         banner.className = "edge-alert-ribbon stale";
         bannerIcon.className = "fa-solid fa-clock-rotate-left";
         bannerTitle.innerText = "Raspberry Pi Telemetry Delayed";
-        bannerDesc.innerText = `Last sensor packet received ${timeAgoStr} (Frame #${data.seq || '---'}). Edge daemon sampling or sleeping.`;
+        bannerDesc.innerText = `Last sensor packet received ${timeAgoStr} (Frame #${seqLabel}). Edge daemon sampling or sleeping.`;
       } else {
         indicator.className = "status-indicator-pill offline";
         txtStatus.innerText = `OFFLINE (${timeAgoStr})`;
@@ -1527,7 +1848,7 @@
         banner.className = "edge-alert-ribbon offline";
         bannerIcon.className = "fa-solid fa-plug-circle-xmark";
         bannerTitle.innerText = "Raspberry Pi Edge Rig Offline";
-        bannerDesc.innerText = `No updates received since ${timeAgoStr} (Frame #${data.seq || '---'}). Chart buffer frozen; waiting for real telemetry.`;
+        bannerDesc.innerText = `No updates received since ${timeAgoStr} (Frame #${seqLabel}). Chart buffer frozen; waiting for real telemetry.`;
       }
     }
 

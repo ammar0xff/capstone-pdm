@@ -1,0 +1,169 @@
+{
+  "constant_baseline_tail_windows": {
+    "mae_min": 136.558,
+    "rmse_min": 160.859
+  },
+  "data": {
+    "bearings": [
+      "bearing1",
+      "bearing10",
+      "bearing11",
+      "bearing12",
+      "bearing13",
+      "bearing14",
+      "bearing15",
+      "bearing2",
+      "bearing3",
+      "bearing4",
+      "bearing5",
+      "bearing6",
+      "bearing7",
+      "bearing8",
+      "bearing9"
+    ],
+    "columns_not_available": [
+      "temperature",
+      "sound_db",
+      "sound_zcr",
+      "sound_rms"
+    ],
+    "columns_used": [
+      "feature_01 (peak)",
+      "feature_02 (RMS)",
+      "feature_03 (kurtosis)"
+    ],
+    "n_bearings": 15,
+    "n_snapshots": 9216,
+    "rul_endpoint": "last published snapshot of each bearing run (dataset-defined end of life)",
+    "snapshot_period_min": 1.0
+  },
+  "label": "BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED",
+  "method": {
+    "baseline": "constant median duration of the other 14 bearings",
+    "causal": true,
+    "indicator": "mean of log peak, log RMS and log1p kurtosis (horizontal axis)",
+    "prediction_cap_minutes": "2 x median training duration; no field basis",
+    "tail_fraction": 0.2,
+    "terminal_health_percentile_from_training_bearings": 75.0,
+    "trend_window_snapshots": 40,
+    "validation": "leave-one-bearing-out; last 20% of the held bearing's snapshots"
+  },
+  "per_bearing": {
+    "bearing1": {
+      "duration_min": 122.0,
+      "predicted_last_rul_min": 112.085,
+      "snapshots": 123,
+      "tail_windows": 26
+    },
+    "bearing10": {
+      "duration_min": 338.0,
+      "predicted_last_rul_min": 0.0,
+      "snapshots": 339,
+      "tail_windows": 69
+    },
+    "bearing11": {
+      "duration_min": 2537.0,
+      "predicted_last_rul_min": 0.0,
+      "snapshots": 2538,
+      "tail_windows": 509
+    },
+    "bearing12": {
+      "duration_min": 2495.0,
+      "predicted_last_rul_min": 160.0,
+      "snapshots": 2496,
+      "tail_windows": 500
+    },
+    "bearing13": {
+      "duration_min": 370.0,
+      "predicted_last_rul_min": 320.0,
+      "snapshots": 371,
+      "tail_windows": 75
+    },
+    "bearing14": {
+      "duration_min": 1514.0,
+      "predicted_last_rul_min": 160.0,
+      "snapshots": 1515,
+      "tail_windows": 304
+    },
+    "bearing15": {
+      "duration_min": 113.0,
+      "predicted_last_rul_min": 249.0,
+      "snapshots": 114,
+      "tail_windows": 24
+    },
+    "bearing2": {
+      "duration_min": 160.0,
+      "predicted_last_rul_min": 37.162,
+      "snapshots": 161,
+      "tail_windows": 33
+    },
+    "bearing3": {
+      "duration_min": 157.0,
+      "predicted_last_rul_min": 0.0,
+      "snapshots": 158,
+      "tail_windows": 33
+    },
+    "bearing4": {
+      "duration_min": 121.0,
+      "predicted_last_rul_min": 249.0,
+      "snapshots": 122,
+      "tail_windows": 26
+    },
+    "bearing5": {
+      "duration_min": 51.0,
+      "predicted_last_rul_min": 0.0,
+      "snapshots": 52,
+      "tail_windows": 12
+    },
+    "bearing6": {
+      "duration_min": 490.0,
+      "predicted_last_rul_min": 0.0,
+      "snapshots": 491,
+      "tail_windows": 99
+    },
+    "bearing7": {
+      "duration_min": 160.0,
+      "predicted_last_rul_min": 249.0,
+      "snapshots": 161,
+      "tail_windows": 33
+    },
+    "bearing8": {
+      "duration_min": 532.0,
+      "predicted_last_rul_min": 53.598,
+      "snapshots": 533,
+      "tail_windows": 108
+    },
+    "bearing9": {
+      "duration_min": 41.0,
+      "predicted_last_rul_min": 11.063,
+      "snapshots": 42,
+      "tail_windows": 10
+    }
+  },
+  "readiness": {
+    "hours_to_failure_for_our_rig": null,
+    "not_field_validated": true,
+    "not_our_motor": true,
+    "operator_action_required": true,
+    "runtime_or_dashboard_claim_changed": false
+  },
+  "source": {
+    "citation": "Wang, B., Lei, Y., Li, N. and Li, N. (2020) A Hybrid Prognostics Approach for Estimating Remaining Useful Life of Rolling Element Bearings. IEEE Transactions on Reliability, 69(1), 401-412. doi:10.1109/TR.2018.2882682",
+    "dataset": "XJTU-SY bearing run-to-failure data (derived CC BY 4.0 feature record)",
+    "derived_data_doi": "10.17632/mpn45f4gxc.1",
+    "derived_data_license": "CC BY 4.0",
+    "derived_data_url": "https://data.mendeley.com/datasets/mpn45f4gxc/1",
+    "field_validation": false,
+    "official_mirror": "https://github.com/WangBiaoXJTU/xjtu-sy-bearing-datasets",
+    "official_page": "https://biaowang.tech/xjtu-sy-bearing-datasets",
+    "operator_confirmed_failure": false,
+    "original_data_license": "[NEED: explicit XJTU-SY reuse licence; page requests citation only]",
+    "our_motor": false
+  },
+  "status": "benchmark_complete",
+  "tail_windows": {
+    "mae_min": 134.924,
+    "n_windows": 1861,
+    "rmse_min": 171.776
+  }
+}

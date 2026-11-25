@@ -14,3 +14,6 @@ circuit/__pycache__/
 ~$*
 edge/calibration_backups/
 edge/calibration_runs.jsonl
+ml/rul_from_rig_report.json
+ml/rul_from_rig_model.joblib
+data/xjtu_sy_mendeley/features/*.mat

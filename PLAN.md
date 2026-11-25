@@ -38,6 +38,35 @@
 - C7 No explicit dataset licence is invented. If the authoritative source has
   no SPDX licence, write `[NEED: explicit FEMTO-ST dataset licence]` and cite
   the public figshare DOI/CC BY 4.0 copy plus the original paper.
+- R17 Show, with evidence, that the project becomes full predictive maintenance
+  once the operator supplies real run-to-failure data from our rig: accept a
+  strict CSV of the nine existing Stage-2 features plus operator-accepted
+  `failure_timestamp`, build causal trailing features, evaluate leave-one-run-out,
+  optionally fit/save a final regressor and predict RUL from a current run.
+- R18 Prove the target-rig path with tests for missing/garbage columns, strict
+  timestamps, constant failure endpoints, clamped `sound_db`, causality,
+  run-disjoint scoring, honest labels, CLI report/model/prediction and no
+  runtime/dashboard change. Generated test data must never be presented as rig data.
+- R19 Make the readiness evidence discoverable from README, the deck, the
+  Arabic review pack, G12 register, file map, AI report, Pi evidence log and
+  plan; link `docs/REAL_MOTOR_READINESS.md` as the single readiness entry point.
+- R20 Ignore generated `ml/rul_from_rig_report.json` and
+  `ml/rul_from_rig_model.joblib`; add no dependency and delete no data.
+- C8 Do not claim field-validated RUL, hours-to-failure on our motor or a
+  "100% on real motor" result. Do not change Stage-1/Stage-2 behaviour, the
+  dashboard, Firebase or Pi files, and do not deploy without user approval.
+- R21 Fetch a different trusted public run-to-failure dataset (XJTU-SY through
+  the CC BY 4.0 Mendeley derived feature record), vendor lossless CSVs with
+  source/CSV hashes, and keep original licence gaps as `[NEED: ...]`.
+- R22 Build/test a causal leave-one-bearing-out benchmark on those data and
+  report MAE/RMSE and the constant baseline honestly, including the case where
+  the model is worse than the baseline.
+- R23 Show the benchmark on the hosted dashboard only under
+  `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`, with source/licence
+  evidence and light-mode public pages; fetch/display FEMTO-ST, CWRU and
+  Reliance evidence without inventing missing facts.
+- C9 Public dataset end-of-life labels are not operator acceptance on our rig;
+  no benchmark value may be called hours-to-failure for our motor.
 
 ## Checklist
 
@@ -64,3 +93,11 @@
 - [x] P20 Add `ml/rul_pronostia.py` and tests: real features, RUL labels, bearing-disjoint metrics, honest labels
 - [x] P21 Add exhibition/review pack and update README, guide, file map, register and evidence logs
 - [x] P22 Run `git diff --check`, full suite, PRONOSTIA reproduction, deck webcheck/visual review and forbidden-claim grep; commit and push; report exact numbers and limits
+- [x] P23 Add `ml/rul_from_rig.py`, `tests/test_rul_from_rig.py` and `docs/REAL_MOTOR_READINESS.md` with the strict CSV contract and honest acceptance gate
+- [x] P24 Link the readiness evidence from README, deck, exhibition pack, register, file map, AI report, Pi evidence, plan and `.gitignore`
+- [ ] P25 Rerun targeted/full tests and `git diff --check`, webcheck/visual-review the deck, then commit and push with remaining `[NEED: ...]` items stated
+- [x] P26 Remove fabricated readings and numeric fallbacks from `public/index.html`, add real-data-only guard tests, browser-verify real and missing packets, and rerun webcheck, visual review and the full suite
+- [x] P27 Fetch and hash the XJTU-SY derived feature record, vendor CSVs and provenance, build/test `ml/rul_xjtu_sy.py`, and reproduce the labelled report
+- [x] P28 Add the labelled benchmark and licence-evidence panel to the hosted dashboard, convert the three hosted pages to light mode, and guard with tests
+- [x] P29 Link the new benchmark/provenance evidence from README, plan, file map, AI report, register, review pack and Pi evidence; rerun full suite and browser checks
+- [x] P30 Check Firebase CLI auth, complete approved OAuth sign-in if needed, deploy the verified hosted site and report the live URL

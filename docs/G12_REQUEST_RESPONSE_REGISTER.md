@@ -23,13 +23,16 @@
 | 8 | تشغيل ملفات الراسبري تلقائياً وهل كل ملف مرفوع يعمل؟ | ✅ تم | §8 يشرح systemd والـ enable عند الإقلاع ويوضح أن ليس كل ملف يعمل | §8 أدناه; `edge/*.service`; `docs/PI_DEPLOYMENT_EVIDENCE.md:5-13` | لا شيء محلياً |
 | 9 | تأكيد إزالة أوبشنز الحالات الأربعة وبيانات الـ simulation | ✅ تم | أُزيلت أدوات المحاكاة من الداشبورد، ويوجد اختبار يمنع رجوعها | `public/index.html`; `tests/test_evaluation.py::TeamFollowUpTest::test_dashboard_has_no_simulation_controls` | لا شيء محلياً |
 | 10 | تجهيز جداول النتائج الإجمالية قبل المعرض | ✅ تم | §10 يحدد أماكن جداول Totals وطريقة إعادة إنتاجها | §10 أدناه; `ml/ai_report.md` §5.4–§5.5; `docs/CAPSTONE_MASTER_HANDBOOK.md` §5.3, §10 | لا شيء محلياً؛ النتائج صناعية فقط |
-| 11 | التيست الحقيقي على موتور ثم prediction/RUL (لينكي MathWorks) | ◐ جزئي | كُتب بروتوكول الاختبار؛ أُضيف benchmark على NASA C-MAPSS FD001 (محاكاة) وbenchmark ثانٍ على ست محامل حقيقية من PRONOSTIA/FEMTO-ST مع validation بفصل المحمل؛ الـ RUL على موتورنا لسه متوقف | §11 أدناه; `ml/ai_report.md` §10–§11; `data/pronostia/README.md` | `[NEED: motor rig access, calibrated raw readings, run-to-failure series from our rig]` |
+| 11 | التيست الحقيقي على موتور ثم prediction/RUL (لينكي MathWorks) | ◐ جزئي | كُتب بروتوكول الاختبار؛ أُضيف benchmark على NASA C-MAPSS FD001 (محاكاة) وbenchmarks على محامل حقيقية من PRONOSTIA/FEMTO-ST وXJTU-SY (15 مساراً) مع validation بفصل المحمل؛ الداشبورد يعرض رقم XJTU-SY موسوماً `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`؛ مسار جاهز لموتورنا عبر `ml/rul_from_rig.py` لكن الـ RUL الميداني لسه متوقف على البيانات | §11 أدناه; `docs/REAL_MOTOR_READINESS.md`; `docs/DATA_PROVENANCE_LICENSES.md`; `ml/ai_report.md` §10–§13; `data/pronostia/README.md`; `data/xjtu_sy_mendeley/README.md` | `[NEED: motor rig access, calibrated raw readings, run-to-failure series from our rig]`; `[NEED: operator-accepted failure endpoint and reviewed metric report]` |
 | 12 | الرد سريعاً لأن الشغل مكمل «بكرة» | — لا ينطبق | لا يوجد تاريخ قابل للتحقق؛ اعتُبر كأولوية لا كطلب هندسي | `/tmp/opencode/textinstinct_chat.txt:1258-1260` | `[NEED: actual exhibition date if a deadline must be quoted]` |
-| 13 | مخرجات أكثر تدرّجاً + مكان المشكلة وتكلفتها ومدة بقاء الموتور | ◐ جزئي | يوجد `response_plan` بأربع أولويات وإجراءات، لكن المدد ثابتة لكل فئة وليست تنبؤاً؛ لا تكلفة ولا زمن بقاء مقيسان | `ml/rf_predictor.py:37-72`; `edge/edge_daq.py:604`; `ml/ai_report.md` §5.5 | `[NEED: degradation curve, part prices, downtime cost and failure labels]` |
+| 13 | مخرجات أكثر تدرّجاً + مكان المشكلة وتكلفتها ومدة بقاء الموتور | ◐ جزئي | يوجد `response_plan` بأربع أولويات وإجراءات، لكن المدد ثابتة لكل فئة وليست تنبؤاً؛ لا تكلفة ولا زمن بقاء مقيسان. مسار `ml/rul_from_rig.py` جاهز لاستبدال ذلك بـ RUL متعلّم بعد بيانات ريجنا | `ml/rf_predictor.py:37-72`; `edge/edge_daq.py:604`; `ml/ai_report.md` §5.5; `docs/REAL_MOTOR_READINESS.md` | `[NEED: degradation curve, part prices, downtime cost and failure labels]` |
 
 **الخلاصة:** كل ما يمكن تنفيذه محلياً دون قياس فيزيائي أُنجز. أُضيف RUL على محامل
-حقيقية عامة (PRONOSTIA) لكنه ليس على موتورنا. البند 6 والجزء المتعلق بـ RUL/التكلفة
-من 11 و13 تبقى متوقفة على بيانات/قياسات من ريجنا؛ لم يُملأ أي منها بقيم مخترعة.
+حقيقية عامة (PRONOSTIA وXJTU-SY) لكنه ليس على موتورنا، ومسار `ml/rul_from_rig.py`
+جاهز لتقييم وتدريب وتنبؤ RUL فور وصول بيانات ريجنا. البند 6 والجزء المتعلق بـ
+RUL/التكلفة من 11 و13 تبقى متوقفة على بيانات/قياسات من ريجنا؛ لم يُملأ أي منها
+بقيم مخترعة. أدلة المصادر والرخص في `docs/DATA_PROVENANCE_LICENSES.md`، وما لا
+يوجد دليل صريح على رخصته مكتوب `[NEED: ...]`.
 
 ---
 
@@ -194,6 +197,28 @@ restating any resource-saving claim]`
   `10.6084/m9.figshare.30595484.v1`. **ده RUL حقيقي على محامل عامة، مش على
   موتور المشروع ومش validation ميداني**، وممنوع تحويل الثواني دي لزمن بقاء
   لموتورنا.
+- وبناءً على طلب «داتا مختلفة من مصدر موثوق» جُلبت 15 مسار run-to-failure من
+  XJTU-SY عبر نسخة مشتقة CC BY 4.0 على Mendeley DOI `10.17632/mpn45f4gxc.1`
+  (هاشات SHA-256 متطابقة مع API بتاع Mendeley). الكود `ml/rul_xjtu_sy.py`
+  والتقرير `ml/rul_xjtu_sy_report.json`: على آخر 20% من كل محمل محجوز جاء
+  **MAE 134.924 دقيقة وRMSE 171.776 دقيقة** مقابل **RMSE 160.859** للـ baseline
+  الثابت — يعني الموديل أسوأ شوية من الـ baseline، وده يتقال كمان. الدقائق دي
+  لمحامل عامة **مش ساعات بقاء لموتورنا**، والداشبورد يعرضها تحت
+  `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`. رخصة المصدر الأصلي غير
+  معلومة صراحةً: `[NEED: explicit XJTU-SY reuse licence]`؛ أدلة المصادر والرخص
+  كلها في `docs/DATA_PROVENANCE_LICENSES.md`، ولا نهاية مسار عام تُعدّ تأكيد
+  مشغّل على فشل ريجنا.
+- استجابةً لطلب «لو عندنا الموتور، المشروع هيبقى predictive maintenance كامل؟»
+  أُضيف مسار جاهز على الجهاز المضيف فقط: `ml/rul_from_rig.py` يقرأ CSV من
+  `edge/edge_daq.py` بعد إضافة `failure_timestamp` من المشغّل، يبني نوافذ
+  causality بآخر 10 صفوف، ويقيّم بفصل الـ run كاملاً (leave-one-run-out) مع
+  MAE/RMSE وbaseline ثابت، ثم يحفظ نموذجاً اختيارياً ويحسب RUL لآخر نافذة في
+  run جاري. العقود والاختبارات في `docs/REAL_MOTOR_READINESS.md` و
+  `tests/test_rul_from_rig.py`. الاختبارات تستخدم بيانات مولّدة للتحقق من المسار
+  **ليست** قياساً من موتورنا؛ كل مخرج موسوم `not field-validated`، ولا يوجد
+  تغيير في الـ runtime أو الداشبورد أو Firebase. المطلوب قبل أي ادعاء ميداني:
+  `[NEED: run-to-failure series with timestamps and failure labels from our rig]`
+  و`[NEED: operator-accepted failure endpoint and reviewed metric report]`.
 - وبناءً على طلب «داتا موتور حقيقي من مصدر موثوق» جُلبت عيّنة من **CWRU
   Bearing Data Center** الرسمي: الموتور **2 hp Reliance Electric induction
   motor**، ومحامل SKF 6205-2RS JEM (DE) و6203-2RS JEM (FE). الملفات في

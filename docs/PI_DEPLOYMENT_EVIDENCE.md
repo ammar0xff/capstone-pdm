@@ -345,3 +345,45 @@ explicitly **not field-validated**.
 No Pi file, service, calibration artifact or Firebase state was changed for
 this step. The operator-owned scripts listed above remain untouched; runtime
 diagnosis and the dashboard still report current state only.
+
+## 2026-11-25 — target-rig RUL readiness path (no Pi change)
+
+At the operator's request, the host-only files `ml/rul_from_rig.py`,
+`tests/test_rul_from_rig.py` and `docs/REAL_MOTOR_READINESS.md` were added. They
+accept a future operator-supplied run-to-failure CSV containing the nine
+already-deployed Stage-2 features plus an operator-accepted
+`failure_timestamp`, build causal trailing windows, evaluate
+leave-one-run-out, optionally fit a final regressor and predict RUL from a
+current run. Every report/prediction is labelled **not field-validated**.
+
+This is readiness evidence only: no run-to-failure series from our rig exists,
+no Pi file, service, calibration artifact or Firebase state was changed, and no
+runtime or dashboard behaviour was altered. The operator-owned
+`edge/raw_measure.py` and `edge/raw_measuree.py` were not modified for this
+step. `[NEED: run-to-failure series with timestamps and failure labels from our
+rig]` and `[NEED: operator-accepted failure endpoint and reviewed metric
+report]` remain before any field claim.
+
+## 2026-11-25 — XJTU-SY benchmark and hosted evidence (no Pi change)
+
+At the user's request a different public run-to-failure source was fetched:
+15 XJTU-SY bearing feature matrices from Mendeley Data DOI
+`10.17632/mpn45f4gxc.1` (CC BY 4.0 derived record, source SHA-256 values
+checked against the Mendeley API). Host-only files `ml/rul_xjtu_sy.py`,
+`ml/rul_xjtu_sy_report.json`, `tests/test_rul_xjtu_sy.py`,
+`data/xjtu_sy_mendeley/` and `docs/DATA_PROVENANCE_LICENSES.md` were added.
+The causal leave-one-bearing-out benchmark over 9,216 one-minute snapshots
+reports last-20% MAE 134.924 min and RMSE 171.776 min against a constant
+baseline RMSE of 160.859 min; the model is slightly worse and that is shown as
+measured. The hosted `public/index.html` displays these numbers only beside
+`BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED` and the source/licence table;
+`public/index.html`, `public/guide.html` and `public/calibration.html` were
+converted to light mode.
+
+No Pi file, service, calibration artifact, calibration run record, Firebase
+state, Stage-1/Stage-2 behaviour, dependency or runtime model was changed.
+Public end-of-life labels are not operator acceptance on our rig, and no
+benchmark minute value is a hours-to-failure claim for our motor. Unresolved
+licence facts remain `[NEED: explicit XJTU-SY reuse licence]`,
+`[NEED: explicit FEMTO-ST dataset licence]`, `[NEED: explicit CWRU dataset
+reuse licence]` and `[NEED: exact Reliance Electric catalogue number]`.
