@@ -1012,10 +1012,12 @@
         probLabel: "Fault Diagnostic Confidence:",
         healthy: "NO RULE TRIGGERED",
         healthyDesc: "No alarm rule fired in this window. This is a rule result, not validated motor health.",
-        warning: "WARNING - DRIFT DETECTED",
-        warningDesc: "Vibration or temperature exceeded 2-sigma warning limit",
-        fault: "CRITICAL MACHINE FAULT",
-        faultDesc: "Statistical gate breach or thermal limit exceeded",
+        warning: "RULE WARNING",
+        warningDesc: "A rule on the Pi raised a warning. See the diagnostic card for which rule and label.",
+        unknown: "INPUT INVALID",
+        unknownDesc: "A sensor value was not a finite number. No health state is reported.",
+        fault: "FAULT RULE FLAGGED",
+        faultDesc: "A fault rule on the Pi fired. See the diagnostic card. This is a rule result, not a validated diagnosis.",
         standby: "STANDBY / WAITING FOR DAQ",
         standbyDesc: "Live telemetry resumes when the edge DAQ service publishes state.",
         awaiting: "Awaiting DAQ state",
@@ -1041,10 +1043,12 @@
         probLabel: "نسبة الثقة في التشخيص:",
         healthy: "لم يتفعّل أي قانون إنذار",
         healthyDesc: "لم يتجاوز أي قياس حدود قوانين الإنذار في هذه اللحظة. ده ناتج قوانين وليس تأكيدًا لسلامة المحرك.",
-        warning: "تحذير - رصد انحراف مبكر",
-        warningDesc: "تجاوز الاهتزاز أو الحرارة حد التحذير 2-سيغما",
-        fault: "إنذار - عطل ميكانيكي حرج",
-        faultDesc: "تجاوز حد التحكم الحرج 3-سيغما أو حدوث تسارع حراري",
+        warning: "تحذير من قوانين الإنذار",
+        warningDesc: "قانون على الـPi رفع تحذيرًا. شوف كارت التشخيص لمعرفة القانون.",
+        unknown: "قراءة غير صالحة",
+        unknownDesc: "قيمة من الحساسات مش رقم صالح. مفيش حالة صحة معروضة.",
+        fault: "قانون عطل اتفعّل",
+        faultDesc: "قانون عطل على الـPi اتفعّل. شوف كارت التشخيص. ده ناتج قوانين وليس تشخيصًا مؤكدًا.",
         standby: "في الانتظار / بانتظار بيانات DAQ",
         standbyDesc: "تعود القياسات اللحظية عندما تنشر خدمة DAQ حالة المحرك.",
         awaiting: "بانتظار حالة DAQ",
@@ -1233,6 +1237,10 @@
         txtState.innerText = dict.warning;
         txtDesc.innerText = dict.warningDesc;
         if (lastState !== "Warning") playAlertBeep(660, 0.3);
+      } else if (online && state === "Unknown") {
+        hero.className = "hero-banner standby";
+        txtState.innerText = dict.unknown;
+        txtDesc.innerText = dict.unknownDesc;
       } else if (!online || state === "Standby") {
         hero.className = "hero-banner standby";
         txtState.innerText = dict.standby;

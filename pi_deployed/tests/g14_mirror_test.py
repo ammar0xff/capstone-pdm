@@ -1,6 +1,6 @@
-"""Consumer mapping test: build the REAL payload block from firebase_mirror.py.g14 for synthetic edge packets; check fields and strict JSON."""
+"""Consumer mapping test: build the REAL payload block from firebase_mirror.py.g15 for synthetic edge packets; check fields and strict JSON."""
 import json,re,textwrap,time
-src=open("firebase_mirror.py.g14").read().splitlines()
+src=open("firebase_mirror.py.g15").read().splitlines()
 a=next(i for i,l in enumerate(src) if l.strip().startswith("payload = {"))
 b=next(i for i,l in enumerate(src) if "if LIGHT_PAYLOAD" in l)
 blk=textwrap.dedent("\n".join(src[a:b]))
