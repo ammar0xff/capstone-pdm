@@ -131,7 +131,7 @@ class TeamFollowUpTest(unittest.TestCase):
         self.assertFalse(nominal[4]["rf_executed"])
         self.assertTrue(breach[4]["rf_executed"])
 
-    def test_edge_packet_and_dashboard_carry_the_decision(self):
+    def test_edge_packet_carries_the_decision_but_dashboard_does_not_show_it(self):
         with open(self.EDGE_DAQ) as f:
             edge = f.read()
         self.assertIn("predict(feature_dict, return_gate_info=True)", edge)
@@ -142,9 +142,13 @@ class TeamFollowUpTest(unittest.TestCase):
         for token in (
             'id="txt-decision-priority"',
             'id="txt-decision-timeframe"',
+            'id="txt-decision-owner"',
             "data.ai?.response_plan",
+            "Next scheduled inspection",
+            "Operations operator",
         ):
-            self.assertIn(token, html)
+            with self.subTest(token=token):
+                self.assertNotIn(token, html)
 
     def test_ifelse_baseline_is_weaker_and_documented(self):
         X, y, groups = load_dataset()

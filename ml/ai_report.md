@@ -181,7 +181,7 @@ All rows below come from the **same 200-window, run-disjoint hold-out** (50 wind
 | New sensor patterns after calibration | Needs hand-written thresholds and retuning | Re-train from labeled windows; decision table stays unchanged |
 | Operator action after classification | Fixed alarm text | Structured `response_plan`: priority, action, timeframe, owner, rationale |
 
-The AI is therefore the **classification and decision layer**, not the sensor layer and not a time-to-failure predictor. The model is small enough to run on the Pi (measured 29.99 ms/window) and is deployed as `ml/model.joblib`; `edge/edge_daq.py` now publishes `ai.response_plan` so the dashboard shows the operator decision after each classification. Removing the model is supported as a degraded fallback, not as an equal replacement.
+The AI is therefore the **classification and decision layer**, not the sensor layer and not a time-to-failure predictor. The model is small enough to run on the Pi (measured 29.99 ms/window) and is deployed as `ml/model.joblib`; `edge/edge_daq.py` publishes `ai.response_plan` in the device packet, but the hosted dashboard no longer displays the priority/timeframe/owner block. Removing the model is supported as a degraded fallback, not as an equal replacement.
 
 ---
 

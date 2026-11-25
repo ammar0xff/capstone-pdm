@@ -296,8 +296,10 @@ restating any resource-saving claim]`
   `SOURCE: DEVICE TELEMETRY ONLY`، نص `Operational Protocol:` مع سطر المشورة
   المرتبط به، خلية `SPC Gate` / `badge-gate-status`، ورسالة
   `STAGE 2 (RF ACTIVE)` (ومثيلتها `STAGE 1 (SPC OK)`) من منطق JavaScript.
-  بطاقات القرار (`ROUTINE/SCHEDULE/URGENT/CRITICAL`، الوقت، المالك) بقيت كما هي
-  وتعرض `NO DATA` / `AWAITING DATA` عند غياب الحزمة. اختبارات
+  وبناءً على طلب لاحق أُزيلت أيضاً كل بطاقة القرار (`ROUTINE`، الوقت، المالك)
+  من الداشبورد المستضاف:HTML وCSS ومنطق JavaScript، بينما يظل `ai.response_plan`
+  داخل حزمة الجهاز كما هو. قيم `NO DATA` / `AWAITING DATA` ما زالت تظهر في
+  بقية الحقول عند غياب الحزمة. اختبارات
   `tests/test_dashboard_real_data_only.py` و`tests/test_device_only_telemetry.py`
   تمنع رجوع هذه العناصر.
 - **«الويب بيظهر (buffer freeze) كتير»:** السبب كان نص offline banner في

@@ -95,15 +95,10 @@ class HostedDashboardRealDataOnlyTest(unittest.TestCase):
                     f"{element_id} must show an explicit unavailable state: {text!r}",
                 )
 
-    def test_initial_status_and_decision_text_waits_for_telemetry(self):
+    def test_initial_status_waits_for_telemetry(self):
         self.assertEqual(text_for(self.html, "txt-cloud-status"), "AWAITING DATA")
         self.assertEqual(text_for(self.html, "status-title"), "Awaiting telemetry")
-        for element_id in ("status-sub", "txt-decision-timeframe"):
-            with self.subTest(element_id=element_id):
-                self.assertIsNone(re.search(r"\d", text_for(self.html, element_id)))
-        self.assertEqual(text_for(self.html, "txt-decision-priority"), "AWAITING DATA")
-        for element_id in ("txt-decision-owner",):
-            self.assertNotRegex(text_for(self.html, element_id), r"\d")
+        self.assertIsNone(re.search(r"\d", text_for(self.html, "status-sub")))
 
     def test_removed_ui_elements_are_absent(self):
         for token in (
@@ -114,6 +109,18 @@ class HostedDashboardRealDataOnlyTest(unittest.TestCase):
             "badge-gate-status",
             "txt-advice",
             "Chart buffer frozen",
+            "protocol-advice-box",
+            "txt-decision-priority",
+            "txt-decision-timeframe",
+            "txt-decision-owner",
+            "decision-chip",
+            "decision-meta",
+            "Next scheduled inspection",
+            "Operations operator",
+            "Timeframe",
+            "Owner",
+            "ROUTINE",
+            "response_plan",
         ):
             with self.subTest(token=token):
                 self.assertNotIn(token, self.html)
@@ -218,7 +225,7 @@ class HostedDashboardRealDataOnlyTest(unittest.TestCase):
         self.assertNotIn(r"\u2014", self.html)
         self.assertIn('if (value === null) return "NO DATA";', self.html)
 
-    def test_presentation_only_and_decision_contract_are_preserved(self):
+    def test_presentation_only_contract_is_preserved(self):
         for token in (
             "toggleSimulator",
             "simScenario",
@@ -228,13 +235,6 @@ class HostedDashboardRealDataOnlyTest(unittest.TestCase):
         ):
             with self.subTest(token=token):
                 self.assertNotIn(token, self.html)
-        for token in (
-            'id="txt-decision-priority"',
-            'id="txt-decision-timeframe"',
-            "data.ai?.response_plan",
-        ):
-            with self.subTest(token=token):
-                self.assertIn(token, self.html)
 
 
 if __name__ == "__main__":

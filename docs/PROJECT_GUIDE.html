@@ -172,7 +172,7 @@ INMP441  (I2S) ─┘          │                     │                     �
     <tr><td>Calibration</td><td><code>edge/calibrate.py</code> → <code>edge/cal.json</code></td><td><code>g_scale</code>, three biases, <code>t_a</code>, <code>t_b</code></td></tr>
     <tr><td>Coarse gate</td><td>Stage 1 in <code>edge_daq.py</code> and <code>ml/rf_predictor.py</code></td><td>Z-score, warning/fault flags, <code>rf_executed</code></td></tr>
     <tr><td>Fine diagnosis</td><td><code>ml/model.joblib</code> through <code>ml/rf_predictor.py</code></td><td>Class, confidence, four-step response plan</td></tr>
-    <tr><td>Presentation</td><td><code>edge/dashboard.py</code>, <code>edge/templates/index.html</code>, <code>public/index.html</code></td><td>Live cards, charts, operator decision, deck links</td></tr>
+    <tr><td>Presentation</td><td><code>edge/dashboard.py</code>, <code>edge/templates/index.html</code>, <code>public/index.html</code></td><td>Live cards, charts, deck links; no operator-decision block on the hosted page</td></tr>
     <tr><td>Cloud mirror</td><td><code>edge/firebase_mirror.py</code></td><td>HTTPS PUT to <code>/motor1.json</code>, backlog on offline</td></tr>
   </table>
   <div class="good"><b>Design decision.</b> The hosted dashboard is presentation-only. Engineering write endpoints and simulator controls were removed so the public site cannot change calibration or inject fake state.</div>
@@ -224,7 +224,7 @@ firebase use castpone2026
 firebase deploy --only hosting
 curl -s https://castpone2026-default-rtdb.firebaseio.com/motor1.json</pre>
   <h3>3.2 Dashboard creation</h3>
-  <p>There are two dashboard surfaces built from the same live state schema. The local Flask page in <code>edge/templates/index.html</code> is served by <code>edge/dashboard.py</code> on the Pi. The hosted page in <code>public/index.html</code> reads Firebase, draws the same charts, shows the operator decision, links to the exhibition deck and calibration explainer, and provides alarm mute. Neither page can write calibration data.</p>
+  <p>There are two dashboard surfaces built from the same live state schema. The local Flask page in <code>edge/templates/index.html</code> is served by <code>edge/dashboard.py</code> on the Pi. The hosted page in <code>public/index.html</code> reads Firebase, draws the same charts, links to the exhibition deck and calibration explainer, and provides alarm mute. The device packet still carries <code>ai.response_plan</code>, but the hosted page no longer shows the priority/timeframe/owner block. Neither page can write calibration data.</p>
   <div class="note"><b>Security reality.</b> The deployed RTDB rules are public read/write. Anyone with the URL can read or overwrite <code>motor1</code>. This was kept for exhibition telemetry and is documented in <code>docs/FIREBASE_SETUP.md</code>. No auth change was made during cleanup. <code>[NEED: auth model and operator identities]</code></div>
   <div class="good"><b>Safe migration.</b> Enable authentication, write least-privilege rules, add a deny-unauthenticated-write test, move any token to a Pi-local environment source, then verify both writer and dashboard before switching rules.</div>
 </section>

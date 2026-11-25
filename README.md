@@ -78,8 +78,10 @@ INMP441 (I2S) ─┘          │                       │
   Bearing Defect or Thermal Runaway, plus an operator response plan.
 - The 100% score in `ml/ai_report.md` belongs only to the run-disjoint
   **synthetic** benchmark. It is not a real-motor accuracy claim.
-- The dashboard shows live state, decisions, charts and links. It has no
-  calibration write endpoint and no simulator controls.
+- The dashboard shows live state, charts and links. The device packet still
+  carries `ai.response_plan`, but the hosted page no longer displays the
+  priority/timeframe/owner decision block. It has no calibration write endpoint
+  and no simulator controls.
 - `ml/degradation_rul.py` is an **offline** trend-to-threshold estimator. It is
   not part of the runtime diagnosis, needs an operator threshold, and is
   labelled "not field-validated" in every result.

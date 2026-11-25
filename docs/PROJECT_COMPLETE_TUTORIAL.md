@@ -251,7 +251,7 @@ sudo systemctl start pdm-daq.service
   - $\Delta t_{\text{age}} \le 20\,\text{s}$: 🟢 **Pi Online & Streaming** (Green beacon).
   - $20\,\text{s} < \Delta t_{\text{age}} \le 90\,\text{s}$: 🟡 **Pi Stale** (Amber warning).
   - $\Delta t_{\text{age}} > 90\,\text{s}$ or network error: 🔴 **Pi Disconnected / Offline** (Red alert badge and persistent banner).
-* **Decision Display**: The operational protocol box shows the `ai.response_plan` fields from the edge packet — priority, action, timeframe and owner — after each classification. The dashboard displays real telemetry only; simulator controls and synthetic scenario buttons have been removed.
+* **Decision data**: The edge packet still carries `ai.response_plan` (priority, action, timeframe, owner), but the hosted dashboard no longer displays that block. The dashboard displays real telemetry only; simulator controls and synthetic scenario buttons have been removed.
 * **Anti-Drift Chart Protection**: Freezes timeline history pushes when the Pi is offline to prevent false duplicate points.
 
 ### 7.2 STEM Exhibition Presentation Deck (`public/guide.html`)

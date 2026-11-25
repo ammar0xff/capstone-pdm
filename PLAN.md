@@ -4,7 +4,7 @@
 
 - R1 README becomes the single entry point: project purpose, architecture, file map, exact run/test/deploy commands, honest status.
 - R2 Organise the repository by documentation, not by deleting or moving user data: add a file map and an operations guide; keep generated artifacts and `.firebase/` untouched.
-- R3 Dashboard is presentation-only: keep live state, operator decision, charts, calibration/deck links and alarm mute; remove engineering/debug text, unverified claims and every write endpoint.
+- R3 Dashboard is presentation-only: keep live state, charts, calibration/deck links and alarm mute; remove engineering/debug text, unverified claims and every write endpoint. The operator decision block is not displayed on the hosted page (see R47).
 - R4 `edge/calibrate.py` becomes a safe Pi calibration runner: 6-face ADXL345 procedure, two-point MAX6675 procedure, schema validation, atomic writes, timestamped backup, run log and honest certificate.
 - R5 Calibration execution is documented exactly in README, handbook, tutorial and a dedicated runbook; no fake PASS results.
 - R6 English PDF guide `docs/G12_Project_Guide.pdf` covers Pi setup, Firebase setup, dashboard creation, AI init/training/use, data generation, paper implementation, current status, and how/why AI predicts.
@@ -112,6 +112,10 @@
 - C12 User approved scope `all` for this round: Firebase Hosting + Pi sync only.
   Make no RTDB telemetry edits, runtime model changes or calibration artifact
   changes; keep light mode and calibration `REVIEW / UNVERIFIED`.
+- R47 Remove the whole operator decision block (`ROUTINE`, `Timeframe` /
+  `Next scheduled inspection`, `Owner` / `Operations operator`) from the hosted
+  `public/index.html`: HTML, CSS and JavaScript. Keep `ai.response_plan` in the
+  device packet and change no RTDB, runtime or calibration behaviour.
 
 ## Checklist
 
@@ -163,3 +167,4 @@
 - [x] P45 Add the labelled C-MAPSS warning panel and FMCG context to dashboard, guide, README, AI report, register, provenance and plan
 - [x] P46 Rerun focused/full suite, `git diff --check` and deterministic webcheck at three widths
 - [x] P47 Commit, deploy Firebase Hosting, sync the committed tree to Pi with backups and record exact evidence
+- [ ] P48 Remove the hosted operator decision block, update guards/docs, run tests + webcheck, then deploy and sync again

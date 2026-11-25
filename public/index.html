@@ -315,78 +315,6 @@
       margin-top: 3px;
     }
 
-    .protocol-advice-box {
-      background: var(--bg-base);
-      border: 1px solid var(--border-subtle);
-      border-radius: 4px;
-      padding: 10px 14px;
-      font-size: 12px;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      color: var(--text-secondary);
-    }
-
-    .protocol-advice-box i {
-      color: var(--accent-blue);
-      margin-top: 2px;
-    }
-
-    .decision-meta {
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      gap: 12px;
-      align-items: center;
-      margin-top: 8px;
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .decision-field {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      min-width: 0;
-    }
-
-    .decision-field small {
-      font-size: 9px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-muted);
-    }
-
-    .decision-chip {
-      font-family: 'JetBrains Mono', ui-monospace, monospace;
-      font-variant-numeric: tabular-nums;
-      font-weight: 700;
-      font-size: 11px;
-      letter-spacing: 0.06em;
-      padding: 3px 8px;
-      border-radius: 3px;
-      background: var(--bg-subtle);
-      border: 1px solid var(--border-strong);
-      color: var(--text-secondary);
-    }
-
-    .decision-chip.schedule {
-      color: #0369a1;
-      border-color: rgba(56, 189, 248, 0.4);
-      background: rgba(56, 189, 248, 0.1);
-    }
-
-    .decision-chip.urgent {
-      color: var(--status-warn);
-      border-color: var(--status-warn-border);
-      background: var(--status-warn-bg);
-    }
-
-    .decision-chip.critical {
-      color: var(--status-alarm);
-      border-color: var(--status-alarm-border);
-      background: var(--status-alarm-bg);
-    }
-
     .telemetry-kpis {
       display: flex;
       gap: 16px;
@@ -906,8 +834,6 @@
       }
       .telemetry-meta > .status-indicator-pill { grid-column: 1 / -1; justify-self: start; }
       .telemetry-meta > div:last-child { justify-content: space-between; }
-      .decision-meta { grid-template-columns: 1fr; gap: 8px; }
-      .decision-chip { justify-self: start; }
       .benchmark-panel { padding: 12px; }
       .benchmark-panel > div { min-width: 0; }
       .benchmark-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -932,7 +858,7 @@
             Predictive Maintenance SCADA
             <span style="font-size: 11px; font-weight: 500; color: var(--text-muted);">// UNIT-01</span>
           </h1>
-          <p>Live machine state &bull; operator decision &bull; offline-first telemetry</p>
+          <p>Live machine state &bull; offline-first telemetry</p>
         </div>
       </div>
 
@@ -987,17 +913,6 @@
           <div class="state-title-text">
             <h2 id="status-title">Awaiting telemetry</h2>
             <p id="status-sub">No classified packet received from the Raspberry Pi mirror yet</p>
-          </div>
-        </div>
-
-        <div class="protocol-advice-box">
-          <i class="fa-solid fa-shield-halved"></i>
-          <div>
-            <div class="decision-meta" aria-label="Operator decision from the classified fault">
-              <span class="decision-chip" id="txt-decision-priority">AWAITING DATA</span>
-              <span class="decision-field"><small>Timeframe</small><span class="font-mono" id="txt-decision-timeframe">NO DATA</span></span>
-              <span class="decision-field"><small>Owner</small><span id="txt-decision-owner">NO DATA</span></span>
-            </div>
           </div>
         </div>
 
@@ -1790,10 +1705,6 @@
       document.getElementById("lamp-icon").className = "fa-solid fa-circle-question";
       document.getElementById("status-title").innerText = "Awaiting telemetry";
       document.getElementById("status-sub").innerText = "No classified packet received from the Raspberry Pi mirror yet";
-      document.getElementById("txt-decision-priority").innerText = "AWAITING DATA";
-      document.getElementById("txt-decision-priority").className = "decision-chip";
-      document.getElementById("txt-decision-timeframe").innerText = "NO DATA";
-      document.getElementById("txt-decision-owner").innerText = "NO DATA";
       document.getElementById("badge-ai-conf").innerText = "NO DATA";
       document.getElementById("badge-ai-conf").style.removeProperty("color");
       document.getElementById("badge-seq").innerText = "NO DATA";
@@ -1839,7 +1750,6 @@
       const slope = firstFinite(data.slope, data.temperature?.slope_c_per_min);
       const sound_db = firstFinite(data.sound_db, data.acoustic?.db_spl);
       const zcr = firstFinite(data.zcr, data.acoustic?.zcr);
-      const responsePlan = data.ai?.response_plan || null;
       const seq = firstFinite(data.seq);
       const uptime = firstFinite(data.uptime_s);
       const dataTs = firstFinite(data.ts);
@@ -1892,24 +1802,6 @@
           ? (uptime / 60).toFixed(1) + "m"
           : uptime.toFixed(0) + "s";
       }
-      // Post-classification operator decision from the edge AI packet.
-      const priorityEl = document.getElementById("txt-decision-priority");
-      const timeframeEl = document.getElementById("txt-decision-timeframe");
-      const ownerEl = document.getElementById("txt-decision-owner");
-      const allowedPriorities = ["ROUTINE", "SCHEDULE", "URGENT", "CRITICAL"];
-      if (responsePlan && allowedPriorities.includes(responsePlan.priority)) {
-        const priority = responsePlan.priority;
-        priorityEl.innerText = priority;
-        priorityEl.className = `decision-chip ${priority.toLowerCase()}`;
-        timeframeEl.innerText = responsePlan.timeframe || "Timeframe not supplied";
-        ownerEl.innerText = responsePlan.owner || "not assigned";
-      } else {
-        priorityEl.innerText = "NO DECISION PACKET";
-        priorityEl.className = "decision-chip";
-        timeframeEl.innerText = "Awaiting classified telemetry";
-        ownerEl.innerText = "NO DATA";
-      }
-
       // Stage gating is only asserted when the packet has a recognised state.
       if (knownState) {
         const isStage2 = knownState !== "Healthy" || Boolean(data.ai?.gate_status?.includes("Stage 2"));
