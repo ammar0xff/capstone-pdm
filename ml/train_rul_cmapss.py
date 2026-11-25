@@ -289,8 +289,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         report = evaluate(args.raw_dir)
         if args.model_out:
             train, _, _ = load_raw(args.raw_dir)
+            features, targets, _, _ = build_windows(train, make_targets(train))
             model = make_model()
-            model.fit(build_windows(train, make_targets(train))[0], make_targets(train))
+            model.fit(features, targets)
             joblib.dump(model, args.model_out)
         report_path = Path(args.report)
         report_path.parent.mkdir(parents=True, exist_ok=True)

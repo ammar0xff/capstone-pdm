@@ -13,6 +13,7 @@ import sys
 import tempfile
 import unittest
 
+import joblib
 import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -178,6 +179,30 @@ class CmapssCliTest(unittest.TestCase):
         self.assertEqual(written["status"], "benchmark_complete")
         self.assertEqual(written["official_test"]["n_units"], 100)
         self.assertIn("not field-validated", written["label"])
+
+    def test_cli_can_save_the_trained_benchmark_model(self):
+        script = os.path.join(ROOT, "ml", "train_rul_cmapss.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            self._write_small_fixture(tmp)
+            model_path = os.path.join(tmp, "model.joblib")
+            proc = subprocess.run(
+                [
+                    sys.executable,
+                    script,
+                    "--raw-dir",
+                    tmp,
+                    "--report",
+                    os.path.join(tmp, "report.json"),
+                    "--model-out",
+                    model_path,
+                ],
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(proc.returncode, 0, proc.stderr)
+            model = joblib.load(model_path)
+        self.assertEqual(len(model.estimators_), rul.N_ESTIMATORS)
+        self.assertEqual(model.n_features_in_, rul.N_FEATURES)
 
     def test_cli_rejects_missing_raw_files(self):
         script = os.path.join(ROOT, "ml", "train_rul_cmapss.py")

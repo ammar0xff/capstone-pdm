@@ -282,6 +282,12 @@ disjointness and the reproduced metrics. Run it with:
 python3 ml/train_rul_cmapss.py --report /tmp/rul_cmapss_report.json
 ```
 
+The run fits two regressors: one on units 1–80 for the unit-held-out check and
+one on all 100 units for the official test score. To persist the final fitted
+benchmark regressor (about 50 MB), add `--model-out /tmp/rul_cmapss_model.joblib`.
+It is a separate benchmark artifact, not the deployed `ml/model.joblib`
+classifier and never loaded by the runtime.
+
 **Scope limit.** These are simulated aircraft turbofan readings, not our
 induction motor, our sensors or our failure modes. The good score validates the
 RUL *pipeline on a public benchmark only*. It is **not** field validation, not a
