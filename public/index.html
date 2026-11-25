@@ -1030,6 +1030,10 @@
               <div class="value-display font-mono" id="val-sound-rms">NO DATA</div>
             </div>
             <div class="metric-data-card">
+              <div class="name">Mic Level, stationary component (dB, uncalibrated)</div>
+              <div class="value-display font-mono" id="val-sound-stat-db">NO DATA</div>
+            </div>
+            <div class="metric-data-card">
               <div class="name">Microphone Link</div>
               <div class="value-display font-mono" id="val-mic" style="font-size: 15px;">NO DATA</div>
             </div>
@@ -1037,6 +1041,7 @@
 
 
           <p class="cal-note">Uncalibrated microphone level. Not a measured sound pressure level.</p>
+          <p class="cal-note">Stationary component: level of the microphone signal after a median-spectrum filter (about 2 s history), shown next to the raw level. It reduces speech-band power only partly and suppresses isolated impacts; it is not speech removal and not a fault indicator.</p>
 
           <div class="chart-panel-box no-data" data-empty-label="NO TELEMETRY">
             <canvas id="chart-sound"></canvas>
@@ -1311,7 +1316,7 @@
       document.getElementById("badge-uptime").innerText = "NO DATA";
       for (const id of [
         "val-rms", "val-peak", "val-kurt", "val-cf", "val-temp",
-        "val-slope", "val-sound-db", "val-sound-zcr", "val-sound-rms"
+        "val-slope", "val-sound-db", "val-sound-zcr", "val-sound-rms", "val-sound-stat-db"
       ]) renderValue(id, null, 0, "");
       for (const id of TEXT_ONLY_IDS) setText(id, "NO DATA", null);
       document.getElementById("note-vib").innerText = "Uncalibrated. Accelerometer sampling rate: NO DATA.";
@@ -1403,6 +1408,7 @@
       renderValue("val-sound-db", sound_db, 1, "dB");
       renderValue("val-sound-zcr", zcr, 4, "cross/sample");
       renderValue("val-sound-rms", sound_rms, 4, "");
+      renderValue("val-sound-stat-db", firstFinite(data.acoustic?.stat_db), 1, "dB");
 
       const flag = (v) => (typeof v === "boolean" ? v : (v === 0 || v === 1 ? v === 1 : null));
       const sys = data.system || {};
@@ -1524,14 +1530,18 @@
         });
     }
 
-    function connectFirebase() {
-      fetchLatest();
-      setInterval(fetchLatest, 2500);
-      setInterval(() => { if (lastData) { updateDashboard(lastData); updateHardwareStatus(lastData); } }, 1000);
+    let sseLastEventMs = 0;
+    let sseRetryMs = 1000;
+    let sseSource = null;
 
+    function openStream() {
       try {
+        if (sseSource) { try { sseSource.close(); } catch (e) {} }
         const sse = new EventSource(FIREBASE_RTDB_URL);
+        sseSource = sse;
         sse.addEventListener('put', function(e) {
+          sseLastEventMs = Date.now();
+          sseRetryMs = 1000;
           try {
             const parsed = JSON.parse(e.data);
             if (parsed && parsed.data) {
@@ -1540,10 +1550,28 @@
             }
           } catch (err) { }
         });
+        sse.addEventListener('keep-alive', function() { sseLastEventMs = Date.now(); });
         sse.onerror = function() {
+          // Reconnect with backoff instead of silently dropping to polling only.
           sse.close();
+          sseLastEventMs = 0;
+          setTimeout(openStream, sseRetryMs);
+          sseRetryMs = Math.min(sseRetryMs * 2, 30000);
         };
       } catch (err) { }
+    }
+
+    function scheduleFetch() {
+      // Full-node poll is the fallback: fast (2.5 s) when the stream is not delivering, slow (10 s) when it is.
+      const streamHealthy = sseLastEventMs && (Date.now() - sseLastEventMs) < 20000;
+      setTimeout(() => { fetchLatest(); scheduleFetch(); }, streamHealthy ? 10000 : 2500);
+    }
+
+    function connectFirebase() {
+      fetchLatest();
+      scheduleFetch();
+      setInterval(() => { if (lastData) { updateDashboard(lastData); updateHardwareStatus(lastData); } }, 1000);
+      openStream();
     }
 
     window.addEventListener('DOMContentLoaded', () => {

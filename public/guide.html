@@ -942,7 +942,7 @@
               <td><b>MDR 4</b></td>
               <td><b>Data Resiliency</b> (Network Dropout Loss)</td>
               <td>$0.0\%$ packet loss</td>
-              <td>Local SQLite buffer and replay implemented; packet loss not measured in a field test</td>
+              <td>Local queue of up to 200 frames while the link is down; replay to the cloud is NOT implemented; packet loss not measured</td>
               <td><span class="badge badge-amber">[NEED: dropout test]</span></td>
             </tr>
           </tbody>
@@ -1016,7 +1016,7 @@
           <div class="flow-step" style="border-left: 3px solid var(--green);">
             <div style="font-weight: 700; color: var(--green); font-size: 13px;">3. RESILIENT STORAGE</div>
             <div style="font-size: 13px; margin-top: 4px;">Local Ring Buffer</div>
-            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Local SQLite buffer and replay</div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Local queue (up to 200 frames); no replay</div>
           </div>
           <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
 
@@ -1231,7 +1231,7 @@
         <div class="slide-tag"><i class="fa-solid fa-shield-halved"></i> Engineering Robustness</div>
         <h2 class="slide-title">Offline-First Resiliency: What If Internet Dies?</h2>
         <p class="slide-subtitle">
-          The Pi keeps sampling and deciding locally when the cloud link is unavailable. Replay is implemented; packet loss and recovery time were not measured in a field test.
+          The Pi keeps sampling and deciding locally when the cloud link is unavailable. Replay to the cloud is not implemented: frames queued while offline are not sent later. Packet loss and recovery time were not measured in a field test.
         </p>
 
         <div class="grid-3">
@@ -1253,9 +1253,9 @@
 
           <div class="feature-card">
             <div class="card-icon" style="color: var(--green);"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-            <div class="card-title">3. Replay</div>
+            <div class="card-title">3. No replay (not implemented)</div>
             <div class="card-desc">
-              The <code style="color: var(--cyan);">pdm-cloud</code> service replays queued frames when the link returns. Loss and integrity were not measured, so no percentage is claimed.
+              The <code style="color: var(--cyan);">pdm-cloud</code> service keeps up to 200 frames in a local file while the link is down and clears them after the next successful write. They are not sent to the cloud later, so there is no back-fill. The Pi keeps sampling and its local dashboard keeps updating. Loss was not measured.
             </div>
           </div>
         </div>
@@ -1302,7 +1302,7 @@
               <i class="fa-solid fa-4"></i> Input: uplink removed &rarr; Output: local continuity
             </div>
             <p class="card-desc">
-              Disconnect the uplink and show the Pi dashboard still updating. Reconnect and show queued frames replaying; do not claim zero packet loss.
+              Disconnect the uplink and show the Pi dashboard still updating. Reconnect and show live data resuming; do not claim back-fill or zero packet loss.
             </p>
           </div>
         </div>
