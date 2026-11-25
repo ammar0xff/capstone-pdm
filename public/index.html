@@ -1489,7 +1489,7 @@
 
       if (ageSec !== null && ageSec <= 20) {
         indicator.className = "status-indicator-pill online";
-        txtStatus.innerText = `STREAMING (< ${Math.max(1, Math.round(ageSec))}s)`;
+        txtStatus.innerText = `STREAMING (${Math.round(ageSec)}s old)`;
         banner.style.display = "none";
       } else if (ageSec !== null && ageSec < 90) {
         indicator.className = "status-indicator-pill stale";

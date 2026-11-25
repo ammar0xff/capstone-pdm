@@ -30,7 +30,7 @@
   <style>
     :root {
       --bg-dark: #f4f7fb;
-      --bg-card: rgba(24, 34, 48, 0.96);
+      --bg-card: rgba(255, 255, 255, 0.97);
       --bg-card-hover: rgba(244, 249, 253, 0.96);
       --border: rgba(24, 34, 48, 0.12);
       --border-accent: rgba(14, 116, 144, 0.35);
@@ -429,7 +429,7 @@
       font-family: 'JetBrains Mono', monospace;
       background: rgba(24, 34, 48, 0.05);
       border: 1px solid rgba(24, 34, 48, 0.12);
-      color: #cbd5e1;
+      color: #334155;
     }
 
     .grand-callout .card-desc {
@@ -808,7 +808,7 @@
       <span class="brand-title">Intelligent Industrial PdM System</span>
       <div class="live-indicator">
         <div class="live-dot"></div>
-        <span>EDGE LIVE</span>
+        <span>STATIC DECK</span>
       </div>
     </div>
 
@@ -855,12 +855,12 @@
         <div class="grid-4 mt-responsive">
           <div class="stat-box stat-hero">
             <div class="stat-number">29.99 ms</div>
-            <div class="stat-label">Pi inference time</div>
+            <div class="stat-label">Pi inference time (earlier note, not re-verified)</div>
             <span class="stat-tag">One window</span>
           </div>
           <div class="stat-box">
             <div class="stat-number">3</div>
-            <div class="stat-label">Live sensor inputs</div>
+            <div class="stat-label">Sensor inputs in the design</div>
             <span class="stat-tag">Vibration · Temp · Sound</span>
           </div>
           <div class="stat-box">
@@ -928,7 +928,7 @@
               <td><b>MDR 2</b></td>
               <td><b>System Response Time</b> (Shock to Alert)</td>
               <td>$&lt; 5.0\text{ seconds}$</td>
-              <td>29.99 ms inference measured on Pi; end-to-end shock-to-alert not measured</td>
+              <td>29.99 ms (earlier note, not re-verified) inference measured on Pi; end-to-end shock-to-alert not measured</td>
               <td><span class="badge badge-amber">[NEED: timing test]</span></td>
             </tr>
             <tr>
@@ -1031,7 +1031,7 @@
           <div class="feature-card">
             <b style="color: var(--cyan);"><i class="fa-solid fa-microchip"></i> Why Edge Computing over Pure Cloud?</b>
             <p class="card-desc">
-              Streaming every raw window would increase bandwidth and expose raw signals; an offline link would also break the live view. Features are computed on the Pi and lightweight status frames are mirrored. Inference was measured at 29.99 ms on the Raspberry Pi 4; cloud cost and end-to-end latency were not measured.
+              Streaming every raw window would increase bandwidth and expose raw signals; an offline link would also break the live view. Features are computed on the Pi and lightweight status frames are mirrored. Inference was measured at 29.99 ms (earlier note, not re-verified) on the Raspberry Pi 4; cloud cost and end-to-end latency were not measured.
             </p>
           </div>
           <div class="feature-card">
@@ -1104,7 +1104,7 @@
           <div class="feature-card" style="border-top: 4px solid var(--red);">
             <div class="stage-header" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; margin-bottom: 12px;">
               <span class="badge badge-red" style="white-space: nowrap;">STAGE 2: FINE DIAGNOSTICS</span>
-              <span style="font-size: 12px; color: var(--text-muted);">29.99 ms on Pi; 26.19 ms host</span>
+              <span style="font-size: 12px; color: var(--text-muted);">29.99 ms (earlier note, not re-verified) on Pi; 26.19 ms host</span>
             </div>
             <div class="card-title">Random Forest classifier</div>
             <p class="card-desc">
@@ -1205,7 +1205,7 @@
               </tr>
               <tr>
                 <td><b>Pi inference</b></td>
-                <td><b>29.99 ms</b> for one window on Raspberry Pi 4</td>
+                <td><b>29.99 ms (earlier note, not re-verified)</b> for one window on Raspberry Pi 4</td>
                 <td><span class="badge badge-blue">Measured; not end-to-end</span></td>
               </tr>
             </tbody>
@@ -1381,7 +1381,7 @@
           <div class="feature-card">
             <b style="color: var(--amber);"><i class="fa-solid fa-brain"></i> Q3: Why Random Forest over Deep Neural Networks?</b>
             <p class="card-desc">
-              <i>"We did not benchmark deep networks locally, so we quote no CNN memory or latency number. Random Forest fits the small tabular feature set, was measured at 29.99 ms per window on the Pi, and gives inspectable feature importance. Its 100% score is synthetic-only."</i>
+              <i>"We did not benchmark deep networks locally, so we quote no CNN memory or latency number. Random Forest fits the small tabular feature set, was measured at 29.99 ms (earlier note, not re-verified) per window on the Pi, and gives inspectable feature importance. Its 100% score is synthetic-only."</i>
             </p>
           </div>
 
@@ -1395,7 +1395,7 @@
           <div class="feature-card">
             <b style="color: var(--green);"><i class="fa-solid fa-hourglass-half"></i> Q5: Is remaining useful life working?</b>
             <p class="card-desc">
-              <i>"Not yet. We have no valid run-to-failure data for a whole motor, so we show no RUL number. Public bearing and turbofan datasets are different machines, and we do not present them as our result. This is an open item, not a pass."</i>
+              <i>"Not yet. We have no valid run-to-failure data for a whole motor, so we show no RUL number. Public bearing and turbofan datasets are different machines, and we do not present them as our result. The rig RUL script (ml/rul_from_rig.py) exists but has no valid whole-motor data to run on. This is an open item, not a pass."</i>
             </p>
           </div>
 
