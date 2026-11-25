@@ -37,7 +37,7 @@ class DashboardTruthTest(unittest.TestCase):
         self.assertIn('if (value === null) return "NO DATA";', HTML)
 
     def test_states_are_labelled(self):
-        for token in ["Old packet only", "Last known: ", "Uncalibrated", "has not been tested on real faults",
+        for token in ["No live data", "That is old", "Uncalibrated", "has not been tested on real faults",
                       "NOT OUR MOTOR", "EXPLORATORY", "not demonstrated on a whole motor", "no RUL number is shown"]:
             self.assertIn(token, HTML, token)
 
@@ -55,3 +55,12 @@ class DashboardTruthTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class GuideTruthTest(unittest.TestCase):
+    def test_guide_has_no_withdrawn_benchmark_claims(self):
+        g = open(os.path.join(ROOT, "public", "guide.html"), encoding="utf-8").read()
+        for token in ["C-MAPSS", "CWRU", "FMCG", "XJTU", "PRONOSTIA", "94.0%", "67.7%", "1.000 (100.0%)"]:
+            self.assertNotIn(token, g, token)
+        for token in ["99.86%", "about 41%", "Remaining life not demonstrated"]:
+            self.assertIn(token, g, token)

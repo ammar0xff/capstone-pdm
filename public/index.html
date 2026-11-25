@@ -711,6 +711,7 @@
     /* Benchmark and provenance evidence - never live telemetry */
     .modality-grid > *, .two-stage-banner > *, .dashboard-layout > * { min-width: 0; }
     .provenance-table { display: block; overflow-x: auto; }
+    .evidence-details > summary { cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-top: 10px; }
     .cal-note { margin: 10px 0 0; font-size: 11px; color: var(--text-muted); line-height: 1.4; }
     .dashboard-layout.is-stale .metrics-2x2, .dashboard-layout.is-stale .chart-panel-box { opacity: 0.55; }
     .benchmark-panel {
@@ -1035,7 +1036,7 @@
           </div>
 
 
-          <p class="cal-note">Uncalibrated microphone level. Not a measured sound pressure level. Microphone capture is currently on hold.</p>
+          <p class="cal-note">Uncalibrated microphone level. Not a measured sound pressure level.</p>
 
           <div class="chart-panel-box no-data" data-empty-label="NO TELEMETRY">
             <canvas id="chart-sound"></canvas>
@@ -1070,17 +1071,19 @@
             <div class="benchmark-metric"><strong>baseline</strong><small>fault vs normal at 3.2 kHz and lower (rate test, not comparable to the first row)</small></div>
             <div class="benchmark-metric"><strong>NONE</strong><small>RUL not demonstrated on a whole motor. No valid run-to-failure data is available, so no RUL number is shown.</small></div>
           </div>
+          <details class="evidence-details" open><summary>Why this does not apply to the rig</summary>
           <p style="margin-top:10px">This rig: the accelerometer samples at about 30 Hz, so the benchmark detector cannot be applied to it. No accuracy has been measured on this rig, and its sensors are not yet calibrated.</p>
+          </details>
         </div>
         <div>
-          <h2>Source &amp; licence evidence</h2>
+          <details class="evidence-details"><summary>Source &amp; licence evidence</summary>
           <table class="provenance-table">
             <thead><tr><th>Source</th><th>Evidence</th><th>Limit</th></tr></thead>
             <tbody>
               <tr>
                 <th>HUST bearing dataset</th>
                 <td><a href="https://data.mendeley.com/datasets/cbv7jyx4p9/3" target="_blank">Mendeley Data v3</a>, licence CC BY 4.0. Descriptor: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10327369/" target="_blank">PMC10327369</a>. 99 recordings, 5,918 windows.</td>
-                <td>Component-level artificial defects on a lab bench. Random forest on 16 spectral and statistical features. Results are exploratory: the 80% target was fixed for the 7-class task, not for fault vs normal.</td>
+                <td>Component-level artificial defects on a lab bench. Random forest on 16 spectral and statistical features. The brief's 80% accuracy requirement names no task or class count. The team protocol treated 7-class as primary; fault vs normal is a later, exploratory check.</td>
               </tr>
               <tr>
                 <th>Removed benchmarks</th>
@@ -1089,6 +1092,7 @@
               </tr>
             </tbody>
           </table>
+          </details>
         </div>
       </section>
 
@@ -1252,6 +1256,7 @@
 
     const TEXT_ONLY_IDS = ["val-tc", "val-open", "val-mic"];
     let lastDataTs = null;
+    let lastData = null;
 
     function setText(id, text, color) {
       const element = document.getElementById(id);
@@ -1265,22 +1270,34 @@
       return ["NO DATA", null];
     }
 
-    function setGates(gateText, rfText, knownState) {
+    const GATE_TEXT_IDLE = "Gate status from the last packet: NO DATA. The state above comes from fixed threshold rules on the Pi. The thresholds are not yet calibrated against this rig.";
+    const RF_TEXT_IDLE = "Class from the last packet: NO DATA. The classifier is trained on generated data and has not been tested on real faults. No probability or confidence is shown, and it gives no remaining-life estimate.";
+
+    function setGates(gateText, rfText, knownState, isStale) {
       const pill1 = document.getElementById("pill-stage1");
       const pill2 = document.getElementById("pill-stage2");
       if (!knownState) {
         pill1.className = "gate-badge-tag pending"; pill1.innerText = "AWAITING DATA";
         pill2.className = "gate-badge-tag pending"; pill2.innerText = "AWAITING DATA";
-        document.getElementById("txt-gate").innerText = "Gate status from the last packet: NO DATA. The state above comes from fixed threshold rules on the Pi. The thresholds are not yet calibrated against this rig.";
-        document.getElementById("txt-rf").innerText = "Class from the last packet: NO DATA. The classifier is trained on generated data and has not been tested on real faults. No probability or confidence is shown, and it gives no remaining-life estimate.";
+        document.getElementById("txt-gate").innerText = GATE_TEXT_IDLE;
+        document.getElementById("txt-rf").innerText = RF_TEXT_IDLE;
         return;
       }
-      pill1.className = "gate-badge-tag " + (knownState === "Healthy" ? "active" : "dormant");
-      pill1.innerText = knownState === "Healthy" ? "NO BREACH" : "RULE BREACHED";
-      pill2.className = "gate-badge-tag pending";
-      pill2.innerText = "UNVALIDATED";
+      const gated = Boolean(gateText && /gated/i.test(gateText));
+      if (isStale) {
+        pill1.className = "gate-badge-tag pending"; pill1.innerText = "OLD PACKET";
+        pill2.className = "gate-badge-tag pending"; pill2.innerText = "OLD PACKET";
+      } else {
+        pill1.className = "gate-badge-tag " + (knownState === "Healthy" ? "active" : "dormant");
+        pill1.innerText = knownState === "Healthy" ? "NO BREACH" : "RULE BREACHED";
+        pill2.className = "gate-badge-tag pending";
+        pill2.innerText = gated ? "NOT RUN" : "UNVALIDATED";
+      }
       document.getElementById("txt-gate").innerText = "Gate status from the last packet: " + (gateText || "NO DATA") + ". The state above comes from fixed threshold rules on the Pi. The thresholds are not yet calibrated against this rig.";
-      document.getElementById("txt-rf").innerText = "Class from the last packet: " + (rfText || "NO DATA") + ". The classifier is trained on generated data and has not been tested on real faults. No probability or confidence is shown, and it gives no remaining-life estimate.";
+      document.getElementById("txt-rf").innerText = (gated
+        ? "Random Forest was not run: the Stage 1 gate passed, so the packet's class is the gate's default, not a prediction. "
+        : "Class from the last packet: " + (rfText || "NO DATA") + ". ")
+        + "The classifier is trained on generated data and has not been tested on real faults. No probability or confidence is shown, and it gives no remaining-life estimate.";
     }
 
     function showAwaitingState() {
@@ -1298,7 +1315,7 @@
       ]) renderValue(id, null, 0, "");
       for (const id of TEXT_ONLY_IDS) setText(id, "NO DATA", null);
       document.getElementById("note-vib").innerText = "Uncalibrated. Accelerometer sampling rate: NO DATA.";
-      setGates(null, null, null);
+      setGates(null, null, null, false);
     }
 
     function updateDashboard(data) {
@@ -1324,44 +1341,49 @@
       const uptime = firstFinite(data.uptime_s);
       const dataTs = firstFinite(data.ts);
       lastDataTs = dataTs;
+      lastData = data;
       const ageSec = dataTs === null ? null : Math.max(0, Date.now() / 1000 - dataTs);
       const isStaleTelemetry = ageSec === null || ageSec > 20;
       const knownState = state && ["Healthy", "Warning", "Fault"].includes(state) ? state : null;
       document.getElementById("main-status-card").dataset.stale = isStaleTelemetry ? "1" : "0";
       document.querySelector(".dashboard-layout").classList.toggle("is-stale", isStaleTelemetry);
 
-      // Only a classified packet can change the state lamp.
+      // Only a classified packet can change the state lamp. An old packet never shows a health state.
       if (knownState) {
         const card = document.getElementById("main-status-card");
         const icon = document.getElementById("lamp-icon");
         const title = document.getElementById("status-title");
         const sub = document.getElementById("status-sub");
         const displayFault = fault || "Classified telemetry";
-        const stalePrefix = isStaleTelemetry ? "Last known: " : "";
 
-        card.className = "scada-hero-panel";
-        if (knownState === "Healthy") {
-          icon.className = "fa-solid fa-check";
-          title.innerText = `${stalePrefix}${displayFault}`;
-          sub.innerText = isStaleTelemetry
-            ? "Old packet only. Not live: check the Raspberry Pi before relying on it."
-            : "No threshold rule breached in the last packet";
-        } else if (knownState === "Warning") {
-          card.classList.add("warning");
-          icon.className = "fa-solid fa-triangle-exclamation";
-          title.innerText = `${stalePrefix}Warning: ${displayFault}`;
-          sub.innerText = "A threshold rule on the Pi was breached. Inspect the machine.";
-          if (!isStaleTelemetry && Date.now() - lastAlertTime > 5000) { playBeep(660, 0.3); lastAlertTime = Date.now(); }
+        if (isStaleTelemetry) {
+          card.className = "scada-hero-panel awaiting";
+          icon.className = "fa-solid fa-clock-rotate-left";
+          title.innerText = "No live data";
+          sub.innerText = `Last packet ${formatTimeAgo(ageSec)} reported: ${displayFault}. That is old, not the current machine state.`;
         } else {
-          card.classList.add("fault");
-          icon.className = "fa-solid fa-triangle-exclamation";
-          title.innerText = `${stalePrefix}Fault flagged: ${displayFault}`;
-          sub.innerText = "The Pi's threshold rules flagged a fault. Inspect the machine.";
-          if (!isStaleTelemetry && Date.now() - lastAlertTime > 2000) { playBeep(980, 0.4); lastAlertTime = Date.now(); }
+          card.className = "scada-hero-panel";
+          if (knownState === "Healthy") {
+            icon.className = "fa-solid fa-check";
+            title.innerText = displayFault;
+            sub.innerText = "No threshold rule breached in the last packet";
+          } else if (knownState === "Warning") {
+            card.classList.add("warning");
+            icon.className = "fa-solid fa-triangle-exclamation";
+            title.innerText = `Warning: ${displayFault}`;
+            sub.innerText = "A threshold rule on the Pi was breached. Inspect the machine.";
+            if (Date.now() - lastAlertTime > 5000) { playBeep(660, 0.3); lastAlertTime = Date.now(); }
+          } else {
+            card.classList.add("fault");
+            icon.className = "fa-solid fa-triangle-exclamation";
+            title.innerText = `Fault flagged: ${displayFault}`;
+            sub.innerText = "The Pi's threshold rules flagged a fault. Inspect the machine.";
+            if (Date.now() - lastAlertTime > 2000) { playBeep(980, 0.4); lastAlertTime = Date.now(); }
+          }
         }
       }
 
-      setGates(textOrNull(data.ai?.gate_status), textOrNull(data.ai?.predicted_class), knownState);
+      setGates(textOrNull(data.ai?.gate_status), textOrNull(data.ai?.predicted_class), knownState, isStaleTelemetry);
 
       if (seq !== null) document.getElementById("badge-seq").innerText = "#" + seq;
       if (uptime !== null) {
@@ -1505,7 +1527,7 @@
     function connectFirebase() {
       fetchLatest();
       setInterval(fetchLatest, 2500);
-      setInterval(updateAge, 1000);
+      setInterval(() => { if (lastData) { updateDashboard(lastData); updateHardwareStatus(lastData); } }, 1000);
 
       try {
         const sse = new EventSource(FIREBASE_RTDB_URL);

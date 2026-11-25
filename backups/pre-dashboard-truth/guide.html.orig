@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="G12 capstone exhibition deck: Raspberry Pi condition monitoring, honest four-class diagnosis and public real-bearing RUL benchmarks.">
+  <title>STEM Exhibition Presentation | Intelligent Industrial Predictive Maintenance</title>
+  
+  <!-- Fonts and icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @font-face { font-family: 'Oxanium'; font-style: normal; font-weight: 300; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/oxanium@5/files/oxanium-latin-300-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'Oxanium'; font-style: normal; font-weight: 400; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/oxanium@5/files/oxanium-latin-400-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'Oxanium'; font-style: normal; font-weight: 500; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/oxanium@5/files/oxanium-latin-500-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'Oxanium'; font-style: normal; font-weight: 600; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/oxanium@5/files/oxanium-latin-600-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'Oxanium'; font-style: normal; font-weight: 700; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/oxanium@5/files/oxanium-latin-700-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'Oxanium'; font-style: normal; font-weight: 800; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/oxanium@5/files/oxanium-latin-800-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-400-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 500; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-500-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 600; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-600-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 700; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-700-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 800; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-800-normal.woff2') format('woff2'); }
+  </style>
+  
+  <!-- KaTeX for Scientific & Mathematical Equations -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+
+  <style>
+    :root {
+      --bg-dark: #f4f7fb;
+      --bg-card: rgba(24, 34, 48, 0.96);
+      --bg-card-hover: rgba(244, 249, 253, 0.96);
+      --border: rgba(24, 34, 48, 0.12);
+      --border-accent: rgba(14, 116, 144, 0.35);
+      --cyan: #0e7490;
+      --cyan-bright: #155e75;
+      --blue: #2563eb;
+      --indigo: #4338ca;
+      --green: #0f766e;
+      --amber: #b45309;
+      --red: #c24141;
+      --purple: #6d28d9;
+      --text-main: #182230;
+      --text-muted: #4b6078;
+      --text-dim: #64798f;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    button {
+      font-family: inherit;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Oxanium', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Clean Technical SCADA Background */
+    .aurora-bg {
+      display: none;
+    }
+
+    /* Interactive Cyber Canvas */
+    #ambient-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.45;
+    }
+
+    /* Top Navigation Bar */
+    .header-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: rgba(255, 255, 255, 0.97);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 22px;
+      z-index: 1000;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-badge {
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 900;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      box-shadow: 0 0 14px rgba(6, 182, 212, 0.5);
+      letter-spacing: 0.05em;
+    }
+
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--green);
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 2px 7px;
+      border-radius: 20px;
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--green);
+      animation: pulseGlow 1.8s infinite ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.6; }
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn {
+      background: rgba(24, 34, 48, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 6px 12px;
+      min-height: 28px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background: rgba(24, 34, 48, 0.12);
+      border-color: var(--cyan);
+      color: var(--cyan);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      color: #ffffff;
+      border: none;
+      font-weight: 800;
+      box-shadow: 0 4px 14px rgba(6, 182, 212, 0.35);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.94;
+      color: #ffffff;
+      box-shadow: 0 6px 20px rgba(6, 182, 212, 0.6);
+    }
+
+    .slide-counter {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--cyan-bright);
+      font-weight: 700;
+      padding: 5px 10px;
+      background: rgba(6, 182, 212, 0.08);
+      border: 1px solid rgba(6, 182, 212, 0.25);
+      border-radius: 6px;
+    }
+
+    /* Dynamic Top Progress Bar */
+    .progress-track {
+      position: fixed;
+      top: 56px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: rgba(24, 34, 48, 0.04);
+      z-index: 999;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--cyan);
+      width: 8.33%;
+      transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.7);
+    }
+
+    /* Main Viewport Locked to 100vh Without Vertical Scrolling */
+    body:not(.scroll-mode) {
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    body:not(.scroll-mode) .viewport {
+      margin-top: 56px;
+      height: calc(100vh - 56px);
+      padding: clamp(6px, 1.2vh, 14px) clamp(14px, 2vw, 28px) 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      z-index: 10;
+    }
+
+    body:not(.scroll-mode) .slides-container {
+      width: 100%;
+      max-width: 1140px;
+      height: 100%;
+      max-height: calc(100vh - 122px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* Slide Card: Flexible Vertical Fit */
+    body:not(.scroll-mode) .slide {
+      width: 100%;
+      max-height: 100%;
+      background: var(--bg-card);
+      border: 1px solid rgba(24, 34, 48, 0.1);
+      border-radius: clamp(14px, 2vh, 22px);
+      padding: clamp(14px, 2.6vh, 32px) clamp(18px, 2.8vw, 42px);
+      box-shadow: 0 24px 56px -12px rgba(24,34,48,0.10), inset 0 1px 1px 0 rgba(24, 34, 48, 0.15);
+      position: relative;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    body:not(.scroll-mode) .slide.active {
+      display: flex;
+      animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.99);
+        filter: blur(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+      }
+    }
+
+    /* Fluid Typography */
+    .slide-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: clamp(10px, 1.3vh, 12px);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--cyan);
+      margin-bottom: clamp(4px, 0.8vh, 10px);
+      padding: 3px 8px;
+      background: rgba(6, 182, 212, 0.1);
+      border: 1px solid rgba(6, 182, 212, 0.28);
+      border-radius: 6px;
+      align-self: flex-start;
+    }
+
+    .slide-title {
+      font-size: clamp(28px, 5.2vh, 52px);
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: clamp(3px, 0.7vh, 8px);
+      letter-spacing: -0.025em;
+      color: var(--text-main);
+      text-wrap: balance;
+    }
+
+    .slide-subtitle {
+      font-size: clamp(13px, 1.9vh, 17px);
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin-bottom: clamp(8px, 1.6vh, 20px);
+      max-width: 68ch;
+    }
+
+    /* Grids */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(10px, 1.5vh, 20px); }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(8px, 1.4vh, 18px); }
+    .grid-4 { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: clamp(8px, 1.2vh, 16px); }
+
+    .mt-responsive { margin-top: clamp(8px, 1.6vh, 20px); }
+    .mt-sm-responsive { margin-top: clamp(6px, 1.1vh, 14px); }
+
+    /* Feature Cards */
+    .feature-card {
+      background: rgba(24, 34, 48, 0.028);
+      border: 1px solid rgba(24, 34, 48, 0.08);
+      border-radius: clamp(10px, 1.4vh, 14px);
+      padding: clamp(10px, 1.6vh, 18px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card:hover {
+      border-color: var(--border-accent);
+      background: var(--bg-card-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px -6px rgba(0,0,0,0.5), 0 0 20px rgba(6, 182, 212, 0.15);
+    }
+
+    .card-icon {
+      font-size: clamp(18px, 2.2vh, 24px);
+      margin-bottom: clamp(4px, 0.8vh, 10px);
+      display: inline-block;
+    }
+
+    .card-title {
+      font-size: clamp(13px, 1.55vh, 15px);
+      font-weight: 700;
+      margin-bottom: clamp(2px, 0.4vh, 5px);
+      color: #fff;
+    }
+
+    .card-desc {
+      font-size: clamp(12px, 1.6vh, 13.5px);
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin-top: clamp(3px, 0.6vh, 6px);
+    }
+
+    /* Metric Display Units */
+    .stat-box {
+      background: rgba(24, 34, 48, 0.02);
+      border: 1px solid rgba(24, 34, 48, 0.1);
+      border-radius: clamp(10px, 1.4vh, 14px);
+      padding: clamp(10px, 1.5vh, 16px) 8px;
+      text-align: center;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .stat-box:hover {
+      background: rgba(6, 182, 212, 0.09);
+      border-color: var(--cyan);
+      transform: translateY(-2px);
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.25);
+    }
+
+    .stat-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(20px, 2.6vh, 26px);
+      font-weight: 900;
+      color: var(--text-main);
+      margin-bottom: 2px;
+      letter-spacing: -0.03em;
+    }
+
+    .stat-hero {
+      border-color: rgba(6, 182, 212, 0.45);
+      background: rgba(6, 182, 212, 0.07);
+    }
+
+    .stat-hero .stat-number {
+      font-size: clamp(28px, 4.2vh, 40px);
+      color: var(--cyan-bright);
+    }
+
+    .stat-label {
+      font-size: clamp(10px, 1.3vh, 12px);
+      text-transform: uppercase;
+      font-weight: 800;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      min-height: 2.2em;
+    }
+
+    .stat-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 5px;
+      border-radius: 4px;
+      margin-top: 3px;
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(24, 34, 48, 0.05);
+      border: 1px solid rgba(24, 34, 48, 0.12);
+      color: #cbd5e1;
+    }
+
+    .grand-callout .card-desc {
+      max-width: 80ch;
+    }
+
+    @media (min-width: 861px) {
+      .grand-callout {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        gap: 16px;
+        align-items: start;
+      }
+    }
+
+    /* Flow Step Row */
+    .flow-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: clamp(6px, 1vh, 12px);
+      flex-wrap: wrap;
+    }
+
+    .flow-step {
+      background: rgba(24, 34, 48, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: clamp(8px, 1.2vh, 12px) clamp(10px, 1vw, 14px);
+      flex: 1;
+      min-width: 140px;
+      transition: all 0.25s ease;
+    }
+
+    .flow-step:hover {
+      background: rgba(24, 34, 48, 0.07);
+      border-color: var(--border-accent);
+      transform: translateY(-1px);
+    }
+
+    .flow-arrow {
+      color: var(--cyan);
+      font-size: 15px;
+    }
+
+    /* Tables */
+    .table-scroll {
+      max-width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .pdm-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: clamp(10.5px, 1.25vh, 12px);
+      margin-top: clamp(4px, 0.8vh, 8px);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .pdm-table th, .pdm-table td {
+      padding: clamp(5px, 0.8vh, 8px) clamp(6px, 0.8vw, 10px);
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .pdm-table th {
+      background: rgba(24, 34, 48, 0.04);
+      color: var(--cyan-bright);
+      font-weight: 800;
+      font-size: clamp(9.5px, 1.1vh, 11px);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .pdm-table tr:hover td {
+      background: rgba(24, 34, 48, 0.025);
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: clamp(9.5px, 1.1vh, 10.5px);
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .badge-green { background: rgba(16, 185, 129, 0.15); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.35); }
+    .badge-amber { background: rgba(245, 158, 11, 0.15); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.35); }
+    .badge-red { background: rgba(239, 68, 68, 0.15); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.35); }
+    .badge-blue { background: rgba(59, 130, 246, 0.15); color: var(--blue); border: 1px solid rgba(59, 130, 246, 0.35); }
+    .badge-purple { background: rgba(168, 85, 247, 0.15); color: var(--purple); border: 1px solid rgba(168, 85, 247, 0.35); }
+
+    /* Waveform Card */
+    .waveform-card {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: clamp(6px, 1vh, 10px);
+      margin-top: 6px;
+    }
+
+    /* Bottom Quick-Jump Dock */
+    .bottom-dock {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(8, 14, 28, 0.92);
+      border: 1px solid rgba(255,255,255,0.12);
+      padding: 5px 12px;
+      border-radius: 30px;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.6), 0 0 16px rgba(6, 182, 212, 0.15);
+      z-index: 100;
+    }
+
+    .dock-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(24, 34, 48, 0.22);
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .dock-dot:hover {
+      background: var(--cyan);
+      transform: scale(1.35);
+    }
+
+    .dock-dot.active {
+      width: 22px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--cyan), var(--blue));
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.7);
+    }
+
+    .dock-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      cursor: pointer;
+      padding: 3px 6px;
+      min-width: 28px;
+      min-height: 28px;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s ease;
+    }
+
+    .dock-btn:hover {
+      color: var(--cyan-bright);
+    }
+
+    /* Modal Lightbox for Artifacts */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.92);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 16px;
+    }
+
+    .modal-content {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--border-accent);
+      border-radius: 16px;
+      max-width: 760px;
+      width: 100%;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 32px 72px rgba(0,0,0,0.85), 0 0 30px rgba(6, 182, 212, 0.3);
+      animation: modalFadeIn 0.3s ease;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-header {
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-body {
+      padding: 18px;
+      overflow-y: auto;
+      text-align: center;
+    }
+
+    .modal-body img {
+      max-width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    /* Slide Overview Grid Modal */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      padding: 16px;
+      max-height: 68vh;
+      overflow-y: auto;
+    }
+
+    .grid-thumb {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s ease;
+    }
+
+    .grid-thumb:hover {
+      border-color: var(--cyan);
+      background: rgba(6, 182, 212, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .grid-thumb.active {
+      border-color: var(--cyan-bright);
+      box-shadow: 0 0 14px rgba(6, 182, 212, 0.4);
+    }
+
+    /* Scroll View Mode */
+    body.scroll-mode {
+      height: auto !important;
+      overflow-y: auto !important;
+    }
+    body.scroll-mode .viewport {
+      display: block;
+      padding: 30px 20px;
+      height: auto !important;
+      margin-top: 56px;
+    }
+    body.scroll-mode .slides-container {
+      max-width: 1020px;
+      margin: 0 auto;
+      max-height: none !important;
+      height: auto !important;
+    }
+    body.scroll-mode .slide {
+      display: block !important;
+      margin-bottom: 36px;
+      box-shadow: 0 14px 36px rgba(0,0,0,0.5);
+      max-height: none !important;
+      height: auto !important;
+      padding: 36px;
+    }
+    body.scroll-mode .bottom-dock,
+    body.scroll-mode .slide-counter {
+      display: none;
+    }
+
+    /* Low-Height Laptop Display Optimizations (e.g. 1366x768 or 1280x720) */
+    @media (max-height: 768px) {
+      .slide-subtitle { margin-bottom: 12px !important; }
+      .feature-card { padding: 10px 14px !important; }
+      .pdm-table th, .pdm-table td { padding: 4px 8px !important; font-size: 10.5px !important; }
+      .waveform-card { padding: 4px !important; }
+      .waveform-card svg { height: 24px !important; }
+    }
+
+    @media (max-height: 680px) {
+      body:not(.scroll-mode) .slide { overflow-y: auto; justify-content: flex-start; }
+      body:not(.scroll-mode) .slide > * { flex-shrink: 0; }
+      /* The six-answer slide needs a compact fit on short projector/laptop viewports. */
+      body:not(.scroll-mode) .slide[data-slide="12"] { padding: 8px !important; }
+      body:not(.scroll-mode) .slide[data-slide="12"] .slide-title { font-size: 26px !important; }
+      body:not(.scroll-mode) .slide[data-slide="12"] .grid-2 { gap: 7px !important; }
+      body:not(.scroll-mode) .slide[data-slide="12"] .feature-card { padding: 7px 12px !important; }
+      body:not(.scroll-mode) .slide[data-slide="12"] .card-desc { font-size: 11.5px !important; line-height: 15.5px !important; }
+    }
+
+    @media (max-width: 860px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .table-scroll .pdm-table { min-width: 0; display: block; }
+      .table-scroll .pdm-table thead { display: none; }
+      .table-scroll .pdm-table tbody,
+      .table-scroll .pdm-table tr,
+      .table-scroll .pdm-table td { display: block; width: 100%; }
+      .table-scroll .pdm-table tr { padding: 8px 0; border-bottom: 1px solid var(--border); }
+      .table-scroll .pdm-table td { border: 0; padding: 3px 4px; font-size: 12px; }
+      .table-scroll .pdm-table tr:hover td { background: transparent; }
+      .table-scroll .pdm-table td::before {
+        content: "";
+        display: block;
+        margin-bottom: 2px;
+        color: var(--cyan-bright);
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .table-scroll .pdm-table td:nth-child(1)::before { content: "Requirement code"; }
+      .table-scroll .pdm-table td:nth-child(2)::before { content: "Parameter / metric"; }
+      .table-scroll .pdm-table td:nth-child(3)::before { content: "Official target"; }
+      .table-scroll .pdm-table td:nth-child(4)::before { content: "Measured result"; }
+      .table-scroll .pdm-table td:nth-child(5)::before { content: "Verification status"; }
+      .flow-arrow { display: none; }
+      body:not(.scroll-mode) .slide { overflow-y: auto; justify-content: flex-start; }
+      body:not(.scroll-mode) .slide > * { flex-shrink: 0; }
+      .slide-title { font-size: 22px; }
+      .slide-subtitle { font-size: 12px; max-width: 80ch; }
+      .card-desc { font-size: 13px; }
+      .chrome-only { display: none; }
+      .header-bar { padding: 0 10px; gap: 8px; }
+      .brand-badge, .live-indicator { white-space: nowrap; }
+      .brand-badge { padding: 2px 6px; font-size: 9px; }
+      .live-indicator { padding: 2px 6px; font-size: 10px; }
+      .nav-controls { gap: 6px; }
+      .btn, .slide-counter { padding: 4px 8px; font-size: 11px; }
+      .brand-title { display: none; }
+      .overview-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (min-width: 600px) and (max-width: 860px) {
+      .slide-title { font-size: 40px; }
+      .slide-subtitle { font-size: 15px; max-width: 80ch; }
+    }
+
+    @media (max-width: 480px) {
+      .btn-grid { display: none; }
+      .stat-hero .stat-number { font-size: 24px; white-space: nowrap; }
+      .stage-header { flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- AURORA AMBIENT GLOW -->
+  <div class="aurora-bg">
+    <div class="aurora-orb orb-1" id="orb1"></div>
+    <div class="aurora-orb orb-2" id="orb2"></div>
+    <div class="aurora-orb orb-3" id="orb3"></div>
+  </div>
+
+  <!-- INTERACTIVE CANVAS -->
+  <canvas id="ambient-canvas"></canvas>
+
+  <!-- TOP APP BAR -->
+  <header class="header-bar">
+    <div class="brand">
+      <div class="brand-badge"><i class="fa-solid fa-microchip"></i> STEM 2026</div>
+      <span class="brand-title">Intelligent Industrial PdM System</span>
+      <div class="live-indicator">
+        <div class="live-dot"></div>
+        <span>EDGE LIVE</span>
+      </div>
+    </div>
+
+    <div class="nav-controls">
+      <button class="btn btn-grid" onclick="openOverviewModal()" title="View all slides in a grid (G)">
+        <i class="fa-solid fa-table-cells-large"></i> Grid
+      </button>
+      <button class="btn chrome-only" id="audioToggleBtn" onclick="toggleAudio()" title="Sound FX Toggle">
+        <i class="fa-solid fa-volume-high" id="audioIcon"></i>
+      </button>
+      <button class="btn chrome-only" id="viewModeBtn" onclick="toggleViewMode()" title="Toggle between Slide Deck and Scroll View (S)">
+        <i class="fa-solid fa-list-check"></i> <span id="viewModeText">Scroll</span>
+      </button>
+      <button class="btn chrome-only" onclick="toggleFullScreen()" title="Fullscreen presentation (F)">
+        <i class="fa-solid fa-expand"></i>
+      </button>
+      <div class="slide-counter" id="slideCounter">01 / 12</div>
+      <a href="calibration.html" class="btn chrome-only" title="Open Sensor Calibration Suite">
+        <i class="fa-solid fa-compass-drafting" style="color: #0f766e;"></i> Calibration
+      </a>
+      <a href="/" class="btn btn-primary" target="_blank" title="Open live machine telemetry">
+        <i class="fa-solid fa-gauge-high"></i> Telemetry
+      </a>
+    </div>
+  </header>
+
+  <!-- PROGRESS BAR -->
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <!-- SLIDES VIEWPORT -->
+  <main class="viewport">
+    <div class="slides-container" id="slidesDeck">
+
+      <!-- SLIDE 1: COVER / HERO -->
+      <section class="slide active" data-slide="1" data-theme="cyan">
+        <div class="slide-tag"><i class="fa-solid fa-award"></i> Grade 12 STEM Capstone 2026/2027 &bull; Grand Challenge</div>
+        <h1 class="slide-title">Intelligent Cyber-Physical System for Industrial Predictive Maintenance (PdM)</h1>
+        <p class="slide-subtitle">
+          An offline-first, edge-computed multi-modal sensor fusion platform for rotating machinery fault diagnosis, combining Shewhart statistical gating, Random Forest AI and published vibration-diagnostics references.
+        </p>
+
+        <div class="grid-4 mt-responsive">
+          <div class="stat-box stat-hero">
+            <div class="stat-number">29.99 ms</div>
+            <div class="stat-label">Pi inference time</div>
+            <span class="stat-tag">One window</span>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number">3</div>
+            <div class="stat-label">Live sensor inputs</div>
+            <span class="stat-tag">Vibration · Temp · Sound</span>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number">4</div>
+            <div class="stat-label">Diagnosis states</div>
+            <span class="stat-tag">Synthetic-trained</span>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number">100.0%</div>
+            <div class="stat-label">CWRU diagnosis accuracy</div>
+            <span class="stat-tag">Real 2 hp motor · four bearing classes · not ours</span>
+          </div>
+        </div>
+
+        <div class="grid-2 mt-responsive">
+          <div class="stat-box stat-hero">
+            <div class="stat-number">94.0%</div>
+            <div class="stat-label">C-MAPSS 30-cycle RUL warning accuracy</div>
+            <span class="stat-tag">Simulated turbofan · 0.750 baseline · not ours</span>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number">67.7%</div>
+            <div class="stat-label">FMCG real-motor RUL warning accuracy</div>
+            <span class="stat-tag">Below 80% · reported as measured · not ours</span>
+          </div>
+        </div>
+
+        <div class="feature-card mt-responsive grand-callout" style="border-left: 4px solid var(--cyan);">
+          <div style="font-weight: 800; font-size: 14px; margin-bottom: 6px; color: var(--cyan);">
+            <i class="fa-solid fa-flag"></i> National STEM Grand Challenge Alignment:
+          </div>
+          <p class="card-desc">
+            <b>Developing the Industrial Base of Egypt</b> &mdash; A locally engineered edge-AI unit reports current machine state on a Raspberry Pi and mirrors it to Firebase when the link is available. Cost saving and avoided downtime were not measured.
+          </p>
+        </div>
+      </section>
+
+      <!-- SLIDE 2: RUBRIC HIGHLIGHT — 4 MEASURABLE DESIGN REQUIREMENTS -->
+      <section class="slide" data-slide="2" data-theme="green">
+        <div class="slide-tag"><i class="fa-solid fa-clipboard-check"></i> Rubric Compliance & Verification</div>
+        <h2 class="slide-title">The 4 Measurable Design Requirements (MDRs)</h2>
+        <p class="slide-subtitle">
+          Official Capstone Specification Requirement: <i>"Students must identify at least four measurable design requirements, including response time and system accuracy... and provide evidence."</i>
+        </p>
+
+        <div class="table-scroll"><table class="pdm-table">
+          <thead>
+            <tr>
+              <th>Requirement Code</th>
+              <th>Parameter / Metric</th>
+              <th>Official Target</th>
+              <th>Empirical Measured Result</th>
+              <th>Verification Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>MDR 1</b></td>
+              <td><b>System Accuracy</b> (Fault Identification)</td>
+              <td>$\ge 80.0\%$</td>
+              <td><b style="color: var(--green);">100.0%</b> on the synthetic generator benchmark, run-disjoint Group 5-Fold CV</td>
+              <td><span class="badge badge-amber">Synthetic only</span></td>
+            </tr>
+            <tr>
+              <td><b>MDR 2</b></td>
+              <td><b>System Response Time</b> (Shock to Alert)</td>
+              <td>$&lt; 5.0\text{ seconds}$</td>
+              <td>29.99 ms inference measured on Pi; end-to-end shock-to-alert not measured</td>
+              <td><span class="badge badge-amber">[NEED: timing test]</span></td>
+            </tr>
+            <tr>
+              <td><b>MDR 3</b></td>
+              <td><b>Edge Computational Efficiency</b> (CPU Savings)</td>
+              <td>$&gt; 75.0\%$</td>
+              <td>Statistical gate implemented; CPU/energy saving not measured</td>
+              <td><span class="badge badge-amber">[NEED: baseline]</span></td>
+            </tr>
+            <tr>
+              <td><b>MDR 4</b></td>
+              <td><b>Data Resiliency</b> (Network Dropout Loss)</td>
+              <td>$0.0\%$ packet loss</td>
+              <td>Local SQLite buffer and replay implemented; packet loss not measured in a field test</td>
+              <td><span class="badge badge-amber">[NEED: dropout test]</span></td>
+            </tr>
+          </tbody>
+        </table></div>
+
+        <div class="feature-card mt-responsive">
+          <div style="font-size: 13px; color: var(--text-muted);">
+            <b>Constraint Verification:</b> All processing runs entirely on a <b>Raspberry Pi 4 Quad-Core 64-bit ARM CPU</b> (satisfying the strict constraint: <i>"Arduino boards are not allowed; advanced controllers required"</i>).
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 3: THE PROBLEM & ECONOMIC IMPACT -->
+      <section class="slide" data-slide="3" data-theme="amber">
+        <div class="slide-tag"><i class="fa-solid fa-triangle-exclamation"></i> Industrial Problem & Motivation</div>
+        <h2 class="slide-title">The Real-World Crisis: Unplanned Factory Shutdowns</h2>
+        <p class="slide-subtitle">
+          Unexpected induction-motor failures can stop a production line. This project reports measured condition changes locally so an operator can act before a fault is confirmed physically.
+        </p>
+
+        <div class="grid-3">
+          <div class="feature-card" style="border-top: 3px solid var(--red);">
+            <div class="card-icon" style="color: var(--red);"><i class="fa-solid fa-fire"></i></div>
+            <div class="card-title">Reactive Maintenance</div>
+            <div class="card-desc">
+              "Run it until it fails." Can damage shafts and stop production. The cost impact was not measured in this project.
+            </div>
+          </div>
+
+          <div class="feature-card" style="border-top: 3px solid var(--amber);">
+            <div class="card-icon" style="color: var(--amber);"><i class="fa-solid fa-calendar-xmark"></i></div>
+            <div class="card-title">Preventive Maintenance</div>
+            <div class="card-desc">
+              "Replace on a fixed calendar." Can replace parts that are still healthy and introduces assembly risk during unnecessary teardowns.
+            </div>
+          </div>
+
+          <div class="feature-card" style="border-top: 3px solid var(--green);">
+            <div class="card-icon" style="color: var(--green);"><i class="fa-solid fa-brain"></i></div>
+            <div class="card-title">Our Predictive Paradigm</div>
+            <div class="card-desc">
+              "Act when the measured state changes." Continuous multi-modal monitoring reports the current class and lets the operator decide. Remaining life on our rig still needs our own run-to-failure data.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 4: SYSTEM ARCHITECTURE & DATA PIPELINE -->
+      <section class="slide" data-slide="4" data-theme="blue">
+        <div class="slide-tag"><i class="fa-solid fa-network-wired"></i> System Architecture</div>
+        <h2 class="slide-title">End-to-End Cyber-Physical Architecture</h2>
+        <p class="slide-subtitle">
+          A four-tier design coupling the sensor rig, edge features and inference, local buffering, and a Firebase RTDB status mirror.
+        </p>
+
+        <div class="flow-row">
+          <div class="flow-step" style="border-left: 3px solid var(--blue);">
+            <div style="font-weight: 700; color: var(--blue); font-size: 13px;">1. PHYSICAL TESTBED</div>
+            <div style="font-size: 13px; margin-top: 4px;">12V Industrial Motor Rig</div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">ADXL345 (I2C) + MAX6675 (SPI)</div>
+          </div>
+          <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+
+          <div class="flow-step" style="border-left: 3px solid var(--cyan);">
+            <div style="font-weight: 700; color: var(--cyan); font-size: 13px;">2. EDGE COMPUTING</div>
+            <div style="font-size: 13px; margin-top: 4px;">Raspberry Pi (64-bit Linux)</div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">DSP Feature Extraction & AI</div>
+          </div>
+          <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+
+          <div class="flow-step" style="border-left: 3px solid var(--green);">
+            <div style="font-weight: 700; color: var(--green); font-size: 13px;">3. RESILIENT STORAGE</div>
+            <div style="font-size: 13px; margin-top: 4px;">Local Ring Buffer</div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Local SQLite buffer and replay</div>
+          </div>
+          <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+
+          <div class="flow-step" style="border-left: 3px solid var(--purple);">
+            <div style="font-weight: 700; color: var(--purple); font-size: 13px;">4. GLOBAL CLOUD</div>
+            <div style="font-size: 13px; margin-top: 4px;">Firebase Realtime DB</div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Firebase RTDB status mirror</div>
+          </div>
+        </div>
+
+        <div class="grid-2 mt-responsive">
+          <div class="feature-card">
+            <b style="color: var(--cyan);"><i class="fa-solid fa-microchip"></i> Why Edge Computing over Pure Cloud?</b>
+            <p class="card-desc">
+              Streaming every raw window would increase bandwidth and expose raw signals; an offline link would also break the live view. Features are computed on the Pi and lightweight status frames are mirrored. Inference was measured at 29.99 ms on the Raspberry Pi 4; cloud cost and end-to-end latency were not measured.
+            </p>
+          </div>
+          <div class="feature-card">
+            <b style="color: var(--green);"><i class="fa-solid fa-bolt"></i> The 0-EGP Cloud Philosophy</b>
+            <p class="card-desc">
+              Telemetry uses the Firebase Spark tier configured for this project; no paid server was added. Synchronisation latency and actual billing were not measured, so no cost or timing claim is made.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 5: RUBRIC HIGHLIGHT — SENSOR CALIBRATION -->
+      <section class="slide" data-slide="5" data-theme="green">
+        <div class="slide-tag"><i class="fa-solid fa-ruler-combined"></i> Mandatory Rubric Verification</div>
+        <h2 class="slide-title">Sensor Calibration & Experimental Error Verification</h2>
+        <p class="slide-subtitle">
+          Official Capstone Requirement: <i>"Students must conduct and document sensor calibration."</i> Uncalibrated sensors cause false alarms.
+        </p>
+
+        <div class="grid-2">
+          <div class="feature-card">
+            <b style="color: var(--cyan);"><i class="fa-solid fa-compass"></i> ADXL345: six-face procedure</b>
+            <p class="card-desc">
+              <code>edge/calibrate.py</code> runs on the Raspberry Pi only. It collects the six ±g faces, validates the schema, writes <code>cal.json</code> atomically with a timestamped backup and a run log, then issues an honest certificate.
+            </p>
+            <p class="card-desc"><span class="badge badge-amber">REVIEW / UNVERIFIED</span></p>
+          </div>
+
+          <div class="feature-card">
+            <b style="color: var(--amber);"><i class="fa-solid fa-temperature-half"></i> MAX6675: two-point procedure</b>
+            <p class="card-desc">
+              The same runner supports a two-point thermal reference procedure. No operator-run, signed result is available, so no offset, scale factor or residual error is quoted here.
+            </p>
+            <p class="card-desc"><span class="badge badge-amber">REVIEW / UNVERIFIED</span></p>
+          </div>
+        </div>
+
+        <div class="feature-card mt-responsive" style="border-left: 4px solid var(--amber);">
+          <div style="font-size: 13px; color: var(--text-muted);">
+            <b>Status:</b> <code>[NEED: signed calibration run record]</code>. The runtime raw-measure script does not apply <code>cal.json</code> and does not write calibration state. Do not present calibration as PASS.
+            <br><b>Procedure:</b> <a href="calibration.html" style="color: var(--cyan);">calibration.html</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 6: TWO-STAGE AI PIPELINE -->
+      <section class="slide" data-slide="6" data-theme="purple">
+        <div class="slide-tag"><i class="fa-solid fa-brain"></i> Edge Artificial Intelligence</div>
+        <h2 class="slide-title">Two-Stage Coarse-to-Fine Inference Gating</h2>
+        <p class="slide-subtitle">
+          Based on the Cyber-Physical System design by <b>Cinar et al. (2022)</b>: a statistical gate avoids classifier calls during normal operation. CPU and energy savings were not measured on our rig.
+        </p>
+
+        <div class="grid-2">
+          <div class="feature-card" style="border-top: 4px solid var(--green);">
+            <div class="stage-header" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <span class="badge badge-green" style="white-space: nowrap;">STAGE 1: COARSE GATING</span>
+              <span style="font-size: 12px; color: var(--text-muted);">gate timing not benchmarked</span>
+            </div>
+            <div class="card-title">Shewhart Statistical Process Control (SPC)</div>
+            <p class="card-desc">
+              Tracks the rolling baseline mean ($\mu$) and variance ($\sigma$) of the machine. When the vibration envelope satisfies:
+              <br><br>
+              <code style="background: rgba(0,0,0,0.5); padding: 6px 10px; border-radius: 6px; color: var(--green); font-family: 'JetBrains Mono';">z = |x - &mu;| / &sigma; &le; 3.0</code>
+              <br><br>
+              the gate reports no anomaly and the classifier is not called. Power and thermal savings were not measured.
+            </p>
+          </div>
+
+          <div class="feature-card" style="border-top: 4px solid var(--red);">
+            <div class="stage-header" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <span class="badge badge-red" style="white-space: nowrap;">STAGE 2: FINE DIAGNOSTICS</span>
+              <span style="font-size: 12px; color: var(--text-muted);">29.99 ms on Pi; 26.19 ms host</span>
+            </div>
+            <div class="card-title">Random Forest classifier</div>
+            <p class="card-desc">
+              When Stage 1 detects a $3\sigma$ violation or kurtosis shock, Stage 2 classifies the current state:
+              <br><br>
+              &bull; <b>Healthy (Class 0):</b> normal baseline.<br>
+              &bull; <b>Mechanical Imbalance (Class 1):</b> $1\times$ RPM signature.<br>
+              &bull; <b>Bearing Defect (Class 2):</b> high-kurtosis impacts.<br>
+              &bull; <b>Thermal Runaway (Class 3):</b> sustained temperature rise.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 7: FEATURE ENGINEERING & VIBRATION KINEMATICS -->
+      <section class="slide" data-slide="7" data-theme="cyan">
+        <div class="slide-tag"><i class="fa-solid fa-chart-line"></i> Physics & Waveform Kinematics</div>
+        <h2 class="slide-title">Nine Input Features & Diagnostic Physics</h2>
+        <p class="slide-subtitle">
+          The classifier uses features motivated by the vibration literature, including <b>Randall & Antoni (2011)</b>. These are model inputs, not field-calibrated failure thresholds.
+        </p>
+
+        <div class="grid-3">
+          <div class="feature-card">
+            <b style="color: var(--cyan);">Kurtosis ($K$) &mdash; Shock Physics</b>
+            <div class="waveform-card">
+              <svg viewBox="0 0 200 40" style="width:100%; height:32px;">
+                <path d="M0,20 Q20,19 40,20 T80,20 T100,2 L102,38 L104,4 L106,30 L108,20 T140,20 T200,20" fill="none" stroke="var(--cyan)" stroke-width="2"/>
+              </svg>
+            </div>
+            <p class="card-desc">
+              Kurtosis is the fourth standardised moment. In the synthetic generator, bearing-impact windows occupy a higher kurtosis range than healthy windows; no field threshold is claimed.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <b style="color: var(--amber);">Crest Factor ($CF$)</b>
+            <div class="waveform-card">
+              <svg viewBox="0 0 200 40" style="width:100%; height:32px;">
+                <path d="M0,20 Q25,0 50,20 T100,20 T150,20 T200,20" fill="none" stroke="var(--amber)" stroke-width="2"/>
+              </svg>
+            </div>
+            <p class="card-desc">
+              $$CF = \frac{x_{\text{peak}}}{x_{\text{rms}}}$$
+              Peak divided by RMS. It highlights sharp impacts in the benchmark features; lead time before a real bearing fault was not measured.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <b style="color: var(--green);">Standards as references</b>
+            <p class="card-desc">
+              ISO 20816 and ISO 10816-3 are cited as vibration-diagnostics background. Their zone values are <b>not</b> used as this rig's calibration constants or physical failure thresholds.
+            </p>
+            <p class="card-desc"><span class="badge badge-amber">[NEED: real operator failure threshold]</span></p>
+          </div>
+        </div>
+
+        <div class="feature-card mt-responsive">
+          <div style="font-size: 13px; color: var(--text-muted);">
+            <b>Nine Random Forest inputs:</b> <code>[rms_dyn, peak_dyn, crest_factor, kurtosis, temp_c, temp_slope, sound_rms, sound_db, sound_zcr]</code>. The SPC gate's <code>z_score</code> is derived from <code>rms_dyn</code> and is not an independent model input.
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 8: RUBRIC HIGHLIGHT — DATASETS & MODEL BENCHMARKING -->
+      <section class="slide" data-slide="8" data-theme="purple">
+        <div class="slide-tag"><i class="fa-solid fa-square-poll-vertical"></i> Rubric Evidence: Datasets & Evaluation</div>
+        <h2 class="slide-title">Machine Learning Benchmarking & Dataset Evidence</h2>
+        <p class="slide-subtitle">
+          Official Capstone Requirement: <i>"Students must provide datasets and a rubric for machine/deep learning algorithms... evidence of accuracy at least 80%."</i>
+          The headline real-motor <b>diagnosis</b> benchmark measures <b>100.0%</b>
+          on a controlled CWRU bearing-condition task. A labelled RUL
+          <b>warning</b> benchmark on NASA's simulated C-MAPSS FD001 measures
+          <b>0.940 (94.0%)</b> against a <b>0.750</b> majority baseline, while the
+          real induction-motor FMCG RUL benchmark measures <b>67.7%</b>, below
+          that target. Both RUL results are reported as measured, not tuned or
+          hidden, and neither is field validation on our rig.
+        </p>
+
+        <div class="grid-2">
+          <table class="pdm-table">
+            <thead>
+              <tr>
+                <th>Evidence</th>
+                <th>Measured / reproduced result</th>
+                <th>Scope</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="background: rgba(16, 185, 129, 0.08);">
+                <td><b>CWRU induction-motor diagnosis</b></td>
+                <td><b>1.000 (100.0%)</b> four-class accuracy on 1,039 windows with sample-disjoint contiguous-block folds; majority baseline <b>0.4004 (40.04%)</b></td>
+                <td><span class="badge badge-amber">BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED</span> · four bearing-condition classes, not the deployed runtime taxonomy; no RUL claim</td>
+              </tr>
+              <tr>
+                <td><b>FMCG induction-motor RUL</b></td>
+                <td>MAE <b>141.716 h</b>, RMSE <b>204.069 h</b>; 24 h warning accuracy <b>67.7%</b> (recall 0.029) — below zero baseline 69.185/106.164 h and no-warning baseline 0.686</td>
+                <td><span class="badge badge-amber">BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED</span> · <a href="https://zenodo.org/records/15637023" target="_blank">DOI 10.5281/zenodo.15637023</a>, CC BY 4.0</td>
+              </tr>
+              <tr>
+                <td><b>Four-class diagnosis</b></td>
+                <td><b>100.0%</b> run-disjoint Group 5-Fold CV, 1,400 windows</td>
+                <td><span class="badge badge-amber">Synthetic only</span></td>
+              </tr>
+              <tr>
+                <td><b>Pi inference</b></td>
+                <td><b>29.99 ms</b> for one window on Raspberry Pi 4</td>
+                <td><span class="badge badge-blue">Measured; not end-to-end</span></td>
+              </tr>
+              <tr style="background: rgba(16, 185, 129, 0.08);">
+                <td><b>C-MAPSS FD001 RUL warning</b></td>
+                <td>30-cycle warning at each unit's last cycle: accuracy <b>0.940 (94.0%)</b> vs majority <b>0.750</b>, precision <b>0.9524</b>, recall <b>0.800</b>; five unit-disjoint folds mean accuracy <b>0.9705</b></td>
+                <td><span class="badge badge-amber">BENCHMARK / SIMULATED TURBOFAN / NOT OUR MOTOR / NOT FIELD-VALIDATED</span> · explicit RUL labels; short-horizon warning, not continuous RUL or an operator alarm</td>
+              </tr>
+              <tr>
+                <td><b>PRONOSTIA RUL</b></td>
+                <td>Last-window MAE <b>182.91 s</b>, RMSE <b>335.26 s</b></td>
+                <td><span class="badge badge-amber">Real bearings, not our motor</span></td>
+              </tr>
+              <tr>
+                <td><b>XJTU-SY RUL</b></td>
+                <td>Last-20% MAE <b>134.924 min</b>, RMSE <b>171.776 min</b>; baseline RMSE 160.859 min</td>
+                <td><span class="badge badge-amber">BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED</span></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="feature-card">
+            <div class="card-title"><i class="fa-solid fa-download" style="color: var(--cyan);"></i> Evidence you can open</div>
+            <p class="card-desc">
+              No alternative-model comparison was measured locally, so none is quoted. Inspect the synthetic benchmark artifacts and the generated windows:
+            </p>
+            <div style="display: flex; flex-direction: column; gap: clamp(4px, 0.8vh, 8px); margin-top: clamp(6px, 1vh, 12px);">
+              <a href="/windows.csv" download class="btn" style="font-size: 12px;"><i class="fa-solid fa-file-csv" style="color: var(--green);"></i> Download synthetic windows.csv</a>
+              <button onclick="openModal('confusion_matrix.png', 'Confusion matrix — synthetic benchmark hold-out')" class="btn" style="font-size: 12px;"><i class="fa-solid fa-image" style="color: var(--cyan);"></i> View confusion matrix (synthetic)</button>
+              <button onclick="openModal('roc_curves.png', 'ROC curves — synthetic benchmark hold-out')" class="btn" style="font-size: 12px;"><i class="fa-solid fa-chart-line" style="color: var(--purple);"></i> View ROC curves (synthetic)</button>
+              <button onclick="openModal('feature_importance.png', 'Random Forest feature importance — synthetic benchmark')" class="btn" style="font-size: 12px;"><i class="fa-solid fa-ranking-star" style="color: var(--amber);"></i> View feature importance</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 9: OFFLINE-FIRST RESILIENCY -->
+      <section class="slide" data-slide="9" data-theme="blue">
+        <div class="slide-tag"><i class="fa-solid fa-shield-halved"></i> Engineering Robustness</div>
+        <h2 class="slide-title">Offline-First Resiliency: What If Internet Dies?</h2>
+        <p class="slide-subtitle">
+          The Pi keeps sampling and deciding locally when the cloud link is unavailable. Replay is implemented; packet loss and recovery time were not measured in a field test.
+        </p>
+
+        <div class="grid-3">
+          <div class="feature-card">
+            <div class="card-icon" style="color: var(--cyan);"><i class="fa-solid fa-database"></i></div>
+            <div class="card-title">1. Local buffer</div>
+            <div class="card-desc">
+              Telemetry is written locally before the Firebase mirror runs. A lost uplink does not stop the Pi's local dashboard or decision loop.
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="card-icon" style="color: var(--amber);"><i class="fa-solid fa-wifi"></i></div>
+            <div class="card-title">2. Local access</div>
+            <div class="card-desc">
+              The dashboard is served by the Pi on the local network. No fixed hotspot address is quoted here; use the address shown by the running service.
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div class="card-icon" style="color: var(--green);"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+            <div class="card-title">3. Replay</div>
+            <div class="card-desc">
+              The <code style="color: var(--cyan);">pdm-cloud</code> service replays queued frames when the link returns. Loss and integrity were not measured, so no percentage is claimed.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 10: RUBRIC HIGHLIGHT — DYNAMIC INPUT-OUTPUT DEMO -->
+      <section class="slide" data-slide="10" data-theme="amber">
+        <div class="slide-tag"><i class="fa-solid fa-vial-circle-check"></i> Rubric Requirement: Dynamic Output Response</div>
+        <h2 class="slide-title">Live Judge Demonstration Protocol</h2>
+        <p class="slide-subtitle">
+          Official Capstone Requirement: <i>"Students must be able to show the change in system outputs or states as a function of changing inputs."</i>
+        </p>
+
+        <div class="grid-2">
+          <div class="feature-card">
+            <div style="font-weight: 700; color: var(--green); margin-bottom: 6px;">
+              <i class="fa-solid fa-1"></i> Input: steady running &rarr; Output: Healthy state
+            </div>
+            <p class="card-desc">
+              Run the motor smoothly and show the dashboard's current state, chart and operator note. Do not quote a numeric zone threshold as a calibrated limit.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div style="font-weight: 700; color: var(--amber); margin-bottom: 6px;">
+              <i class="fa-solid fa-2"></i> Input: controlled imbalance &rarr; Output: state change
+            </div>
+            <p class="card-desc">
+              With the approved demo weight fitted, show the reported class changing to <b>Warning / Mechanical Imbalance</b> and the $1\times$ RPM signature in the chart. Response time was not measured end-to-end.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div style="font-weight: 700; color: var(--red); margin-bottom: 6px;">
+              <i class="fa-solid fa-3"></i> Input: bearing-impact demo &rarr; Output: classification
+            </div>
+            <p class="card-desc">
+              Use the approved tap test and show whether Stage 2 reports <b>Bearing Defect</b>. Do not quote a kurtosis trip value as a field threshold.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div style="font-weight: 700; color: var(--blue); margin-bottom: 6px;">
+              <i class="fa-solid fa-4"></i> Input: uplink removed &rarr; Output: local continuity
+            </div>
+            <p class="card-desc">
+              Disconnect the uplink and show the Pi dashboard still updating. Reconnect and show queued frames replaying; do not claim zero packet loss.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 11: ACADEMIC REFERENCES & STANDARDS -->
+      <section class="slide" data-slide="11" data-theme="cyan">
+        <div class="slide-tag"><i class="fa-solid fa-book-bookmark"></i> Scientific Foundation</div>
+        <h2 class="slide-title">Academic References & Industrial Standards</h2>
+        <p class="slide-subtitle">
+          The design is informed by peer-reviewed work and ISO vibration-diagnostics references. Literature is not presented as measured evidence from our rig.
+        </p>
+
+        <div class="grid-2">
+          <div class="feature-card">
+            <b style="color: var(--cyan);"><i class="fa-solid fa-file-pdf"></i> Cinar et al. (2022) &mdash; <i>Machines</i> (MDPI)</b><br>
+            <span style="font-size: 12px; color: var(--text-muted);">"A Predictive Maintenance System Design and Implementation for Intelligent Manufacturing"</span>
+            <p class="card-desc">
+              Informed the Cyber-Physical System layout and coarse-to-fine gating idea. We did not measure a CPU-saving percentage on our rig.<br>
+              <a href="https://doi.org/10.3390/machines10111006" target="_blank" style="color: var(--cyan); text-decoration: none; font-size: 12px;">DOI: 10.3390/machines10111006</a>
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <b style="color: var(--green);"><i class="fa-solid fa-certificate"></i> ISO 10816-3 / ISO 20816-3 Standards</b><br>
+            <span style="font-size: 12px; color: var(--text-muted);">"Evaluation of machine vibration by measurements on non-rotating parts"</span>
+            <p class="card-desc">
+              Cited for vibration-severity terminology and as background to the synthetic generator. ISO zone numbers are not used as this rig's calibrated thresholds.<br>
+              <a href="https://www.iso.org/standard/50528.html" target="_blank" style="color: var(--green); text-decoration: none; font-size: 12px;">ISO Standard Catalog Reference</a>
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <b style="color: var(--amber);"><i class="fa-solid fa-microchip"></i> Mourtzis et al. (2020) &mdash; <i>Frontiers in Mech. Eng.</i></b><br>
+            <span style="font-size: 12px; color: var(--text-muted);">"Intelligent Predictive Maintenance and Remote Monitoring Framework"</span>
+            <p class="card-desc">
+              Informed the multi-modal edge-to-cloud layout. Our three live inputs are vibration, temperature and sound; timing and cloud cost were not measured.<br>
+              <a href="https://doi.org/10.3389/fmech.2020.578379" target="_blank" style="color: var(--amber); text-decoration: none; font-size: 12px;">DOI: 10.3389/fmech.2020.578379</a>
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <b style="color: var(--purple);"><i class="fa-solid fa-chart-line"></i> Randall & Antoni (2011) &mdash; <i>MSSP</i> (Elsevier)</b><br>
+            <span style="font-size: 12px; color: var(--text-muted);">"Rolling element bearing diagnostics—A tutorial"</span>
+            <p class="card-desc">
+              Motivates the use of kurtosis and crest factor as diagnostic features. It does not supply a validated failure threshold for our motor.<br>
+              <a href="https://doi.org/10.1016/j.ymssp.2010.07.017" target="_blank" style="color: var(--purple); text-decoration: none; font-size: 12px;">DOI: 10.1016/j.ymssp.2010.07.017</a>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 12: JUDGE DEFENSE MASTER KEY -->
+      <section class="slide" data-slide="12" data-theme="indigo">
+        <div class="slide-tag"><i class="fa-solid fa-shield-halved"></i> Honest Defense Key</div>
+        <h2 class="slide-title">Judge Defense Master Key: Six Straight Answers</h2>
+        <p class="slide-subtitle">
+          Use these six answers without upgrading a benchmark claim into a field claim.
+        </p>
+
+        <div class="grid-2">
+          <div class="feature-card">
+            <b style="color: var(--cyan);"><i class="fa-solid fa-microchip"></i> Q1: Why didn't you just use an Arduino?</b>
+            <p class="card-desc">
+              <i>"The capstone brief excludes Arduino and the rig already uses I2C, SPI and I2S sensors plus a local Flask dashboard and Linux services. We chose a Raspberry Pi 4 for that integrated edge role. We did not benchmark an Arduino alternative, so we make no speed claim against it."</i>
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <b style="color: var(--green);"><i class="fa-solid fa-cloud-arrow-up"></i> Q2: Why not stream all raw vibration directly to the Cloud?</b>
+            <p class="card-desc">
+              <i>"Streaming every raw window would increase bandwidth and expose raw signals; an offline link would also break the live view. We compute features on the Pi and mirror lightweight status frames. We did not measure cloud cost or end-to-end latency, so we do not quote either."</i>
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <b style="color: var(--amber);"><i class="fa-solid fa-brain"></i> Q3: Why Random Forest over Deep Neural Networks?</b>
+            <p class="card-desc">
+              <i>"We did not benchmark deep networks locally, so we quote no CNN memory or latency number. Random Forest fits the small tabular feature set, was measured at 29.99 ms per window on the Pi, and gives inspectable feature importance. Its 100% score is synthetic-only."</i>
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <b style="color: var(--purple);"><i class="fa-solid fa-ruler-combined"></i> Q4: How did you prove your sensors are accurate?</b>
+            <p class="card-desc">
+              <i>"A Pi-only six-face ADXL345 and two-point MAX6675 calibration procedure is implemented and documented, with backups and an honest certificate. No operator-run signed record exists yet, so we say REVIEW / UNVERIFIED, not PASS."</i>
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <b style="color: var(--green);"><i class="fa-solid fa-hourglass-half"></i> Q5: Is remaining useful life working?</b>
+            <p class="card-desc">
+              <i>"RUL is working as a labelled public benchmark, not on our motor. The above-80% RUL result is a 30-cycle warning task on NASA C-MAPSS FD001 simulated turbofan data: 0.940 (94.0%) accuracy at each unit's last cycle against a 0.750 majority baseline, with five unit-disjoint folds averaging 0.9705. It uses explicit RUL labels, is not continuous RUL accuracy, not a deployed alarm threshold and not our induction motor. Separately, the headline real-motor diagnosis benchmark is CWRU's real 2 hp induction motor: 1.000 (100.0%) on 1,039 windows against a 0.4004 (40.04%) majority baseline, with sample-disjoint blocks and four bearing-condition classes — not our deployed taxonomy and not RUL. For real induction-motor RUL, the source is a 160 kW three-phase induction-motor dataset (Zenodo DOI 10.5281/zenodo.15637023, CC BY 4.0) with operating-hour labels. Four leave-one-run-out runs measured 141.716 h MAE, 204.069 h RMSE and 67.7% 24-hour warning accuracy with recall 0.029 — below 80% and worse than the zero (69.185/106.164 h) and no-warning (0.686) baselines, so we report it as measured, not tuned. PRONOSTIA (182.91 s / 335.26 s) and XJTU-SY (134.924 / 171.776 min) remain labelled public bearing benchmarks. All are BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED, never hours-to-failure for our rig. Field RUL needs our own run-to-failure series and operator-confirmed failure times; ml/rul_from_rig.py is the ready path, not a result today."</i>
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <b style="color: var(--amber);"><i class="fa-solid fa-database"></i> Q6: Which data is actually real?</b>
+            <p class="card-desc">
+              <i>"C-MAPSS FD001 is a simulated turbofan with explicit RUL labels (Zenodo DOI 10.5281/zenodo.15346912, CC BY 4.0) and a 94.0% 30-cycle warning benchmark, not a physical motor; FMCG is a real 160 kW three-phase induction motor with explicit operating-hour RUL labels (CC BY 4.0); CWRU is a real 2 hp Reliance Electric motor with seeded faults whose controlled benchmark measures 1.000 (100.0%) on four bearing-condition classes; PRONOSTIA has six and XJTU-SY has fifteen real bearing run-to-failure trajectories; the earlier classroom 100% figure was synthetic only. None of these datasets came from our capstone rig, and no result is presented as field validation. Source and licence evidence is on the dashboard; explicit reuse licences that could not be verified stay marked [NEED: ...]."</i>
+            </p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- BOTTOM INTERACTIVE DOCK -->
+  <div class="bottom-dock" id="bottomDock">
+    <button class="dock-btn" onclick="prevSlide()" title="Previous slide (Left Arrow)"><i class="fa-solid fa-chevron-left"></i></button>
+    <div id="dockDots" style="display: flex; gap: 6px; align-items: center;"></div>
+    <button class="dock-btn" onclick="nextSlide()" title="Next slide (Right Arrow)"><i class="fa-solid fa-chevron-right"></i></button>
+  </div>
+
+  <!-- MODAL LIGHTBOX OVERLAY -->
+  <div class="modal-overlay" id="artifactModal" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <b style="color: var(--cyan); font-size: 14px;" id="modalTitle">Artifact Preview</b>
+        <button onclick="closeModal()" style="background:transparent; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <img id="modalImg" src="" alt="Artifact">
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE OVERVIEW GRID MODAL -->
+  <div class="modal-overlay" id="overviewModal" onclick="closeOverviewModal(event)">
+    <div class="modal-content" style="max-width: 900px;" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <b style="color: var(--cyan); font-size: 14px;"><i class="fa-solid fa-table-cells-large"></i> Slide Deck Overview (12 Slides)</b>
+        <button onclick="closeOverviewModal()" style="background:transparent; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="overview-grid" id="overviewGrid"></div>
+    </div>
+  </div>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 12;
+    const slides = document.querySelectorAll('.slide');
+    const counterEl = document.getElementById('slideCounter');
+    const progressFill = document.getElementById('progressFill');
+    const dockDotsContainer = document.getElementById('dockDots');
+    let soundEnabled = true;
+
+    // Web Audio API Synthesizer for Clean Haptic Feedback
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playTone(freq, type, duration, vol) {
+      if (!soundEnabled) return;
+      try {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type || 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(vol || 0.05, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function toggleAudio() {
+      soundEnabled = !soundEnabled;
+      document.getElementById('audioIcon').className = soundEnabled ? 'fa-solid fa-volume-high' : 'fa-solid fa-volume-xmark';
+      if (soundEnabled) playTone(880, 'sine', 0.1, 0.08);
+    }
+
+    // Build dock dots
+    for (let i = 1; i <= totalSlides; i++) {
+      const dot = document.createElement('div');
+      dot.className = `dock-dot ${i === 1 ? 'active' : ''}`;
+      dot.title = `Jump to Slide ${i}`;
+      dot.onclick = () => jumpToSlide(i);
+      dockDotsContainer.appendChild(dot);
+    }
+
+    // Build Overview Grid Thumbnails
+    const overviewGrid = document.getElementById('overviewGrid');
+    slides.forEach((s, idx) => {
+      const thumb = document.createElement('div');
+      thumb.className = `grid-thumb ${idx === 0 ? 'active' : ''}`;
+      const title = s.querySelector('.slide-title')?.textContent || `Slide ${idx+1}`;
+      const tag = s.querySelector('.slide-tag')?.textContent || `Topic`;
+      thumb.innerHTML = `
+        <div style="font-size:10px; font-weight:800; color:var(--cyan); margin-bottom:4px;">${String(idx+1).padStart(2,'0')} &bull; ${tag.slice(0, 18)}</div>
+        <div style="font-size:12px; font-weight:700; color:#fff; line-height:1.3;">${title.slice(0, 38)}...</div>
+      `;
+      thumb.onclick = () => {
+        jumpToSlide(idx + 1);
+        closeOverviewModal();
+      };
+      overviewGrid.appendChild(thumb);
+    });
+
+    function openOverviewModal() {
+      document.getElementById('overviewModal').style.display = 'flex';
+      playTone(520, 'triangle', 0.15, 0.05);
+    }
+
+    function closeOverviewModal() {
+      document.getElementById('overviewModal').style.display = 'none';
+    }
+
+    function jumpToSlide(idx) {
+      currentSlide = idx;
+      updateSlide();
+      playTone(700, 'sine', 0.08, 0.04);
+    }
+
+    // Dynamic Aurora Accent Adaptation
+    function updateAurora(theme) {
+      const orb1 = document.getElementById('orb1');
+      const orb2 = document.getElementById('orb2');
+      if (theme === 'green') {
+        orb1.style.background = 'radial-gradient(circle, var(--green) 0%, transparent 70%)';
+        orb2.style.background = 'radial-gradient(circle, var(--cyan) 0%, transparent 70%)';
+      } else if (theme === 'amber') {
+        orb1.style.background = 'radial-gradient(circle, var(--amber) 0%, transparent 70%)';
+        orb2.style.background = 'radial-gradient(circle, var(--red) 0%, transparent 70%)';
+      } else if (theme === 'purple' || theme === 'indigo') {
+        orb1.style.background = 'radial-gradient(circle, var(--purple) 0%, transparent 70%)';
+        orb2.style.background = 'radial-gradient(circle, var(--blue) 0%, transparent 70%)';
+      } else {
+        orb1.style.background = 'radial-gradient(circle, var(--cyan) 0%, transparent 70%)';
+        orb2.style.background = 'radial-gradient(circle, var(--blue) 0%, transparent 70%)';
+      }
+    }
+
+    function updateSlide() {
+      slides.forEach(slide => slide.classList.remove('active'));
+      const activeSlide = document.querySelector(`.slide[data-slide="${currentSlide}"]`);
+      if (activeSlide) {
+        activeSlide.classList.add('active');
+        triggerNumberCounters(activeSlide);
+        updateAurora(activeSlide.getAttribute('data-theme'));
+      }
+      counterEl.textContent = `${String(currentSlide).padStart(2, '0')} / ${String(totalSlides).padStart(2, '0')}`;
+      progressFill.style.width = `${(currentSlide / totalSlides) * 100}%`;
+
+      // Update dock dots
+      const dots = dockDotsContainer.querySelectorAll('.dock-dot');
+      dots.forEach((dot, i) => {
+        dot.className = `dock-dot ${i + 1 === currentSlide ? 'active' : ''}`;
+      });
+
+      // Update overview thumbs
+      const thumbs = overviewGrid.querySelectorAll('.grid-thumb');
+      thumbs.forEach((t, i) => {
+        t.className = `grid-thumb ${i + 1 === currentSlide ? 'active' : ''}`;
+      });
+
+      // Re-render KaTeX if available
+      if (window.renderMathInElement && activeSlide) {
+        renderMathInElement(activeSlide, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+          ]
+        });
+      }
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        currentSlide++;
+        updateSlide();
+        playTone(600, 'sine', 0.08, 0.04);
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        currentSlide--;
+        updateSlide();
+        playTone(450, 'sine', 0.08, 0.04);
+      }
+    }
+
+    // Number counting animation
+    function triggerNumberCounters(container) {
+      const counters = container.querySelectorAll('.stat-number[data-target]');
+      counters.forEach(el => {
+        const target = parseFloat(el.getAttribute('data-target'));
+        const prefix = el.getAttribute('data-prefix') || '';
+        const suffix = el.getAttribute('data-suffix') || '';
+        const decimals = parseInt(el.getAttribute('data-decimals') || '0');
+        let current = 0;
+        const duration = 650;
+        const stepTime = 20;
+        const totalSteps = duration / stepTime;
+        const increment = target / totalSteps;
+
+        const timer = setInterval(() => {
+          current += increment;
+          if (current >= target) {
+            current = target;
+            clearInterval(timer);
+          }
+          el.textContent = `${prefix}${current.toFixed(decimals)}${suffix}`;
+        }, stepTime);
+      });
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (document.body.classList.contains('scroll-mode')) return;
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      } else if (e.key.toLowerCase() === 'f') {
+        toggleFullScreen();
+      } else if (e.key.toLowerCase() === 's') {
+        toggleViewMode();
+      } else if (e.key.toLowerCase() === 'g') {
+        openOverviewModal();
+      } else if (e.key === 'Escape') {
+        closeModal();
+        closeOverviewModal();
+      }
+    });
+
+    // Touch Swipe Navigation for mobile & tablets
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    document.addEventListener('touchstart', e => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, false);
+
+    document.addEventListener('touchend', e => {
+      touchEndX = e.changedTouches[0].screenX;
+      if (document.body.classList.contains('scroll-mode')) return;
+      if (touchEndX < touchStartX - 50) nextSlide();
+      if (touchEndX > touchStartX + 50) prevSlide();
+    }, false);
+
+    // View mode toggle
+    function toggleViewMode() {
+      document.body.classList.toggle('scroll-mode');
+      const isScroll = document.body.classList.contains('scroll-mode');
+      document.getElementById('viewModeText').textContent = isScroll ? 'Slide' : 'Scroll';
+      document.getElementById('viewModeBtn').querySelector('i').className = isScroll ? 'fa-solid fa-film' : 'fa-solid fa-list-check';
+      if (!isScroll) {
+        updateSlide();
+      }
+    }
+
+    // Fullscreen toggle
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {});
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    // Modal Lightbox
+    function openModal(src, title) {
+      document.getElementById('modalImg').src = src;
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('artifactModal').style.display = 'flex';
+      playTone(550, 'triangle', 0.15, 0.05);
+    }
+
+    function closeModal() {
+      document.getElementById('artifactModal').style.display = 'none';
+    }
+
+    // Ambient Cyber Particle Canvas
+    (function initCanvas() {
+      const canvas = document.getElementById('ambient-canvas');
+      const ctx = canvas.getContext('2d');
+      let w, h;
+      let particles = [];
+
+      function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      for (let i = 0; i < 48; i++) {
+        particles.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          vx: (Math.random() - 0.5) * 0.4,
+          vy: (Math.random() - 0.5) * 0.4,
+          radius: Math.random() * 1.8 + 0.8
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, w, h);
+        ctx.fillStyle = 'rgba(6, 182, 212, 0.4)';
+        ctx.strokeStyle = 'rgba(6, 182, 212, 0.08)';
+
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.x < 0) p.x = w;
+          if (p.x > w) p.x = 0;
+          if (p.y < 0) p.y = h;
+          if (p.y > h) p.y = 0;
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fill();
+
+          for (let j = i + 1; j < particles.length; j++) {
+            const p2 = particles[j];
+            const dx = p.x - p2.x;
+            const dy = p.y - p2.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < 130) {
+              ctx.lineWidth = 1 - dist / 130;
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      draw();
+    })();
+
+    // Initialize first slide counter
+    window.addEventListener('DOMContentLoaded', () => {
+      updateSlide();
+    });
+  </script>
+</body>
+</html>
