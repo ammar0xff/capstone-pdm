@@ -8,7 +8,12 @@
 - **Result:** Test accuracy **100.0% on the synthetic benchmark only** · single-window inference **26.19 ms on the training host** and **29.99 ms on the Raspberry Pi 4** (both measured) · full inject→alert timing not measured
 - **Evidence Files:** `ml/confusion_matrix.png`, `ml/roc_curves.png`, `ml/feature_importance.png`, `ml/model.joblib`, `ml/model_meta.json`, `tests/test_evaluation.py`
 
-> **Honesty note — read this before quoting any number.** The dataset is generated from published physics equations, not measured on a real motor. The 100% figure proves the pipeline separates the simulated classes; it is **not** evidence of 100% accuracy on real hardware. The headline public RUL evidence is now §15: the Zenodo FMCG induction-motor benchmark measured **141.716 h MAE**, **204.069 h RMSE** and **0.677 (67.7%)** 24-hour warning accuracy, below 80% and below two baselines. This system performs **fault detection and 4-class fault classification**, with rule-based maintenance advice; it does **not** estimate Remaining Useful Life (predict how many days until failure) for our rig, which would require run-to-failure time-series measurements from that rig. The separate offline tool `ml/degradation_rul.py` can extrapolate a trend to an operator-supplied threshold, but its output is explicitly labelled **not field-validated** and is not used by the runtime or dashboard. A separate public benchmark on NASA C-MAPSS FD001 simulated turbofan data (§10) verifies the RUL pipeline on trusted run-to-failure data; it is **not our motor and not field validation**. `z_score` appears in the CSV but is intentionally **not** a Random Forest input: it is the Stage-1 SPC gate metric computed from `rms_dyn`, and the gate returns it in `gate_info`.
+> **Honesty note — read this before quoting any number.** The dataset is generated from published physics equations, not measured on a real motor. The 100% figure proves the pipeline separates the simulated classes; it is **not** evidence of 100% accuracy on real hardware. The headline public RUL evidence is now §15: the Zenodo FMCG induction-motor benchmark measured **141.716 h MAE**, **204.069 h RMSE** and **0.677 (67.7%)** 24-hour warning accuracy, below 80% and below two baselines. Separately, §16 reports a controlled
+**real-motor CWRU diagnosis** benchmark: **1.000 (100.0%)** over 1,039 windows
+against a **0.4004 (40.04%)** majority baseline. It uses four CWRU bearing-
+condition classes, not the deployed runtime taxonomy, and is not our motor,
+field validation or RUL. This system performs **fault detection and 4-class fault classification**, with rule-based maintenance advice;
+ it does **not** estimate Remaining Useful Life (predict how many days until failure) for our rig, which would require run-to-failure time-series measurements from that rig. The separate offline tool `ml/degradation_rul.py` can extrapolate a trend to an operator-supplied threshold, but its output is explicitly labelled **not field-validated** and is not used by the runtime or dashboard. A separate public benchmark on NASA C-MAPSS FD001 simulated turbofan data (§10) verifies the RUL pipeline on trusted run-to-failure data; it is **not our motor and not field validation**. `z_score` appears in the CSV but is intentionally **not** a Random Forest input: it is the Stage-1 SPC gate metric computed from `rms_dyn`, and the gate returns it in `gate_info`.
 >
 > The request-by-request G12 answer register is `docs/G12_REQUEST_RESPONSE_REGISTER.md`; it states exactly which items are done locally and which are blocked on real measurements.
 
@@ -530,3 +535,55 @@ from our rig]`. The deployed classifier, dashboard readings, Firebase state and
 Pi files are unchanged. Other licence gaps remain exactly
 `[NEED: explicit FEMTO-ST licence]`, `[NEED: explicit XJTU-SY reuse licence]`
 and `[NEED: explicit CWRU licence; exact catalogue number]`.
+
+## 16. Headline real-motor diagnosis benchmark — CWRU (not our motor)
+
+The user asked for a project that works above 80% on real motor data while
+allowing their own data to be substituted later. RUL on the FMCG series is
+genuinely below 80% (§15), so it is not relabelled or tuned. Instead, the >80%
+headline is a separate, explicitly labelled **diagnosis** benchmark on real
+CWRU induction-motor vibrations. This is an honest change of task, not a change
+to the failed RUL number and not a claim about the capstone rig.
+
+| Item | Value |
+|---|---|
+| Vendored source | `data/cwru/` (unmodified `.mat` recordings, MD5-checked) |
+| Motor | CWRU 2 hp Reliance Electric induction motor |
+| Operating point | 0 hp, approximately 1797 rpm, 12,000 samples/s |
+| Classes | healthy (`Normal_0.mat`), inner race (`IR007_0.mat`), rolling element (`B007_0.mat`), outer race (`OR007@6_0.mat`) |
+| Exclusions | 1/2/3 hp healthy files and base accelerometer channels; reasons in `ml/diagnosis_cwru_report.json` |
+| Report | `ml/diagnosis_cwru_report.json` |
+| Licence status | `[NEED: explicit CWRU licence; exact catalogue number]` |
+
+`ml/diagnosis_cwru.py` takes 1,024-sample windows at a 512-sample hop **within**
+4,096-sample contiguous blocks, so windows from different blocks never share a
+sample. Five folds hold out contiguous blocks from every recording; the
+`StandardScaler` and `RandomForestClassifier(n_estimators=200, max_depth=12,
+random_state=42)` are fitted only on the other folds. Sixteen causal features
+cover RMS, peak, standard deviation, kurtosis, skewness, crest/shape/impulse/
+clearance factors, spectral centroid, five log band powers and peak FFT bin.
+
+| Result | Value |
+|---|---:|
+| Four-class accuracy | **1.000 (100.0%)** |
+| Majority-class baseline accuracy | **0.4004 (40.04%)** |
+| Macro precision / recall / F1 | 1.000 / 1.000 / 1.000 |
+| Per-class recall | 1.000 for all four classes |
+| Windows / groups / folds | 1,039 / 150 / 5 |
+| Per-fold accuracy | 1.000 in every fold |
+
+The perfect score is limited to this small, controlled public sample with
+seeded faults. It does **not** prove 100% accuracy on our motor, is not field
+validation, is not RUL, and is not validation of the deployed runtime classes
+(healthy / imbalance / bearing defect / thermal runaway). The deployed classifier,
+dashboard readings, Firebase state and Pi files are unchanged. `tests/test_diagnosis_cwru.py`
+verifies hashes, class mapping, sample-disjoint groups, config errors, report
+reproduction, CLI output and the >80% claim with its baseline. The `--manifest`
+option accepts another motor's labelled, hash-optional recordings so the same
+code path can be reused when the operator supplies their data; such a report is labelled
+`OPERATOR-SUPPLIED / PROVENANCE UNVERIFIED / NOT FIELD-VALIDATED` and carries no CWRU provenance.
+Reproduce with:
+
+```
+python3 ml/diagnosis_cwru.py --report ml/diagnosis_cwru_report.json
+```

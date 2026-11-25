@@ -483,3 +483,18 @@ No Pi sync, hosting deploy, runtime service, model, calibration artifact or
 Firebase state was changed by this FMCG step. The device-only telemetry rule
 `REMOVE SIMULATOR, ALL FROM DEVICE` and the `NO DATA` / `AWAITING DATA` /
 `NOT REPORTED` rendering rules remain exactly as verified above.
+
+## CWRU real-motor diagnosis benchmark — repository only, no Pi change
+
+A subsequent repository-only change added `ml/diagnosis_cwru.py`,
+`ml/diagnosis_cwru_report.json` and `tests/test_diagnosis_cwru.py`. The four
+selected drive-end `.mat` files remain hash-checked and unmodified. Five folds
+hold out contiguous 4,096-sample blocks so no vibration sample crosses from
+training into test; the measured held-out accuracy is **1.000 (100.0%)** over
+1,039 windows against a **0.4004 (40.04%)** majority baseline. These are four
+bearing-condition classes on CWRU's 2 hp Reliance Electric motor: not our
+deployed taxonomy, not our rig, not RUL and not field validation.
+
+No Pi sync, hosting deploy, runtime service, model, calibration artifact or
+Firebase state was changed by this CWRU step. The device-only telemetry rule
+and `NO DATA` / `AWAITING DATA` / `NOT REPORTED` rendering remain unchanged.

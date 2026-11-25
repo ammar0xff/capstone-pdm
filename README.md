@@ -8,27 +8,33 @@ Firebase Realtime Database. The hosted dashboard is presentation-only.
 
 **Current status:** implementation and the four-class **synthetic** benchmark
 are complete; physical-rig validation, field-validated RUL and measured CPU
-savings are not. The headline public RUL evidence is now a real 160 kW
-three-phase induction-motor dataset with an explicit operating-hours RUL label
-(Zenodo DOI `10.5281/zenodo.15637023`, CC BY 4.0). Four leave-one-run-out
-RUL-to-zero trials measured MAE **141.716 h**, RMSE **204.069 h** and 24-hour
-warning accuracy **0.677 (67.7%)** with recall **0.029** over 334 tail rows.
-The constant-zero baseline (MAE **69.185 h**, RMSE **106.164 h**) and the
-constant-no-warning baseline (accuracy **0.686**) are better, so the measured
-shortfall is reported rather than hidden. This is `BENCHMARK / NOT OUR MOTOR /
-NOT FIELD-VALIDATED`, not hours-to-failure for the capstone motor. An offline
-degradation estimator is available as an analysis tool only; it requires an
-operator-supplied threshold. Other public checks remain NASA C-MAPSS FD001
-(simulated turbofan), six PRONOSTIA/FEMTO-ST bearings (last-window MAE
-**182.91 s**, RMSE **335.26 s**), 15 XJTU-SY bearings (tail MAE **134.924 min**,
-RMSE **171.776 min** against **160.859 min** baseline RMSE) and four documented
-NASA IMS failures (tail MAE **9165.28 min**, RMSE **12531.9 min** against
-**17382.2 min** baseline RMSE), all benchmark-only. CWRU is a real 2 hp Reliance
-Electric motor sample with seeded faults, not a run-to-failure series. A
-target-rig readiness path is in place: once the operator supplies real
-run-to-failure CSVs from our motor, `ml/rul_from_rig.py` can evaluate, fit and
-predict RUL; it is not field-validated until that data and the failure endpoint
-are accepted. See `docs/REAL_MOTOR_READINESS.md`,
+savings are not. The headline **real-motor diagnosis** evidence is now a
+controlled CWRU four-class bearing-condition benchmark on a real 2 hp Reliance
+Electric induction motor: **1.000 (100.0%)** accuracy over 1,039 windows with
+sample-disjoint contiguous-block folds, against a **0.4004 (40.04%)**
+majority-class baseline. Those four classes (healthy / inner race / ball /
+outer race) are **not** the deployed runtime taxonomy, and the result is
+`BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED` — not "on our motor".
+The separate headline RUL evidence remains a real 160 kW three-phase
+induction-motor dataset with an explicit operating-hours RUL label (Zenodo DOI
+`10.5281/zenodo.15637023`, CC BY 4.0). Four leave-one-run-out RUL-to-zero trials
+measured MAE **141.716 h**, RMSE **204.069 h** and 24-hour warning accuracy
+**0.677 (67.7%)** with recall **0.029** over 334 tail rows. The constant-zero
+baseline (MAE **69.185 h**, RMSE **106.164 h**) and the constant-no-warning
+baseline (accuracy **0.686**) are better, so the measured shortfall is reported
+rather than hidden and is not tuned to reach 80%. An offline degradation
+estimator is available as an analysis tool only; it requires an operator-
+supplied threshold. Other public checks remain NASA C-MAPSS FD001 (simulated
+turbofan), six PRONOSTIA/FEMTO-ST bearings (last-window MAE **182.91 s**, RMSE
+**335.26 s**), 15 XJTU-SY bearings (tail MAE **134.924 min**, RMSE **171.776 min**
+against **160.859 min** baseline RMSE) and four documented NASA IMS failures
+(tail MAE **9165.28 min**, RMSE **12531.9 min** against **17382.2 min** baseline
+RMSE), all benchmark-only. CWRU has no run-to-failure series, so it supports
+diagnosis but not an RUL claim. A target-rig readiness path is in place: once
+the operator supplies real run-to-failure CSVs from our motor,
+`ml/rul_from_rig.py` can evaluate, fit and predict RUL; it is not field-validated
+until that data and the failure endpoint are accepted. See
+`docs/REAL_MOTOR_READINESS.md`,
 `docs/G12_REQUEST_RESPONSE_REGISTER.md` for request-by-request evidence and
 `docs/EXHIBITION_REVIEW_PACK.md` for the Arabic review/demo sheet.
 
@@ -83,6 +89,11 @@ INMP441 (I2S) ─┘          │                       │
 - `ml/rul_nasa_ims.py` evaluates a third public benchmark on the four failures
   documented in the NASA IMS bearing tests; it is also labelled benchmark only,
   with nominal recorded minutes rather than wall-clock hours.
+- `ml/diagnosis_cwru.py` is the headline real-motor diagnosis benchmark: four
+  bearing-condition classes from a real CWRU induction motor, grouped by
+  non-overlapping sample blocks, with a majority baseline and a `--manifest`
+  option for another motor's labelled recordings. Its 100.0% result is not the
+  deployed four-class taxonomy and is not our motor.
 - `ml/rul_fmcg.py` is the headline public RUL benchmark on real 160 kW
   three-phase induction-motor data with explicit operating-hour RUL labels. Its
   measured 67.7% 24-hour warning accuracy is below 80% and is reported as-is.
@@ -197,7 +208,8 @@ See `docs/FIREBASE_SETUP.md` before altering the rules or client behavior.
 | Simulator removed from cloud path | `edge/stream_live.py`, `tests/test_device_only_telemetry.py` | Retired stub cannot generate or upload packets; only `edge/firebase_mirror.py` writes RTDB |
 | Dataset provenance and licences | `docs/DATA_PROVENANCE_LICENSES.md`, `tests/test_rul_xjtu_sy.py` | CC BY 4.0 derived record and US Government Work metadata for NASA IMS; original XJTU-SY, FEMTO-ST, CWRU SPDX names and Reliance catalogue number remain `[NEED: ...]` |
 | Real-motor sample | `data/cwru/`, `tests/test_cwru_data.py` | CWRU 2 hp Reliance Electric; seeded faults, no run-to-failure |
-| Real-motor accuracy, field-validated RUL, cost savings | — | `[NEED: physical run data]` |
+| Headline real-motor diagnosis benchmark | `ml/diagnosis_cwru.py`, `ml/diagnosis_cwru_report.json`, `tests/test_diagnosis_cwru.py` | 1.000 (100.0%) on 1,039 CWRU windows, majority baseline 0.4004; sample-disjoint folds; not our motor or deployed taxonomy |
+| Real-motor accuracy on our rig, field-validated RUL, cost savings | — | `[NEED: physical run data]` |
 | Sensor calibration certificate | `edge/calibrate.py` and runbook | Procedure ready; `[NEED: signed run record]` |
 
 ## Offline degradation estimate (not field-validated)
@@ -349,6 +361,46 @@ first 43 set-1 snapshots, then 10), **not wall-clock operating hours**, and the
 endpoint is the last published snapshot, not operator sign-off on our rig.
 This result is `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED` and does not
 change the runtime classifier, dashboard readings, Firebase state or Pi files.
+
+## Headline real-motor diagnosis benchmark — CWRU (not our motor)
+
+The real-motor result above 80% is a **diagnosis** benchmark, not an RUL claim.
+It uses unmodified drive-end vibration recordings from CWRU's 2 hp Reliance
+Electric induction motor (0 hp, approximately 1797 rpm, 12,000 samples/s). Four
+hash-verified files give four explicit condition labels: healthy, inner-race
+fault, rolling-element fault and outer-race fault (0.007 inch seeded faults).
+The 1 hp / 2 hp / 3 hp healthy files are excluded so all four classes share the
+same operating point.
+
+```sh
+python3 ml/diagnosis_cwru.py --report ml/diagnosis_cwru_report.json
+```
+
+The evaluator takes 1,024-sample windows with a 512-sample hop **inside**
+4,096-sample contiguous blocks. Folds hold out whole blocks from every file, so
+windows from different folds never share a vibration sample; the scaler and
+200-tree Random Forest are fitted on training folds only. Each window has 16
+time- and frequency-domain features. The held-out result over 150 blocks and
+1,039 windows is:
+
+| Metric | Result |
+|---|---:|
+| Four-class accuracy | **1.000 (100.0%)** |
+| Majority-class baseline accuracy | **0.4004 (40.04%)** |
+| Macro precision / recall / F1 | 1.000 / 1.000 / 1.000 |
+| Per-class recall | 1.000 for all four classes |
+| Per-fold accuracy | 1.000 in all five folds |
+
+This is a perfect score on a small, controlled public sample with seeded
+faults; it is **not** evidence of 100% accuracy on our rig, in the field, or on
+the deployed runtime classes (healthy / imbalance / bearing defect / thermal
+runaway). It is `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`. To run the
+same evaluator on another motor later, pass a JSON class manifest with
+`--data-dir` and `--manifest`; no runtime, dashboard or Firebase file changes.
+The exact CWRU reuse licence and Reliance catalogue number remain
+`[NEED: explicit CWRU licence; exact catalogue number]`. A report produced from
+`--manifest` is labelled `OPERATOR-SUPPLIED / PROVENANCE UNVERIFIED /
+NOT FIELD-VALIDATED` and does not inherit CWRU source metadata.
 
 ## Headline public RUL benchmark — FMCG induction motor (not our motor)
 

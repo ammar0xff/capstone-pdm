@@ -34,14 +34,19 @@ The short tokens used elsewhere in the repository are kept verbatim:
 
 ## How this evidence is used
 
-- `ml/rul_fmcg.py` produces the headline labelled public induction-motor RUL
-  benchmark with explicit CC BY 4.0 metadata; `ml/rul_xjtu_sy.py` and the other
-  scripts remain separate public benchmarks only.
+- `ml/diagnosis_cwru.py` produces the headline real-motor **diagnosis** result
+  (1.000 / 100.0% on 1,039 windows against a 0.4004 / 40.04% majority baseline)
+  from the CWRU files above. It is a controlled bearing-condition task, not our
+  motor, not the deployed taxonomy, not RUL and not field validation.
+- `ml/rul_fmcg.py` produces the labelled public induction-motor RUL benchmark
+  with explicit CC BY 4.0 metadata; its 67.7% warning accuracy is reported as
+  measured. `ml/rul_xjtu_sy.py` and the other scripts remain separate public
+  benchmarks only.
 - `docs/REAL_MOTOR_READINESS.md` keeps the exact contract and operator-owned
   failure endpoint required for any claim about our own rig.
-- The hosted dashboard shows the FMCG, XJTU-SY, PRONOSTIA and NASA IMS results
-  beside a `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED` label and this
-  evidence panel.
+- The hosted dashboard shows the CWRU diagnosis result beside the FMCG,
+  XJTU-SY, PRONOSTIA and NASA IMS results, each under
+  `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`, with this evidence panel.
 
 No benchmark value is written to the live telemetry path, and no public
 licence is treated as acceptance of a failure on our motor.

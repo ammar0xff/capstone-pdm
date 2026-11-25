@@ -14,6 +14,7 @@ PAGES = {
 DASHBOARD = PAGES["index"]
 REPORT = os.path.join(ROOT, "ml", "rul_xjtu_sy_report.json")
 FMCG_REPORT = os.path.join(ROOT, "ml", "rul_fmcg_report.json")
+CWRU_REPORT = os.path.join(ROOT, "ml", "diagnosis_cwru_report.json")
 
 
 class BenchmarkDisplayTest(unittest.TestCase):
@@ -139,6 +140,81 @@ class FmcgBenchmarkDisplayTest(unittest.TestCase):
                 "field-validated RUL complete",
                 "hours-to-failure for our motor",
                 "operator-approved alarm threshold of 24 h",
+            ):
+                with self.subTest(page=page, forbidden=forbidden):
+                    self.assertNotIn(forbidden, text)
+
+
+class CwruDiagnosisDisplayTest(unittest.TestCase):
+    """The headline real-motor diagnosis panel quotes its committed report."""
+
+    @classmethod
+    def setUpClass(cls):
+        with open(DASHBOARD, encoding="utf-8") as handle:
+            cls.html = handle.read()
+        with open(PAGES["guide"], encoding="utf-8") as handle:
+            cls.guide = handle.read()
+        with open(CWRU_REPORT, encoding="utf-8") as handle:
+            cls.report = json.load(handle)
+
+    def test_headline_numbers_match_the_committed_report(self):
+        metrics = self.report["metrics"]
+        baseline = self.report["majority_class_baseline"]
+        data = self.report["data"]
+        self.assertEqual(metrics["accuracy"], 1.0)
+        self.assertEqual(baseline["accuracy"], 0.4004)
+        self.assertGreater(metrics["accuracy"], 0.80)
+        for expected in (
+            f"<strong>{metrics['accuracy']:.3f}</strong>",
+            f"<strong>{baseline['accuracy']}</strong>",
+            "<strong>1,039</strong>",
+            f"<strong>{data['n_folds']}</strong>",
+            "<small>four-class accuracy · 100.0%</small>",
+            "<small>majority baseline · 40.04%</small>",
+            "<small>windows · 150 contiguous blocks</small>",
+            "<small>sample-disjoint folds</small>",
+        ):
+            with self.subTest(expected=expected):
+                self.assertIn(expected, self.html)
+
+    def test_panel_keeps_scope_licence_gap_and_device_only_rule(self):
+        for token in (
+            "CWRU induction motor",
+            "2 hp Reliance Electric",
+            "four bearing-condition classes",
+            "not</b> the deployed runtime classes",
+            "not</b> RUL",
+            "NOT FIELD-VALIDATED",
+            "[NEED: explicit CWRU licence; exact catalogue number]",
+            "ml/diagnosis_cwru_report.json",
+            "REMOVE SIMULATOR, ALL FROM DEVICE",
+            "NO DATA",
+            "AWAITING DATA",
+            "NOT REPORTED",
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, self.html)
+
+    def test_guide_deck_states_the_same_measured_result(self):
+        for token in (
+            "1.000",
+            "100.0%",
+            "0.4004",
+            "40.04%",
+            "1,039",
+            "sample-disjoint",
+            "CWRU induction-motor diagnosis",
+            "BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED",
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, self.guide)
+
+    def test_no_real_motor_or_field_validation_claim_is_introduced(self):
+        for page, text in (("index", self.html), ("guide", self.guide)):
+            for forbidden in (
+                "100% on our motor",
+                "field-validated RUL complete",
+                "hours-to-failure for our motor",
             ):
                 with self.subTest(page=page, forbidden=forbidden):
                     self.assertNotIn(forbidden, text)

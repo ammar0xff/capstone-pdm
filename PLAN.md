@@ -82,6 +82,16 @@
 - C10 Keep `REMOVE SIMULATOR, ALL FROM DEVICE`, device-only telemetry wording,
   light-mode scope, calibration `REVIEW / UNVERIFIED`, all `[NEED: ...]` tokens
   and the deployed runtime model unchanged; do not deploy or sync to the Pi.
+- R39 Add a reproducible four-class diagnosis benchmark on real CWRU induction-
+  motor recordings, with a sample-disjoint grouped split and a majority baseline.
+- R40 Report the measured CWRU diagnosis accuracy above 80% as a separate,
+  labelled real-motor result; never present it as our motor, field validation,
+  RUL or validation of the deployed runtime taxonomy.
+- R41 Make the evaluator accept an operator-supplied class manifest so the same
+  code can score another motor's labelled recordings without changing the
+  deployed runtime, dashboard or Firebase state.
+- C11 Keep the honest FMCG RUL result (67.7%, below 80%) unchanged; no tuning,
+  relabelling or selective reporting to force an RUL success claim.
 
 ## Checklist
 
@@ -124,3 +134,7 @@
 - [x] P36 Add tests for source hashes, RUL-to-zero run selection, causal features, run-disjoint scoring, report equality and CLI reproducibility
 - [x] P37 Update hosted panel, guide, README, AI report, G12 register, Arabic review pack, provenance, file map and Pi evidence with the labelled real-motor benchmark
 - [x] P38 Remove the unused Mehran exploration script, rerun full suite and `git diff --check`, commit and push; no deployment or Pi sync
+- [x] P39 Build `ml/diagnosis_cwru.py` and commit the measured report with CWRU hashes, grouped sample-disjoint folds and a majority baseline
+- [x] P40 Add `tests/test_diagnosis_cwru.py` for source integrity, hashes, manifest reuse, group separation, reproduction, >80% accuracy and honest wording
+- [x] P41 Update the hosted benchmark panel, guide, README, AI report, Arabic review pack, register, provenance, file map and Pi evidence with the labelled CWRU result
+- [x] P42 Rerun focused/full tests, `git diff --check` and webcheck, then commit and push; no deployment or Pi sync

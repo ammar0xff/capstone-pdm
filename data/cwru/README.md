@@ -58,3 +58,27 @@ trajectory, so this dataset can support a **diagnosis** benchmark on real motor
 data, **not** an RUL / time-to-failure claim. It is also not our capstone rig's
 motor. Any accuracy measured here is "on CWRU's 2 hp Reliance Electric motor",
 not "on our motor" and not field validation of our deployed model.
+
+## Four-class diagnosis benchmark (repository only)
+
+`ml/diagnosis_cwru.py` uses the four 0 hp files above as explicit condition
+labels: healthy, inner-race fault, rolling-element fault and outer-race fault.
+It takes 1,024-sample windows inside non-overlapping 4,096-sample blocks and
+holds out whole blocks across five folds, so no vibration sample appears in
+both training and test folds. The committed report is
+`ml/diagnosis_cwru_report.json`; reproduce with:
+
+```sh
+python3 ml/diagnosis_cwru.py --report ml/diagnosis_cwru_report.json
+```
+
+Measured result: **1.000 (100.0%)** accuracy on 1,039 windows, against a
+**0.4004 (40.04%)** majority-class baseline; macro precision / recall / F1 are
+1.000 and every fold and every class recall is 1.000. This is a controlled
+public benchmark with seeded faults: `BENCHMARK / NOT OUR MOTOR /
+NOT FIELD-VALIDATED`. It is not an RUL result, not our deployed taxonomy and
+not field validation of the capstone classifier. The exact CWRU reuse licence
+and Reliance catalogue number remain
+`[NEED: explicit CWRU licence; exact catalogue number]`. For another motor,
+pass a JSON class manifest with `--data-dir` and `--manifest`; no runtime,
+dashboard or Firebase file is changed.

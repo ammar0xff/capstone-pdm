@@ -1,0 +1,439 @@
+{
+  "data": {
+    "class_counts": {
+      "ball": 209,
+      "healthy": 416,
+      "inner_race": 206,
+      "outer_race": 208
+    },
+    "class_names": [
+      "healthy",
+      "inner_race",
+      "ball",
+      "outer_race"
+    ],
+    "n_folds": 5,
+    "n_groups": 150,
+    "n_recordings": 4,
+    "n_windows": 1039,
+    "operating_point": "0 hp, approximately 1797 rpm",
+    "sample_rate_hz": 12000
+  },
+  "label": "BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED",
+  "majority_class_baseline": {
+    "accuracy": 0.4004,
+    "confusion_tp_fp_fn_support": [
+      [
+        416,
+        623,
+        0,
+        416
+      ],
+      [
+        0,
+        0,
+        206,
+        206
+      ],
+      [
+        0,
+        0,
+        209,
+        209
+      ],
+      [
+        0,
+        0,
+        208,
+        208
+      ]
+    ],
+    "macro": {
+      "f1": 0.1429,
+      "precision": 0.1001,
+      "recall": 0.25
+    },
+    "per_class": {
+      "ball": {
+        "f1": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "support": 209
+      },
+      "healthy": {
+        "f1": 0.5718,
+        "precision": 0.4004,
+        "recall": 1.0,
+        "support": 416
+      },
+      "inner_race": {
+        "f1": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "support": 206
+      },
+      "outer_race": {
+        "f1": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "support": 208
+      }
+    }
+  },
+  "method": {
+    "baseline": "majority condition class fitted on training folds only",
+    "block_samples": 4096,
+    "causal": true,
+    "features": [
+      "rms",
+      "peak",
+      "std",
+      "kurtosis",
+      "skewness",
+      "crest_factor",
+      "shape_factor",
+      "impulse_factor",
+      "clearance_factor",
+      "spectral_centroid_hz",
+      "log_band_power_0_100hz",
+      "log_band_power_100_500hz",
+      "log_band_power_500_1500hz",
+      "log_band_power_1500_3000hz",
+      "log_band_power_3000_6000hz",
+      "peak_fft_bin_hz"
+    ],
+    "hop_samples": 512,
+    "model": "RandomForestClassifier(n_estimators=200, max_depth=12, random_state=42)",
+    "sample_disjoint_folds": true,
+    "scaler": "StandardScaler fitted on training folds only",
+    "seed": 42,
+    "validation": "grouped k-fold; contiguous 4096-sample blocks held out together",
+    "window_samples": 1024
+  },
+  "metrics": {
+    "accuracy": 1.0,
+    "confusion_tp_fp_fn_support": [
+      [
+        416,
+        0,
+        0,
+        416
+      ],
+      [
+        206,
+        0,
+        0,
+        206
+      ],
+      [
+        209,
+        0,
+        0,
+        209
+      ],
+      [
+        208,
+        0,
+        0,
+        208
+      ]
+    ],
+    "macro": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "per_class": {
+      "ball": {
+        "f1": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "support": 209
+      },
+      "healthy": {
+        "f1": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "support": 416
+      },
+      "inner_race": {
+        "f1": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "support": 206
+      },
+      "outer_race": {
+        "f1": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "support": 208
+      }
+    }
+  },
+  "per_fold": {
+    "fold_1": {
+      "accuracy": 1.0,
+      "majority_baseline_accuracy": 0.4,
+      "test_groups": [
+        "B007_0.mat:block_000",
+        "B007_0.mat:block_001",
+        "B007_0.mat:block_002",
+        "B007_0.mat:block_003",
+        "B007_0.mat:block_004",
+        "B007_0.mat:block_005",
+        "IR007_0.mat:block_000",
+        "IR007_0.mat:block_001",
+        "IR007_0.mat:block_002",
+        "IR007_0.mat:block_003",
+        "IR007_0.mat:block_004",
+        "IR007_0.mat:block_005",
+        "Normal_0.mat:block_000",
+        "Normal_0.mat:block_001",
+        "Normal_0.mat:block_002",
+        "Normal_0.mat:block_003",
+        "Normal_0.mat:block_004",
+        "Normal_0.mat:block_005",
+        "Normal_0.mat:block_006",
+        "Normal_0.mat:block_007",
+        "Normal_0.mat:block_008",
+        "Normal_0.mat:block_009",
+        "Normal_0.mat:block_010",
+        "Normal_0.mat:block_011",
+        "OR007@6_0.mat:block_000",
+        "OR007@6_0.mat:block_001",
+        "OR007@6_0.mat:block_002",
+        "OR007@6_0.mat:block_003",
+        "OR007@6_0.mat:block_004",
+        "OR007@6_0.mat:block_005"
+      ],
+      "test_windows": 210,
+      "train_group_count": 120
+    },
+    "fold_2": {
+      "accuracy": 1.0,
+      "majority_baseline_accuracy": 0.4,
+      "test_groups": [
+        "B007_0.mat:block_006",
+        "B007_0.mat:block_007",
+        "B007_0.mat:block_008",
+        "B007_0.mat:block_009",
+        "B007_0.mat:block_010",
+        "B007_0.mat:block_011",
+        "IR007_0.mat:block_006",
+        "IR007_0.mat:block_007",
+        "IR007_0.mat:block_008",
+        "IR007_0.mat:block_009",
+        "IR007_0.mat:block_010",
+        "IR007_0.mat:block_011",
+        "Normal_0.mat:block_012",
+        "Normal_0.mat:block_013",
+        "Normal_0.mat:block_014",
+        "Normal_0.mat:block_015",
+        "Normal_0.mat:block_016",
+        "Normal_0.mat:block_017",
+        "Normal_0.mat:block_018",
+        "Normal_0.mat:block_019",
+        "Normal_0.mat:block_020",
+        "Normal_0.mat:block_021",
+        "Normal_0.mat:block_022",
+        "Normal_0.mat:block_023",
+        "OR007@6_0.mat:block_006",
+        "OR007@6_0.mat:block_007",
+        "OR007@6_0.mat:block_008",
+        "OR007@6_0.mat:block_009",
+        "OR007@6_0.mat:block_010",
+        "OR007@6_0.mat:block_011"
+      ],
+      "test_windows": 210,
+      "train_group_count": 120
+    },
+    "fold_3": {
+      "accuracy": 1.0,
+      "majority_baseline_accuracy": 0.4,
+      "test_groups": [
+        "B007_0.mat:block_012",
+        "B007_0.mat:block_013",
+        "B007_0.mat:block_014",
+        "B007_0.mat:block_015",
+        "B007_0.mat:block_016",
+        "B007_0.mat:block_017",
+        "IR007_0.mat:block_012",
+        "IR007_0.mat:block_013",
+        "IR007_0.mat:block_014",
+        "IR007_0.mat:block_015",
+        "IR007_0.mat:block_016",
+        "IR007_0.mat:block_017",
+        "Normal_0.mat:block_024",
+        "Normal_0.mat:block_025",
+        "Normal_0.mat:block_026",
+        "Normal_0.mat:block_027",
+        "Normal_0.mat:block_028",
+        "Normal_0.mat:block_029",
+        "Normal_0.mat:block_030",
+        "Normal_0.mat:block_031",
+        "Normal_0.mat:block_032",
+        "Normal_0.mat:block_033",
+        "Normal_0.mat:block_034",
+        "Normal_0.mat:block_035",
+        "OR007@6_0.mat:block_012",
+        "OR007@6_0.mat:block_013",
+        "OR007@6_0.mat:block_014",
+        "OR007@6_0.mat:block_015",
+        "OR007@6_0.mat:block_016",
+        "OR007@6_0.mat:block_017"
+      ],
+      "test_windows": 210,
+      "train_group_count": 120
+    },
+    "fold_4": {
+      "accuracy": 1.0,
+      "majority_baseline_accuracy": 0.4,
+      "test_groups": [
+        "B007_0.mat:block_018",
+        "B007_0.mat:block_019",
+        "B007_0.mat:block_020",
+        "B007_0.mat:block_021",
+        "B007_0.mat:block_022",
+        "B007_0.mat:block_023",
+        "IR007_0.mat:block_018",
+        "IR007_0.mat:block_019",
+        "IR007_0.mat:block_020",
+        "IR007_0.mat:block_021",
+        "IR007_0.mat:block_022",
+        "IR007_0.mat:block_023",
+        "Normal_0.mat:block_036",
+        "Normal_0.mat:block_037",
+        "Normal_0.mat:block_038",
+        "Normal_0.mat:block_039",
+        "Normal_0.mat:block_040",
+        "Normal_0.mat:block_041",
+        "Normal_0.mat:block_042",
+        "Normal_0.mat:block_043",
+        "Normal_0.mat:block_044",
+        "Normal_0.mat:block_045",
+        "Normal_0.mat:block_046",
+        "Normal_0.mat:block_047",
+        "OR007@6_0.mat:block_018",
+        "OR007@6_0.mat:block_019",
+        "OR007@6_0.mat:block_020",
+        "OR007@6_0.mat:block_021",
+        "OR007@6_0.mat:block_022",
+        "OR007@6_0.mat:block_023"
+      ],
+      "test_windows": 210,
+      "train_group_count": 120
+    },
+    "fold_5": {
+      "accuracy": 1.0,
+      "majority_baseline_accuracy": 0.402,
+      "test_groups": [
+        "B007_0.mat:block_024",
+        "B007_0.mat:block_025",
+        "B007_0.mat:block_026",
+        "B007_0.mat:block_027",
+        "B007_0.mat:block_028",
+        "B007_0.mat:block_029",
+        "IR007_0.mat:block_024",
+        "IR007_0.mat:block_025",
+        "IR007_0.mat:block_026",
+        "IR007_0.mat:block_027",
+        "IR007_0.mat:block_028",
+        "IR007_0.mat:block_029",
+        "Normal_0.mat:block_048",
+        "Normal_0.mat:block_049",
+        "Normal_0.mat:block_050",
+        "Normal_0.mat:block_051",
+        "Normal_0.mat:block_052",
+        "Normal_0.mat:block_053",
+        "Normal_0.mat:block_054",
+        "Normal_0.mat:block_055",
+        "Normal_0.mat:block_056",
+        "Normal_0.mat:block_057",
+        "Normal_0.mat:block_058",
+        "Normal_0.mat:block_059",
+        "OR007@6_0.mat:block_024",
+        "OR007@6_0.mat:block_025",
+        "OR007@6_0.mat:block_026",
+        "OR007@6_0.mat:block_027",
+        "OR007@6_0.mat:block_028",
+        "OR007@6_0.mat:block_029"
+      ],
+      "test_windows": 199,
+      "train_group_count": 120
+    }
+  },
+  "readiness": {
+    "dashboard_or_firebase_changed": false,
+    "not_field_validated": true,
+    "not_our_motor": true,
+    "operator_action_required": true,
+    "rul_claim": null,
+    "runtime_classifier_changed": false
+  },
+  "source": {
+    "dataset": "CWRU Bearing Data Center drive-end vibration recordings",
+    "excluded_sources": [
+      {
+        "files": [
+          "Normal_1.mat",
+          "Normal_2.mat",
+          "Normal_3.mat"
+        ],
+        "reason": "healthy recordings at 1/2/3 hp; excluded to keep 0 hp / ~1797 rpm conditions comparable"
+      },
+      {
+        "files": [
+          "X118_BA_time",
+          "X105_BA_time",
+          "X130_BA_time"
+        ],
+        "reason": "base accelerometer arrays are not the drive-end channel used here"
+      }
+    ],
+    "field_validation": false,
+    "licence_gap": "[NEED: explicit CWRU licence; exact catalogue number]",
+    "licence_note": "The official CWRU pages state no explicit reuse licence: [NEED: explicit CWRU licence; exact catalogue number]. A republished copy on IEEE DataPort (DOI 10.21227/g8ts-zd15) is marked CC BY 4.0; CWRU remains the origin and that licence is not invented for the official files.",
+    "motor": "2 hp Reliance Electric induction motor",
+    "operator_confirmed_failure": false,
+    "operator_supplied": false,
+    "our_motor": false,
+    "source_files": [
+      {
+        "channel": "X097_DE_time",
+        "class_id": 0,
+        "class_name": "healthy",
+        "file": "Normal_0.mat",
+        "md5": "ee410e7243aefcd8b7120876556464e7"
+      },
+      {
+        "channel": "X105_DE_time",
+        "class_id": 1,
+        "class_name": "inner_race",
+        "file": "IR007_0.mat",
+        "md5": "f14821b40412f33018279198da7f9cdc"
+      },
+      {
+        "channel": "X118_DE_time",
+        "class_id": 2,
+        "class_name": "ball",
+        "file": "B007_0.mat",
+        "md5": "ff0f20588edc64140ae33888fcf1114a"
+      },
+      {
+        "channel": "X130_DE_time",
+        "class_id": 3,
+        "class_name": "outer_race",
+        "file": "OR007@6_0.mat",
+        "md5": "e45f73f65cc3de4482d28d758503f2c1"
+      }
+    ],
+    "source_urls": [
+      "https://engineering.case.edu/bearingdatacenter/welcome",
+      "https://engineering.case.edu/bearingdatacenter/bearing-information",
+      "https://engineering.case.edu/bearingdatacenter/normal-baseline-data",
+      "https://engineering.case.edu/bearingdatacenter/12k-drive-end-bearing-fault-data"
+    ]
+  },
+  "status": "diagnosis_benchmark_complete",
+  "task": "four-class bearing-condition diagnosis on a real induction motor; not the deployed runtime taxonomy and not RUL"
+}

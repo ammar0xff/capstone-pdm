@@ -10,6 +10,7 @@
 |---|---|---|
 | النظام بيعمل إيه دلوقتي؟ | يقرأ ثلاثة حساسات على الراسبري، بوابة SPC ثم تصنيف الحالة الحالية إلى أربع فئات، ويعرض القرار على الداشبورد ويرآيه على Firebase. | `README.md`، `edge/edge_daq.py`، `public/index.html` |
 | الدقة 100% معناها إيه؟ | دقة الـ benchmark **الصناعي** فقط على 1,400 نافذة مولّدة. **ليست** دقة على موتور حقيقي. | `ml/ai_report.md` §5، `tests/test_evaluation.py` |
+| الـ 100% بتاعة CWRU معناها إيه؟ | benchmark **تشخيص** على موتور CWRU حقيقي 2 hp: **1.000 (100.0%)** على 1,039 نافذة بفصل blocks متصلة غير متداخلة، ومقابل majority baseline **0.4004 (40.04%)**. الأربع فئات حالة محمل وليست فئات الـ runtime؛ `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`، وليست RUL. | `ml/diagnosis_cwru.py`، `ml/diagnosis_cwru_report.json`، `tests/test_diagnosis_cwru.py`، `ml/ai_report.md` §16 |
 | فيه RUL شغال؟ | نعم على **benchmarks عامة، وعنوانها دلوقتي موتور حقيقي 160 kW ثلاثي الأطوار**: Zenodo DOI `10.5281/zenodo.15637023` برخصة CC BY 4.0 وRUL بالساعات؛ أربعة مسارات بفصل الـ run كامل أعطت **MAE 141.716 ساعة** و**RMSE 204.069 ساعة** ودقة إنذار 24 ساعة **0.677 (67.7%)** (recall **0.029**) — أقل من 80% وأسوأ من baseline صفر **69.185/106.164** وno-warning **0.686**، ويتقال كما هو. benchmarks المحامل القديمة (PRONOSTIA وXJTU-SY وNASA IMS) لسه موسومة، وكلها **مش** ساعات بقاء لموتورنا. | `ml/rul_fmcg.py`، `ml/rul_fmcg_report.json`، `data/fmcg_induction_rul/README.md`، `ml/rul_pronostia_report.json`، `ml/rul_xjtu_sy_report.json`، `ml/rul_nasa_ims_report.json`، `public/index.html` |
 | لو كان عندنا موتورنا، المشروع هيبقى predictive maintenance كامل؟ | المسار مجهّز: `ml/rul_from_rig.py` يقرأ CSV بـ `failure_timestamp` من المشغّل، يقيّم بفصل الـ run، ويحفظ نموذجاً ويتنبأ بـ RUL. **لا** نقول إنه اتختبر ميدانياً. | `docs/REAL_MOTOR_READINESS.md`، `ml/rul_from_rig.py`، `tests/test_rul_from_rig.py` |
 | البيانات حقيقية؟ | نعم في Benchmarks العامة: سجل FMCG لموتور حقيقي 160 kW ثلاثي الأطوار بـ RUL بالساعات، وCWRU عيّنة موتور حقيقي بعيوب مِصَنعة، وPRONOSTIA ست تجارب وXJTU-SY 15 تجربة وNASA IMS 4 حالات فشل موثّقة run-to-failure حقيقية لمحامل. لا، ليست من ريج المشروع. | `data/fmcg_induction_rul/README.md`، `data/cwru/README.md`، `data/pronostia/README.md`، `data/xjtu_sy_mendeley/README.md`، `data/nasa_ims/README.md` |
@@ -21,7 +22,7 @@
 | إيه المطلوب للخطوة الجاية؟ | `[NEED: run-to-failure series with timestamps and failure labels from our rig]`، `[NEED: measured degradation curve]`، `[NEED: real operator failure threshold]`. | `README.md`، `ml/ai_report.md` §11 |
 
 **الجملة الآمنة للمعرض:**
-> «النظام يكتشف ويصنّف الحالة الآن ويقترح إجراءً؛ التنبؤ بالبقاء شغال كـ benchmark على موتور حقيقي عام بـ RUL بالساعات، ودقة إنذار 24 ساعة فيه 67.7% نقولها كما هي لأنها تحت 80%؛ مسار `ml/rul_from_rig.py` جاهز لبيانات موتورنا، ومحتاج بيانات run-to-failure وتوقيع نهاية العمر قبل أي ادعاء ميداني.»
+> «النظام يكتشف ويصنّف الحالة الآن ويقترح إجراءً؛ أعلى رقم حقيقي لدينا هو **1.000 (100.0%)** على benchmark تشخيص CWRU بأربع فئات حالة محمل، مقابل **0.4004 (40.04%)** baseline، وهو `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED` وليس فئات ريجنا. أما التنبؤ بالبقاء فشغال كـ benchmark على موتور حقيقي عام بـ RUL بالساعات، ودقة إنذار 24 ساعة فيه 67.7% نقولها كما هي لأنها تحت 80%؛ مسار `ml/rul_from_rig.py` جاهز لبيانات موتورنا، ومحتاج بيانات run-to-failure وتوقيع نهاية العمر قبل أي ادعاء ميداني.»
 
 ## 2) تسلسل العرض (Demo) — 5 دقائق
 
@@ -35,14 +36,19 @@
 4. **القراءة الخام:** اعرض نموذج CSV مسجّل من `edge/raw_measuree.py` فيه قيم
    ADXL الخام وكلمة MAX6675 وRMS الصوت. إن أردت تشغيله حياً، أوقف `pdm-daq`
    مؤقتاً ثم أعد تشغيله؛ لا تكتب `cal.json`.
-5. **الـ RUL الحقيقي على benchmark:** افتح `ml/rul_fmcg_report.json` في اللوحة
+5. **التشخيص على موتور حقيقي:** افتح `ml/diagnosis_cwru_report.json` وبيّن
+   **1.000 (100.0%)** على 1,039 نافذة مقابل **0.4004 (40.04%)** baseline، مع
+   فصل الـ blocks من غير تداخل. قل فوراً: أربع فئات حالة محمل، مش فئات ريجنا،
+   ومش RUL. Label: `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`.
+   لإعادة الإنتاج: `python3 ml/diagnosis_cwru.py --report /tmp/diagnosis_cwru.json`.
+6. **الـ RUL الحقيقي على benchmark:** افتح `ml/rul_fmcg_report.json` في اللوحة
    وبيّن **141.716 h MAE** و**204.069 h RMSE** و**67.7%** دقة إنذار 24 ساعة،
    مع إنها أقل من 80% وأسوأ من الـ baselines. Label:
    `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`. لإعادة الإنتاج:
    `python3 ml/rul_fmcg.py --report /tmp/rul_fmcg_report.json`. للمصادر المستقلة
    افتح `ml/rul_pronostia_report.json` و`ml/rul_xjtu_sy_report.json` و
    `ml/rul_nasa_ims_report.json` وبيّن نفس الـ label، مع دقائق التسجيل الاسمية.
-6. **الاختبارات:** `PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m unittest
+7. **الاختبارات:** `PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m unittest
    discover -s tests` → العدد النهائي و`OK` يُذكر في تقرير التسليم، لا يُختلق.
 
 ## 3) فهرس الأدلة
@@ -60,6 +66,7 @@
 | مصادر الرخص وأدلة النسخ | `docs/DATA_PROVENANCE_LICENSES.md`، `tests/test_dashboard_benchmark_evidence.py` |
 | جاهزية RUL على موتورنا (مش نتيجة ميدانية) | `docs/REAL_MOTOR_READINESS.md`، `ml/rul_from_rig.py`، `tests/test_rul_from_rig.py` |
 | موتور حقيقي بعيوب مِصَنعة | `data/cwru/`، `tests/test_cwru_data.py` |
+| تشخيص 4 فئات على موتور CWRU حقيقي (مش موتورنا) | `ml/diagnosis_cwru.py`، `ml/diagnosis_cwru_report.json`، `tests/test_diagnosis_cwru.py` |
 | سجل الردود على G12 | `docs/G12_REQUEST_RESPONSE_REGISTER.md` |
 | حزمة العرض دي | `docs/EXHIBITION_REVIEW_PACK.md` |
 | شريحة الويب | `https://castpone2026.web.app/guide.html` |
@@ -85,6 +92,12 @@ failure labels from our rig]`.
 لا. «حقيقي» هنا يعني مقيس في تجارب منشورة وموثّقة، لا مولّدة. مصدرها FMCG أو
 CWRU أو PRONOSTIA/FEMTO-ST أو XJTU-SY أو NASA IMS، وكلٌّ له ريج وظروف مختلفة عن
 ريجنا. رخصة FMCG صريحة CC BY 4.0 على Zenodo DOI `10.5281/zenodo.15637023`.
+
+**س: الـ 100% بتاعة CWRU تعني إن نموذجنا على موتورنا 100%؟**
+لا. الرقم **1.000 (100.0%)** محسوب على أربع فئات حالة محمل في عيّنة CWRU
+بمقارنة **0.4004 (40.04%)** baseline، بفصل blocks متصلة غير متداخلة. فئات
+الـ runtime عندنا مختلفة، والريج مختلف، ولا يوجد validation ميداني؛ لذلك
+الوصف الإلزامي `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`.
 
 **س: الرخصة واضحة؟**
 FMCG على Zenodo معلنة CC BY 4.0 (DOI `10.5281/zenodo.15637023`)، ونسخة figshare

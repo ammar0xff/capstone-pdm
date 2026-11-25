@@ -1281,7 +1281,77 @@
         </div>
       </section>
 
-      <!-- Labelled public benchmark: never live telemetry, never our motor; headline FMCG induction-motor panel -->
+      <!-- Labelled public benchmark: never live telemetry, never our motor; headline CWRU diagnosis panel -->
+      <section class="benchmark-panel" aria-label="Public induction-motor diagnosis benchmark and data provenance">
+        <div>
+          <h2>Diagnosis benchmark <span class="font-mono">/ CWRU induction motor</span></h2>
+          <div class="benchmark-warning">
+            <span>BENCHMARK</span>
+            <span>NOT OUR MOTOR</span>
+            <span>NOT FIELD-VALIDATED</span>
+          </div>
+          <p>
+            Four-class bearing-condition diagnosis on a real 2 hp Reliance
+            Electric induction motor: healthy, inner race, rolling element and
+            outer race. These four bearing-condition classes are <b>not</b> the deployed runtime classes,
+            and this is <b>not</b> RUL or a measurement from the capstone rig.
+            from the capstone rig.
+          </p>
+          <div class="benchmark-metrics">
+            <div class="benchmark-metric">
+              <strong>1.000</strong>
+              <small>four-class accuracy · 100.0%</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>0.4004</strong>
+              <small>majority baseline · 40.04%</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>1,039</strong>
+              <small>windows · 150 contiguous blocks</small>
+            </div>
+            <div class="benchmark-metric">
+              <strong>5</strong>
+              <small>sample-disjoint folds</small>
+            </div>
+          </div>
+          <p style="margin-top:10px">
+            Windows of 1,024 samples are taken inside non-overlapping 4,096-sample
+            blocks; a fold holds out whole blocks from every recording, so no
+            vibration sample appears in both training and test. The scaler and
+            forest are fitted on training folds only. All five folds reported
+            <b>1.000</b>; this perfect score is limited to this controlled public
+            sample with seeded faults.
+          </p>
+        </div>
+        <div>
+          <h2>Source &amp; licence evidence</h2>
+          <table class="provenance-table">
+            <thead>
+              <tr><th>Source</th><th>Evidence</th><th>Limit</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>CWRU motor</th>
+                <td>Official CWRU drive-end recordings, four MD5-checked 0 hp files and explicit condition labels; report <span class="font-mono">ml/diagnosis_cwru_report.json</span>.</td>
+                <td>Real motor, but seeded faults and short steady-state files. Not our rig, not field validation and no RUL endpoint.</td>
+              </tr>
+              <tr>
+                <th>Licence gap</th>
+                <td class="provenance-need">[NEED: explicit CWRU licence; exact catalogue number]</td>
+                <td>The same evaluator accepts an operator-supplied class manifest for another motor; no runtime or Firebase file changes.</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="margin-top:10px">
+            Full evidence: <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/ml/diagnosis_cwru.py" target="_blank">ml/diagnosis_cwru.py</a>
+            &middot; <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/tests/test_diagnosis_cwru.py" target="_blank">tests/test_diagnosis_cwru.py</a>
+            &middot; <a href="https://engineering.case.edu/bearingdatacenter/welcome" target="_blank">CWRU Bearing Data Center</a>.
+          </p>
+        </div>
+      </section>
+
+      <!-- Separate labelled public RUL benchmark: never live telemetry, never our motor -->
       <section class="benchmark-panel" aria-label="Public induction-motor RUL benchmark and data provenance">
         <div>
           <h2>RUL benchmark <span class="font-mono">/ FMCG induction motor</span></h2>

@@ -82,6 +82,7 @@ The dashboard exposes only read-only JSON endpoints and page rendering. The old
 | `rul_pronostia_report.json` | Committed measured metrics for the PRONOSTIA benchmark |
 | `rul_xjtu_sy.py`, `rul_xjtu_sy_report.json` | Second real-bearing RUL benchmark on 15 XJTU-SY bearings; labelled benchmark, not our motor, baseline gap reported honestly |
 | `rul_nasa_ims.py`, `rul_nasa_ims_report.json` | Third public RUL benchmark on four documented NASA IMS failed bearings; labelled benchmark, not our motor, not field-validated |
+| `diagnosis_cwru.py`, `diagnosis_cwru_report.json` | Headline real-motor four-class diagnosis benchmark on hash-checked CWRU recordings; 1.000 / 100.0% on 1,039 sample-disjoint windows against 0.4004 / 40.04% baseline; `--manifest` supports another motor's labelled files |
 | `rul_fmcg.py`, `rul_fmcg_report.json` | Headline public RUL benchmark on four real FMCG 160 kW induction-motor runs with explicit hour labels; measured 67.7% warning accuracy reported honestly |
 | `nasa_ims_features.py` | Reproducible, streamed regeneration of the compact NASA IMS feature record from IMS.zip with `unrar` |
 | `rul_from_rig.py` | Target-rig run-to-failure RUL trainer/evaluator/predictor; ready path, not field-validated |
@@ -99,8 +100,8 @@ The dashboard exposes only read-only JSON endpoints and page rendering. The old
 | `data/cmapss/train_FD001.txt` | NASA raw training trajectories (do not edit) |
 | `data/cmapss/test_FD001.txt` | NASA raw test trajectories (do not edit) |
 | `data/cmapss/RUL_FD001.txt` | NASA withheld test RUL labels (do not edit) |
-| `data/cwru/README.md` | Provenance for a real 2 hp Reliance Electric motor sample |
-| `data/cwru/*.mat` | Unmodified CWRU healthy and seeded-fault recordings (do not edit) |
+| `data/cwru/README.md` | Provenance plus the labelled 1.000 / 100.0% diagnosis benchmark result and its scope warning |
+| `data/cwru/*.mat` | Unmodified CWRU healthy and seeded-fault recordings used by `ml/diagnosis_cwru.py` (do not edit) |
 | `data/pronostia/README.md` | Provenance, licence gap, acquisition facts and scope warning for PRONOSTIA |
 | `data/pronostia/manifest.json` | MD5 of all 8,384 vendored CSVs plus source archive hashes |
 | `data/pronostia/Bearing*/acc_*.csv`, `temp_*.csv` | Unmodified real bearing run-to-failure recordings (do not edit) |
