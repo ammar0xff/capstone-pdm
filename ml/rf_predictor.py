@@ -11,6 +11,11 @@ import os
 import time
 import numpy as np
 
+try:
+    from gate_thresholds import rf_stage1
+except ImportError:
+    from ml.gate_thresholds import rf_stage1
+
 
 class PdMClassifier:
     def __init__(
@@ -131,13 +136,10 @@ class PdMClassifier:
         # STAGE 1: Statistical Process Control (SPC) Shewhart Gate
         # -------------------------------------------------------------
         # Z-Score relative to calibrated healthy baseline
-        z_score = (rms - self.spc_baseline_rms) / max(1e-5, self.spc_sigma_rms)
-        is_thermal_anomaly = abs(slope) > self.spc_slope_thresh or temp > 55.0
-        is_vibration_anomaly = (
-            z_score > self.spc_z_thresh or kurt > 5.0 or cf > 4.0 or rms > 0.120
+        stage1_breached, z_score = rf_stage1(
+            rms, kurt, cf, temp, slope,
+            self.spc_baseline_rms, self.spc_sigma_rms, self.spc_z_thresh, self.spc_slope_thresh,
         )
-
-        stage1_breached = is_vibration_anomaly or is_thermal_anomaly
 
         if not stage1_breached:
             # Stage 1 Passed: Nominal Machine State. Random Forest stays DORMANT!

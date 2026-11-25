@@ -49,6 +49,8 @@ if ML_DIR not in sys.path:
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
+from gate_thresholds import edge_flags  # noqa: E402  (ML_DIR is on sys.path above)
+
 try:
     from rf_predictor import PdMClassifier
 except ImportError:
@@ -463,20 +465,15 @@ def main():
 
             # 4. Shewhart SPC Gating & Industrial Anomaly Classification
             # Stage 1: Coarse Statistical & Thermal Gating
-            is_thermal_fault = (last_temp_c > 70.0) or (temp_slope > 10.0)
-            is_thermal_warn = (last_temp_c > 50.0) or (temp_slope > 5.0)
-
-            is_vib_fault = (
-                (rms_dyn > ucl_fault)
-                or (kurtosis > 7.0 and rms_dyn > 0.03)
-                or (peak_dyn > 0.40)
+            _flags = edge_flags(
+                rms_dyn, kurtosis, peak_dyn, last_temp_c, temp_slope,
+                sound_db, sound_zcr, ucl_warning, ucl_fault,
             )
-            is_vib_warn = (
-                (rms_dyn > ucl_warning)
-                or (kurtosis > 5.0 and rms_dyn > 0.03)
-                or (peak_dyn > 0.25)
-            )
-            is_sound_fault = (sound_db > 88.0) or (sound_zcr > 0.28)
+            is_thermal_fault = _flags["thermal_fault"]
+            is_thermal_warn = _flags["thermal_warn"]
+            is_vib_fault = _flags["vib_fault"]
+            is_vib_warn = _flags["vib_warn"]
+            is_sound_fault = _flags["sound_fault"]
 
             feature_dict = {
                 "rms_dyn": round(rms_dyn, 4),
