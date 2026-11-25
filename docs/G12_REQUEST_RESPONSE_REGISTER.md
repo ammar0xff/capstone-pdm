@@ -307,3 +307,19 @@ restating any resource-saving claim]`
   ولا يوجد تغيير في سلوك الرسوم أو في بيانات Firebase.
 - نطاق النشر المُتفق عليه: Firebase Hosting + مزامنة الراسبري فقط. no RTDB telemetry
   edits, no runtime model changes and no calibration artifact changes.
+
+### التنفيذ النهائي لهذه الطلبات (2026-11-25)
+
+- `firebase deploy --only hosting --project castpone2026` (CLI 15.35.0) نجح:
+  14 ملفاً، `Release complete`، الرابط `https://castpone2026.web.app`. صفحات
+  `/` و`guide.html` و`calibration.html` رجعت HTTP 200 بعد النشر؛ الداشبورد لا
+  يحتوي على العناصر الأربعة المحذوفة ولا على نص `Chart buffer frozen`، وصفحة
+  المعايرة ما زالت `REVIEW / UNVERIFIED`. فحص الويب الحتمي على نسخة محلية
+  بلا بيانات جهاز نجح: `RESULT: PASS (0 floor, 0 reflex)` على ثلاثة مقاسات.
+- مزامنة الراسبري `renad@100.126.244.75:/home/renad/pdm` نقلت 26 ملفاً من
+  الـ commits بعد آخر مزامنة مُتحقّق منها، بعد عمل backup لـ13 ملفاً موجوداً في
+  `/home/renad/pdm_backup_20261125T165156Z`؛ الـ26 ملفاً كلها نجحت في
+  `md5sum -c`. الخدمات الثلاث `active`، والـ Flask المحلي HTTP 200، وفاحص
+  المحاكي طبع رسالة `SIMULATOR REMOVED` فقط. لم يُعاد تشغيل أي سيرفيس، ولم
+  يتغيرRTDB أو الموديل أو ملفات المعايرة. التفاصيل الكاملة في
+  `docs/PI_DEPLOYMENT_EVIDENCE.md`.

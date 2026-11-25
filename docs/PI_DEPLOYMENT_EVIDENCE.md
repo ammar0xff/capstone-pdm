@@ -498,3 +498,64 @@ deployed taxonomy, not our rig, not RUL and not field validation.
 No Pi sync, hosting deploy, runtime service, model, calibration artifact or
 Firebase state was changed by this CWRU step. The device-only telemetry rule
 and `NO DATA` / `AWAITING DATA` / `NOT REPORTED` rendering remain unchanged.
+
+## 2026-11-25 (final round) — above-80% RUL warning, UI cleanup, Hosting + Pi sync
+
+Local verification before deployment (all run in this session): focused
+`unittest tests.test_device_only_telemetry tests.test_dashboard_real_data_only
+tests.test_dashboard_benchmark_evidence tests.test_rul_cmapss_warning` →
+`Ran 45 tests` / `OK` in 89.621 s; full
+`PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m unittest discover -s tests` →
+`Ran 171 tests` / `OK` in 254.108 s; `git diff --check` exit `0`.
+`python3 ml/rul_cmapss_warning.py` regenerated the measured report: last-cycle
+accuracy `0.940`, majority `0.750`, precision `0.9524`, recall `0.800`;
+grouped unit-disjoint CV mean `0.9705` vs majority `0.8248`. The deterministic
+local fixture (`/tmp/opencode/webcheck_public`, telemetry URL replaced with
+`data:text/event-stream,%20`) passed
+`~/.config/opencode/webtools/webcheck <dir> --facts /tmp/opencode/webcheck_brief.md`
+at mobile 390 / tablet 820 / desktop 1440 with
+`RESULT: PASS (0 floor, 0 reflex)`; the five open `[NEED: ...]` licence markers
+remain visible.
+
+The verified tree was committed as `4c7787f`
+(`Add honest above-80% RUL warning benchmark and clean hosted UI`). Firebase CLI
+`15.35.0` (logged in as `ammar0xf@gmail.com`) ran
+`firebase deploy --only hosting --project castpone2026`: found 14 files in
+`public`, upload/finalize/release complete, `Hosting URL:
+https://castpone2026.web.app`. After deployment, `/`, `/guide.html` and
+`/calibration.html` returned HTTP 200 with 81,604 / 77,496 / 38,644 bytes.
+The live index contains `NASA C-MAPSS FD001` and the corrected
+`Charts are holding the last received packet; waiting for fresh telemetry.`
+text, and contains zero occurrences of `SOURCE: DEVICE TELEMETRY ONLY`,
+`SPC Gate`, `Operational Protocol:`, `STAGE 2 (RF ACTIVE)` or
+`Chart buffer frozen`. The calibration page still shows `REVIEW` and
+`UNVERIFIED`.
+
+Pi sync used `/tmp/opencode/pi_sync_final.sh` over SSH to
+`renad@100.126.244.75:/home/renad/pdm`. It copied the 26 changed/new files from
+commits after the previous verified sync (`83c22e7`, including the three
+repository-only benchmark commits), first backing up the 13 files that already
+existed on the Pi to `/home/renad/pdm_backup_20261125T165156Z` (`SYNC_TS=
+20261125T165156Z`). All 26 files passed `md5sum -c` on the Pi (`OK`, no FAILED
+lines). The manifest was
+`data/cwru/README.md; data/fmcg_induction_rul/{README.md,manifest.json,raw.csv};
+docs/{DATA_PROVENANCE_LICENSES.md,EXHIBITION_REVIEW_PACK.md,FILE_MAP.md,
+G12_REQUEST_RESPONSE_REGISTER.md,PI_DEPLOYMENT_EVIDENCE.md};
+ml/{ai_report.md,diagnosis_cwru.py,diagnosis_cwru_report.json,
+rul_cmapss_warning.py,rul_cmapss_warning_report.json,rul_fmcg.py,
+rul_fmcg_report.json}; PLAN.md; public/{guide.html,index.html}; README.md;
+tests/{test_dashboard_benchmark_evidence.py,test_dashboard_real_data_only.py,
+test_device_only_telemetry.py,test_diagnosis_cwru.py,test_rul_cmapss_warning.py,
+test_rul_fmcg.py}`.
+
+Pi verification after sync: `pdm-daq.service`, `pdm-cloud.service` and
+`pdm-dashboard.service` were all `active`; `http://127.0.0.1:5000/` returned
+HTTP 200; `python3 /home/renad/pdm/edge/stream_live.py` printed only
+`SIMULATOR REMOVED: telemetry must come from the Raspberry Pi device via
+edge/firebase_mirror.py. No simulated data is generated or uploaded.`; the
+synced `public/index.html` contains two `NASA C-MAPSS FD001` markers and zero
+removed UI/buffer-freeze tokens. No runtime service was restarted, and no
+`edge/`, `cal.json`, `cloud_config.json`, model, calibration artifact or RTDB
+telemetry value was edited by this sync. The FMCG RUL result remains 67.7% and
+the C-MAPSS result remains explicitly `SIMULATED TURBOFAN / NOT OUR MOTOR /
+NOT FIELD-VALIDATED`.

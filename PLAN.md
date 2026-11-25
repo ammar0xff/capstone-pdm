@@ -162,4 +162,4 @@
 - [x] P44 Build/run `ml/rul_cmapss_warning.py`, commit the measured report and add provenance/leakage/fold/baseline tests
 - [x] P45 Add the labelled C-MAPSS warning panel and FMCG context to dashboard, guide, README, AI report, register, provenance and plan
 - [x] P46 Rerun focused/full suite, `git diff --check` and deterministic webcheck at three widths
-- [ ] P47 Commit, deploy Firebase Hosting, sync the committed tree to Pi with backups and record exact evidence
+- [x] P47 Commit, deploy Firebase Hosting, sync the committed tree to Pi with backups and record exact evidence
