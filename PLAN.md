@@ -95,7 +95,7 @@
 - [x] P22 Run `git diff --check`, full suite, PRONOSTIA reproduction, deck webcheck/visual review and forbidden-claim grep; commit and push; report exact numbers and limits
 - [x] P23 Add `ml/rul_from_rig.py`, `tests/test_rul_from_rig.py` and `docs/REAL_MOTOR_READINESS.md` with the strict CSV contract and honest acceptance gate
 - [x] P24 Link the readiness evidence from README, deck, exhibition pack, register, file map, AI report, Pi evidence, plan and `.gitignore`
-- [ ] P25 Rerun targeted/full tests and `git diff --check`, webcheck/visual-review the deck, then commit and push with remaining `[NEED: ...]` items stated
+- [x] P25 Rerun targeted/full tests and `git diff --check`, webcheck/visual-review the deck, then commit and push with remaining `[NEED: ...]` items stated (commit `e143171`, applied to Pi; automated webcheck PASS, independent critic unavailable)
 - [x] P26 Remove fabricated readings and numeric fallbacks from `public/index.html`, add real-data-only guard tests, browser-verify real and missing packets, and rerun webcheck, visual review and the full suite
 - [x] P27 Fetch and hash the XJTU-SY derived feature record, vendor CSVs and provenance, build/test `ml/rul_xjtu_sy.py`, and reproduce the labelled report
 - [x] P28 Add the labelled benchmark and licence-evidence panel to the hosted dashboard, convert the three hosted pages to light mode, and guard with tests

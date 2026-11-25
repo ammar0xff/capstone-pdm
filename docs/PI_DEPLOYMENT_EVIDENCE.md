@@ -387,3 +387,28 @@ benchmark minute value is a hours-to-failure claim for our motor. Unresolved
 licence facts remain `[NEED: explicit XJTU-SY reuse licence]`,
 `[NEED: explicit FEMTO-ST dataset licence]`, `[NEED: explicit CWRU dataset
 reuse licence]` and `[NEED: exact Reliance Electric catalogue number]`.
+
+## 2026-11-25 — commit `e143171` applied to the powered-on Pi
+
+The verified working tree was committed as `e143171`
+(`docs+web: honest real-data RUL benchmark, provenance evidence and light-mode
+pages`) and pushed to `origin/main`. The same 39 changed/new non-runtime files
+were copied from that commit to `/home/renad/pdm` with `tar`/`scp` (the Pi has
+no `git`). Every file that already existed on the Pi was first backed up to
+`/home/renad/pdm_backup_e143171_20261125151611` (12 files backed up). All 39
+files passed `md5sum -c` on the Pi (`39` OK, no FAILED lines).
+
+Verification on the Pi: `pdm-daq.service`, `pdm-cloud.service` and
+`pdm-dashboard.service` were all `active`; `http://127.0.0.1:5000/` returned
+HTTP 200. The Flask app serves `edge/templates/index.html`, which was not part
+of this change and remains untouched, so `/guide.html` and `/calibration.html`
+return 404 on the local Flask port by design — those are hosted Firebase pages
+and the synced copies in `public/` contain the benchmark and licence-evidence
+markers. The sync manifest contained no `edge/`, `cal.json`, `cloud_config.json`
+or state file; any timestamp change on `edge/cloud_config.json` is the Pi's own
+cloud writer, not this file sync.
+
+No runtime service was restarted, no calibration artifact, calibration run
+record, Stage-1/Stage-2 behaviour, Firebase state or deployed model was changed.
+The unresolved `[NEED: ...]` items above are still open and no field-validated
+RUL claim is made.
