@@ -17,6 +17,9 @@
 - C4 No new dependency, no deletion of data, no destructive command.
 - R10 Offline degradation estimator requires an operator-supplied threshold, fits linear/exponential trends, and labels every result not field-validated; no runtime, dashboard or model change.
 - C5 No physical failure threshold invented or bundled with the code.
+- R11 Add a reproducible RUL benchmark on a trusted public run-to-failure
+  dataset with DOI and licence, labelled not our motor and not field-validated;
+  do not change runtime diagnosis, dashboard or model behaviour.
 
 ## Checklist
 
@@ -35,3 +38,6 @@
 - [x] P12 Restore the operator's `edge/raw_measuree.py`, remove my sound-cal additions, add sound-error reporting/backoff, deploy and verify live raw three-sensor logging
 - [x] P13 Add `ml/degradation_rul.py` with tests and docs; operator threshold required, every result not field-validated
 - [x] P14 Re-run full suite, `git diff --check`, commit and push the estimator work
+- [x] P15 Vendor C-MAPSS FD001 raw files with provenance and build `ml/train_rul_cmapss.py`; reproduce official test RMSE 15.51 / MAE 11.51
+- [x] P16 Add `tests/test_rul_cmapss.py`, document the benchmark as public simulated turbofan data in README, AI report, G12 register, file map and Pi evidence
+- [ ] P17 Run `git diff --check` plus the full suite, then commit and push the benchmark work

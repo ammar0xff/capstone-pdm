@@ -73,10 +73,20 @@ The dashboard exposes only read-only JSON endpoints and page rendering. The old
 | `rf_predictor.py` | Runtime classifier wrapper and response plans |
 | `benchmark_latency.py` | Single-window latency measurement helper |
 | `degradation_rul.py` | Offline trend-to-threshold estimator (operator threshold; not field-validated) |
+| `train_rul_cmapss.py` | Public FD001 RUL benchmark; simulated turbofan, not our motor, not field-validated |
 | `ai_report.md` | Training, evaluation and honest evidence register |
 | `windows.csv` | Generated dataset used by training |
 | `model.joblib`, `model_meta.json` | Deployed model artifacts |
 | `*.png` | Generated charts for reports/book |
+
+## Benchmark data (`data/`)
+
+| Path | Role |
+|---|---|
+| `data/cmapss/README.md` | Source, DOI, licence, MD5 hashes and scope warning for FD001 |
+| `data/cmapss/train_FD001.txt` | NASA raw training trajectories (do not edit) |
+| `data/cmapss/test_FD001.txt` | NASA raw test trajectories (do not edit) |
+| `data/cmapss/RUL_FD001.txt` | NASA withheld test RUL labels (do not edit) |
 
 ## Hosted presentation (`public/`)
 

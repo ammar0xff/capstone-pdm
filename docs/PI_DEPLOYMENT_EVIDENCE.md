@@ -304,3 +304,19 @@ The operator has since edited the raw scripts themselves, so these are now
 `/home/renad/raw_sensor_data.csv` (51 rows, 23:08) has all three sensors'
 columns but `sound_rms=0.0` and empty `sound_dbfs`, consistent with the DAQ
 service holding the microphone during that run; no script change was made.
+
+## 2026-11-25 — public C-MAPSS FD001 RUL benchmark (no Pi change)
+
+The operator selected NASA C-MAPSS FD001 as a trusted public source. The raw
+FD001 files were downloaded from Zenodo (DOI `10.5281/zenodo.15346912`, CC BY
+4.0, archive MD5 `79a22f36e80606c69d0e9e4da5bb2b7a`) and vendored into
+`data/cmapss/` with verified per-file hashes. `ml/train_rul_cmapss.py`,
+`tests/test_rul_cmapss.py` and the benchmark write-up were added on the host
+only. Official test RMSE 15.51 cycles / MAE 11.51; unit-held-out validation
+last-window RMSE 2.25 cycles. These are simulated turbofan data, not our
+motor, and are explicitly **not field-validated**.
+
+No Pi file, service, calibration artifact or Firebase state was changed for
+this step. The operator-owned scripts listed above remain untouched. Runtime
+diagnosis and the dashboard still report current state only; the benchmark is
+an offline reproducibility check, not a live RUL feature.

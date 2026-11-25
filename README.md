@@ -10,7 +10,10 @@ Firebase Realtime Database. The hosted dashboard is presentation-only.
 physical-rig validation, field-validated RUL and measured CPU savings are not.
 An offline degradation estimator is available as an analysis tool only; it
 requires an operator-supplied threshold and is explicitly not field-validated.
-See `docs/G12_REQUEST_RESPONSE_REGISTER.md` for request-by-request evidence.
+A separate RUL benchmark on public NASA C-MAPSS FD001 data is complete and
+reproducible, but those are simulated turbofan data — not our motor, not field
+validation. See `docs/G12_REQUEST_RESPONSE_REGISTER.md` for request-by-request
+evidence.
 
 ## Start here
 
@@ -47,6 +50,9 @@ INMP441 (I2S) ─┘          │                       │
 - `ml/degradation_rul.py` is an **offline** trend-to-threshold estimator. It is
   not part of the runtime diagnosis, needs an operator threshold, and is
   labelled "not field-validated" in every result.
+- `ml/train_rul_cmapss.py` reproduces a public RUL benchmark on simulated
+  turbofan run-to-failure data. It is a pipeline check only, never a life
+  prediction for our induction motor.
 
 ## First-time setup
 
@@ -139,6 +145,7 @@ See `docs/FIREBASE_SETUP.md` before altering the rules or client behavior.
 | Pi services and model deployment | `docs/PI_DEPLOYMENT_EVIDENCE.md` | Verified on 2026-11-23 |
 | Pi latency | 26.19 ms host / 29.99 ms Pi, single-window inference | Measured; full inject→alert timing not measured |
 | Offline degradation estimator | `ml/degradation_rul.py`, `tests/test_degradation_rul.py` | Implemented; operator threshold required; not field-validated |
+| Public RUL benchmark | `ml/train_rul_cmapss.py`, `data/cmapss/`, `tests/test_rul_cmapss.py` | Complete on NASA C-MAPSS FD001 (simulated turbofan); not our motor |
 | Real-motor accuracy, field-validated RUL, cost savings | — | `[NEED: physical run data]` |
 | Sensor calibration certificate | `edge/calibrate.py` and runbook | Procedure ready; `[NEED: signed run record]` |
 
@@ -161,6 +168,30 @@ Every result carries `"threshold_source": "operator-supplied"` and a
 `"not field-validated"` label. `[NEED: measured degradation curve]` and
 `[NEED: run-to-failure series with timestamps and failure labels]` remain
 before this can be presented as real RUL.
+
+## Public RUL benchmark (not our motor)
+
+To validate the RUL pipeline on trusted run-to-failure data, use NASA C-MAPSS
+FD001. The three raw text files are vendored in `data/cmapss/` with their MD5
+hashes and provenance in `data/cmapss/README.md`. Source: NASA PCoE,
+DOI `10.5281/zenodo.15346912`, CC BY 4.0.
+
+```
+python3 ml/train_rul_cmapss.py --report /tmp/rul_cmapss_report.json
+```
+
+The script trains a 30-cycle-window Random Forest with a 125-cycle RUL cap,
+holds out units 81–100 by unit for validation, and scores the final model on
+NASA's withheld `RUL_FD001.txt` labels. Reproduced values: validation
+last-window RMSE **2.25** cycles; official test RMSE **15.51** cycles and MAE
+**11.51** cycles, versus **43.39** for a constant baseline. Full details and
+the citation are in `ml/ai_report.md` §10.
+
+This is a **public simulated turbofan benchmark only**: it does not use our
+sensors, our motor or our failure modes, and must not be reported as remaining
+useful life of the capstone rig. The classifier, dashboard and Firebase state
+are untouched. `[NEED: run-to-failure series with timestamps and failure
+labels from our rig]` before any field-validated RUL claim.
 
 ## Budget
 

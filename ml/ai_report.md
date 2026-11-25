@@ -8,7 +8,7 @@
 - **Result:** Test accuracy **100.0% on the synthetic benchmark only** · single-window inference **26.19 ms on the training host** and **29.99 ms on the Raspberry Pi 4** (both measured) · full inject→alert timing not measured
 - **Evidence Files:** `ml/confusion_matrix.png`, `ml/roc_curves.png`, `ml/feature_importance.png`, `ml/model.joblib`, `ml/model_meta.json`, `tests/test_evaluation.py`
 
-> **Honesty note — read this before quoting any number.** The dataset is generated from published physics equations, not measured on a real motor. The 100% figure proves the pipeline separates the simulated classes; it is **not** evidence of 100% accuracy on real hardware. This system performs **fault detection and 4-class fault classification**, with rule-based maintenance advice; it does **not** estimate Remaining Useful Life (predict how many days until failure), which would require run-to-failure time-series measurements. The separate offline tool `ml/degradation_rul.py` can extrapolate a trend to an operator-supplied threshold, but its output is explicitly labelled **not field-validated** and is not used by the runtime or dashboard. `z_score` appears in the CSV but is intentionally **not** a Random Forest input: it is the Stage-1 SPC gate metric computed from `rms_dyn`, and the gate returns it in `gate_info`.
+> **Honesty note — read this before quoting any number.** The dataset is generated from published physics equations, not measured on a real motor. The 100% figure proves the pipeline separates the simulated classes; it is **not** evidence of 100% accuracy on real hardware. This system performs **fault detection and 4-class fault classification**, with rule-based maintenance advice; it does **not** estimate Remaining Useful Life (predict how many days until failure), which would require run-to-failure time-series measurements. The separate offline tool `ml/degradation_rul.py` can extrapolate a trend to an operator-supplied threshold, but its output is explicitly labelled **not field-validated** and is not used by the runtime or dashboard. A separate public benchmark on NASA C-MAPSS FD001 simulated turbofan data (§10) verifies the RUL pipeline on trusted run-to-failure data; it is **not our motor and not field validation**. `z_score` appears in the CSV but is intentionally **not** a Random Forest input: it is the Stage-1 SPC gate metric computed from `rms_dyn`, and the gate returns it in `gate_info`.
 >
 > The request-by-request G12 answer register is `docs/G12_REQUEST_RESPONSE_REGISTER.md`; it states exactly which items are done locally and which are blocked on real measurements.
 
@@ -242,3 +242,49 @@ The JSON returned `status: estimated`, `rul_seconds: 3.0`,
 `estimated_cross_time: 7.0`, `threshold_source: operator-supplied` and the
 `not field-validated` label. The 3.0 is only the fitted crossing time minus the
 last sample time (7.0 − 4.0) in the units of the supplied history.
+
+## 10. Public RUL benchmark — NASA C-MAPSS FD001 (not our motor)
+
+The user selected a trusted public run-to-failure source so the RUL pipeline
+could be checked on real trajectories with published labels. FD001 was chosen
+from the NASA PCoE C-MAPSS archive.
+
+| Item | Value |
+|---|---|
+| Dataset | C-MAPSS FD001, simulated turbofan degradation, 100 engines |
+| Publisher / DOI | NASA PCoE, `10.5281/zenodo.15346912` |
+| Licence | CC BY 4.0 |
+| Citation | A. Saxena, K. Goebel, D. Simon and N. Eklund, "Damage Propagation Modeling for Aircraft Engine Run-to-Failure Simulation", PHM08, Denver, 2008. |
+| Archive MD5 | `79a22f36e80606c69d0e9e4da5bb2b7a` |
+| Local files | `data/cmapss/{train,test,RUL}_FD001.txt` (hashes in `data/cmapss/README.md`) |
+
+Method: a Random Forest regressor on trailing 30-cycle windows of the three
+operating settings and the 17 non-constant sensors (window mean, standard
+deviation and short-minus-long trend → 54 features). The training target is
+`last cycle of the unit − current cycle`, capped at 125 cycles; it is used only
+as a target, never as a feature. Units 81–100 are held out by unit for
+validation, then the final model is fitted on all 100 training units and scored
+once on NASA's withheld test labels. Model: 100 trees, `random_state=42`.
+
+| Result | Validation (last window, units 81–100) | Official FD001 test |
+|---|---:|---:|
+| RMSE (cycles) | **2.25** | **15.51** |
+| MAE (cycles) | 2.05 | 11.51 |
+| Units | 20 | 100 |
+
+A constant-prediction baseline scores 43.39 RMSE on the same official test
+labels, so the learned model is clearly extracting degradation signal from the
+public benchmark. `tests/test_rul_cmapss.py` verifies the file hashes, shapes,
+the target formula, that no future cycle or RUL label enters the features, unit
+disjointness and the reproduced metrics. Run it with:
+
+```
+python3 ml/train_rul_cmapss.py --report /tmp/rul_cmapss_report.json
+```
+
+**Scope limit.** These are simulated aircraft turbofan readings, not our
+induction motor, our sensors or our failure modes. The good score validates the
+RUL *pipeline on a public benchmark only*. It is **not** field validation, not a
+remaining-life estimate for our rig, and does not change the runtime diagnosis,
+dashboard or Firebase state. The field case still needs
+`[NEED: run-to-failure series with timestamps and failure labels from our rig]`.

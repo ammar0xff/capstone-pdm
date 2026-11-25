@@ -23,7 +23,7 @@
 | 8 | تشغيل ملفات الراسبري تلقائياً وهل كل ملف مرفوع يعمل؟ | ✅ تم | §8 يشرح systemd والـ enable عند الإقلاع ويوضح أن ليس كل ملف يعمل | §8 أدناه; `edge/*.service`; `docs/PI_DEPLOYMENT_EVIDENCE.md:5-13` | لا شيء محلياً |
 | 9 | تأكيد إزالة أوبشنز الحالات الأربعة وبيانات الـ simulation | ✅ تم | أُزيلت أدوات المحاكاة من الداشبورد، ويوجد اختبار يمنع رجوعها | `public/index.html`; `tests/test_evaluation.py::TeamFollowUpTest::test_dashboard_has_no_simulation_controls` | لا شيء محلياً |
 | 10 | تجهيز جداول النتائج الإجمالية قبل المعرض | ✅ تم | §10 يحدد أماكن جداول Totals وطريقة إعادة إنتاجها | §10 أدناه; `ml/ai_report.md` §5.4–§5.5; `docs/CAPSTONE_MASTER_HANDBOOK.md` §5.3, §10 | لا شيء محلياً؛ النتائج صناعية فقط |
-| 11 | التيست الحقيقي على موتور ثم prediction/RUL (لينكي MathWorks) | ⛔ متوقف | كُتب بروتوكول الاختبار، ووُثّق أن RUL هدف خارجي وليس مطبقاً في النظام | §11 أدناه; `ml/ai_report.md:11,206-210` | `[NEED: motor rig access, calibrated raw readings, run-to-failure series]` |
+| 11 | التيست الحقيقي على موتور ثم prediction/RUL (لينكي MathWorks) | ◐ جزئي | كُتب بروتوكول الاختبار؛ أُضيف benchmark عام على NASA C-MAPSS FD001 (توربينات محاكاة، مش موتورنا) للتحقق من الـ pipeline فقط؛ الـ RUL الحقيقي لسه متوقف | §11 أدناه; `ml/ai_report.md` §10; `data/cmapss/README.md` | `[NEED: motor rig access, calibrated raw readings, run-to-failure series]` |
 | 12 | الرد سريعاً لأن الشغل مكمل «بكرة» | — لا ينطبق | لا يوجد تاريخ قابل للتحقق؛ اعتُبر كأولوية لا كطلب هندسي | `/tmp/opencode/textinstinct_chat.txt:1258-1260` | `[NEED: actual exhibition date if a deadline must be quoted]` |
 | 13 | مخرجات أكثر تدرّجاً + مكان المشكلة وتكلفتها ومدة بقاء الموتور | ◐ جزئي | يوجد `response_plan` بأربع أولويات وإجراءات، لكن المدد ثابتة لكل فئة وليست تنبؤاً؛ لا تكلفة ولا زمن بقاء مقيسان | `ml/rf_predictor.py:37-72`; `edge/edge_daq.py:604`; `ml/ai_report.md` §5.5 | `[NEED: degradation curve, part prices, downtime cost and failure labels]` |
 
@@ -173,6 +173,14 @@ restating any resource-saving claim]`
   مخزّنة، ولا ربط بالـ runtime أو الداشبورد، وكل نتيجة موسومة
   `not field-validated` و`operator-supplied`. لذلك هي أداة تقدير مشروحة فقط،
   وليست RUL حقيقياً ولا دليلاً على زمن بقاء الموتور.
+- أُضيف كمان **benchmark عام على بيانات موثوقة** (اخترته أنت): NASA C-MAPSS
+  FD001 من PCoE، DOI `10.5281/zenodo.15346912` وترخيص CC BY 4.0. النتائج:
+  RMSE 15.51 دورة وMAE 11.51 على اختبار NASA الرسمي، مع RMSE 2.25 على
+  تحقّق منفصل بالوحدة. الكود `ml/train_rul_cmapss.py` والبيانات الخام في
+  `data/cmapss/` والاختبارات في `tests/test_rul_cmapss.py`. **دي بيانات
+  توربينات محاكاة، مش موتورنا، ومش validation ميداني**؛ بتثبت بس إن الـ pipeline
+  شغال على مسار run-to-failure عام بملصقات منشورة، وممنوع تقديمها كزمن بقاء
+  للموتور بتاع المشروع.
 - التنفيذ الحالي يصنّف **الحالة الحالية** ويُصدر `response_plan` بأربع أولويات
   (`ROUTINE/SCHEDULE/URGENT/CRITICAL`) وإجراءات ثابتة لكل فئة. هذا «تدرّج في القرار»،
   لكنه **ليس** تدرّجاً محسوباً من منحنى تدهور، ولا تكلفة/زمن بقاء.
