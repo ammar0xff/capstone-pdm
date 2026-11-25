@@ -25,7 +25,9 @@ def _header(path):
 
 
 def resolve_history_path(base_dir):
-    """Path new rows should be appended to. Creates nothing."""
+    """Path new rows should be appended to. Creates nothing. Uses an absolute base_dir
+    so the result does not depend on the working directory."""
+    base_dir = os.path.abspath(base_dir)
     legacy = os.path.join(base_dir, LEGACY_NAME)
     if not os.path.exists(legacy) or _header(legacy) == COLUMNS_V2:
         return legacy
@@ -33,25 +35,44 @@ def resolve_history_path(base_dir):
 
 
 def ensure_header(path):
+    """Write the header only to a missing or empty file, so a restart never adds a second one."""
     if not os.path.exists(path) or os.path.getsize(path) == 0:
         with open(path, "w", newline="") as f:
             csv.writer(f).writerow(COLUMNS_V2)
 
 
+def _parse_lines(path):
+    """Yield (row list) for each trustworthy line. Skipped, never repaired: lines with
+    NUL bytes (power-loss zero fill), undecodable lines, an unterminated last line
+    (a writer may be mid-write), and lines whose first field is not a timestamp."""
+    with open(path, "rb") as f:
+        data = f.read()
+    lines = data.split(b"\n")
+    if lines and lines[-1] != b"":
+        lines = lines[:-1]  # unterminated last line: possibly being written right now
+    for raw in lines[1:]:  # first line is the header
+        if not raw or b"\x00" in raw:
+            continue
+        try:
+            text = raw.decode("utf-8").rstrip("\r")
+            row = next(csv.reader([text]))
+            float(row[0])
+        except (UnicodeDecodeError, StopIteration, ValueError, IndexError, csv.Error):
+            continue
+        yield row
+
+
 def read_rows(base_dir):
-    """All rows from the legacy file and the v2 file as dicts, by each row's own width.
-    Rows with an unexpected width are skipped, never guessed."""
+    """All trustworthy rows from the legacy file and the v2 file as dicts, mapped by each
+    row's own width (11 or 14). Any other width is skipped, never guessed."""
     out = []
     for name in (LEGACY_NAME, V2_NAME):
         path = os.path.join(base_dir, name)
         if not os.path.exists(path):
             continue
-        with open(path, newline="") as f:
-            rd = csv.reader(f)
-            next(rd, None)
-            for row in rd:
-                if len(row) == len(COLUMNS_V2):
-                    out.append(dict(zip(COLUMNS_V2, row)))
-                elif len(row) == len(COLUMNS_V1):
-                    out.append(dict(zip(COLUMNS_V1, row)))
+        for row in _parse_lines(path):
+            if len(row) == len(COLUMNS_V2):
+                out.append(dict(zip(COLUMNS_V2, row)))
+            elif len(row) == len(COLUMNS_V1):
+                out.append(dict(zip(COLUMNS_V1, row)))
     return out
