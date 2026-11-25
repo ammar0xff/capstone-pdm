@@ -1,0 +1,14 @@
+/home/renad/stat_stage/edge_daq.live_backup_20261126T005146.py
+/home/renad/stat_stage/edge_daq.live_backup_20261126T005212.py
+/home/renad/stat_stage/g14_backup_20261126T013201
+/home/renad/stat_stage/g14_backup_20261126T013543
+/home/renad/stat_stage/g14_last_backup
+/home/renad/stat_stage/g14m_backup_20261126T013700
+/home/renad/stat_stage/g14m_last_backup
+/home/renad/stat_stage/tmpfs_backup_20261126T012107
+/home/renad/stat_stage/tmpfs_last_backup
+[Service]
+Environment=G12_STATE_DIR=/dev/shm/pdm
+Environment=G12_MIRROR_LIGHT=1
+Environment=G12_MIRROR_KEEPALIVE=1
+Environment=PYTHONUNBUFFERED=1

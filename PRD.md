@@ -1,4 +1,6 @@
 # PRD — AI-Driven Edge Predictive Maintenance & Remote Monitoring System
+
+> **Status note (2026-11-26):** This document is the original PLAN. The following are NOT implemented in the current build: offline backfill or SD replay to Firebase (the mirror keeps at most 200 frames in a JSON file and drops them after the next successful write, with no replay and no SQLite), a lossless 10 s outage guarantee, calibrated SPC baselines, and a connected RUL estimate. See docs/FULL_CYCLE_STATUS.md for the verified state.
 **Grade 12 Capstone 2026/2027 S1 | Theme: Communication, Sensing, Information, Informatics**
 
 - **Date:** 2026-10-14
@@ -24,7 +26,7 @@ Portable offline-first rig on Pi 4 4GB: ADXL345 + K-type/MAX6675 + INMP441 → c
 |F2|Dual-dashboard sync|both flip ≤5s|M2, wireless+ICT|
 |F3|Coarse→fine AI|SPC gates DL + proba|M1 ≥80%|
 |F4|Fault injection|shake / distant heat / tone|input→output|
-|F5|Offline survival|10s WiFi pull → 0 loss|M5/M6|
+|F5|Offline survival|10s WiFi pull → 0 loss [PLAN, not implemented]|M5/M6|
 |F6|Calibration mode|cal.json + sheets|cal req|
 |F7|Maintenance advice|fault → action text|industrial value|
 |F8|QR + AR/EN + dataset/rubric|scan + print pack|IoT+AI platforms|
@@ -155,7 +157,7 @@ The build exits non-zero on any FAIL, so a broken netlist cannot produce a drawi
 |Audience|Judges + technician, mobile-first|Engineer + judges (depth)|
 |Shows|Live g / temp / dB, big Healthy/Warning/Fault lamp, fault-type + advice, alert banner, QR, AR/EN toggle|Time series, FFT overlay, X-bar/R SPC, TBA/TB_VA, Th_DB, MQTT_QM, QL_M, confusion-matrix snapshot|
 |Source|Pi Flask :5000 live; public mirror reads RTDB|RTDB via JSON API plugin + CSV snapshot upload|
-|Offline|Yes — Pi hotspot, fully working|Cached snapshot + SD replay|
+|Offline|Yes — Pi hotspot, fully working|Cached snapshot + SD replay [PLAN, not implemented]|
 |Cost|0 EGP (Flask local + Hosting free 10GB)|0 EGP (free tier)|
 
 Single data model shared by both (see §9.3). Same `state` value → both flip together in demo.
@@ -165,7 +167,7 @@ Single data model shared by both (see §9.3). Same `state` value → both flip t
 ### 6.1 Functional
 1. F1: Concurrent timestamped sampling of 3 sensors.
 2. F2: Live values + state on **both** Grafana and Custom Panel; consistent within 2s.
-3. F3: Offline workflow: SD + local MQTT + Flask works with zero internet; auto-reconnect + backfill; ≤5s outage lossless.
+3. F3: Offline workflow: SD + local MQTT + Flask works with zero internet; auto-reconnect + backfill; ≤5s outage lossless [PLAN, not implemented].
 4. F4: SPC breach → DL inference → notification (Custom banner + Firebase push + Grafana annotation) ≤5s.
 5. F5: Fault-injection demo (shake / distant heat / tone) visibly flips both UIs.
 6. F6: Calibration mode + QR to each dashboard + AR/EN labels.
@@ -211,7 +213,7 @@ Secondary on Grafana: TBA/TB_VA/TB_CA, Th_DB, P_Loss, MQTT_QM, QL_M, reconnect i
 |Mosquitto on Pi + Flask|local|unlimited offline|0|
 |**Total cloud**| | |**0 EGP**|
 
-Quota guard: Pi counts writes/day; if >15k, auto-throttle to 1/60s + SD-only + Grafana CSV replay.
+Quota guard: Pi counts writes/day; if >15k, auto-throttle to 1/60s + SD-only + Grafana CSV replay [PLAN, not implemented].
 
 ### 9.2 Protocols & sampling
 - Local primary: MQTT `factory/motor1` QoS1 to Mosquitto on Pi; Flask SSE to browser. Works on `pi-hotspot` with zero internet.
@@ -238,7 +240,7 @@ Quota guard: Pi counts writes/day; if >15k, auto-throttle to 1/60s + SD-only + G
 3. Shake 3s → RMS spike → Warning→Fault + banner + Grafana annotation ≤5s (film it).
 4. Warm K-type probe (hand/dryer 30cm) → slope alarm on both.
 5. Clap/tone → acoustic flag.
-6. Pull WiFi 10s → Panel-local keeps live, SD buffers → restore → Firebase backfill, Grafana gap filled.
+6. Pull WiFi 10s → Panel-local keeps live, SD buffers → restore → Firebase backfill, Grafana gap filled [PLAN, not implemented].
 7. Show hard copies: confusion matrix + cal sheets + dataset sample + rubric + logbooks + every receipt.
 
 ## 11. Budget Control
@@ -262,7 +264,7 @@ Quota guard: Pi counts writes/day; if >15k, auto-throttle to 1/60s + SD-only + G
 |Pi stock/price|halt|order W1, sealed receipt, borrow dev backup|
 |MAX wiring noise|jitter|shielded, 100nF, 3-wire, averaging|
 |Venue WiFi blocked|no cloud|hotspot + local Flask primary; cloud mirror optional for grading|
-|Firebase quota hit|mirror stall|throttle 1/60s + SD replay; Grafana CSV fallback|
+|Firebase quota hit|mirror stall|throttle 1/60s + SD replay; Grafana CSV fallback [PLAN, not implemented]|
 |Grafana plugin auth|no live|pre-cache snapshot image + CSV upload backup|
 |SD corruption|loss|read-only root, safe shutdown, laptop CSV copy|
 |Acc <80%|fail|more windows, 2-class fallback, feature fix before CNN|

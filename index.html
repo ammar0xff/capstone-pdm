@@ -37,6 +37,8 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 </style>
 </head>
 <body>
+<div style="background:#fff3cd;border:1px solid #d6a800;padding:10px;margin:10px;font:14px sans-serif"><b>Status note (2026-11-26):</b> this book describes the PLAN. Not implemented in the current build: offline backfill or SD replay to Firebase (the mirror keeps at most 200 frames in a JSON file and discards them after the next successful write; no replay, no SQLite), a lossless 10 s outage guarantee, calibrated SPC baselines, and a connected RUL estimate. See docs/FULL_CYCLE_STATUS.md.</div>
+
 <div class="cover">
 <div class="badge">GRADE 12 CAPSTONE • 2026/2027 S1 • INDUSTRIAL BASE</div>
 <h1>Intelligent Predictive Maintenance<br>& Remote Monitoring System</h1>
@@ -105,7 +107,7 @@ svg.schem{width:100%;height:auto;background:#fbfcfd;border:1px solid var(--line)
 <tr><td>F2</td><td>Dual dashboard sync</td><td>Panel lamp + Grafana chart flip together ≤5s</td><td>M2, wireless+ICT</td></tr>
 <tr><td>F3</td><td>Coarse→fine AI</td><td>SPC in-limits → log; out → DL fault-type + proba</td><td>M1 ≥80%</td></tr>
 <tr><td>F4</td><td>Fault-injection demo</td><td>shake / distant heat / tone visibly triggers Warning→Fault</td><td>input→output proof</td></tr>
-<tr><td>F5</td><td>Offline survival</td><td>WiFi pulled 10s → local keeps live → backfill, 0 loss</td><td>M5/M6</td></tr>
+<tr><td>F5</td><td>Offline survival</td><td>WiFi pulled 10s → local keeps live → backfill, 0 loss [PLAN, not implemented]</td><td>M5/M6</td></tr>
 <tr><td>F6</td><td>Calibration mode</td><td>before/after offsets, cal.json, signed sheets</td><td>cal requirement</td></tr>
 <tr><td>F7</td><td>Maintenance advice</td><td>e.g. Vib 0.91 → check coupling, order bearing</td><td>industrial value</td></tr>
 <tr><td>F8</td><td>QR + AR/EN + dataset/rubric pack</td><td>scan to Panel/Grafana, printed evidence + logbooks</td><td>IoT + AI platforms</td></tr></table>
@@ -450,7 +452,7 @@ X,y,G = df.drop(columns=[<span class="s">'label'</span>,<span class="s">'event_i
 <tr><td>2</td><td>Shake rig 3s</td><td>RMS spike → Warning→Fault + banner + Grafana annotation</td></tr>
 <tr><td>3</td><td>Warm K-type probe (hand/dryer 30cm)</td><td>temp slope alarm on Panel + Grafana</td></tr>
 <tr><td>4</td><td>Clap/tone at mic</td><td>acoustic flag both</td></tr>
-<tr><td>5</td><td>Pull WiFi 10s → restore</td><td>Panel-local keeps live, SD buffers → Firebase backfill, Grafana gap filled</td></tr>
+<tr><td>5</td><td>Pull WiFi 10s → restore</td><td>Panel-local keeps live, SD buffers → Firebase backfill, Grafana gap filled [PLAN, not implemented]</td></tr>
 <tr><td>6</td><td>Show papers</td><td>confusion matrix + cal sheets + rubric + logbooks + every receipt + 0-EGP cloud proof</td></tr></table>
 <div class="kpi"><div><b>M1 ≥80%</b><span>accuracy</span></div><div><b>M2 ≤5s</b><span>response</span></div><div><b>M3 ±0.1g</b><span>vib error</span></div><div><b>M4 ±2°C</b><span>temp error</span></div><div><b>M5 ≥60min</b><span>uptime</span></div><div><b>M6 ≤2%</b><span>packet loss</span></div></div>
 <p style="font-size:13px;color:var(--muted)">Extra Cinar KPIs on dashboard: TBA/TB_VA/TB_CA, Th_DB, MQTT_QM, QL_M, reconnect interval.</p>
