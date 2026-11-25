@@ -36,7 +36,7 @@ files just because they look stale; confirm with the owner first.
 | `G12_REQUEST_RESPONSE_REGISTER.md` | All 13 G12 requests with status and evidence |
 | `EXHIBITION_REVIEW_PACK.md` | Arabic one-page defence sheet, demo sequence, evidence index, Q&A and forbidden claims |
 | `REAL_MOTOR_READINESS.md` | Exact target-rig RUL CSV contract, commands, tests and acceptance gate; not field-validated |
-| `DATA_PROVENANCE_LICENSES.md` | Fetched source/licence evidence for XJTU-SY, its derived record, FEMTO-ST, CWRU and the Reliance motor; unresolved facts stay `[NEED: ...]` |
+| `DATA_PROVENANCE_LICENSES.md` | Fetched source/licence evidence for XJTU-SY, its derived record, FEMTO-ST, CWRU, NASA IMS and the Reliance motor; unresolved facts stay `[NEED: ...]` |
 | `CAPSTONE_MASTER_HANDBOOK.md` | Engineering handbook and theory |
 | `PROJECT_COMPLETE_TUTORIAL.md` | End-to-end tutorial |
 | `STUDENT_MASTER_GUIDE.md` | Student-facing build and presentation guide |
@@ -55,7 +55,7 @@ files just because they look stale; confirm with the owner first.
 | `calibrate.py` | Operator-run six-face/thermal calibration runner | Manual on Pi |
 | `raw_measure.py` | Raw, uncalibrated ADXL345/MAX6675 reader with optional CSV | Manual on Pi |
 | `exhibition_drill.py` | Exhibition rehearsal tool | Manual |
-| `stream_live.py` | Live stream helper | Manual |
+| `stream_live.py` | Retired simulator uplink — refuses to run, no RTDB writes | Disabled |
 | `generate_qr.py` | QR generation helper | Manual |
 | `cal.json` | Active runtime calibration consumed by `edge_daq.py` | Runtime state |
 | `cloud_config.json`, `cloud_backlog.json` | Mirror configuration/offline queue | Runtime state |
@@ -81,6 +81,8 @@ The dashboard exposes only read-only JSON endpoints and page rendering. The old
 | `rul_pronostia.py` | Real bearing run-to-failure RUL benchmark; leave-one-bearing-out, not our motor, not field-validated |
 | `rul_pronostia_report.json` | Committed measured metrics for the PRONOSTIA benchmark |
 | `rul_xjtu_sy.py`, `rul_xjtu_sy_report.json` | Second real-bearing RUL benchmark on 15 XJTU-SY bearings; labelled benchmark, not our motor, baseline gap reported honestly |
+| `rul_nasa_ims.py`, `rul_nasa_ims_report.json` | Third public RUL benchmark on four documented NASA IMS failed bearings; labelled benchmark, not our motor, not field-validated |
+| `nasa_ims_features.py` | Reproducible, streamed regeneration of the compact NASA IMS feature record from IMS.zip with `unrar` |
 | `rul_from_rig.py` | Target-rig run-to-failure RUL trainer/evaluator/predictor; ready path, not field-validated |
 | `rul_from_rig_report.json`, `rul_from_rig_model.joblib` | Generated only when the script is run with operator data; ignored by git |
 | `ai_report.md` | Training, evaluation and honest evidence register |
@@ -104,6 +106,8 @@ The dashboard exposes only read-only JSON endpoints and page rendering. The old
 | `data/xjtu_sy_mendeley/README.md`, `manifest.json` | Provenance, source/CSV SHA-256 hashes and limits of the CC BY 4.0 derived XJTU-SY record |
 | `data/xjtu_sy_mendeley/features/*.mat` | Unmodified derived feature matrices fetched from Mendeley; ignored by git (do not edit) |
 | `data/xjtu_sy_mendeley/csv/*.csv` | Lossless CSV conversions with a snapshot column; used by the XJTU-SY benchmark |
+| `data/nasa_ims/README.md`, `manifest.json` | NASA IMS source/archive SHA-256, licence evidence, documented failures and compact-record limits |
+| `data/nasa_ims/failed_bearings.csv` | Derived RMS/kurtosis for four documented NASA IMS failed bearings; nominal recorded minutes, not wall-clock hours |
 
 ## Hosted presentation (`public/`)
 

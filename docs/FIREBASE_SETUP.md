@@ -20,7 +20,8 @@ the Pi. It does not invent credentials and it does not silently change auth.
 
 The mirror writes only the latest state packet. It is not a time-series
 database and the hosted dashboard is a presentation client, not an engineering
-control surface.
+control surface. `edge/stream_live.py` is retired and cannot inject simulated
+packets into this path; it is the only former writer besides the mirror.
 
 ## 2. Recreate the setup
 

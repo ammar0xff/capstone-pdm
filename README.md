@@ -24,7 +24,10 @@ also complete: last-20% tail MAE **134.924 min** and RMSE **171.776 min**,
 versus **160.859 min** constant-baseline RMSE (the trend model is honestly
 slightly worse than the baseline on this metric). It is `BENCHMARK / NOT OUR
 MOTOR / NOT FIELD-VALIDATED`, with source and licence evidence in
-`docs/DATA_PROVENANCE_LICENSES.md`. A target-rig readiness path is also in place: once the
+`docs/DATA_PROVENANCE_LICENSES.md`. A third benchmark on four documented NASA
+IMS bearing failures is also complete: last-20% tail MAE **9165.28 min** and
+RMSE **12531.9 min** against **17382.2 min** constant-baseline
+RMSE, in nominal recorded minutes only. A target-rig readiness path is also in place: once the
 operator supplies real run-to-failure CSVs from our motor, `ml/rul_from_rig.py`
 can evaluate, fit and predict RUL; it is not field-validated until that data and
 the failure endpoint are accepted. See `docs/REAL_MOTOR_READINESS.md`,
@@ -80,6 +83,9 @@ INMP441 (I2S) ─┘          │                       │
   15 run-to-failure bearings) from a CC BY 4.0 derived feature record. Its
   result is labelled `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED` and is
   displayed as such on the hosted dashboard.
+- `ml/rul_nasa_ims.py` evaluates a third public benchmark on the four failures
+  documented in the NASA IMS bearing tests; it is also labelled benchmark only,
+  with nominal recorded minutes rather than wall-clock hours.
 - `ml/rul_from_rig.py` is the offline target-rig readiness path: it validates
   operator-supplied run-to-failure CSVs, evaluates causally and run-disjointly,
   fits a final RUL regressor and predicts from a current run. No field result is
@@ -112,8 +118,15 @@ sudo systemctl status pdm-daq.service pdm-cloud.service pdm-dashboard.service
 ```
 
 Only the three units above are services. `edge/calibrate.py`,
-`edge/raw_measure.py`, `edge/exhibition_drill.py`, `edge/stream_live.py` and
-`edge/generate_qr.py` are operator-run tools, not daemons.
+`edge/raw_measure.py`, `edge/exhibition_drill.py` and `edge/generate_qr.py` are
+operator-run tools, not daemons. `edge/stream_live.py` is retired: it no longer
+generates or uploads simulated packets. The RTDB path is written only by
+`edge/firebase_mirror.py` from device state; `tests/test_device_only_telemetry.py`
+guards this.
+
+**REMOVE SIMULATOR, ALL FROM DEVICE.** No simulator can publish to the hosted
+dashboard. Missing, null or stale packets are shown as `NO DATA` or
+`AWAITING DATA`; they are not falsely labelled as device telemetry.
 
 ### Raw measurements — read the sensors directly
 
@@ -179,7 +192,9 @@ See `docs/FIREBASE_SETUP.md` before altering the rules or client behavior.
 | Public RUL benchmark | `ml/train_rul_cmapss.py`, `data/cmapss/`, `tests/test_rul_cmapss.py` | Complete on NASA C-MAPSS FD001 (simulated turbofan); not our motor |
 | Real-bearing RUL benchmark | `ml/rul_pronostia.py`, `data/pronostia/`, `tests/test_rul_pronostia.py` | Complete on six PRONOSTIA run-to-failure bearings; not our motor, not field-validated |
 | Second real-bearing RUL benchmark | `ml/rul_xjtu_sy.py`, `data/xjtu_sy_mendeley/`, `tests/test_rul_xjtu_sy.py` | Complete on 15 XJTU-SY bearings; labelled benchmark, baseline comparison reported honestly; not our motor |
-| Dataset provenance and licences | `docs/DATA_PROVENANCE_LICENSES.md`, `tests/test_rul_xjtu_sy.py` | CC BY 4.0 derived record; original XJTU-SY, FEMTO-ST, CWRU licences and Reliance catalogue number remain `[NEED: ...]` |
+| Third public RUL benchmark | `ml/rul_nasa_ims.py`, `data/nasa_ims/`, `tests/test_rul_nasa_ims.py` | Four documented NASA IMS failed bearings; benchmark only, nominal recorded minutes, not field-validated |
+| Simulator removed from cloud path | `edge/stream_live.py`, `tests/test_device_only_telemetry.py` | Retired stub cannot generate or upload packets; only `edge/firebase_mirror.py` writes RTDB |
+| Dataset provenance and licences | `docs/DATA_PROVENANCE_LICENSES.md`, `tests/test_rul_xjtu_sy.py` | CC BY 4.0 derived record and US Government Work metadata for NASA IMS; original XJTU-SY, FEMTO-ST, CWRU SPDX names and Reliance catalogue number remain `[NEED: ...]` |
 | Real-motor sample | `data/cwru/`, `tests/test_cwru_data.py` | CWRU 2 hp Reliance Electric; seeded faults, no run-to-failure |
 | Real-motor accuracy, field-validated RUL, cost savings | — | `[NEED: physical run data]` |
 | Sensor calibration certificate | `edge/calibrate.py` and runbook | Procedure ready; `[NEED: signed run record]` |
@@ -297,6 +312,42 @@ hours-to-failure for our motor. The hosted dashboard shows them only under
 `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`. Dataset-defined run ends are
 **not** operator confirmation of a failure on our rig. No temperature or
 acoustic channel exists in this record, so it cannot validate those sensors.
+
+## Third public RUL benchmark — NASA IMS (not our motor)
+
+A third source was added after the licence/public-use review: the University of
+Cincinnati IMS / Rexnord run-to-failure tests hosted by
+[NASA Open Data](https://data.nasa.gov/dataset/ims-bearings). The published
+[IMS.zip](https://data.nasa.gov/docs/legacy/IMS.zip) has SHA-256
+`6cb42c263b0281c725abf99f4b9fcf49915c949f31dbd2333877dc2e06ce9ec2`; its portal
+metadata names US Government Work while displaying `other-license-specified`, so
+both facts are quoted in `docs/DATA_PROVENANCE_LICENSES.md`.
+
+`data/nasa_ims/failed_bearings.csv` contains 11,620 one-second, 20 kHz
+snapshots for the four failures documented in the archive README: set 1 bearing
+3 (inner race), set 1 bearing 4 (rolling element), set 2 bearing 1 (outer race)
+and set 3 bearing 3 (outer race). Reproduce it with
+`ml/nasa_ims_features.py`, which streams RAR members with the already-installed
+`unrar` tool and does not need a new dependency or a multi-gigabyte extraction.
+
+The benchmark normalises mean log RMS by each bearing's first 10% of snapshots,
+fits the trailing 40-snapshot trend, extrapolates to the 75th-percentile
+terminal health of the other bearings, and scores the last 20% of each held
+bearing under leave-one-bearing-out validation (2,328 windows):
+
+| Metric | Result |
+|---|---:|
+| Tail-window MAE | **9165.28 min** |
+| Tail-window RMSE | **12531.9 min** |
+| Constant-baseline tail-window MAE | 17011.8 min |
+| Constant-baseline tail-window RMSE | 17382.2 min |
+
+Both scores are reported as measured; the trend model was not tuned to beat the
+constant baseline. The minutes are nominal recorded cadence (5 minutes for the
+first 43 set-1 snapshots, then 10), **not wall-clock operating hours**, and the
+endpoint is the last published snapshot, not operator sign-off on our rig.
+This result is `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED` and does not
+change the runtime classifier, dashboard readings, Firebase state or Pi files.
 
 ## Target-rig readiness (not field-validated)
 

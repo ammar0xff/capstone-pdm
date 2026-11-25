@@ -935,7 +935,8 @@
           <span id="txt-cloud-status" class="font-mono">AWAITING DATA</span>
         </div>
         
-        <div style="font-size: 11px; color: var(--text-muted); display: flex; gap: 12px;">
+        <div style="font-size: 11px; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 12px;">
+          <span>SOURCE: <b class="font-mono" style="color: var(--text-main);">DEVICE TELEMETRY ONLY</b></span>
           <span>SEQ: <b class="font-mono" style="color: var(--text-main);" id="badge-seq">NO DATA</b></span>
           <span>UPTIME: <b class="font-mono" style="color: var(--text-main);" id="badge-uptime">NO DATA</b></span>
         </div>
@@ -1311,6 +1312,13 @@
             &middot; <a href="https://data.mendeley.com/datasets/mpn45f4gxc/1" target="_blank">CC BY 4.0 derived feature record</a>
             &middot; <a href="https://doi.org/10.1109/TR.2018.2882682" target="_blank">Wang et al., IEEE TR 2020</a>
           </p>
+          <p style="margin-top:10px">
+            A separately sourced benchmark on four documented
+            <a href="https://data.nasa.gov/dataset/ims-bearings" target="_blank">NASA IMS</a>
+            failed bearings is reported in <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/ml/rul_nasa_ims_report.json" target="_blank">ml/rul_nasa_ims_report.json</a>
+            under the same <span class="font-mono">BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED</span>
+            label. Its minutes are nominal recorded cadence, not wall-clock operating hours.
+          </p>
         </div>
         <div>
           <h2>Source &amp; licence evidence</h2>
@@ -1321,8 +1329,8 @@
             <tbody>
               <tr>
                 <th>XJTU-SY</th>
-                <td>Public run-to-failure bearings; citation requested by the publisher.</td>
-                <td><span class="provenance-need">[NEED: explicit reuse licence]</span>; no temperature or acoustic channels.</td>
+                <td>Official page: "anyone can use them to validate prognostics algorithms"; citation requested.</td>
+                <td><span class="provenance-need">[NEED: explicit reuse licence]</span> (SPDX name); no temperature or acoustic channels.</td>
               </tr>
               <tr>
                 <th>Derived features</th>
@@ -1331,19 +1339,30 @@
               </tr>
               <tr>
                 <th>FEMTO / PRONOSTIA</th>
-                <td><a href="https://doi.org/10.6084/m9.figshare.30595484.v1" target="_blank">Public combined copy</a> reported CC BY 4.0 by the figshare API.</td>
-                <td><span class="provenance-need">[NEED: explicit FEMTO-ST licence]</span>; 20 g stop rule is challenge-defined.</td>
+                <td><a href="https://raw.githubusercontent.com/Lucky-Loek/ieee-phm-2012-data-challenge-dataset/master/IEEEPHM2012-Challenge-Details.pdf" target="_blank">Challenge PDF</a>: datasets "made publicly available", citation requested; <a href="https://doi.org/10.6084/m9.figshare.30595484.v1" target="_blank">combined copy</a> CC BY 4.0.</td>
+                <td><span class="provenance-need">[NEED: explicit FEMTO-ST licence]</span> (SPDX name); 20 g stop rule is challenge-defined.</td>
               </tr>
               <tr>
                 <th>CWRU / Reliance</th>
-                <td><a href="https://engineering.case.edu/bearingdatacenter" target="_blank">Bearing Data Center</a>: 2 hp Reliance Electric motor; EDM-seeded faults; site terms "AS IS".</td>
+                <td><a href="https://engineering.case.edu/bearingdatacenter" target="_blank">Bearing Data Center</a>: 2 hp Reliance Electric motor; EDM-seeded faults. Derived <a href="https://doi.org/10.5281/zenodo.10986655" target="_blank">Zenodo copy</a>: CC BY 4.0.</td>
                 <td><span class="provenance-need">[NEED: CWRU licence; exact catalogue number]</span>; no run-to-failure endpoint.</td>
+              </tr>
+              <tr>
+                <th>NASA IMS</th>
+                <td><a href="https://data.nasa.gov/dataset/ims-bearings" target="_blank">NASA Open Data Portal</a> metadata names <a href="https://www.usa.gov/government-works" target="_blank">US Government Work</a>; three real bearing run-to-failure tests.</td>
+                <td>Not our motor; failure endpoint is dataset-defined, not operator sign-off.</td>
               </tr>
             </tbody>
           </table>
           <p style="margin-top:10px">
             Full evidence: <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/docs/DATA_PROVENANCE_LICENSES.md" target="_blank">DATA_PROVENANCE_LICENSES.md</a>
             &middot; <a href="https://github.com/ammar0xff/capstone-pdm/blob/main/docs/REAL_MOTOR_READINESS.md" target="_blank">REAL_MOTOR_READINESS.md</a>
+          </p>
+          <p style="margin-top:10px">
+            Device-only rule: <b>REMOVE SIMULATOR, ALL FROM DEVICE</b>. Simulator
+            uplink tools are retired; absent, null or stale readings stay
+            <span class="font-mono">NO DATA</span> / <span class="font-mono">AWAITING DATA</span>
+            rather than being labelled as device telemetry.
           </p>
         </div>
       </section>

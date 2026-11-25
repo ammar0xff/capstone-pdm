@@ -101,3 +101,6 @@
 - [x] P28 Add the labelled benchmark and licence-evidence panel to the hosted dashboard, convert the three hosted pages to light mode, and guard with tests
 - [x] P29 Link the new benchmark/provenance evidence from README, plan, file map, AI report, register, review pack and Pi evidence; rerun full suite and browser checks
 - [x] P30 Check Firebase CLI auth, complete approved OAuth sign-in if needed, deploy the verified hosted site and report the live URL
+- [ ] P31 Add a second trusted public run-to-failure benchmark (NASA IMS bearings, University of Cincinnati via NASA Open Data) with source hash, label, tests and honest metrics; keep NOT OUR MOTOR / NOT FIELD-VALIDATED
+- [ ] P32 Fetch and quote explicit licence/public-use evidence for XJTU-SY, FEMTO-ST, CWRU and NASA IMS; keep `[NEED: ...]` for SPDX names and the Reliance catalogue number
+- [ ] P33 User wording: "REMOVE SIMULATOR, ALL FROM DEVICE" — retire `edge/stream_live.py` so no simulator can write RTDB, label hosted telemetry as device-only (unknown/stale = `NO DATA`), guard with tests, then commit/push, deploy and apply to the Pi with backups

@@ -421,3 +421,52 @@ or acoustic channel exists in this record, so it cannot validate those sensors.
 Runtime diagnosis, Stage-1/Stage-2 behaviour, Firebase state, Pi files and
 dependencies are unchanged. Source and licence evidence for XJTU-SY, FEMTO-ST,
 CWRU and the Reliance motor is in `docs/DATA_PROVENANCE_LICENSES.md`.
+
+## 14. Third public run-to-failure benchmark — NASA IMS (not our motor)
+
+The licence/public-use review also identified the University of Cincinnati IMS
+/ Rexnord tests hosted by NASA Open Data. Four failed bearings are documented in
+the archive README: set 1 bearing 3 (inner race), set 1 bearing 4 (rolling
+element), set 2 bearing 1 (outer race) and set 3 bearing 3 (outer race).
+
+| Item | Value |
+|---|---|
+| Portal | `https://data.nasa.gov/dataset/ims-bearings` |
+| Archive | `https://data.nasa.gov/docs/legacy/IMS.zip`, SHA-256 `6cb42c263b0281c725abf99f4b9fcf49915c949f31dbd2333877dc2e06ce9ec2` |
+| Licence evidence | Portal metadata `license = https://www.usa.gov/government-works`; page also displays `other-license-specified` |
+| Required citation | Qiu, Lee and Lin, Journal of Sound and Vibration 289 (2006) 1066-1090 |
+| Local data | `data/nasa_ims/failed_bearings.csv`, 11,620 derived one-second 20 kHz snapshots; `manifest.json` records the file hash, source hash, labels and counts |
+
+`ml/nasa_ims_features.py` regenerates the compact record by streaming one RAR
+member at a time with the already-installed `unrar`. No new dependency and no
+bulk extraction of the roughly 6.5 GB raw text are required. The published set-3
+archive contains 6,324 snapshots although the README PDF describes 4,448; the
+archive listing is used and the discrepancy is recorded, not silently resolved.
+
+The evaluator normalises mean log RMS by each bearing's own first 10% of
+snapshots, fits the trailing 40-snapshot trend, extrapolates to the
+75th-percentile terminal health of the other bearings, caps the prediction at
+twice their median nominal duration and scores the last 20% of each held
+bearing with leave-one-bearing-out validation (2,328 windows).
+The endpoint is the dataset's last published snapshot, not operator sign-off.
+
+| Result | Value |
+|---|---:|
+| Tail-window MAE | **9165.28 min** |
+| Tail-window RMSE | **12531.9 min** |
+| Constant-baseline tail-window MAE | 17011.8 min |
+| Constant-baseline tail-window RMSE | 17382.2 min |
+
+The trend and constant-baseline results are both reported as measured; the
+model was not tuned to win. Minutes are nominal recorded cadence (5 for the
+first 43 set-1 snapshots, then 10), not wall-clock operating hours. No
+temperature or acoustic channel exists in this source. `BENCHMARK / NOT OUR
+MOTOR / NOT FIELD-VALIDATED` is printed in `ml/rul_nasa_ims_report.json`; no
+number here is hours-to-failure for our motor. `tests/test_rul_nasa_ims.py`
+checks the source and manifest hashes, snapshot counts, labels, causality,
+baseline reporting, CLI reproducibility and honest label. Reproduce with:
+
+```
+python3 ml/nasa_ims_features.py --zip /path/IMS.zip --out data/nasa_ims/failed_bearings.csv
+python3 ml/rul_nasa_ims.py --report /tmp/rul_nasa_ims_report.json
+```

@@ -1,0 +1,76 @@
+{
+  "bearings": [
+    {
+      "channels": [
+        4,
+        5
+      ],
+      "failure": "inner race",
+      "id": "s1_b3",
+      "set": "1st_test",
+      "snapshots": 2156
+    },
+    {
+      "channels": [
+        6,
+        7
+      ],
+      "failure": "rolling element",
+      "id": "s1_b4",
+      "set": "1st_test",
+      "snapshots": 2156
+    },
+    {
+      "channels": [
+        0
+      ],
+      "failure": "outer race",
+      "id": "s2_b1",
+      "set": "2nd_test",
+      "snapshots": 984
+    },
+    {
+      "channels": [
+        2
+      ],
+      "failure": "outer race",
+      "id": "s3_b3",
+      "set": "3rd_test",
+      "snapshots": 6324
+    }
+  ],
+  "features": {
+    "failed_bearings.csv": {
+      "columns": [
+        "set",
+        "bearing",
+        "failure",
+        "snapshot",
+        "minutes",
+        "timestamp",
+        "rms1",
+        "kurt1",
+        "rms2",
+        "kurt2"
+      ],
+      "derivation": "ml/nasa_ims_features.py (streamed unrar, no bulk extraction)",
+      "rows": 11620,
+      "sha256": "bea57b5ba1fc81c39adda9d550f4a3d39402cbb26bb0ed5c06e0fcba98a7d77d"
+    }
+  },
+  "limits": [
+    "BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED",
+    "Minutes are nominal recorded cadence (5 for first 43 snapshots of set 1, then 10), not wall-clock operating hours",
+    "Endpoint is the last published snapshot of each documented failed-bearing test",
+    "Temperature and acoustic channels are not present in this source"
+  ],
+  "source": {
+    "archive_sha256": "6cb42c263b0281c725abf99f4b9fcf49915c949f31dbd2333877dc2e06ce9ec2",
+    "archive_url": "https://data.nasa.gov/docs/legacy/IMS.zip",
+    "citation": "Qiu, Lee and Lin, Journal of Sound and Vibration 289 (2006) 1066-1090",
+    "dataset": "NASA IMS Bearings, University of Cincinnati IMS / Rexnord",
+    "license_evidence": "https://www.usa.gov/government-works",
+    "license_note": "portal also displays other-license-specified; both facts quoted",
+    "portal_url": "https://data.nasa.gov/dataset/ims-bearings"
+  }
+}

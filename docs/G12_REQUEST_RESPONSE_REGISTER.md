@@ -23,12 +23,12 @@
 | 8 | تشغيل ملفات الراسبري تلقائياً وهل كل ملف مرفوع يعمل؟ | ✅ تم | §8 يشرح systemd والـ enable عند الإقلاع ويوضح أن ليس كل ملف يعمل | §8 أدناه; `edge/*.service`; `docs/PI_DEPLOYMENT_EVIDENCE.md:5-13` | لا شيء محلياً |
 | 9 | تأكيد إزالة أوبشنز الحالات الأربعة وبيانات الـ simulation | ✅ تم | أُزيلت أدوات المحاكاة من الداشبورد، ويوجد اختبار يمنع رجوعها | `public/index.html`; `tests/test_evaluation.py::TeamFollowUpTest::test_dashboard_has_no_simulation_controls` | لا شيء محلياً |
 | 10 | تجهيز جداول النتائج الإجمالية قبل المعرض | ✅ تم | §10 يحدد أماكن جداول Totals وطريقة إعادة إنتاجها | §10 أدناه; `ml/ai_report.md` §5.4–§5.5; `docs/CAPSTONE_MASTER_HANDBOOK.md` §5.3, §10 | لا شيء محلياً؛ النتائج صناعية فقط |
-| 11 | التيست الحقيقي على موتور ثم prediction/RUL (لينكي MathWorks) | ◐ جزئي | كُتب بروتوكول الاختبار؛ أُضيف benchmark على NASA C-MAPSS FD001 (محاكاة) وbenchmarks على محامل حقيقية من PRONOSTIA/FEMTO-ST وXJTU-SY (15 مساراً) مع validation بفصل المحمل؛ الداشبورد يعرض رقم XJTU-SY موسوماً `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`؛ مسار جاهز لموتورنا عبر `ml/rul_from_rig.py` لكن الـ RUL الميداني لسه متوقف على البيانات | §11 أدناه; `docs/REAL_MOTOR_READINESS.md`; `docs/DATA_PROVENANCE_LICENSES.md`; `ml/ai_report.md` §10–§13; `data/pronostia/README.md`; `data/xjtu_sy_mendeley/README.md` | `[NEED: motor rig access, calibrated raw readings, run-to-failure series from our rig]`; `[NEED: operator-accepted failure endpoint and reviewed metric report]` |
+| 11 | التيست الحقيقي على موتور ثم prediction/RUL (لينكي MathWorks) | ◐ جزئي | كُتب بروتوكول الاختبار؛ أُضيف benchmark على NASA C-MAPSS FD001 (محاكاة) وbenchmarks على محامل حقيقية من PRONOSTIA/FEMTO-ST وXJTU-SY (15 مساراً) وNASA IMS (أربعة محامل فاشلة موثّقة) مع validation بفصل المحمل؛ الداشبورد يعرض رقم XJTU-SY موسوماً `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`؛ مسار جاهز لموتورنا عبر `ml/rul_from_rig.py` لكن الـ RUL الميداني لسه متوقف على البيانات | §11 أدناه; `docs/REAL_MOTOR_READINESS.md`; `docs/DATA_PROVENANCE_LICENSES.md`; `ml/ai_report.md` §10–§14; `data/pronostia/README.md`; `data/xjtu_sy_mendeley/README.md`; `data/nasa_ims/README.md` | `[NEED: motor rig access, calibrated raw readings, run-to-failure series from our rig]`; `[NEED: operator-accepted failure endpoint and reviewed metric report]` |
 | 12 | الرد سريعاً لأن الشغل مكمل «بكرة» | — لا ينطبق | لا يوجد تاريخ قابل للتحقق؛ اعتُبر كأولوية لا كطلب هندسي | `/tmp/opencode/textinstinct_chat.txt:1258-1260` | `[NEED: actual exhibition date if a deadline must be quoted]` |
 | 13 | مخرجات أكثر تدرّجاً + مكان المشكلة وتكلفتها ومدة بقاء الموتور | ◐ جزئي | يوجد `response_plan` بأربع أولويات وإجراءات، لكن المدد ثابتة لكل فئة وليست تنبؤاً؛ لا تكلفة ولا زمن بقاء مقيسان. مسار `ml/rul_from_rig.py` جاهز لاستبدال ذلك بـ RUL متعلّم بعد بيانات ريجنا | `ml/rf_predictor.py:37-72`; `edge/edge_daq.py:604`; `ml/ai_report.md` §5.5; `docs/REAL_MOTOR_READINESS.md` | `[NEED: degradation curve, part prices, downtime cost and failure labels]` |
 
 **الخلاصة:** كل ما يمكن تنفيذه محلياً دون قياس فيزيائي أُنجز. أُضيف RUL على محامل
-حقيقية عامة (PRONOSTIA وXJTU-SY) لكنه ليس على موتورنا، ومسار `ml/rul_from_rig.py`
+حقيقية عامة (PRONOSTIA وXJTU-SY وNASA IMS) لكنه ليس على موتورنا، ومسار `ml/rul_from_rig.py`
 جاهز لتقييم وتدريب وتنبؤ RUL فور وصول بيانات ريجنا. البند 6 والجزء المتعلق بـ
 RUL/التكلفة من 11 و13 تبقى متوقفة على بيانات/قياسات من ريجنا؛ لم يُملأ أي منها
 بقيم مخترعة. أدلة المصادر والرخص في `docs/DATA_PROVENANCE_LICENSES.md`، وما لا
@@ -208,6 +208,17 @@ restating any resource-saving claim]`
   معلومة صراحةً: `[NEED: explicit XJTU-SY reuse licence]`؛ أدلة المصادر والرخص
   كلها في `docs/DATA_PROVENANCE_LICENSES.md`، ولا نهاية مسار عام تُعدّ تأكيد
   مشغّل على فشل ريجنا.
+- وبناءً على طلب مصدر موثوق إضافي، جُلبت تجارب **NASA IMS** لمحامل
+  جامعة سينسيناتي/ريكسنورد من بوابة NASA Open Data (هاش الأرشيف
+  `6cb42c263b0281c725abf99f4b9fcf49915c949f31dbd2333877dc2e06ce9ec2`)، وُثّقت
+  4 حالات فشل موثّقة في README الأرشيف داخل `data/nasa_ims/` مع 11,620 لقطة
+  مختصرة. الكود `ml/rul_nasa_ims.py` والتقرير `ml/rul_nasa_ims_report.json`:
+  على آخر 20% من كل محمل محجوز جاء **MAE 9165.28 دقيقة وRMSE
+  12531.9 دقيقة** مقابل **RMSE 17382.2** للـ baseline الثابت
+  (2,328 نافذة). الدقائق دي cadence تسجيل اسمي **مش** ساعات بقاء
+  لموتورنا، ونهاية المسار المنشورة **مش** تأكيد مشغّل. بوابة NASA بتذكر
+  `https://www.usa.gov/government-works` ومعروضة كمان كـ `other-license-specified`
+  والرخصتين مقولتين كما هما في `docs/DATA_PROVENANCE_LICENSES.md`.
 - استجابةً لطلب «لو عندنا الموتور، المشروع هيبقى predictive maintenance كامل؟»
   أُضيف مسار جاهز على الجهاز المضيف فقط: `ml/rul_from_rig.py` يقرأ CSV من
   `edge/edge_daq.py` بعد إضافة `failure_timestamp` من المشغّل، يبني نوافذ

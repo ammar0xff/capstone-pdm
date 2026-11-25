@@ -106,7 +106,7 @@ intelligent-raman/
 │   └── feature_importance.png       # Gini impurity feature importance bar chart
 │
 ├── public/
-│   ├── index.html                   # Global live telemetry dashboard with hardware offline detection & simulator
+│   ├── index.html                   # Global live telemetry dashboard, device telemetry only
 │   ├── guide.html                   # 12-slide interactive exhibition presentation deck (viewport responsive)
 │   ├── calibration.html             # Interactive metrology suite, 6-face tilt widget, and printable certificate
 │   ├── windows.csv                  # Mirrored dataset accessible for web clients

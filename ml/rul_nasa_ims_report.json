@@ -1,0 +1,93 @@
+{
+  "constant_baseline_tail_windows": {
+    "mae_min": 17011.804,
+    "rmse_min": 17382.217
+  },
+  "data": {
+    "bearings": [
+      "s1_b3",
+      "s1_b4",
+      "s2_b1",
+      "s3_b3"
+    ],
+    "columns_not_available": [
+      "temperature",
+      "sound_db",
+      "sound_zcr",
+      "sound_rms"
+    ],
+    "columns_used": [
+      "RMS of selected 20 kHz vibration channels (20,480 samples per snapshot)"
+    ],
+    "n_bearings": 4,
+    "n_snapshots": 11620,
+    "rul_endpoint": "last published snapshot of each documented failed-bearing test (dataset-defined end of test)",
+    "snapshot_period_min": "5 for the first 43 snapshots of set 1, then 10; nominal recorded cadence, not wall-clock operating hours"
+  },
+  "label": "BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED",
+  "method": {
+    "baseline": "constant median nominal duration of the other bearings",
+    "causal": true,
+    "indicator": "mean log RMS across selected channels minus the bearing's own first 10% median (causal normalisation)",
+    "prediction_cap_minutes": "2 x median nominal duration of the other bearings; no field basis",
+    "tail_fraction": 0.2,
+    "terminal_health_percentile_from_training_bearings": 75.0,
+    "trend_window_snapshots": 40,
+    "validation": "leave-one-bearing-out; last 20% of the held bearing's snapshots"
+  },
+  "per_bearing": {
+    "s1_b3": {
+      "failure": "inner race",
+      "nominal_duration_min": 21335.0,
+      "predicted_last_rul_min": 25.147,
+      "snapshots": 2156,
+      "tail_windows": 432
+    },
+    "s1_b4": {
+      "failure": "rolling element",
+      "nominal_duration_min": 21335.0,
+      "predicted_last_rul_min": 381.646,
+      "snapshots": 2156,
+      "tail_windows": 432
+    },
+    "s2_b1": {
+      "failure": "outer race",
+      "nominal_duration_min": 9830.0,
+      "predicted_last_rul_min": 21335.0,
+      "snapshots": 984,
+      "tail_windows": 198
+    },
+    "s3_b3": {
+      "failure": "outer race",
+      "nominal_duration_min": 63230.0,
+      "predicted_last_rul_min": 0.0,
+      "snapshots": 6324,
+      "tail_windows": 1266
+    }
+  },
+  "readiness": {
+    "hours_to_failure_for_our_rig": null,
+    "not_field_validated": true,
+    "not_our_motor": true,
+    "operator_action_required": true,
+    "runtime_or_dashboard_claim_changed": false
+  },
+  "source": {
+    "archive_sha256": "6cb42c263b0281c725abf99f4b9fcf49915c949f31dbd2333877dc2e06ce9ec2",
+    "archive_url": "https://data.nasa.gov/docs/legacy/IMS.zip",
+    "citation": "Qiu, H., Lee, J. and Lin, J. (2006) Wavelet Filter-based Weak Signature Detection Method and its Application on Roller Bearing Prognostics. Journal of Sound and Vibration 289, 1066-1090.",
+    "dataset": "NASA IMS Bearings run-to-failure tests (University of Cincinnati IMS / Rexnord)",
+    "field_validation": false,
+    "license_evidence": "https://www.usa.gov/government-works",
+    "license_note": "portal metadata names US Government Work; page displays other-license-specified",
+    "operator_confirmed_failure": false,
+    "our_motor": false,
+    "portal_url": "https://data.nasa.gov/dataset/ims-bearings"
+  },
+  "status": "benchmark_complete",
+  "tail_windows": {
+    "mae_min": 9165.276,
+    "n_windows": 2328,
+    "rmse_min": 12531.872
+  }
+}
