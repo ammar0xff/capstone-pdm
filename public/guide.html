@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="G12 capstone exhibition deck: Raspberry Pi condition monitoring, honest four-class diagnosis and public real-bearing RUL benchmarks.">
   <title>STEM Exhibition Presentation | Intelligent Industrial Predictive Maintenance</title>
   
   <!-- Fonts & Typography -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- KaTeX for Scientific & Mathematical Equations -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
@@ -19,7 +20,7 @@
   <style>
     :root {
       --bg-dark: #040711;
-      --bg-card: rgba(13, 20, 38, 0.78);
+      --bg-card: rgba(13, 20, 38, 0.96);
       --bg-card-hover: rgba(22, 33, 62, 0.88);
       --border: rgba(255, 255, 255, 0.08);
       --border-accent: rgba(6, 182, 212, 0.45);
@@ -42,10 +43,14 @@
       padding: 0;
     }
 
+    button {
+      font-family: inherit;
+    }
+
     body {
       background-color: var(--bg-dark);
       color: var(--text-main);
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Oxanium', sans-serif;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -77,9 +82,7 @@
       left: 0;
       right: 0;
       height: 56px;
-      background: rgba(8, 14, 28, 0.85);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: rgba(8, 14, 28, 0.97);
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
@@ -147,6 +150,7 @@
       border: 1px solid var(--border);
       color: var(--text-main);
       padding: 6px 12px;
+      min-height: 28px;
       border-radius: 8px;
       font-size: 12px;
       font-weight: 600;
@@ -156,7 +160,6 @@
       gap: 6px;
       transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
       text-decoration: none;
-      backdrop-filter: blur(8px);
     }
 
     .btn:hover {
@@ -204,7 +207,7 @@
 
     .progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, var(--cyan), var(--blue), var(--purple));
+      background: var(--cyan);
       width: 8.33%;
       transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       box-shadow: 0 0 10px rgba(6, 182, 212, 0.7);
@@ -248,8 +251,6 @@
       border-radius: clamp(14px, 2vh, 22px);
       padding: clamp(14px, 2.6vh, 32px) clamp(18px, 2.8vw, 42px);
       box-shadow: 0 24px 56px -12px rgba(0,0,0,0.7), inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(28px);
-      -webkit-backdrop-filter: blur(28px);
       position: relative;
       display: none;
       flex-direction: column;
@@ -280,7 +281,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      font-size: clamp(9px, 1.1vh, 11px);
+      font-size: clamp(10px, 1.3vh, 12px);
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.1em;
@@ -294,27 +295,27 @@
     }
 
     .slide-title {
-      font-size: clamp(18px, 2.7vh, 31px);
+      font-size: clamp(28px, 5.2vh, 52px);
       font-weight: 900;
-      line-height: 1.18;
+      line-height: 1.1;
       margin-bottom: clamp(3px, 0.7vh, 8px);
       letter-spacing: -0.025em;
-      background: linear-gradient(135deg, #ffffff 40%, #cbd5e1 75%, var(--cyan) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: var(--text-main);
+      text-wrap: balance;
     }
 
     .slide-subtitle {
-      font-size: clamp(11px, 1.4vh, 14px);
+      font-size: clamp(13px, 1.9vh, 17px);
       color: var(--text-muted);
       line-height: 1.45;
       margin-bottom: clamp(8px, 1.6vh, 20px);
+      max-width: 68ch;
     }
 
     /* Grids */
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(10px, 1.5vh, 20px); }
     .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(8px, 1.4vh, 18px); }
-    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(8px, 1.2vh, 16px); }
+    .grid-4 { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: clamp(8px, 1.2vh, 16px); }
 
     .mt-responsive { margin-top: clamp(8px, 1.6vh, 20px); }
     .mt-sm-responsive { margin-top: clamp(6px, 1.1vh, 14px); }
@@ -351,7 +352,7 @@
     }
 
     .card-desc {
-      font-size: clamp(10.5px, 1.3vh, 12.5px);
+      font-size: clamp(12px, 1.6vh, 13.5px);
       color: var(--text-muted);
       line-height: 1.45;
       margin-top: clamp(3px, 0.6vh, 6px);
@@ -359,14 +360,18 @@
 
     /* Metric Display Units */
     .stat-box {
-      background: rgba(6, 182, 212, 0.04);
-      border: 1px solid rgba(6, 182, 212, 0.2);
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: clamp(10px, 1.4vh, 14px);
       padding: clamp(10px, 1.5vh, 16px) 8px;
       text-align: center;
       transition: all 0.3s ease;
       position: relative;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
     }
 
     .stat-box:hover {
@@ -378,29 +383,56 @@
 
     .stat-number {
       font-family: 'JetBrains Mono', monospace;
-      font-size: clamp(22px, 3.2vh, 34px);
+      font-size: clamp(20px, 2.6vh, 26px);
       font-weight: 900;
-      color: var(--cyan-bright);
+      color: var(--text-main);
       margin-bottom: 2px;
       letter-spacing: -0.03em;
     }
 
+    .stat-hero {
+      border-color: rgba(6, 182, 212, 0.45);
+      background: rgba(6, 182, 212, 0.07);
+    }
+
+    .stat-hero .stat-number {
+      font-size: clamp(28px, 4.2vh, 40px);
+      color: var(--cyan-bright);
+    }
+
     .stat-label {
-      font-size: clamp(9.5px, 1.1vh, 11px);
+      font-size: clamp(10px, 1.3vh, 12px);
       text-transform: uppercase;
       font-weight: 800;
       color: var(--text-muted);
       letter-spacing: 0.06em;
+      min-height: 2.2em;
     }
 
     .stat-tag {
       display: inline-block;
-      font-size: clamp(8.5px, 1vh, 9.5px);
+      font-size: 11px;
       font-weight: 800;
       padding: 2px 5px;
       border-radius: 4px;
       margin-top: 3px;
       font-family: 'JetBrains Mono', monospace;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #cbd5e1;
+    }
+
+    .grand-callout .card-desc {
+      max-width: 80ch;
+    }
+
+    @media (min-width: 861px) {
+      .grand-callout {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        gap: 16px;
+        align-items: start;
+      }
     }
 
     /* Flow Step Row */
@@ -434,6 +466,12 @@
     }
 
     /* Tables */
+    .table-scroll {
+      max-width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
     .pdm-table {
       width: 100%;
       border-collapse: collapse;
@@ -499,7 +537,6 @@
       border: 1px solid rgba(255,255,255,0.12);
       padding: 5px 12px;
       border-radius: 30px;
-      backdrop-filter: blur(24px);
       box-shadow: 0 10px 28px rgba(0,0,0,0.6), 0 0 16px rgba(6, 182, 212, 0.15);
       z-index: 100;
     }
@@ -531,9 +568,12 @@
       color: var(--text-main);
       cursor: pointer;
       padding: 3px 6px;
+      min-width: 28px;
+      min-height: 28px;
       font-size: 11px;
       display: flex;
       align-items: center;
+      justify-content: center;
       transition: color 0.2s ease;
     }
 
@@ -548,8 +588,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(16px);
+      background: rgba(0,0,0,0.92);
       display: none;
       align-items: center;
       justify-content: center;
@@ -659,22 +698,73 @@
 
     /* Low-Height Laptop Display Optimizations (e.g. 1366x768 or 1280x720) */
     @media (max-height: 768px) {
-      .slide-title { font-size: 24px !important; }
       .slide-subtitle { margin-bottom: 12px !important; }
-      .stat-number { font-size: 26px !important; }
       .feature-card { padding: 10px 14px !important; }
-      .card-desc { font-size: 11px !important; }
       .pdm-table th, .pdm-table td { padding: 4px 8px !important; font-size: 10.5px !important; }
       .waveform-card { padding: 4px !important; }
       .waveform-card svg { height: 24px !important; }
     }
 
     @media (max-width: 860px) {
-      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .table-scroll .pdm-table { min-width: 0; display: block; }
+      .table-scroll .pdm-table thead { display: none; }
+      .table-scroll .pdm-table tbody,
+      .table-scroll .pdm-table tr,
+      .table-scroll .pdm-table td { display: block; width: 100%; }
+      .table-scroll .pdm-table tr { padding: 8px 0; border-bottom: 1px solid var(--border); }
+      .table-scroll .pdm-table td { border: 0; padding: 3px 4px; font-size: 12px; }
+      .table-scroll .pdm-table tr:hover td { background: transparent; }
+      .table-scroll .pdm-table td::before {
+        content: "";
+        display: block;
+        margin-bottom: 2px;
+        color: var(--cyan-bright);
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .table-scroll .pdm-table td:nth-child(1)::before { content: "Requirement code"; }
+      .table-scroll .pdm-table td:nth-child(2)::before { content: "Parameter / metric"; }
+      .table-scroll .pdm-table td:nth-child(3)::before { content: "Official target"; }
+      .table-scroll .pdm-table td:nth-child(4)::before { content: "Measured result"; }
+      .table-scroll .pdm-table td:nth-child(5)::before { content: "Verification status"; }
+      .flow-arrow { display: none; }
+      body:not(.scroll-mode) .slide { overflow-y: auto; justify-content: flex-start; }
+      body:not(.scroll-mode) .slide > * { flex-shrink: 0; }
       .slide-title { font-size: 22px; }
-      .header-bar { padding: 0 12px; }
+      .slide-subtitle { font-size: 12px; max-width: 80ch; }
+      .card-desc { font-size: 13px; }
+      .chrome-only { display: none; }
+      .header-bar { padding: 0 10px; gap: 8px; }
+      .brand-badge, .live-indicator { white-space: nowrap; }
+      .brand-badge { padding: 2px 6px; font-size: 9px; }
+      .live-indicator { padding: 2px 6px; font-size: 10px; }
+      .nav-controls { gap: 6px; }
+      .btn, .slide-counter { padding: 4px 8px; font-size: 11px; }
       .brand-title { display: none; }
       .overview-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (min-width: 600px) and (max-width: 860px) {
+      .slide-title { font-size: 40px; }
+      .slide-subtitle { font-size: 15px; max-width: 80ch; }
+    }
+
+    @media (max-width: 480px) {
+      .btn-grid { display: none; }
+      .stat-hero .stat-number { font-size: 24px; white-space: nowrap; }
+      .stage-header { flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+      }
     }
   </style>
 </head>
@@ -702,20 +792,20 @@
     </div>
 
     <div class="nav-controls">
-      <button class="btn" onclick="openOverviewModal()" title="View all slides in a grid (G)">
+      <button class="btn btn-grid" onclick="openOverviewModal()" title="View all slides in a grid (G)">
         <i class="fa-solid fa-table-cells-large"></i> Grid
       </button>
-      <button class="btn" id="audioToggleBtn" onclick="toggleAudio()" title="Sound FX Toggle">
+      <button class="btn chrome-only" id="audioToggleBtn" onclick="toggleAudio()" title="Sound FX Toggle">
         <i class="fa-solid fa-volume-high" id="audioIcon"></i>
       </button>
-      <button class="btn" id="viewModeBtn" onclick="toggleViewMode()" title="Toggle between Slide Deck and Scroll View (S)">
+      <button class="btn chrome-only" id="viewModeBtn" onclick="toggleViewMode()" title="Toggle between Slide Deck and Scroll View (S)">
         <i class="fa-solid fa-list-check"></i> <span id="viewModeText">Scroll</span>
       </button>
-      <button class="btn" onclick="toggleFullScreen()" title="Fullscreen presentation (F)">
+      <button class="btn chrome-only" onclick="toggleFullScreen()" title="Fullscreen presentation (F)">
         <i class="fa-solid fa-expand"></i>
       </button>
       <div class="slide-counter" id="slideCounter">01 / 12</div>
-      <a href="calibration.html" class="btn" title="Open Sensor Calibration Suite">
+      <a href="calibration.html" class="btn chrome-only" title="Open Sensor Calibration Suite">
         <i class="fa-solid fa-compass-drafting" style="color: #10b981;"></i> Calibration
       </a>
       <a href="/" class="btn btn-primary" target="_blank" title="Open live machine telemetry">
@@ -738,38 +828,38 @@
         <div class="slide-tag"><i class="fa-solid fa-award"></i> Grade 12 STEM Capstone 2026/2027 &bull; Grand Challenge</div>
         <h1 class="slide-title">Intelligent Cyber-Physical System for Industrial Predictive Maintenance (PdM)</h1>
         <p class="slide-subtitle">
-          An offline-first, edge-computed multi-modal sensor fusion platform for rotating machinery fault diagnosis based on Shewhart Statistical Gating, Random Forest AI, and ISO 10816-3 standards.
+          An offline-first, edge-computed multi-modal sensor fusion platform for rotating machinery fault diagnosis, combining Shewhart statistical gating, Random Forest AI and published vibration-diagnostics references.
         </p>
 
         <div class="grid-4 mt-responsive">
-          <div class="stat-box">
-            <div class="stat-number" data-target="0.00" data-decimals="2">0.00</div>
-            <div class="stat-label">EGP Added Software Cost</div>
-            <span class="stat-tag badge-green">100% Free-Tier &amp; FOSS</span>
+          <div class="stat-box stat-hero">
+            <div class="stat-number">29.99 ms</div>
+            <div class="stat-label">Pi inference time</div>
+            <span class="stat-tag">One window</span>
           </div>
           <div class="stat-box">
-            <div class="stat-number" data-target="100" data-suffix="%">100%</div>
-            <div class="stat-label">Offline Autonomous</div>
-            <span class="stat-tag badge-blue">Local SQLite Buffer</span>
+            <div class="stat-number">3</div>
+            <div class="stat-label">Live sensor inputs</div>
+            <span class="stat-tag">Vibration · Temp · Sound</span>
           </div>
           <div class="stat-box">
-            <div class="stat-number" data-target="30.0" data-decimals="1" data-suffix=" ms">30.0 ms</div>
-            <div class="stat-label">Inference Latency (measured on Raspberry Pi 4)</div>
-            <span class="stat-tag badge-purple">300 Decision Trees</span>
+            <div class="stat-number">4</div>
+            <div class="stat-label">Diagnosis states</div>
+            <span class="stat-tag">Synthetic-trained</span>
           </div>
           <div class="stat-box">
-            <div class="stat-number" data-target="92.4" data-decimals="1" data-suffix="%">92.4%</div>
-            <div class="stat-label">Edge CPU Energy Saved</div>
-            <span class="stat-tag badge-amber">Shewhart SPC Gating</span>
+            <div class="stat-number">6</div>
+            <div class="stat-label">RUL bearing runs</div>
+            <span class="stat-tag">Public benchmark</span>
           </div>
         </div>
 
-        <div class="feature-card mt-responsive" style="border-left: 4px solid var(--cyan);">
+        <div class="feature-card mt-responsive grand-callout" style="border-left: 4px solid var(--cyan);">
           <div style="font-weight: 800; font-size: 14px; margin-bottom: 6px; color: var(--cyan);">
             <i class="fa-solid fa-flag"></i> National STEM Grand Challenge Alignment:
           </div>
           <p class="card-desc">
-            <b>Developing the Industrial Base of Egypt</b> &mdash; Replacing imported, expensive proprietary vibration monitoring systems (costing $3,000&ndash;$10,000 per motor) with a locally engineered, zero-licensing-cost edge AI cyber-physical unit that stops catastrophic factory downtime in Egyptian manufacturing plants.
+            <b>Developing the Industrial Base of Egypt</b> &mdash; A locally engineered edge-AI unit reports current machine state on a Raspberry Pi and mirrors it to Firebase when the link is available. Cost saving and avoided downtime were not measured.
           </p>
         </div>
       </section>
@@ -782,7 +872,7 @@
           Official Capstone Specification Requirement: <i>"Students must identify at least four measurable design requirements, including response time and system accuracy... and provide evidence."</i>
         </p>
 
-        <table class="pdm-table">
+        <div class="table-scroll"><table class="pdm-table">
           <thead>
             <tr>
               <th>Requirement Code</th>
@@ -797,32 +887,32 @@
               <td><b>MDR 1</b></td>
               <td><b>System Accuracy</b> (Fault Identification)</td>
               <td>$\ge 80.0\%$</td>
-              <td><b style="color: var(--green);">100.0%</b> (synthetic benchmark, run-disjoint Group 5-Fold CV)</td>
-              <td><span class="badge badge-green">PASSED (+20%)</span></td>
+              <td><b style="color: var(--green);">100.0%</b> on the synthetic generator benchmark, run-disjoint Group 5-Fold CV</td>
+              <td><span class="badge badge-amber">Synthetic only</span></td>
             </tr>
             <tr>
               <td><b>MDR 2</b></td>
               <td><b>System Response Time</b> (Shock to Alert)</td>
               <td>$&lt; 5.0\text{ seconds}$</td>
-              <td><b style="color: var(--cyan);">1.28 s</b> windowing + <b>30.0 ms</b> inference (measured on Pi)</td>
-              <td><span class="badge badge-green">PASSED (3.7s faster)</span></td>
+              <td>29.99 ms inference measured on Pi; end-to-end shock-to-alert not measured</td>
+              <td><span class="badge badge-amber">[NEED: timing test]</span></td>
             </tr>
             <tr>
               <td><b>MDR 3</b></td>
               <td><b>Edge Computational Efficiency</b> (CPU Savings)</td>
               <td>$&gt; 75.0\%$</td>
-              <td><b style="color: var(--amber);">92.4% reduction</b> via Shewhart SPC Gating</td>
-              <td><span class="badge badge-green">PASSED (+17.4%)</span></td>
+              <td>Statistical gate implemented; CPU/energy saving not measured</td>
+              <td><span class="badge badge-amber">[NEED: baseline]</span></td>
             </tr>
             <tr>
               <td><b>MDR 4</b></td>
               <td><b>Data Resiliency</b> (Network Dropout Loss)</td>
               <td>$0.0\%$ packet loss</td>
-              <td><b style="color: var(--purple);">0.0% loss</b> (100% recovered from SQLite buffer)</td>
-              <td><span class="badge badge-green">PASSED (Zero loss)</span></td>
+              <td>Local SQLite buffer and replay implemented; packet loss not measured in a field test</td>
+              <td><span class="badge badge-amber">[NEED: dropout test]</span></td>
             </tr>
           </tbody>
-        </table>
+        </table></div>
 
         <div class="feature-card mt-responsive">
           <div style="font-size: 13px; color: var(--text-muted);">
@@ -836,7 +926,7 @@
         <div class="slide-tag"><i class="fa-solid fa-triangle-exclamation"></i> Industrial Problem & Motivation</div>
         <h2 class="slide-title">The Real-World Crisis: Unplanned Factory Shutdowns</h2>
         <p class="slide-subtitle">
-          Electric induction motors drive over 70% of all mechanical power in industry. Their unexpected failure halts assembly lines and destroys profitability.
+          Unexpected induction-motor failures can stop a production line. This project reports measured condition changes locally so an operator can act before a fault is confirmed physically.
         </p>
 
         <div class="grid-3">
@@ -844,7 +934,7 @@
             <div class="card-icon" style="color: var(--red);"><i class="fa-solid fa-fire"></i></div>
             <div class="card-title">Reactive Maintenance</div>
             <div class="card-desc">
-              "Run it until it blows up." Destroys shafts, ruins production batches, creates factory fire hazards, and repair costs exceed planned maintenance by <b>up to 500%</b>.
+              "Run it until it fails." Can damage shafts and stop production. The cost impact was not measured in this project.
             </div>
           </div>
 
@@ -852,7 +942,7 @@
             <div class="card-icon" style="color: var(--amber);"><i class="fa-solid fa-calendar-xmark"></i></div>
             <div class="card-title">Preventive Maintenance</div>
             <div class="card-desc">
-              "Replace parts every 90 days on a calendar." Highly wasteful: studies show up to <b>80% of replaced bearings</b> were completely healthy. Technicians also induce assembly faults during unnecessary teardowns.
+              "Replace on a fixed calendar." Can replace parts that are still healthy and introduces assembly risk during unnecessary teardowns.
             </div>
           </div>
 
@@ -860,7 +950,7 @@
             <div class="card-icon" style="color: var(--green);"><i class="fa-solid fa-brain"></i></div>
             <div class="card-title">Our Predictive Paradigm</div>
             <div class="card-desc">
-              "Replace only when physical degradation is mathematically confirmed." Continuous multi-modal condition monitoring flags microscopic raceway spalling and mass imbalance weeks before catastrophic seizure.
+              "Act when the measured state changes." Continuous multi-modal monitoring reports the current class and lets the operator decide. Remaining life on our rig still needs our own run-to-failure data.
             </div>
           </div>
         </div>
@@ -871,7 +961,7 @@
         <div class="slide-tag"><i class="fa-solid fa-network-wired"></i> System Architecture</div>
         <h2 class="slide-title">End-to-End Cyber-Physical Architecture</h2>
         <p class="slide-subtitle">
-          A four-tier resilient design coupling embedded hardware, edge intelligence, resilient storage, and global serverless telemetry.
+          A four-tier design coupling the sensor rig, edge features and inference, local buffering, and a Firebase RTDB status mirror.
         </p>
 
         <div class="flow-row">
@@ -892,14 +982,14 @@
           <div class="flow-step" style="border-left: 3px solid var(--green);">
             <div style="font-weight: 700; color: var(--green); font-size: 13px;">3. RESILIENT STORAGE</div>
             <div style="font-size: 13px; margin-top: 4px;">Local Ring Buffer</div>
-            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Zero data loss on cut Wi-Fi</div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Local SQLite buffer and replay</div>
           </div>
           <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
 
           <div class="flow-step" style="border-left: 3px solid var(--purple);">
             <div style="font-weight: 700; color: var(--purple); font-size: 13px;">4. GLOBAL CLOUD</div>
             <div style="font-size: 13px; margin-top: 4px;">Firebase Realtime DB</div>
-            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Worldwide live phone dashboard</div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Firebase RTDB status mirror</div>
           </div>
         </div>
 
@@ -907,13 +997,13 @@
           <div class="feature-card">
             <b style="color: var(--cyan);"><i class="fa-solid fa-microchip"></i> Why Edge Computing over Pure Cloud?</b>
             <p class="card-desc">
-              Raw 100 Hz vibration sampling generates millions of records per hour. Streaming raw high-frequency waveforms to cloud APIs causes severe latency, costs thousands in egress fees, and fails when the internet drops. Edge DSP computes features locally (inference benchmarked at 30.0 ms on the Raspberry Pi 4).
+              Streaming every raw window would increase bandwidth and expose raw signals; an offline link would also break the live view. Features are computed on the Pi and lightweight status frames are mirrored. Inference was measured at 29.99 ms on the Raspberry Pi 4; cloud cost and end-to-end latency were not measured.
             </p>
           </div>
           <div class="feature-card">
             <b style="color: var(--green);"><i class="fa-solid fa-bolt"></i> The 0-EGP Cloud Philosophy</b>
             <p class="card-desc">
-              We engineered our telemetry around Google Firebase's generous Free Spark Tier. Non-blocking JSON streaming maintains sub-second synchronization worldwide without paying a single piastre in server fees.
+              Telemetry uses the Firebase Spark tier configured for this project; no paid server was added. Synchronisation latency and actual billing were not measured, so no cost or timing claim is made.
             </p>
           </div>
         </div>
@@ -928,94 +1018,27 @@
         </p>
 
         <div class="grid-2">
-          <div>
-            <div style="font-weight: 700; font-size: 13px; color: var(--cyan); margin-bottom: 6px;">
-              <i class="fa-solid fa-compass"></i> ADXL345 6-Position Static Gravitational Calibration
-            </div>
-            <table class="pdm-table" style="font-size: 12px;">
-              <thead>
-                <tr>
-                  <th>Axis</th>
-                  <th>$+1g$ Test</th>
-                  <th>$-1g$ Test</th>
-                  <th>$0g$ Offset ($b$)</th>
-                  <th>Scale Factor ($S$)</th>
-                  <th>Residual Error</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><b>X-Axis</b></td>
-                  <td>$+264$ LSB</td>
-                  <td>$-248$ LSB</td>
-                  <td>$+8.0$ LSB ($+0.031g$)</td>
-                  <td>$0.00391g$/LSB</td>
-                  <td><span class="badge badge-green">&plusmn; 0.25%</span></td>
-                </tr>
-                <tr>
-                  <td><b>Y-Axis</b></td>
-                  <td>$+259$ LSB</td>
-                  <td>$-253$ LSB</td>
-                  <td>$+3.0$ LSB ($+0.012g$)</td>
-                  <td>$0.00390g$/LSB</td>
-                  <td><span class="badge badge-green">&plusmn; 0.00%</span></td>
-                </tr>
-                <tr>
-                  <td><b>Z-Axis</b></td>
-                  <td>$+271$ LSB</td>
-                  <td>$-241$ LSB</td>
-                  <td>$+15.0$ LSB ($+0.058g$)</td>
-                  <td>$0.00392g$/LSB</td>
-                  <td><span class="badge badge-green">&plusmn; 0.51%</span></td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="feature-card">
+            <b style="color: var(--cyan);"><i class="fa-solid fa-compass"></i> ADXL345: six-face procedure</b>
+            <p class="card-desc">
+              <code>edge/calibrate.py</code> runs on the Raspberry Pi only. It collects the six ±g faces, validates the schema, writes <code>cal.json</code> atomically with a timestamped backup and a run log, then issues an honest certificate.
+            </p>
+            <p class="card-desc"><span class="badge badge-amber">REVIEW / UNVERIFIED</span></p>
           </div>
 
-          <div>
-            <div style="font-weight: 700; font-size: 13px; color: var(--amber); margin-bottom: 6px;">
-              <i class="fa-solid fa-temperature-half"></i> MAX6675 2-Point Thermal Reference Calibration
-            </div>
-            <table class="pdm-table" style="font-size: 12px;">
-              <thead>
-                <tr>
-                  <th>Reference Environment</th>
-                  <th>True Standard ($T_{\text{ref}}$)</th>
-                  <th>Measured ($T_{\text{meas}}$)</th>
-                  <th>Error (&Delta;T)</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><b>Ice-Water Equilibrium</b></td>
-                  <td>$0.0^\circ\text{C}$</td>
-                  <td>$+0.25^\circ\text{C}$</td>
-                  <td>$+0.25^\circ\text{C}$</td>
-                  <td><span class="badge badge-green">PASSED</span></td>
-                </tr>
-                <tr>
-                  <td><b>Regulated Room Temp</b></td>
-                  <td>$22.5^\circ\text{C}$</td>
-                  <td>$+22.75^\circ\text{C}$</td>
-                  <td>$+0.25^\circ\text{C}$ ($1.1\%$)</td>
-                  <td><span class="badge badge-green">PASSED</span></td>
-                </tr>
-                <tr>
-                  <td><b>Boiling Distilled Water</b></td>
-                  <td>$100.0^\circ\text{C}$</td>
-                  <td>$+99.50^\circ\text{C}$</td>
-                  <td>$-0.50^\circ\text{C}$ ($0.5\%$)</td>
-                  <td><span class="badge badge-green">PASSED</span></td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="feature-card">
+            <b style="color: var(--amber);"><i class="fa-solid fa-temperature-half"></i> MAX6675: two-point procedure</b>
+            <p class="card-desc">
+              The same runner supports a two-point thermal reference procedure. No operator-run, signed result is available, so no offset, scale factor or residual error is quoted here.
+            </p>
+            <p class="card-desc"><span class="badge badge-amber">REVIEW / UNVERIFIED</span></p>
           </div>
         </div>
 
-        <div class="feature-card mt-responsive">
+        <div class="feature-card mt-responsive" style="border-left: 4px solid var(--amber);">
           <div style="font-size: 13px; color: var(--text-muted);">
-            <b>Firmware Compensation:</b> Offset vectors are loaded directly into the edge acquisition daemon (`pdm-daq`), guaranteeing zero DC drift during continuous 24/7 operation.
+            <b>Status:</b> <code>[NEED: signed calibration run record]</code>. The runtime raw-measure script does not apply <code>cal.json</code> and does not write calibration state. Do not present calibration as PASS.
+            <br><b>Procedure:</b> <a href="calibration.html" style="color: var(--cyan);">calibration.html</a>
           </div>
         </div>
       </section>
@@ -1025,37 +1048,38 @@
         <div class="slide-tag"><i class="fa-solid fa-brain"></i> Edge Artificial Intelligence</div>
         <h2 class="slide-title">Two-Stage Coarse-to-Fine Inference Gating</h2>
         <p class="slide-subtitle">
-          Based on the Cyber-Physical System design by <b>Cinar et al. (2022)</b>: Continuous deep learning burns edge batteries; statistical gating saves &gt;90% of edge CPU cycles.
+          Based on the Cyber-Physical System design by <b>Cinar et al. (2022)</b>: a statistical gate avoids classifier calls during normal operation. CPU and energy savings were not measured on our rig.
         </p>
 
         <div class="grid-2">
           <div class="feature-card" style="border-top: 4px solid var(--green);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <span class="badge badge-green">STAGE 1: COARSE GATING</span>
-              <span style="font-size: 12px; color: var(--text-muted);">sub-ms by design (not benchmarked)</span>
+            <div class="stage-header" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <span class="badge badge-green" style="white-space: nowrap;">STAGE 1: COARSE GATING</span>
+              <span style="font-size: 12px; color: var(--text-muted);">gate timing not benchmarked</span>
             </div>
             <div class="card-title">Shewhart Statistical Process Control (SPC)</div>
             <p class="card-desc">
-              Tracks the rolling baseline mean ($\mu$) and variance ($\sigma$) of the machine. As long as the vibration envelope satisfies:
+              Tracks the rolling baseline mean ($\mu$) and variance ($\sigma$) of the machine. When the vibration envelope satisfies:
               <br><br>
               <code style="background: rgba(0,0,0,0.5); padding: 6px 10px; border-radius: 6px; color: var(--green); font-family: 'JetBrains Mono';">z = |x - &mu;| / &sigma; &le; 3.0</code>
               <br><br>
-              The machine is healthy. Heavy machine learning is <b>kept asleep</b>, saving power and thermal head.
+              the gate reports no anomaly and the classifier is not called. Power and thermal savings were not measured.
             </p>
           </div>
 
           <div class="feature-card" style="border-top: 4px solid var(--red);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-              <span class="badge badge-red">STAGE 2: FINE DIAGNOSTICS</span>
-              <span style="font-size: 12px; color: var(--text-muted);">30.0 ms on Pi; 26.2 ms host</span>
+            <div class="stage-header" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <span class="badge badge-red" style="white-space: nowrap;">STAGE 2: FINE DIAGNOSTICS</span>
+              <span style="font-size: 12px; color: var(--text-muted);">29.99 ms on Pi; 26.19 ms host</span>
             </div>
-            <div class="card-title">Ensemble Classifier (Random Forest / GBDT)</div>
+            <div class="card-title">Random Forest classifier</div>
             <p class="card-desc">
-              The moment Stage 1 detects a $3\sigma$ violation or Kurtosis shock, Stage 2 wakes up immediately to classify the exact failure fingerprint:
+              When Stage 1 detects a $3\sigma$ violation or kurtosis shock, Stage 2 classifies the current state:
               <br><br>
-              &bull; <b>Healthy (Class 0):</b> Normal operational baseline.<br>
-              &bull; <b>Mechanical Imbalance (Class 1):</b> $1\times$ RPM sinusoidal wave.<br>
-              &bull; <b>Bearing Defect (Class 2):</b> High Kurtosis micro-impact shocks.
+              &bull; <b>Healthy (Class 0):</b> normal baseline.<br>
+              &bull; <b>Mechanical Imbalance (Class 1):</b> $1\times$ RPM signature.<br>
+              &bull; <b>Bearing Defect (Class 2):</b> high-kurtosis impacts.<br>
+              &bull; <b>Thermal Runaway (Class 3):</b> sustained temperature rise.
             </p>
           </div>
         </div>
@@ -1064,9 +1088,9 @@
       <!-- SLIDE 7: FEATURE ENGINEERING & VIBRATION KINEMATICS -->
       <section class="slide" data-slide="7" data-theme="cyan">
         <div class="slide-tag"><i class="fa-solid fa-chart-line"></i> Physics & Waveform Kinematics</div>
-        <h2 class="slide-title">10 Mathematical Features & Diagnostic Physics</h2>
+        <h2 class="slide-title">Nine Input Features & Diagnostic Physics</h2>
         <p class="slide-subtitle">
-          Why our model doesn't guess: It learns the mechanical kinematics formalized by <b>Randall & Antoni (2011)</b> and <b>ISO 10816-3</b>.
+          The classifier uses features motivated by the vibration literature, including <b>Randall & Antoni (2011)</b>. These are model inputs, not field-calibrated failure thresholds.
         </p>
 
         <div class="grid-3">
@@ -1078,7 +1102,7 @@
               </svg>
             </div>
             <p class="card-desc">
-              Healthy vibration is Gaussian ($K \approx 3.0$). When a bearing ball strikes a microscopic pit, it produces microsecond impact spikes driving $K > 5.0$ to $15.0+$.
+              Kurtosis is the fourth standardised moment. In the synthetic generator, bearing-impact windows occupy a higher kurtosis range than healthy windows; no field threshold is claimed.
             </p>
           </div>
 
@@ -1091,24 +1115,22 @@
             </div>
             <p class="card-desc">
               $$CF = \frac{x_{\text{peak}}}{x_{\text{rms}}}$$
-              Ratio of peak amplitude to effective energy. Detects sharp impact spikes before overall RMS velocity climbs, serving as an early bearing wear indicator.
+              Peak divided by RMS. It highlights sharp impacts in the benchmark features; lead time before a real bearing fault was not measured.
             </p>
           </div>
 
           <div class="feature-card">
-            <b style="color: var(--green);">ISO 10816-3 Severity Zones</b>
-            <div style="margin-top: clamp(4px, 0.8vh, 8px); font-size: clamp(10.5px, 1.3vh, 12.5px); line-height: 1.5;">
-              <span class="badge badge-green">Zone A</span> &lt; 0.10g (Pristine)<br>
-              <span class="badge badge-blue">Zone B</span> &lt; 0.15g (Unrestricted)<br>
-              <span class="badge badge-amber">Zone C</span> 0.15 &ndash; 0.35g (Restricted)<br>
-              <span class="badge badge-red">Zone D</span> &gt; 0.35g (Catastrophic)
-            </div>
+            <b style="color: var(--green);">Standards as references</b>
+            <p class="card-desc">
+              ISO 20816 and ISO 10816-3 are cited as vibration-diagnostics background. Their zone values are <b>not</b> used as this rig's calibration constants or physical failure thresholds.
+            </p>
+            <p class="card-desc"><span class="badge badge-amber">[NEED: real operator failure threshold]</span></p>
           </div>
         </div>
 
         <div class="feature-card mt-responsive">
           <div style="font-size: 13px; color: var(--text-muted);">
-            <b>Complete 10-Dimensional Vector:</b> <code>[RMS, Peak-to-Peak, Variance, StdDev, Crest Factor, Shape Factor, Impulse Factor, Margin Factor, Kurtosis, Temperature]</code>.
+            <b>Nine Random Forest inputs:</b> <code>[rms_dyn, peak_dyn, crest_factor, kurtosis, temp_c, temp_slope, sound_rms, sound_db, sound_zcr]</code>. The SPC gate's <code>z_score</code> is derived from <code>rms_dyn</code> and is not an independent model input.
           </div>
         </div>
       </section>
@@ -1125,50 +1147,45 @@
           <table class="pdm-table">
             <thead>
               <tr>
-                <th>Model Architecture</th>
-                <th>Validation Accuracy</th>
-                <th>Pi Inference Time</th>
-                <th>Memory Footprint</th>
+                <th>Evidence</th>
+                <th>Measured / reproduced result</th>
+                <th>Scope</th>
               </tr>
             </thead>
             <tbody>
               <tr style="background: rgba(16, 185, 129, 0.08);">
-                <td><b>Random Forest (Ours)</b></td>
-                <td><b style="color: var(--green);">100.0%</b></td>
-                <td><b>30.0 ms (Pi, measured)</b></td>
-                <td><span class="badge badge-green">Ultra-Light (~2 MB)</span></td>
+                <td><b>Four-class diagnosis</b></td>
+                <td><b>100.0%</b> run-disjoint Group 5-Fold CV, 1,400 windows</td>
+                <td><span class="badge badge-amber">Synthetic only</span></td>
               </tr>
               <tr>
-                <td>Gradient Boosting (GBDT)</td>
-                <td>100.0%</td>
-                <td>3.4 ms</td>
-                <td><span class="badge badge-blue">Light (~4 MB)</span></td>
+                <td><b>Pi inference</b></td>
+                <td><b>29.99 ms</b> for one window on Raspberry Pi 4</td>
+                <td><span class="badge badge-blue">Measured; not end-to-end</span></td>
               </tr>
               <tr>
-                <td>Logistic Regression</td>
-                <td>91.2%</td>
-                <td>0.4 ms</td>
-                <td><span class="badge badge-green">Minimal (Linear)</span></td>
+                <td><b>C-MAPSS FD001 RUL</b></td>
+                <td>Official test RMSE <b>15.51</b>, MAE <b>11.51</b> cycles</td>
+                <td><span class="badge badge-amber">Simulated turbofan</span></td>
               </tr>
               <tr>
-                <td>1D-CNN (Deep Learning)</td>
-                <td>99.1%</td>
-                <td>28.5 ms</td>
-                <td><span class="badge badge-red">Heavy (~65 MB RAM)</span></td>
+                <td><b>PRONOSTIA RUL</b></td>
+                <td>Last-window MAE <b>182.91 s</b>, RMSE <b>335.26 s</b></td>
+                <td><span class="badge badge-amber">Real bearings, not our motor</span></td>
               </tr>
             </tbody>
           </table>
 
           <div class="feature-card">
-            <div class="card-title"><i class="fa-solid fa-download" style="color: var(--cyan);"></i> Official Exhibition Datasets & Evidence</div>
+            <div class="card-title"><i class="fa-solid fa-download" style="color: var(--cyan);"></i> Evidence you can open</div>
             <p class="card-desc">
-              Judges can click to inspect or download the original artifacts directly from our deployed system:
+              No alternative-model comparison was measured locally, so none is quoted. Inspect the synthetic benchmark artifacts and the generated windows:
             </p>
             <div style="display: flex; flex-direction: column; gap: clamp(4px, 0.8vh, 8px); margin-top: clamp(6px, 1vh, 12px);">
-              <a href="/windows.csv" download class="btn" style="font-size: 12px;"><i class="fa-solid fa-file-csv" style="color: var(--green);"></i> Download Training Dataset (windows.csv)</a>
-              <button onclick="openModal('confusion_matrix.png', 'Confusion Matrix (100% Sensitivity)')" class="btn" style="font-size: 12px;"><i class="fa-solid fa-image" style="color: var(--cyan);"></i> View Confusion Matrix (100% Sensitivity)</button>
-              <button onclick="openModal('roc_curves.png', 'Multi-Class ROC Curves (AUC = 1.00)')" class="btn" style="font-size: 12px;"><i class="fa-solid fa-chart-line" style="color: var(--purple);"></i> View ROC Curves (AUC = 1.00)</button>
-              <button onclick="openModal('feature_importance.png', 'Random Forest Gini Feature Importance')" class="btn" style="font-size: 12px;"><i class="fa-solid fa-ranking-star" style="color: var(--amber);"></i> View Feature Importance Plot</button>
+              <a href="/windows.csv" download class="btn" style="font-size: 12px;"><i class="fa-solid fa-file-csv" style="color: var(--green);"></i> Download synthetic windows.csv</a>
+              <button onclick="openModal('confusion_matrix.png', 'Confusion matrix — synthetic benchmark hold-out')" class="btn" style="font-size: 12px;"><i class="fa-solid fa-image" style="color: var(--cyan);"></i> View confusion matrix (synthetic)</button>
+              <button onclick="openModal('roc_curves.png', 'ROC curves — synthetic benchmark hold-out')" class="btn" style="font-size: 12px;"><i class="fa-solid fa-chart-line" style="color: var(--purple);"></i> View ROC curves (synthetic)</button>
+              <button onclick="openModal('feature_importance.png', 'Random Forest feature importance — synthetic benchmark')" class="btn" style="font-size: 12px;"><i class="fa-solid fa-ranking-star" style="color: var(--amber);"></i> View feature importance</button>
             </div>
           </div>
         </div>
@@ -1179,31 +1196,31 @@
         <div class="slide-tag"><i class="fa-solid fa-shield-halved"></i> Engineering Robustness</div>
         <h2 class="slide-title">Offline-First Resiliency: What If Internet Dies?</h2>
         <p class="slide-subtitle">
-          Industrial equipment cannot rely on fragile Wi-Fi. Our Cyber-Physical System continues operating even with Ethernet cables severed.
+          The Pi keeps sampling and deciding locally when the cloud link is unavailable. Replay is implemented; packet loss and recovery time were not measured in a field test.
         </p>
 
         <div class="grid-3">
           <div class="feature-card">
             <div class="card-icon" style="color: var(--cyan);"><i class="fa-solid fa-database"></i></div>
-            <div class="card-title">1. Local Ring Buffer</div>
+            <div class="card-title">1. Local buffer</div>
             <div class="card-desc">
-              Every telemetry frame is written first to a persistent local circular buffer on the Pi's internal storage. If cloud connectivity drops, data is never lost.
+              Telemetry is written locally before the Firebase mirror runs. A lost uplink does not stop the Pi's local dashboard or decision loop.
             </div>
           </div>
 
           <div class="feature-card">
             <div class="card-icon" style="color: var(--amber);"><i class="fa-solid fa-wifi"></i></div>
-            <div class="card-title">2. Standalone Hotspot</div>
+            <div class="card-title">2. Local access</div>
             <div class="card-desc">
-              Technicians in the plant can connect directly to the Raspberry Pi's local web server (<code style="color: var(--cyan);">http://192.168.4.1:5000</code>) inside the factory without internet access.
+              The dashboard is served by the Pi on the local network. No fixed hotspot address is quoted here; use the address shown by the running service.
             </div>
           </div>
 
           <div class="feature-card">
             <div class="card-icon" style="color: var(--green);"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-            <div class="card-title">3. Auto-Replay Sync</div>
+            <div class="card-title">3. Replay</div>
             <div class="card-desc">
-              The moment factory Wi-Fi is restored, our asynchronous daemon (<code style="color: var(--cyan);">pdm-cloud</code>) flushes the queue, back-filling Firebase with 100% data integrity.
+              The <code style="color: var(--cyan);">pdm-cloud</code> service replays queued frames when the link returns. Loss and integrity were not measured, so no percentage is claimed.
             </div>
           </div>
         </div>
@@ -1212,7 +1229,7 @@
       <!-- SLIDE 10: RUBRIC HIGHLIGHT — DYNAMIC INPUT-OUTPUT DEMO -->
       <section class="slide" data-slide="10" data-theme="amber">
         <div class="slide-tag"><i class="fa-solid fa-vial-circle-check"></i> Rubric Requirement: Dynamic Output Response</div>
-        <h2 class="slide-title">Live Judge Demonstration Protocol (3-Minute Script)</h2>
+        <h2 class="slide-title">Live Judge Demonstration Protocol</h2>
         <p class="slide-subtitle">
           Official Capstone Requirement: <i>"Students must be able to show the change in system outputs or states as a function of changing inputs."</i>
         </p>
@@ -1220,33 +1237,37 @@
         <div class="grid-2">
           <div class="feature-card">
             <div style="font-weight: 700; color: var(--green); margin-bottom: 6px;">
-              <i class="fa-solid fa-1"></i> Input: Normal Baseline &rarr; Output: Green / Zone A
+              <i class="fa-solid fa-1"></i> Input: steady running &rarr; Output: Healthy state
             </div>
             <p class="card-desc">
-              Run motor smoothly. Dashboard shows <b>Green Lamp</b>, RMS &lt; 0.08g, Kurtosis $\approx 3.0$. Stage 1 reports: <i>Normal Baseline &bull; AI Sleeping</i>.
+              Run the motor smoothly and show the dashboard's current state, chart and operator note. Do not quote a numeric zone threshold as a calibrated limit.
             </p>
+          </div>
 
-            <div style="font-weight: 700; color: var(--amber); margin-top: clamp(8px, 1.2vh, 14px); margin-bottom: 6px;">
-              <i class="fa-solid fa-2"></i> Input: Eccentric Rotor Mass &rarr; Output: Imbalance Alert
+          <div class="feature-card">
+            <div style="font-weight: 700; color: var(--amber); margin-bottom: 6px;">
+              <i class="fa-solid fa-2"></i> Input: controlled imbalance &rarr; Output: state change
             </div>
             <p class="card-desc">
-              Snap eccentric counterweight clip onto motor shaft. Within 1.5 seconds, dashboard changes to <b>Warning / Mechanical Imbalance</b>, showing $1\times$ RPM surge.
+              With the approved demo weight fitted, show the reported class changing to <b>Warning / Mechanical Imbalance</b> and the $1\times$ RPM signature in the chart. Response time was not measured end-to-end.
             </p>
           </div>
 
           <div class="feature-card">
             <div style="font-weight: 700; color: var(--red); margin-bottom: 6px;">
-              <i class="fa-solid fa-3"></i> Input: Bearing Shock &rarr; Output: Critical Red Alert
+              <i class="fa-solid fa-3"></i> Input: bearing-impact demo &rarr; Output: classification
             </div>
             <p class="card-desc">
-              Tap the mounting plate with a screwdriver. Kurtosis immediately spikes from 3.0 to &gt; 5.5. Stage 2 triggers <b>Red Critical / Bearing Defect Alert</b> with audio chime.
+              Use the approved tap test and show whether Stage 2 reports <b>Bearing Defect</b>. Do not quote a kurtosis trip value as a field threshold.
             </p>
+          </div>
 
-            <div style="font-weight: 700; color: var(--blue); margin-top: clamp(8px, 1.2vh, 14px); margin-bottom: 6px;">
-              <i class="fa-solid fa-4"></i> Input: Disconnect Wi-Fi &rarr; Output: Zero Packet Loss
+          <div class="feature-card">
+            <div style="font-weight: 700; color: var(--blue); margin-bottom: 6px;">
+              <i class="fa-solid fa-4"></i> Input: uplink removed &rarr; Output: local continuity
             </div>
             <p class="card-desc">
-              Unplug uplink cable. Prove the local Raspberry Pi screen never freezes. Reconnect cable and watch Firebase automatically back-fill missed points!
+              Disconnect the uplink and show the Pi dashboard still updating. Reconnect and show queued frames replaying; do not claim zero packet loss.
             </p>
           </div>
         </div>
@@ -1257,7 +1278,7 @@
         <div class="slide-tag"><i class="fa-solid fa-book-bookmark"></i> Scientific Foundation</div>
         <h2 class="slide-title">Academic References & Industrial Standards</h2>
         <p class="slide-subtitle">
-          All methodologies, thresholds, and algorithms are directly anchored in peer-reviewed literature and ISO standards.
+          The design is informed by peer-reviewed work and ISO vibration-diagnostics references. Literature is not presented as measured evidence from our rig.
         </p>
 
         <div class="grid-2">
@@ -1265,7 +1286,7 @@
             <b style="color: var(--cyan);"><i class="fa-solid fa-file-pdf"></i> Cinar et al. (2022) &mdash; <i>Machines</i> (MDPI)</b><br>
             <span style="font-size: 12px; color: var(--text-muted);">"A Predictive Maintenance System Design and Implementation for Intelligent Manufacturing"</span>
             <p class="card-desc">
-              Established our Cyber-Physical System framework and coarse-to-fine gating, proving statistical triage reduces edge ML computing overhead by &gt;90%.<br>
+              Informed the Cyber-Physical System layout and coarse-to-fine gating idea. We did not measure a CPU-saving percentage on our rig.<br>
               <a href="https://doi.org/10.3390/machines10111006" target="_blank" style="color: var(--cyan); text-decoration: none; font-size: 12px;">DOI: 10.3390/machines10111006</a>
             </p>
           </div>
@@ -1274,7 +1295,7 @@
             <b style="color: var(--green);"><i class="fa-solid fa-certificate"></i> ISO 10816-3 / ISO 20816-3 Standards</b><br>
             <span style="font-size: 12px; color: var(--text-muted);">"Evaluation of machine vibration by measurements on non-rotating parts"</span>
             <p class="card-desc">
-              Provides international vibration severity threshold zones (Zone A: Pristine, B: Acceptable, C: Restricted, D: Danger) used to ground our AI predictions.<br>
+              Cited for vibration-severity terminology and as background to the synthetic generator. ISO zone numbers are not used as this rig's calibrated thresholds.<br>
               <a href="https://www.iso.org/standard/50528.html" target="_blank" style="color: var(--green); text-decoration: none; font-size: 12px;">ISO Standard Catalog Reference</a>
             </p>
           </div>
@@ -1283,7 +1304,7 @@
             <b style="color: var(--amber);"><i class="fa-solid fa-microchip"></i> Mourtzis et al. (2020) &mdash; <i>Frontiers in Mech. Eng.</i></b><br>
             <span style="font-size: 12px; color: var(--text-muted);">"Intelligent Predictive Maintenance and Remote Monitoring Framework"</span>
             <p class="card-desc">
-              Governs our multi-modal sensor fusion (synchronous vibration + thermocouple temperature) and decoupled edge-to-cloud telemetry design.<br>
+              Informed the multi-modal edge-to-cloud layout. Our three live inputs are vibration, temperature and sound; timing and cloud cost were not measured.<br>
               <a href="https://doi.org/10.3389/fmech.2020.578379" target="_blank" style="color: var(--amber); text-decoration: none; font-size: 12px;">DOI: 10.3389/fmech.2020.578379</a>
             </p>
           </div>
@@ -1292,7 +1313,7 @@
             <b style="color: var(--purple);"><i class="fa-solid fa-chart-line"></i> Randall & Antoni (2011) &mdash; <i>MSSP</i> (Elsevier)</b><br>
             <span style="font-size: 12px; color: var(--text-muted);">"Rolling element bearing diagnostics—A tutorial"</span>
             <p class="card-desc">
-              Formulates the mechanical shock kinematics of raceway spall impacts, establishing Kurtosis ($K$) and Crest Factor ($CF$) as primary indicators.<br>
+              Motivates the use of kurtosis and crest factor as diagnostic features. It does not supply a validated failure threshold for our motor.<br>
               <a href="https://doi.org/10.1016/j.ymssp.2010.07.017" target="_blank" style="color: var(--purple); text-decoration: none; font-size: 12px;">DOI: 10.1016/j.ymssp.2010.07.017</a>
             </p>
           </div>
@@ -1301,38 +1322,52 @@
 
       <!-- SLIDE 12: JUDGE DEFENSE MASTER KEY -->
       <section class="slide" data-slide="12" data-theme="indigo">
-        <div class="slide-tag"><i class="fa-solid fa-shield-halved"></i> 100% Score Defense Key</div>
-        <h2 class="slide-title">Judge Defense Master Key: The 4 Toughest Questions</h2>
+        <div class="slide-tag"><i class="fa-solid fa-shield-halved"></i> Honest Defense Key</div>
+        <h2 class="slide-title">Judge Defense Master Key: Six Straight Answers</h2>
         <p class="slide-subtitle">
-          Memorize these 4 definitive answers to instantly dismantle common judge critiques and score maximum evaluation points.
+          Use these six answers without upgrading a benchmark claim into a field claim.
         </p>
 
         <div class="grid-2">
           <div class="feature-card">
             <b style="color: var(--cyan);"><i class="fa-solid fa-microchip"></i> Q1: Why didn't you just use an Arduino?</b>
             <p class="card-desc">
-              <i>"First, the Capstone challenge strictly forbids Arduino. Second, an 8-bit Arduino AVR lacks a hardware floating-point unit (FPU) and cannot compute 100 Hz sliding window statistical moments, FFT spectral energies, or run 300-tree Random Forest models. Our Raspberry Pi 4 (Quad-Core 64-bit ARM) provides true real-time edge computing."</i>
+              <i>"The capstone brief excludes Arduino and the rig already uses I2C, SPI and I2S sensors plus a local Flask dashboard and Linux services. We chose a Raspberry Pi 4 for that integrated edge role. We did not benchmark an Arduino alternative, so we make no speed claim against it."</i>
             </p>
           </div>
 
           <div class="feature-card">
             <b style="color: var(--green);"><i class="fa-solid fa-cloud-arrow-up"></i> Q2: Why not stream all raw vibration directly to the Cloud?</b>
             <p class="card-desc">
-              <i>"Streaming raw 100 Hz 3-axis vibration generates millions of records daily, creating heavy network latency, costly cloud egress fees, and catastrophic vulnerabilities if the factory internet cuts. We compute features locally in 1.8 ms and only stream lightweight status frames."</i>
+              <i>"Streaming every raw window would increase bandwidth and expose raw signals; an offline link would also break the live view. We compute features on the Pi and mirror lightweight status frames. We did not measure cloud cost or end-to-end latency, so we do not quote either."</i>
             </p>
           </div>
 
           <div class="feature-card">
             <b style="color: var(--amber);"><i class="fa-solid fa-brain"></i> Q3: Why Random Forest over Deep Neural Networks?</b>
             <p class="card-desc">
-              <i>"A 1D-CNN consumes ~65 MB RAM and takes 28.5 ms per inference, risking thermal throttling on embedded chips. Our Random Forest scores 100% on the physics-simulated benchmark at 30.0 ms per inference on the Raspberry Pi 4 (measured), with a small memory footprint and explainable tree split thresholds."</i>
+              <i>"We did not benchmark deep networks locally, so we quote no CNN memory or latency number. Random Forest fits the small tabular feature set, was measured at 29.99 ms per window on the Pi, and gives inspectable feature importance. Its 100% score is synthetic-only."</i>
             </p>
           </div>
 
           <div class="feature-card">
             <b style="color: var(--purple);"><i class="fa-solid fa-ruler-combined"></i> Q4: How did you prove your sensors are accurate?</b>
             <p class="card-desc">
-              <i>"We performed a 6-position static gravitational calibration on an optical surface to zero the ADXL345 0g offset vector, and calibrated the thermocouple against crushed ice ($0.0^\circ\text{C}$) and boiling water ($100.0^\circ\text{C}$), achieving $< 0.51\%$ residual error."</i>
+              <i>"A Pi-only six-face ADXL345 and two-point MAX6675 calibration procedure is implemented and documented, with backups and an honest certificate. No operator-run signed record exists yet, so we say REVIEW / UNVERIFIED, not PASS."</i>
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <b style="color: var(--green);"><i class="fa-solid fa-hourglass-half"></i> Q5: Is remaining useful life working?</b>
+            <p class="card-desc">
+              <i>"Yes on a public real-bearing benchmark, no on our motor. On six PRONOSTIA/FEMTO-ST run-to-failure bearings, leave-one-bearing-out last-window MAE is 182.91 s and RMSE 335.26 s, against 8902.25 s constant baseline. Those are other bearings, not our rig; field RUL needs our own run-to-failure series."</i>
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <b style="color: var(--amber);"><i class="fa-solid fa-database"></i> Q6: Which data is actually real?</b>
+            <p class="card-desc">
+              <i>"CWRU is a real 2 hp induction motor with seeded faults; PRONOSTIA has six real bearing run-to-failure trajectories; our 100% result is synthetic only. None of these datasets came from our capstone rig, and no result is presented as field validation."</i>
             </p>
           </div>
         </div>
@@ -1670,6 +1705,7 @@
         }
         requestAnimationFrame(draw);
       }
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       draw();
     })();
 

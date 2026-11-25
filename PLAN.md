@@ -20,6 +20,24 @@
 - R11 Add a reproducible RUL benchmark on a trusted public run-to-failure
   dataset with DOI and licence, labelled not our motor and not field-validated;
   do not change runtime diagnosis, dashboard or model behaviour.
+- R12 User request: collect data correctly, use real data, make RUL work on a
+  genuine run-to-failure series, and make the whole project exhibition/review
+  ready without false claims.
+- R13 Choose a real run-to-failure bearing dataset with a defined failure
+  endpoint and ground-truth RUL; PRONOSTIA/FEMTO-ST is the working choice
+  because it has six full learning runs, vibration + temperature, three loads,
+  a 20 g endpoint and a public DOI/licence copy. It is not our motor.
+- R14 Vendor only the six-learning-run subset with provenance, source MD5,
+  citation and honest licence status; keep the repository within disk budget.
+- R15 Build/test a real-data RUL evaluator using bearing-disjoint validation,
+  report MAE/RMSE in seconds and avoid claiming field validity on our rig.
+- R16 Prepare an exhibition/review pack in Arabic: one-page defence sheet,
+  demo sequence, evidence index, Q&A, forbidden claims and honest RUL wording.
+- C6 No claim that PRONOSTIA/CWRU/C-MAPSS data came from our motor; no hours
+  to failure on our rig; no "100% on real motor"; no runtime/dashboard change.
+- C7 No explicit dataset licence is invented. If the authoritative source has
+  no SPDX licence, write `[NEED: explicit FEMTO-ST dataset licence]` and cite
+  the public figshare DOI/CC BY 4.0 copy plus the original paper.
 
 ## Checklist
 
@@ -41,3 +59,8 @@
 - [x] P15 Vendor C-MAPSS FD001 raw files with provenance and build `ml/train_rul_cmapss.py`; reproduce official test RMSE 15.51 / MAE 11.51
 - [x] P16 Add `tests/test_rul_cmapss.py`, document the benchmark as public simulated turbofan data in README, AI report, G12 register, file map and Pi evidence
 - [x] P17 Run `git diff --check` plus the full suite, then commit and push the benchmark work (63 tests OK, commit `9c5f8f2`)
+- [x] P18 Verify PRONOSTIA source/DOI/licence and disk budget; record the choice and missing licence status
+- [x] P19 Download the public PRONOSTIA archive, verify MD5, vendor the six learning runs and provenance
+- [x] P20 Add `ml/rul_pronostia.py` and tests: real features, RUL labels, bearing-disjoint metrics, honest labels
+- [x] P21 Add exhibition/review pack and update README, guide, file map, register and evidence logs
+- [x] P22 Run `git diff --check`, full suite, PRONOSTIA reproduction, deck webcheck/visual review and forbidden-claim grep; commit and push; report exact numbers and limits

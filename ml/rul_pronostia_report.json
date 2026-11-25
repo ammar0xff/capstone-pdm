@@ -1,0 +1,132 @@
+{
+  "all_windows": {
+    "mae_s": 6656.679037440501,
+    "n_windows": 7480,
+    "rmse_s": 9557.013964835096
+  },
+  "constant_baseline_last_window": {
+    "description": "median duration of the five training bearings",
+    "mae_s": 8900.0,
+    "rmse_s": 8902.246907382429
+  },
+  "data": {
+    "acc_files": 7534,
+    "bearings": [
+      "Bearing1_1",
+      "Bearing1_2",
+      "Bearing2_1",
+      "Bearing2_2",
+      "Bearing3_1",
+      "Bearing3_2"
+    ],
+    "rpm_and_load": {
+      "Bearing1_x": "1800 rpm / 4000 N",
+      "Bearing2_x": "1650 rpm / 4200 N",
+      "Bearing3_x": "1500 rpm / 5000 N"
+    },
+    "temp_files": 850,
+    "wall_clock_resets": {
+      "Bearing1_1": 2,
+      "Bearing1_2": 0,
+      "Bearing2_1": 0,
+      "Bearing2_2": 0,
+      "Bearing3_1": 0,
+      "Bearing3_2": 0
+    }
+  },
+  "label": "IEEE PHM 2012 PRONOSTIA/FEMTO-ST real bearing benchmark - not our motor, not field-validated",
+  "last_window": {
+    "mae_s": 182.90964285714287,
+    "n_bearings": 6,
+    "rmse_s": 335.2577590868679
+  },
+  "method": {
+    "feature_names": [
+      "rms_mean",
+      "rms_std",
+      "rms_trend",
+      "kurtosis_mean",
+      "kurtosis_std",
+      "kurtosis_trend",
+      "peak_mean",
+      "peak_std",
+      "peak_trend",
+      "crest_mean",
+      "crest_std",
+      "crest_trend",
+      "temp_mean_now",
+      "temp_max_now",
+      "temp_available"
+    ],
+    "model": "RandomForestRegressor",
+    "n_estimators": 100,
+    "n_features": 15,
+    "random_state": 42,
+    "recording_interval_s": 10,
+    "rul_endpoint": "last vibration recording (challenge 20 g stop rule)",
+    "timebase": "recording number x published cadence (10 s vibration, 60 s temperature); wall-clock resets counted, not used",
+    "validation": "leave-one-bearing-out; all windows of the held bearing",
+    "window_recordings": 10
+  },
+  "per_bearing": {
+    "Bearing1_1": {
+      "acc_files": 2803,
+      "baseline_last_rul_s": 8700.0,
+      "condition": "Bearing1",
+      "duration_s": 28020.0,
+      "predicted_last_rul_s": 97.78984126984125,
+      "temp_files": 466
+    },
+    "Bearing1_2": {
+      "acc_files": 871,
+      "baseline_last_rul_s": 9100.0,
+      "condition": "Bearing1",
+      "duration_s": 8700.0,
+      "predicted_last_rul_s": 13.830833333333334,
+      "temp_files": 144
+    },
+    "Bearing2_1": {
+      "acc_files": 911,
+      "baseline_last_rul_s": 8700.0,
+      "condition": "Bearing2",
+      "duration_s": 9100.0,
+      "predicted_last_rul_s": 32.73849206349206,
+      "temp_files": 151
+    },
+    "Bearing2_2": {
+      "acc_files": 797,
+      "baseline_last_rul_s": 9100.0,
+      "condition": "Bearing2",
+      "duration_s": 7960.0,
+      "predicted_last_rul_s": 102.57214285714286,
+      "temp_files": 0
+    },
+    "Bearing3_1": {
+      "acc_files": 515,
+      "baseline_last_rul_s": 9100.0,
+      "condition": "Bearing3",
+      "duration_s": 5140.0,
+      "predicted_last_rul_s": 806.9319047619048,
+      "temp_files": 89
+    },
+    "Bearing3_2": {
+      "acc_files": 1637,
+      "baseline_last_rul_s": 8700.0,
+      "condition": "Bearing3",
+      "duration_s": 16360.0,
+      "predicted_last_rul_s": 43.594642857142865,
+      "temp_files": 0
+    }
+  },
+  "source": {
+    "archive_md5": "0feedeab9584a68199f1f72fe45e3d19",
+    "dataset": "IEEE PHM 2012 PRONOSTIA/FEMTO-ST bearing learning set",
+    "explicit_femto_license": "[NEED: explicit FEMTO-ST dataset licence]",
+    "field_validation": false,
+    "licensed_copy_doi": "10.6084/m9.figshare.30595484.v1",
+    "licensed_copy_license": "CC BY 4.0",
+    "our_motor": false,
+    "url": "https://phm-datasets.s3.amazonaws.com/NASA/10.+FEMTO+Bearing.zip"
+  },
+  "status": "benchmark_complete"
+}

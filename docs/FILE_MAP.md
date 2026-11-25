@@ -33,6 +33,7 @@ files just because they look stale; confirm with the owner first.
 | `FIREBASE_SETUP.md` | Current RTDB/Hosting configuration and security caveat |
 | `PROJECT_GUIDE.html`, `G12_Project_Guide.pdf` | English guide; HTML is source, PDF is generated |
 | `G12_REQUEST_RESPONSE_REGISTER.md` | All 13 G12 requests with status and evidence |
+| `EXHIBITION_REVIEW_PACK.md` | Arabic one-page defence sheet, demo sequence, evidence index, Q&A and forbidden claims |
 | `CAPSTONE_MASTER_HANDBOOK.md` | Engineering handbook and theory |
 | `PROJECT_COMPLETE_TUTORIAL.md` | End-to-end tutorial |
 | `STUDENT_MASTER_GUIDE.md` | Student-facing build and presentation guide |
@@ -74,6 +75,8 @@ The dashboard exposes only read-only JSON endpoints and page rendering. The old
 | `benchmark_latency.py` | Single-window latency measurement helper |
 | `degradation_rul.py` | Offline trend-to-threshold estimator (operator threshold; not field-validated) |
 | `train_rul_cmapss.py` | Public FD001 RUL benchmark; simulated turbofan, not our motor, not field-validated |
+| `rul_pronostia.py` | Real bearing run-to-failure RUL benchmark; leave-one-bearing-out, not our motor, not field-validated |
+| `rul_pronostia_report.json` | Committed measured metrics for the PRONOSTIA benchmark |
 | `ai_report.md` | Training, evaluation and honest evidence register |
 | `windows.csv` | Generated dataset used by training |
 | `model.joblib`, `model_meta.json` | Deployed model artifacts |
@@ -89,6 +92,9 @@ The dashboard exposes only read-only JSON endpoints and page rendering. The old
 | `data/cmapss/RUL_FD001.txt` | NASA withheld test RUL labels (do not edit) |
 | `data/cwru/README.md` | Provenance for a real 2 hp Reliance Electric motor sample |
 | `data/cwru/*.mat` | Unmodified CWRU healthy and seeded-fault recordings (do not edit) |
+| `data/pronostia/README.md` | Provenance, licence gap, acquisition facts and scope warning for PRONOSTIA |
+| `data/pronostia/manifest.json` | MD5 of all 8,384 vendored CSVs plus source archive hashes |
+| `data/pronostia/Bearing*/acc_*.csv`, `temp_*.csv` | Unmodified real bearing run-to-failure recordings (do not edit) |
 
 ## Hosted presentation (`public/`)
 

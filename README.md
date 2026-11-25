@@ -14,8 +14,14 @@ A separate RUL benchmark on public NASA C-MAPSS FD001 data is complete and
 reproducible, but those are simulated turbofan data — not our motor, not field
 validation. A small real-motor sample from CWRU (2 hp Reliance Electric
 induction motor) is vendored in `data/cwru/` for diagnosis benchmarks; its
-faults are seeded, so it is not a run-to-failure series. See
-`docs/G12_REQUEST_RESPONSE_REGISTER.md` for request-by-request evidence.
+faults are seeded, so it is not a run-to-failure series. A separate benchmark
+on six **real bearing run-to-failure experiments** from IEEE PHM 2012
+PRONOSTIA/FEMTO-ST is complete: leave-one-bearing-out last-window MAE
+**182.91 s** and RMSE **335.26 s** (constant baseline RMSE **8902.25 s**).
+Those are genuine bearing trajectories, but they are not our motor and are not
+field validation. See `docs/G12_REQUEST_RESPONSE_REGISTER.md` for
+request-by-request evidence and `docs/EXHIBITION_REVIEW_PACK.md` for the
+Arabic review/demo sheet.
 
 ## Start here
 
@@ -29,6 +35,7 @@ faults are seeded, so it is not a run-to-failure series. See
 | Honest answers to all 13 G12 requests | `docs/G12_REQUEST_RESPONSE_REGISTER.md` |
 | AI design, training and measured results | `ml/ai_report.md` |
 | Pi deployment evidence and latency | `docs/PI_DEPLOYMENT_EVIDENCE.md` |
+| Arabic exhibition/review sheet, demo and Q&A | `docs/EXHIBITION_REVIEW_PACK.md` |
 | Requirements and scope | `PRD.md` |
 
 ## System at a glance
@@ -55,6 +62,9 @@ INMP441 (I2S) ─┘          │                       │
 - `ml/train_rul_cmapss.py` reproduces a public RUL benchmark on simulated
   turbofan run-to-failure data. It is a pipeline check only, never a life
   prediction for our induction motor.
+- `ml/rul_pronostia.py` reproduces RUL on six real PRONOSTIA bearing
+  run-to-failure experiments with leave-one-bearing-out validation. It is
+  genuine bearing data, still not our motor and not field validation.
 
 ## First-time setup
 
@@ -148,6 +158,7 @@ See `docs/FIREBASE_SETUP.md` before altering the rules or client behavior.
 | Pi latency | 26.19 ms host / 29.99 ms Pi, single-window inference | Measured; full inject→alert timing not measured |
 | Offline degradation estimator | `ml/degradation_rul.py`, `tests/test_degradation_rul.py` | Implemented; operator threshold required; not field-validated |
 | Public RUL benchmark | `ml/train_rul_cmapss.py`, `data/cmapss/`, `tests/test_rul_cmapss.py` | Complete on NASA C-MAPSS FD001 (simulated turbofan); not our motor |
+| Real-bearing RUL benchmark | `ml/rul_pronostia.py`, `data/pronostia/`, `tests/test_rul_pronostia.py` | Complete on six PRONOSTIA run-to-failure bearings; not our motor, not field-validated |
 | Real-motor sample | `data/cwru/`, `tests/test_cwru_data.py` | CWRU 2 hp Reliance Electric; seeded faults, no run-to-failure |
 | Real-motor accuracy, field-validated RUL, cost savings | — | `[NEED: physical run data]` |
 | Sensor calibration certificate | `edge/calibrate.py` and runbook | Procedure ready; `[NEED: signed run record]` |
@@ -195,6 +206,43 @@ sensors, our motor or our failure modes, and must not be reported as remaining
 useful life of the capstone rig. The classifier, dashboard and Firebase state
 are untouched. `[NEED: run-to-failure series with timestamps and failure
 labels from our rig]` before any field-validated RUL claim.
+
+## Real bearing RUL benchmark (not our motor)
+
+To check RUL on genuine run-to-failure trajectories, use the six learning
+bearings from IEEE PHM 2012 PRONOSTIA/FEMTO-ST. The 8,384 unmodified CSV
+recordings are vendored in `data/pronostia/` with an MD5 manifest. Sources:
+NASA PHM mirror (`https://phm-datasets.s3.amazonaws.com/NASA/10.+FEMTO+Bearing.zip`,
+outer archive MD5 `0feedeab9584a68199f1f72fe45e3d19`) and a public CC BY 4.0
+copy at figshare DOI `10.6084/m9.figshare.30595484.v1`. The FEMTO-ST pages do
+not state an explicit reuse licence: `[NEED: explicit FEMTO-ST dataset licence]`.
+
+```
+python3 ml/rul_pronostia.py --report /tmp/rul_pronostia_report.json
+```
+
+The script builds 15 causal features from trailing vibration windows (RMS,
+kurtosis, peak, crest factor) plus the latest temperature reading, labels each
+window as seconds to the final vibration burst, and validates by leaving one
+whole bearing out at a time. It uses the published 10 s vibration / 60 s
+temperature cadence because two wall-clock resets in `Bearing1_1` are counted
+but not silently repaired. Measured results in `ml/rul_pronostia_report.json`:
+
+| Metric | Result |
+|---|---:|
+| Last-window MAE (six held-out bearings) | **182.91 s** |
+| Last-window RMSE (six held-out bearings) | **335.26 s** |
+| All-window MAE (7,480 windows) | 6656.68 s |
+| All-window RMSE (7,480 windows) | 9557.01 s |
+| Constant-baseline last-window RMSE | 8902.25 s |
+
+The last-window error is far below the constant baseline, so the model tracks
+late-life degradation on these bearings. The all-window error is large, which
+is reported honestly rather than hidden. This remains a **public real-bearing
+benchmark only**: PRONOSTIA used a 250 W motor/gearbox, not our induction rig;
+no result here is a remaining-life estimate for our motor. Field RUL still
+requires `[NEED: run-to-failure series with timestamps and failure labels from
+our rig]`. Full write-up: `ml/ai_report.md` §11.
 
 ## Budget
 

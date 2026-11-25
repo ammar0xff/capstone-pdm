@@ -23,12 +23,13 @@
 | 8 | تشغيل ملفات الراسبري تلقائياً وهل كل ملف مرفوع يعمل؟ | ✅ تم | §8 يشرح systemd والـ enable عند الإقلاع ويوضح أن ليس كل ملف يعمل | §8 أدناه; `edge/*.service`; `docs/PI_DEPLOYMENT_EVIDENCE.md:5-13` | لا شيء محلياً |
 | 9 | تأكيد إزالة أوبشنز الحالات الأربعة وبيانات الـ simulation | ✅ تم | أُزيلت أدوات المحاكاة من الداشبورد، ويوجد اختبار يمنع رجوعها | `public/index.html`; `tests/test_evaluation.py::TeamFollowUpTest::test_dashboard_has_no_simulation_controls` | لا شيء محلياً |
 | 10 | تجهيز جداول النتائج الإجمالية قبل المعرض | ✅ تم | §10 يحدد أماكن جداول Totals وطريقة إعادة إنتاجها | §10 أدناه; `ml/ai_report.md` §5.4–§5.5; `docs/CAPSTONE_MASTER_HANDBOOK.md` §5.3, §10 | لا شيء محلياً؛ النتائج صناعية فقط |
-| 11 | التيست الحقيقي على موتور ثم prediction/RUL (لينكي MathWorks) | ◐ جزئي | كُتب بروتوكول الاختبار؛ أُضيف benchmark عام على NASA C-MAPSS FD001 (توربينات محاكاة، مش موتورنا) للتحقق من الـ pipeline فقط؛ الـ RUL الحقيقي لسه متوقف | §11 أدناه; `ml/ai_report.md` §10; `data/cmapss/README.md` | `[NEED: motor rig access, calibrated raw readings, run-to-failure series]` |
+| 11 | التيست الحقيقي على موتور ثم prediction/RUL (لينكي MathWorks) | ◐ جزئي | كُتب بروتوكول الاختبار؛ أُضيف benchmark على NASA C-MAPSS FD001 (محاكاة) وbenchmark ثانٍ على ست محامل حقيقية من PRONOSTIA/FEMTO-ST مع validation بفصل المحمل؛ الـ RUL على موتورنا لسه متوقف | §11 أدناه; `ml/ai_report.md` §10–§11; `data/pronostia/README.md` | `[NEED: motor rig access, calibrated raw readings, run-to-failure series from our rig]` |
 | 12 | الرد سريعاً لأن الشغل مكمل «بكرة» | — لا ينطبق | لا يوجد تاريخ قابل للتحقق؛ اعتُبر كأولوية لا كطلب هندسي | `/tmp/opencode/textinstinct_chat.txt:1258-1260` | `[NEED: actual exhibition date if a deadline must be quoted]` |
 | 13 | مخرجات أكثر تدرّجاً + مكان المشكلة وتكلفتها ومدة بقاء الموتور | ◐ جزئي | يوجد `response_plan` بأربع أولويات وإجراءات، لكن المدد ثابتة لكل فئة وليست تنبؤاً؛ لا تكلفة ولا زمن بقاء مقيسان | `ml/rf_predictor.py:37-72`; `edge/edge_daq.py:604`; `ml/ai_report.md` §5.5 | `[NEED: degradation curve, part prices, downtime cost and failure labels]` |
 
-**الخلاصة:** كل ما يمكن تنفيذه محلياً دون قياس فيزيائي أُنجز. البنود 6 و11 والجزء المتعلق
-بـ RUL/التكلفة من 13 تبقى متوقفة على بيانات حقيقية؛ لم يُملأ أي منها بقيم مخترعة.
+**الخلاصة:** كل ما يمكن تنفيذه محلياً دون قياس فيزيائي أُنجز. أُضيف RUL على محامل
+حقيقية عامة (PRONOSTIA) لكنه ليس على موتورنا. البند 6 والجزء المتعلق بـ RUL/التكلفة
+من 11 و13 تبقى متوقفة على بيانات/قياسات من ريجنا؛ لم يُملأ أي منها بقيم مخترعة.
 
 ---
 
@@ -181,6 +182,18 @@ restating any resource-saving claim]`
   توربينات محاكاة، مش موتورنا، ومش validation ميداني**؛ بتثبت بس إن الـ pipeline
   شغال على مسار run-to-failure عام بملصقات منشورة، وممنوع تقديمها كزمن بقاء
   للموتور بتاع المشروع.
+- وبناءً على طلب «داتا حقيقية و RUL شغال فعلياً» جُلبت **6 مسارات run-to-failure
+  حقيقية لمحامل** من IEEE PHM 2012 PRONOSTIA/FEMTO-ST (موتور 250 W وجيربوكس،
+  مش موتورنا). البيانات في `data/pronostia/` (8,384 ملف CSV، manifest بـ MD5)
+  والكود `ml/rul_pronostia.py`. التحقق بفصل المحمل كاملاً (leave-one-bearing-out)
+  أعطى **MAE 182.91 ثانية وRMSE 335.26 ثانية** على آخر نافذة للمحامل الستة،
+  مقابل **RMSE 8902.25** للـ baseline الثابت. على كل النوافذ (7,480) جاء
+  **MAE 6656.68 وRMSE 9557.01** ثانية — رقم كبير يُقال كما هو ولا يُخفى.
+  الرخصة الصريحة لمصدر FEMTO-ST غير معلومة: `[NEED: explicit FEMTO-ST dataset
+  licence]`؛ توجد نسخة CC BY 4.0 على figshare DOI
+  `10.6084/m9.figshare.30595484.v1`. **ده RUL حقيقي على محامل عامة، مش على
+  موتور المشروع ومش validation ميداني**، وممنوع تحويل الثواني دي لزمن بقاء
+  لموتورنا.
 - وبناءً على طلب «داتا موتور حقيقي من مصدر موثوق» جُلبت عيّنة من **CWRU
   Bearing Data Center** الرسمي: الموتور **2 hp Reliance Electric induction
   motor**، ومحامل SKF 6205-2RS JEM (DE) و6203-2RS JEM (FE). الملفات في

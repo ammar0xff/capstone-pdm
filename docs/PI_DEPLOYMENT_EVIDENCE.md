@@ -330,3 +330,18 @@ healthy plus 7 mil seeded inner-race / ball / outer-race faults at 0 hp) into
 faults are seeded short recordings, so this is **not** a run-to-failure series
 and cannot validate RUL. No Pi file, service, calibration artifact or Firebase
 state was changed; the runtime classifier remains the same.
+
+## 2026-11-25 — real PRONOSTIA bearing RUL benchmark (no Pi change)
+
+At the operator's request, the six learning bearings from IEEE PHM 2012
+PRONOSTIA/FEMTO-ST were vendored into `data/pronostia/` (8,384 unmodified CSVs,
+601,742,616 bytes) with an MD5 manifest and explicit source/DOI/licence notes.
+`ml/rul_pronostia.py`, `tests/test_rul_pronostia.py` and the write-up were added
+on the host only. Leave-one-bearing-out last-window MAE is 182.91 s and RMSE
+335.26 s, against 8902.25 s constant-baseline RMSE; all-window MAE is 6656.68 s
+and RMSE 9557.01 s. These are real bearing trajectories, not our motor, and are
+explicitly **not field-validated**.
+
+No Pi file, service, calibration artifact or Firebase state was changed for
+this step. The operator-owned scripts listed above remain untouched; runtime
+diagnosis and the dashboard still report current state only.

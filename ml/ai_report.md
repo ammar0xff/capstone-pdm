@@ -294,3 +294,58 @@ RUL *pipeline on a public benchmark only*. It is **not** field validation, not a
 remaining-life estimate for our rig, and does not change the runtime diagnosis,
 dashboard or Firebase state. The field case still needs
 `[NEED: run-to-failure series with timestamps and failure labels from our rig]`.
+
+## 11. Real bearing RUL benchmark — IEEE PHM 2012 PRONOSTIA (not our motor)
+
+The user asked for real data and genuinely working RUL, not another synthetic
+score. The six learning bearings from the IEEE PHM 2012 PRONOSTIA/FEMTO-ST
+challenge were vendored because they are genuine run-to-failure bearing
+experiments with vibration, temperature and a defined 20 g stop endpoint.
+
+| Item | Value |
+|---|---|
+| Dataset | PRONOSTIA/FEMTO-ST bearing learning set, six run-to-failure bearings |
+| NASA PHM mirror | `https://phm-datasets.s3.amazonaws.com/NASA/10.+FEMTO+Bearing.zip` |
+| Outer archive MD5 | `0feedeab9584a68199f1f72fe45e3d19` |
+| Nested archive MD5 values | `da75861c0df34eaf079f863751e41cd7`, `8ee4422f627c77d2cbeb89107f02c27d` |
+| Explicitly licensed copy | figshare DOI `10.6084/m9.figshare.30595484.v1`, CC BY 4.0 |
+| Licence gap | `[NEED: explicit FEMTO-ST dataset licence]` |
+| Local data | `data/pronostia/` — 8,384 CSVs, 601,742,616 bytes, MD5 manifest |
+| Test rig in the source | 250 W asynchronous motor + gearbox; 1800/1650/1500 rpm at 4000/4200/5000 N |
+
+Method: each 0.1 s vibration recording yields dynamic RMS, kurtosis, peak and
+crest factor; the latest temperature burst is joined causally by recording
+number. A trailing window of 10 recordings (100 s) produces 15 features. The
+target is seconds from the current recording to the final vibration recording.
+A Random Forest (100 trees, `random_state=42`) is retrained for each of the six
+bearing-disjoint folds; the held bearing's last window and all windows are
+scored separately. Two wall-clock resets in `Bearing1_1` are counted and the
+published 10 s/60 s cadence is used instead of silently rewriting timestamps.
+
+| Result | Value |
+|---|---:|
+| Last-window MAE — six held-out bearings | **182.91 s** |
+| Last-window RMSE — six held-out bearings | **335.26 s** |
+| All-window MAE — 7,480 windows | 6656.68 s |
+| All-window RMSE — 7,480 windows | 9557.01 s |
+| Constant-baseline last-window RMSE | 8902.25 s |
+| Constant-baseline last-window MAE | 8900.00 s |
+
+Per-bearing observed durations are 28,020 / 8,700 / 9,100 / 7,960 / 5,140 /
+16,360 s. The last-window error is much smaller than the constant baseline,
+which shows that late-life degradation is learnable on these real bearings.
+The all-window error remains large, especially early in life, and is reported
+as-is. `tests/test_rul_pronostia.py` verifies every vendored file hash, causal
+features, no future temperature join, bearing-disjoint validation and the
+reproduced metrics. Reproduce with:
+
+```
+python3 ml/rul_pronostia.py --report /tmp/rul_pronostia_report.json
+```
+
+**Scope limit.** These are not our sensors, our motor or our failure modes.
+This is real-data RUL on a public bearing benchmark, **not** field validation
+on the capstone rig and not an hours-to-failure claim for our motor. Runtime
+diagnosis, the dashboard and Firebase state are unchanged. The field case
+still needs `[NEED: run-to-failure series with timestamps and failure labels
+from our rig]`.
