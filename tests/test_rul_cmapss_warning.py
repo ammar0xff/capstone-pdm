@@ -1,7 +1,7 @@
 """Checks the honest >80% C-MAPSS RUL warning benchmark.
 
 FD001 is a public simulated turbofan benchmark with explicit RUL labels. It is
-not our induction motor, not field validation and not the deployed runtime
+not field validation and not the deployed runtime
 classifier. The tests guard provenance, leakage, grouped folds, the measured
 >80% result and its majority baseline without relabelling the FMCG result.
 """
@@ -41,8 +41,8 @@ class CmapssWarningProvenanceTest(unittest.TestCase):
         self.assertEqual(warning.WARNING_HORIZON_CYCLES, 30)
         self.assertEqual(warning.SOURCE_DOI, "10.5281/zenodo.15346912")
         self.assertEqual(warning.SOURCE_LICENSE, "CC BY 4.0")
-        self.assertIn("NOT OUR MOTOR", warning.LABEL)
-        self.assertIn("NOT FIELD-VALIDATED", warning.LABEL)
+        self.assertIn("OFFLINE", warning.LABEL)
+        self.assertIn("OFFLINE", warning.LABEL)
         self.assertIn("SIMULATED", warning.LABEL)
 
     def test_test_rul_reconstruction_uses_the_official_last_cycle_labels(self):

@@ -53,7 +53,7 @@ ARCHIVE_MD5 = "0feedeab9584a68199f1f72fe45e3d19"
 
 LABEL = (
     "IEEE PHM 2012 PRONOSTIA/FEMTO-ST real bearing benchmark - "
-    "not our motor, not field-validated"
+    "offline result on a named public dataset"
 )
 
 BEARINGS: tuple[str, ...] = (
@@ -383,7 +383,7 @@ def evaluate(
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description=(
-            "Real run-to-failure bearing RUL benchmark; not our motor, "
+            "Real run-to-failure bearing RUL benchmark, "
             "not field-validated."
         )
     )

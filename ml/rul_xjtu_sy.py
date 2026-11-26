@@ -43,7 +43,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_CSV_DIR = ROOT / "data" / "xjtu_sy_mendeley" / "csv"
 DEFAULT_REPORT = ROOT / "ml" / "rul_xjtu_sy_report.json"
 
-LABEL = "BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED"
+LABEL = "OFFLINE RESULT / NAMED PUBLIC DATASET"
 SOURCE_URL = "https://biaowang.tech/xjtu-sy-bearing-datasets"
 MIRROR_URL = "https://github.com/WangBiaoXJTU/xjtu-sy-bearing-datasets"
 DERIVED_DATA_DOI = "10.17632/mpn45f4gxc.1"

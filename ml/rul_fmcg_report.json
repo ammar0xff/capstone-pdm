@@ -43,7 +43,7 @@
     "rul_endpoint": "source RUL label reaches 0; Downtime=YES is present in two runs",
     "rul_unit": "hours from startup to shutdown or retirement (paper definition)"
   },
-  "label": "BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED",
+  "label": "OFFLINE RESULT / NAMED PUBLIC DATASET",
   "method": {
     "baseline": "constant zero, constant median RUL of the training runs, and a constant no-warning classifier",
     "causal": true,

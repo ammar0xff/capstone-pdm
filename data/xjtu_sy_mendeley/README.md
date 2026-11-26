@@ -62,7 +62,7 @@ reproduces `ml/rul_xjtu_sy_report.json`.
 The reported endpoint is the published last snapshot of each bearing. The
 leave-one-bearing-out evaluation covers the last 20% of the held bearing's
 snapshots. See the report for exact MAE/RMSE and the constant-baseline
-comparison. The label is `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`.
+comparison. The label is `OFFLINE RESULT / NAMED PUBLIC DATASET`.
 
 ## Scope warning
 

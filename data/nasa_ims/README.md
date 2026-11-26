@@ -10,7 +10,7 @@
 | Requested citation | Qiu, H., Lee, J. and Lin, J., "Wavelet Filter-based Weak Signature Detection Method and its Application on Roller Bearing Prognostics", Journal of Sound and Vibration 289 (2006) 1066-1090 |
 | Labelled failures | Set 1 bearing 3 inner race, set 1 bearing 4 rolling element, set 2 bearing 1 outer race, set 3 bearing 3 outer race — as documented in the archive README PDF |
 | Snapshot counts | 2,156 / 2,156 / 984 / 6,324 in the published RAR files; the README PDF describes 4,448 files for set 3, so the archive listing is used and the discrepancy is recorded rather than silently resolved |
-| Limit | **BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED.** The last published snapshot is a dataset-defined end of test, not operator-accepted failure of the capstone motor |
+| Limit | **OFFLINE RESULT / NAMED PUBLIC DATASET.** The last published snapshot is a dataset-defined end of test, not operator-accepted failure of the capstone motor |
 
 ## What is vendored here
 

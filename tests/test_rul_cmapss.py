@@ -1,6 +1,6 @@
 """Checks the NASA C-MAPSS FD001 RUL benchmark.
 
-These are public simulated turbofan data, not our motor. The tests guard the
+These are public simulated turbofan data. The tests guard the
 provenance, the absence of label leakage and the published benchmark metrics;
 they do not claim field validation.
 """
@@ -42,7 +42,7 @@ class CmapssProvenanceTest(unittest.TestCase):
         self.assertEqual(rul.SOURCE_DOI, "10.5281/zenodo.15346912")
         self.assertEqual(rul.SOURCE_LICENSE, "CC BY 4.0")
         self.assertEqual(rul.ARCHIVE_MD5, "79a22f36e80606c69d0e9e4da5bb2b7a")
-        self.assertIn("not our motor", rul.LABEL)
+        self.assertIn("offline result on a named public dataset", rul.LABEL)
         self.assertIn("not field-validated", rul.LABEL)
 
 
@@ -123,7 +123,7 @@ class CmapssBenchmarkTest(unittest.TestCase):
 
     def test_report_labels_state_it_is_a_benchmark_only(self):
         self.assertEqual(self.report["status"], "benchmark_complete")
-        self.assertIn("not our motor", self.report["label"])
+        self.assertIn("offline result on a named public dataset", self.report["label"])
         self.assertIn("not field-validated", self.report["label"])
         self.assertIs(self.report["source"]["field_validation"], False)
         self.assertEqual(self.report["source"]["doi"], rul.SOURCE_DOI)

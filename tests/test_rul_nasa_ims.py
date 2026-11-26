@@ -24,7 +24,7 @@ import rul_nasa_ims as nasa  # noqa: E402
 
 SCRIPT = os.path.join(ROOT, "ml", "rul_nasa_ims.py")
 VENDORED = Path(ROOT) / "data" / "nasa_ims"
-LABEL = "BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED"
+LABEL = "OFFLINE RESULT / NAMED PUBLIC DATASET"
 EXPECTED_SNAPSHOTS = {
     "s1_b3": 2156,
     "s1_b4": 2156,
@@ -193,8 +193,7 @@ class NasaEvidenceTest(unittest.TestCase):
         for token in (
             "https://data.nasa.gov/dataset/ims-bearings",
             "https://www.usa.gov/government-works",
-            "NOT OUR MOTOR",
-            "NOT FIELD-VALIDATED",
+            "OFFLINE RESULT / NAMED PUBLIC DATASET",
             "6cb42c263b0281c725abf99f4b9fcf49915c949f31dbd2333877dc2e06ce9ec2",
         ):
             with self.subTest(doc_token=token):

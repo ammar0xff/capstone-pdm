@@ -75,7 +75,7 @@ class PronostiaProvenanceTest(unittest.TestCase):
     def test_source_metadata_is_cited_and_not_field_validated(self):
         self.assertEqual(rul.LICENSED_COPY_DOI, "10.6084/m9.figshare.30595484.v1")
         self.assertEqual(rul.LICENSED_COPY_LICENSE, "CC BY 4.0")
-        self.assertIn("not our motor", rul.LABEL)
+        self.assertIn("offline result on a named public dataset", rul.LABEL)
         self.assertIn("not field-validated", rul.LABEL)
         self.assertEqual(len(rul.BEARINGS), 6)
         self.assertTrue(
@@ -158,7 +158,7 @@ class PronostiaBenchmarkTest(unittest.TestCase):
             self.assertEqual(actual["temp_files"], expected["temp_files"])
             for field in ("duration_s", "predicted_last_rul_s", "baseline_last_rul_s"):
                 self.assertAlmostEqual(actual[field], expected[field], delta=1.0)
-        self.assertIn("not our motor", self.report["label"])
+        self.assertIn("offline result on a named public dataset", self.report["label"])
         self.assertIn("not field-validated", self.report["label"])
         self.assertIs(self.report["source"]["our_motor"], False)
         self.assertIs(self.report["source"]["field_validation"], False)

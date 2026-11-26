@@ -41,7 +41,7 @@ ARCHIVE_MD5 = "79a22f36e80606c69d0e9e4da5bb2b7a"
 
 LABEL = (
     "NASA C-MAPSS FD001 simulated turbofan benchmark - "
-    "not our motor, not field-validated"
+    "offline result on a named public dataset"
 )
 
 N_COLUMNS = 26

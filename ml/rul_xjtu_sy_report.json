@@ -37,7 +37,7 @@
     "rul_endpoint": "last published snapshot of each bearing run (dataset-defined end of life)",
     "snapshot_period_min": 1.0
   },
-  "label": "BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED",
+  "label": "OFFLINE RESULT / NAMED PUBLIC DATASET",
   "method": {
     "baseline": "constant median duration of the other 14 bearings",
     "causal": true,

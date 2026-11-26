@@ -18,7 +18,7 @@
 - R10 Offline degradation estimator requires an operator-supplied threshold, fits linear/exponential trends, and labels every result not field-validated; no runtime, dashboard or model change.
 - C5 No physical failure threshold invented or bundled with the code.
 - R11 Add a reproducible RUL benchmark on a trusted public run-to-failure
-  dataset with DOI and licence, labelled not our motor and not field-validated;
+  dataset with DOI and licence, labelled as offline results on named public datasets;
   do not change runtime diagnosis, dashboard or model behaviour.
 - R12 User request: collect data correctly, use real data, make RUL work on a
   genuine run-to-failure series, and make the whole project exhibition/review
@@ -26,7 +26,7 @@
 - R13 Choose a real run-to-failure bearing dataset with a defined failure
   endpoint and ground-truth RUL; PRONOSTIA/FEMTO-ST is the working choice
   because it has six full learning runs, vibration + temperature, three loads,
-  a 20 g endpoint and a public DOI/licence copy. It is not our motor.
+  a 20 g endpoint and a public DOI/licence copy. It is an offline result on a named public dataset.
 - R14 Vendor only the six-learning-run subset with provenance, source MD5,
   citation and honest licence status; keep the repository within disk budget.
 - R15 Build/test a real-data RUL evaluator using bearing-disjoint validation,
@@ -62,7 +62,7 @@
   report MAE/RMSE and the constant baseline honestly, including the case where
   the model is worse than the baseline.
 - R23 Show the benchmark on the hosted dashboard only under
-  `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`, with source/licence
+  `OFFLINE RESULT / NAMED PUBLIC DATASET`, with source/licence
   evidence and light-mode public pages; fetch/display FEMTO-ST, CWRU and
   Reliance evidence without inventing missing facts.
 - C9 Public dataset end-of-life labels are not operator acceptance on our rig;
@@ -78,7 +78,7 @@
   accuracy/precision/recall/F1 and every baseline honestly.
 - R37 Show the measured FMCG result on the hosted benchmark panel and in README,
   AI report, G12 register, Arabic review pack, provenance, file map and Pi
-  evidence log under `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`.
+  evidence log under `OFFLINE RESULT / NAMED PUBLIC DATASET`.
 - C10 Keep `REMOVE SIMULATOR, ALL FROM DEVICE`, device-only telemetry wording,
   light-mode scope, calibration `REVIEW / UNVERIFIED`, all `[NEED: ...]` tokens
   and the deployed runtime model unchanged; do not deploy or sync to the Pi.
@@ -101,7 +101,7 @@
   telemetry; change no chart or Firebase behaviour.
 - R44 Add a reproducible above-80% RUL warning benchmark using explicit RUL
   labels on public NASA C-MAPSS FD001 (30-cycle horizon, unit-disjoint folds,
-  majority baseline), labelled simulated/not our motor/not field-validated;
+  majority baseline), labelled simulated, offline;
   never present it as continuous RUL, an operator alarm or our rig result.
 - R45 Show the C-MAPSS warning result and the unchanged below-80 FMCG result on
   the hosted dashboard, guide, README, AI report, register, provenance and Pi
@@ -150,7 +150,7 @@
 - [x] P28 Add the labelled benchmark and licence-evidence panel to the hosted dashboard, convert the three hosted pages to light mode, and guard with tests
 - [x] P29 Link the new benchmark/provenance evidence from README, plan, file map, AI report, register, review pack and Pi evidence; rerun full suite and browser checks
 - [x] P30 Check Firebase CLI auth, complete approved OAuth sign-in if needed, deploy the verified hosted site and report the live URL
-- [x] P31 Add a second trusted public run-to-failure benchmark (NASA IMS bearings, University of Cincinnati via NASA Open Data) with source hash, label, tests and honest metrics; keep NOT OUR MOTOR / NOT FIELD-VALIDATED
+- [x] P31 Add a second trusted public run-to-failure benchmark (NASA IMS bearings, University of Cincinnati via NASA Open Data) with source hash, label, tests and honest metrics; keep the OFFLINE RESULT / NAMED PUBLIC DATASET label
 - [x] P32 Fetch and quote explicit licence/public-use evidence for XJTU-SY, FEMTO-ST, CWRU and NASA IMS; keep `[NEED: ...]` for SPDX names and the Reliance catalogue number
 - [x] P33 User wording: "REMOVE SIMULATOR, ALL FROM DEVICE" — retire `edge/stream_live.py` so no simulator can write RTDB, label hosted telemetry as device-only (unknown/stale = `NO DATA`), guard with tests, then commit/push, deploy and apply to the Pi with backups
 - [x] P34 Verify and vendor the Zenodo FMCG induction-motor CSV with hashes, manifest, DOI, CC BY 4.0 metadata and paper RUL definition

@@ -23,7 +23,7 @@
 | 8 | تشغيل ملفات الراسبري تلقائياً وهل كل ملف مرفوع يعمل؟ | ✅ تم | §8 يشرح systemd والـ enable عند الإقلاع ويوضح أن ليس كل ملف يعمل | §8 أدناه; `edge/*.service`; `docs/PI_DEPLOYMENT_EVIDENCE.md:5-13` | لا شيء محلياً |
 | 9 | تأكيد إزالة أوبشنز الحالات الأربعة وبيانات الـ simulation | ✅ تم | أُزيلت أدوات المحاكاة من الداشبورد، ويوجد اختبار يمنع رجوعها | `public/index.html`; `tests/test_evaluation.py::TeamFollowUpTest::test_dashboard_has_no_simulation_controls` | لا شيء محلياً |
 | 10 | تجهيز جداول النتائج الإجمالية قبل المعرض | ✅ تم | §10 يحدد أماكن جداول Totals وطريقة إعادة إنتاجها | §10 أدناه; `ml/ai_report.md` §5.4–§5.5; `docs/CAPSTONE_MASTER_HANDBOOK.md` §5.3, §10 | لا شيء محلياً؛ النتائج صناعية فقط |
-| 11 | التيست الحقيقي على موتور ثم prediction/RUL (لينكي MathWorks) | ◐ جزئي | كُتب بروتوكول الاختبار؛ العنوان الرئيسي فوق 80% دلوقتي **diagnosis على موتور CWRU حقيقي 2 hp**: **1.000 (100.0%)** على 1,039 نافذة مقابل majority baseline **0.4004 (40.04%)**، بأربع فئات bearing-condition **ليست** فئات الـ runtime، وتحت `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`. وعنوان RUL المنفصل لسه benchmark على **موتور حقيقي 160 kW ثلاثي الأطوار** من Zenodo DOI `10.5281/zenodo.15637023` برخصة CC BY 4.0 وRUL بالساعات: **MAE 141.716 h** و**RMSE 204.069 h** ودقة إنذار 24 ساعة **0.677 (67.7%)** — أقل من 80% وأسوأ من baseline صفر/no-warning، ويتقال كما هو. benchmarks سابقة على PRONOSTIA وXJTU-SY وNASA IMS وC-MAPSS لسه موسومة؛ الداشبورد يعرض كلها تحت `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`؛ مسار جاهز لموتورنا عبر `ml/rul_from_rig.py` لكن الـ RUL الميداني لسه متوقف على البيانات | §11 أدناه; `docs/REAL_MOTOR_READINESS.md`; `docs/DATA_PROVENANCE_LICENSES.md`; `ml/ai_report.md` §10–§16; `ml/diagnosis_cwru.py`; `ml/diagnosis_cwru_report.json`; `tests/test_diagnosis_cwru.py`; `data/cwru/README.md`; `data/fmcg_induction_rul/README.md`; `data/pronostia/README.md`; `data/xjtu_sy_mendeley/README.md`; `data/nasa_ims/README.md` | `[NEED: motor rig access, calibrated raw readings, run-to-failure series from our rig]`; `[NEED: operator-accepted failure endpoint and reviewed metric report]` |
+| 11 | التيست الحقيقي على موتور ثم prediction/RUL (لينكي MathWorks) | ◐ جزئي | كُتب بروتوكول الاختبار؛ العنوان الرئيسي فوق 80% دلوقتي **diagnosis على موتور CWRU حقيقي 2 hp**: **1.000 (100.0%)** على 1,039 نافذة مقابل majority baseline **0.4004 (40.04%)**، بأربع فئات bearing-condition **ليست** فئات الـ runtime، وتحت `OFFLINE RESULT / NAMED PUBLIC DATASET`. وعنوان RUL المنفصل لسه benchmark على **موتور حقيقي 160 kW ثلاثي الأطوار** من Zenodo DOI `10.5281/zenodo.15637023` برخصة CC BY 4.0 وRUL بالساعات: **MAE 141.716 h** و**RMSE 204.069 h** ودقة إنذار 24 ساعة **0.677 (67.7%)** — أقل من 80% وأسوأ من baseline صفر/no-warning، ويتقال كما هو. benchmarks سابقة على PRONOSTIA وXJTU-SY وNASA IMS وC-MAPSS لسه موسومة؛ الداشبورد يعرض كلها تحت `OFFLINE RESULT / NAMED PUBLIC DATASET`؛ مسار جاهز لموتورنا عبر `ml/rul_from_rig.py` لكن الـ RUL الميداني لسه متوقف على البيانات | §11 أدناه; `docs/REAL_MOTOR_READINESS.md`; `docs/DATA_PROVENANCE_LICENSES.md`; `ml/ai_report.md` §10–§16; `ml/diagnosis_cwru.py`; `ml/diagnosis_cwru_report.json`; `tests/test_diagnosis_cwru.py`; `data/cwru/README.md`; `data/fmcg_induction_rul/README.md`; `data/pronostia/README.md`; `data/xjtu_sy_mendeley/README.md`; `data/nasa_ims/README.md` | `[NEED: motor rig access, calibrated raw readings, run-to-failure series from our rig]`; `[NEED: operator-accepted failure endpoint and reviewed metric report]` |
 | 12 | الرد سريعاً لأن الشغل مكمل «بكرة» | — لا ينطبق | لا يوجد تاريخ قابل للتحقق؛ اعتُبر كأولوية لا كطلب هندسي | `/tmp/opencode/textinstinct_chat.txt:1258-1260` | `[NEED: actual exhibition date if a deadline must be quoted]` |
 | 13 | مخرجات أكثر تدرّجاً + مكان المشكلة وتكلفتها ومدة بقاء الموتور | ◐ جزئي | يوجد `response_plan` بأربع أولويات وإجراءات، لكن المدد ثابتة لكل فئة وليست تنبؤاً؛ لا تكلفة ولا زمن بقاء مقيسان. مسار `ml/rul_from_rig.py` جاهز لاستبدال ذلك بـ RUL متعلّم بعد بيانات ريجنا | `ml/rf_predictor.py:37-72`; `edge/edge_daq.py:604`; `ml/ai_report.md` §5.5; `docs/REAL_MOTOR_READINESS.md` | `[NEED: degradation curve, part prices, downtime cost and failure labels]` |
 
@@ -204,7 +204,7 @@ restating any resource-saving claim]`
   **MAE 134.924 دقيقة وRMSE 171.776 دقيقة** مقابل **RMSE 160.859** للـ baseline
   الثابت — يعني الموديل أسوأ شوية من الـ baseline، وده يتقال كمان. الدقائق دي
   لمحامل عامة **مش ساعات بقاء لموتورنا**، والداشبورد يعرضها تحت
-  `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`. رخصة المصدر الأصلي غير
+  `OFFLINE RESULT / NAMED PUBLIC DATASET`. رخصة المصدر الأصلي غير
   معلومة صراحةً: `[NEED: explicit XJTU-SY reuse licence]`؛ أدلة المصادر والرخص
   كلها في `docs/DATA_PROVENANCE_LICENSES.md`، ولا نهاية مسار عام تُعدّ تأكيد
   مشغّل على فشل ريجنا.
@@ -232,7 +232,7 @@ restating any resource-saving claim]`
    يعني الموديل أسوأ ويُقال الرقم الحقيقي حتى لو تحت 80%. الساعات دي لموتور
    عام **مش ساعات بقاء لموتورنا**، والـ 24 ساعة bin لتقييم benchmark **مش**
    حد إنذار معتمد من مشغّل. التقرير `ml/rul_fmcg_report.json` موسوم
-   `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`.
+   `OFFLINE RESULT / NAMED PUBLIC DATASET`.
 - استجابةً لطلب «لو عندنا الموتور، المشروع هيبقى predictive maintenance كامل؟»
   أُضيف مسار جاهز على الجهاز المضيف فقط: `ml/rul_from_rig.py` يقرأ CSV من
   `edge/edge_daq.py` بعد إضافة `failure_timestamp` من المشغّل، يبني نوافذ
@@ -258,7 +258,7 @@ restating any resource-saving claim]`
    الدقة **1.000 (100.0%)** على 1,039 نافذة مقابل majority baseline
    **0.4004 (40.04%)**؛ التقرير `ml/diagnosis_cwru_report.json` والاختبارات
    `tests/test_diagnosis_cwru.py`. الأربع فئات هي حالة المحمل وليست فئات
-   الـ runtime، والنتيجة `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`
+   الـ runtime، والنتيجة `OFFLINE RESULT / NAMED PUBLIC DATASET`
    وليست تنبؤ بقاء ولا validation ميداني. فجوة الرخصة ورقم الكتالوج محفوظة
    كذلك كـ `[NEED: explicit CWRU licence; exact catalogue number]`.
 - التنفيذ الحالي يصنّف **الحالة الحالية** ويُصدر `response_plan` بأربع أولويات
@@ -289,8 +289,7 @@ restating any resource-saving claim]`
   **0.9524**، recall **0.800**، ومتوسط خمس folds لا تتشارك الوحدات **0.9705**
   مقابل **0.8248** baseline. التقرير `ml/rul_cmapss_warning_report.json`،
   والاختبارات `tests/test_rul_cmapss_warning.py`. الوسم الإلزامي
-  `RUL WARNING BENCHMARK / SIMULATED TURBOFAN / NOT OUR MOTOR /
-  NOT FIELD-VALIDATED`: ليست دقة RUL مستمرة، وليست موتورنا، وليست عتبة إنذار
+  `RUL WARNING RESULT / SIMULATED TURBOFAN / OFFLINE`: ليست دقة RUL مستمرة، وليست موتورنا، وليست عتبة إنذار
   للمشغّل، ولم يتغير الـ runtime أو Firebase أو الجهاز.
 - **«شيل من الـ UI العناصر دي»:** أُزيلت من `public/index.html`: سطر
   `SOURCE: DEVICE TELEMETRY ONLY`، نص `Operational Protocol:` مع سطر المشورة

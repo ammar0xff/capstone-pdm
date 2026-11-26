@@ -34,7 +34,7 @@
       "Bearing3_2": 0
     }
   },
-  "label": "IEEE PHM 2012 PRONOSTIA/FEMTO-ST real bearing benchmark - not our motor, not field-validated",
+  "label": "IEEE PHM 2012 PRONOSTIA/FEMTO-ST real bearing benchmark - offline result on a named public dataset",
   "last_window": {
     "mae_s": 182.90964285714287,
     "n_bearings": 6,

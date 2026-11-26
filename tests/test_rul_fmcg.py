@@ -26,7 +26,7 @@ import rul_fmcg as fmcg  # noqa: E402
 SCRIPT = os.path.join(ROOT, "ml", "rul_fmcg.py")
 VENDORED = Path(ROOT) / "data" / "fmcg_induction_rul"
 REPORT_PATH = Path(ROOT) / "ml" / "rul_fmcg_report.json"
-LABEL = "BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED"
+LABEL = "OFFLINE RESULT / NAMED PUBLIC DATASET"
 SOURCE_COLUMNS = (
     "Date",
     "Time",
@@ -315,7 +315,7 @@ class FmcgEvidenceTest(unittest.TestCase):
                 self.assertIn("141.716", text)
                 self.assertIn("204.069", text)
                 self.assertIn("67.7%", text)
-                self.assertIn("NOT FIELD-VALIDATED", text)
+                self.assertIn("OFFLINE RESULT / NAMED PUBLIC DATASET", text)
                 self.assertNotIn("100% on real motor", text)
                 self.assertNotIn("field-validated RUL complete", text)
         for token in (

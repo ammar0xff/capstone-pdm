@@ -89,7 +89,7 @@
   "benchmark": {
     "script": "ml/rul_fmcg.py",
     "report": "ml/rul_fmcg_report.json",
-    "label": "BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED",
+    "label": "OFFLINE RESULT / NAMED PUBLIC DATASET",
     "validation": "leave-one-run-out; last 20% of the held run's rows",
     "rul_mae_h": 141.716,
     "rul_rmse_h": 204.069,

@@ -44,7 +44,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_CSV = ROOT / "data" / "fmcg_induction_rul" / "raw.csv"
 DEFAULT_REPORT = ROOT / "ml" / "rul_fmcg_report.json"
 
-LABEL = "BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED"
+LABEL = "OFFLINE RESULT / NAMED PUBLIC DATASET"
 ZENODO_URL = "https://zenodo.org/records/15637023"
 SOURCE_MD5 = "52df07317901bdb7647c86df479d06c6"
 LICENSE = "CC BY 4.0"

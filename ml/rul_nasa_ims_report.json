@@ -24,7 +24,7 @@
     "rul_endpoint": "last published snapshot of each documented failed-bearing test (dataset-defined end of test)",
     "snapshot_period_min": "5 for the first 43 snapshots of set 1, then 10; nominal recorded cadence, not wall-clock operating hours"
   },
-  "label": "BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED",
+  "label": "OFFLINE RESULT / NAMED PUBLIC DATASET",
   "method": {
     "baseline": "constant median nominal duration of the other bearings",
     "causal": true,

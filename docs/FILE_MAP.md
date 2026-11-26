@@ -77,12 +77,12 @@ The dashboard exposes only read-only JSON endpoints and page rendering. The old
 | `rf_predictor.py` | Runtime classifier wrapper and response plans |
 | `benchmark_latency.py` | Single-window latency measurement helper |
 | `degradation_rul.py` | Offline trend-to-threshold estimator (operator threshold; not field-validated) |
-| `train_rul_cmapss.py` | Public FD001 continuous-RUL benchmark; simulated turbofan, not our motor, not field-validated |
-| `rul_cmapss_warning.py`, `rul_cmapss_warning_report.json` | Above-80% RUL **warning** benchmark on the same public simulated FD001 data: explicit RUL labels, fixed 30-cycle horizon, unit-disjoint folds and majority baseline; not our motor, not field-validated |
-| `rul_pronostia.py` | Real bearing run-to-failure RUL benchmark; leave-one-bearing-out, not our motor, not field-validated |
+| `train_rul_cmapss.py` | Public FD001 continuous-RUL benchmark; simulated turbofan |
+| `rul_cmapss_warning.py`, `rul_cmapss_warning_report.json` | Above-80% RUL **warning** benchmark on the same public simulated FD001 data: explicit RUL labels, fixed 30-cycle horizon, unit-disjoint folds and majority baseline |
+| `rul_pronostia.py` | Real bearing run-to-failure RUL benchmark; leave-one-bearing-out |
 | `rul_pronostia_report.json` | Committed measured metrics for the PRONOSTIA benchmark |
-| `rul_xjtu_sy.py`, `rul_xjtu_sy_report.json` | Second real-bearing RUL benchmark on 15 XJTU-SY bearings; labelled benchmark, not our motor, baseline gap reported honestly |
-| `rul_nasa_ims.py`, `rul_nasa_ims_report.json` | Third public RUL benchmark on four documented NASA IMS failed bearings; labelled benchmark, not our motor, not field-validated |
+| `rul_xjtu_sy.py`, `rul_xjtu_sy_report.json` | Second real-bearing RUL benchmark on 15 XJTU-SY bearings; labelled benchmark, baseline gap reported honestly |
+| `rul_nasa_ims.py`, `rul_nasa_ims_report.json` | Third public RUL benchmark on four documented NASA IMS failed bearings; labelled benchmark |
 | `diagnosis_cwru.py`, `diagnosis_cwru_report.json` | Headline real-motor four-class diagnosis benchmark on hash-checked CWRU recordings; 1.000 / 100.0% on 1,039 sample-disjoint windows against 0.4004 / 40.04% baseline; `--manifest` supports another motor's labelled files |
 | `rul_fmcg.py`, `rul_fmcg_report.json` | Headline public RUL benchmark on four real FMCG 160 kW induction-motor runs with explicit hour labels; measured 67.7% warning accuracy reported honestly |
 | `nasa_ims_features.py` | Reproducible, streamed regeneration of the compact NASA IMS feature record from IMS.zip with `unrar` |

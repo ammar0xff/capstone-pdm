@@ -38,7 +38,7 @@ class DashboardTruthTest(unittest.TestCase):
 
     def test_states_are_labelled(self):
         for token in ["No live data", "That is old", "The classifier is trained on generated data.",
-                      "NOT OUR MOTOR", "EXPLORATORY", "not demonstrated on a whole motor", "no validated RUL exists"]:
+                      "OFFLINE RESULTS", "doi:10.1186/s13104-023-06400-4", "EXPLORATORY", "not demonstrated on a whole motor", "no validated RUL exists"]:
             self.assertIn(token, HTML, token)
 
     def test_benchmark_numbers_match_recorded_result(self):

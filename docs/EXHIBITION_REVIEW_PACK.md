@@ -10,8 +10,8 @@
 |---|---|---|
 | النظام بيعمل إيه دلوقتي؟ | يقرأ ثلاثة حساسات على الراسبري، بوابة SPC ثم تصنيف الحالة الحالية إلى أربع فئات، ويعرض القرار على الداشبورد ويرآيه على Firebase. | `README.md`، `edge/edge_daq.py`، `public/index.html` |
 | الدقة 100% معناها إيه؟ | دقة الـ benchmark **الصناعي** فقط على 1,400 نافذة مولّدة. **ليست** دقة على موتور حقيقي. | `ml/ai_report.md` §5، `tests/test_evaluation.py` |
-| الـ 100% بتاعة CWRU معناها إيه؟ | benchmark **تشخيص** على موتور CWRU حقيقي 2 hp: **1.000 (100.0%)** على 1,039 نافذة بفصل blocks متصلة غير متداخلة، ومقابل majority baseline **0.4004 (40.04%)**. الأربع فئات حالة محمل وليست فئات الـ runtime؛ `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`، وليست RUL. | `ml/diagnosis_cwru.py`، `ml/diagnosis_cwru_report.json`، `tests/test_diagnosis_cwru.py`، `ml/ai_report.md` §16 |
-| فيه RUL شغال؟ | **No, not on our motor.** Our rig has no run-to-failure data and no operator failure labels, so no RUL number is shown or supported for it. What exists is offline benchmark work on public data, labelled not our motor and not field-validated. Regression error (MAE/RMSE) and warning classification metrics are different measures. On the real 160 kW induction-motor dataset (Zenodo DOI `10.5281/zenodo.15637023`, CC BY 4.0, four runs, leave-one-run-out) the model is worse than simple baselines: MAE 141.716 h vs 69.185 h for constant zero, RMSE 204.069 h vs 106.164 h, and 24-hour warning accuracy 0.677 vs 0.686 for never warning, with recall 0.029. On XJTU-SY bearings tail MAE is 134.924 min vs 136.558 min for a constant baseline (RMSE 171.776 vs 160.859 min, worse). NASA IMS (MAE 9165.28 vs 17011.8 min) and PRONOSTIA (last-window MAE 182.91 s vs 8900 s, six bearings) are better than their constant baselines on bearing benchmarks only. The 0.940 warning accuracy is on simulated NASA C-MAPSS turbofan data, a different task. None of this is our motor. | `ml/rul_fmcg.py`، `ml/rul_fmcg_report.json`، `data/fmcg_induction_rul/README.md`، `ml/rul_pronostia_report.json`، `ml/rul_xjtu_sy_report.json`، `ml/rul_nasa_ims_report.json`، `public/index.html` |
+| الـ 100% بتاعة CWRU معناها إيه؟ | benchmark **تشخيص** على موتور CWRU حقيقي 2 hp: **1.000 (100.0%)** على 1,039 نافذة بفصل blocks متصلة غير متداخلة، ومقابل majority baseline **0.4004 (40.04%)**. الأربع فئات حالة محمل وليست فئات الـ runtime؛ `OFFLINE RESULT / NAMED PUBLIC DATASET`، وليست RUL. | `ml/diagnosis_cwru.py`، `ml/diagnosis_cwru_report.json`، `tests/test_diagnosis_cwru.py`، `ml/ai_report.md` §16 |
+| فيه RUL شغال؟ | **No RUL number is shown or supported for the rig.** Our rig has no run-to-failure data and no operator failure labels, so no RUL number is shown or supported for it. What exists is offline benchmark work on public data, labelled as offline results on named public datasets. Regression error (MAE/RMSE) and warning classification metrics are different measures. On the real 160 kW induction-motor dataset (Zenodo DOI `10.5281/zenodo.15637023`, CC BY 4.0, four runs, leave-one-run-out) the model is worse than simple baselines: MAE 141.716 h vs 69.185 h for constant zero, RMSE 204.069 h vs 106.164 h, and 24-hour warning accuracy 0.677 vs 0.686 for never warning, with recall 0.029. On XJTU-SY bearings tail MAE is 134.924 min vs 136.558 min for a constant baseline (RMSE 171.776 vs 160.859 min, worse). NASA IMS (MAE 9165.28 vs 17011.8 min) and PRONOSTIA (last-window MAE 182.91 s vs 8900 s, six bearings) are better than their constant baselines on bearing benchmarks only. The 0.940 warning accuracy is on simulated NASA C-MAPSS turbofan data, a different task. None of this is our motor. | `ml/rul_fmcg.py`، `ml/rul_fmcg_report.json`، `data/fmcg_induction_rul/README.md`، `ml/rul_pronostia_report.json`، `ml/rul_xjtu_sy_report.json`، `ml/rul_nasa_ims_report.json`، `public/index.html` |
 | لو كان عندنا موتورنا، المشروع هيبقى predictive maintenance كامل؟ | المسار مجهّز: `ml/rul_from_rig.py` يقرأ CSV بـ `failure_timestamp` من المشغّل، يقيّم بفصل الـ run، ويحفظ نموذجاً ويتنبأ بـ RUL. **لا** نقول إنه اتختبر ميدانياً. | `docs/REAL_MOTOR_READINESS.md`، `ml/rul_from_rig.py`، `tests/test_rul_from_rig.py` |
 | البيانات حقيقية؟ | نعم في Benchmarks العامة: سجل FMCG لموتور حقيقي 160 kW ثلاثي الأطوار بـ RUL بالساعات، وCWRU عيّنة موتور حقيقي بعيوب مِصَنعة، وPRONOSTIA ست تجارب وXJTU-SY 15 تجربة وNASA IMS 4 حالات فشل موثّقة run-to-failure حقيقية لمحامل. لا، ليست من ريج المشروع. | `data/fmcg_induction_rul/README.md`، `data/cwru/README.md`، `data/pronostia/README.md`، `data/xjtu_sy_mendeley/README.md`، `data/nasa_ims/README.md` |
 | المصادر والرخص موثّقة؟ | الداشبورد يعرض لوحة أدلة مع رخص CC BY 4.0 الصريحة لـ FMCG والنسخة المشتقة وmetadata بتاع NASA IMS (`usa.gov/government-works`)؛ الرخصة الصريحة لأصل XJTU-SY وFEMTO-ST وCWRU ورقم كتالوج Reliance غير متوفرة ومكتوبة `[NEED: ...]`، لا نخترعها. | `docs/DATA_PROVENANCE_LICENSES.md`، `tests/test_dashboard_benchmark_evidence.py` |
@@ -22,13 +22,12 @@
 | إيه المطلوب للخطوة الجاية؟ | `[NEED: run-to-failure series with timestamps and failure labels from our rig]`، `[NEED: measured degradation curve]`، `[NEED: real operator failure threshold]`. | `README.md`، `ml/ai_report.md` §11 |
 
 **الجملة الآمنة للمعرض:**
-> «النظام يكتشف ويصنّف الحالة الآن ويقترح إجراءً؛ أعلى رقم حقيقي لدينا هو **1.000 (100.0%)** على benchmark تشخيص CWRU بأربع فئات حالة محمل، مقابل **0.4004 (40.04%)** baseline، وهو `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED` وليس فئات ريجنا. أما التنبؤ بالبقاء فشغال كـ benchmark على موتور حقيقي عام بـ RUL بالساعات، ودقة إنذار 24 ساعة فيه 67.7% نقولها كما هي لأنها تحت 80%؛ مسار `ml/rul_from_rig.py` جاهز لبيانات موتورنا، ومحتاج بيانات run-to-failure وتوقيع نهاية العمر قبل أي ادعاء ميداني.»
+> «النظام يكتشف ويصنّف الحالة الآن ويقترح إجراءً؛ أعلى رقم حقيقي لدينا هو **1.000 (100.0%)** على benchmark تشخيص CWRU بأربع فئات حالة محمل، مقابل **0.4004 (40.04%)** baseline، وهو `OFFLINE RESULT / NAMED PUBLIC DATASET` وليس فئات ريجنا. أما التنبؤ بالبقاء فشغال كـ benchmark على موتور حقيقي عام بـ RUL بالساعات، ودقة إنذار 24 ساعة فيه 67.7% نقولها كما هي لأنها تحت 80%؛ مسار `ml/rul_from_rig.py` جاهز لبيانات موتورنا، ومحتاج بيانات run-to-failure وتوقيع نهاية العمر قبل أي ادعاء ميداني.»
 
 ## 2) تسلسل العرض (Demo) — 5 دقائق
 
 1. **الداشبورد المباشر:** افتح `https://castpone2026.web.app/` → بيّن الحالةLive،
-   قرار المشغّل، الرسوم، ولوحة الـ benchmark الموسومة `BENCHMARK / NOT OUR MOTOR /
-   NOT FIELD-VALIDATED` مع أدلة المصادر. لا تضغط أي أداة محاكاة (غير موجودة أصلاً).
+   قرار المشغّل، الرسوم، ولوحة الـ benchmark الموسومة `OFFLINE RESULT / NAMED PUBLIC DATASET` مع أدلة المصادر. لا تضغط أي أداة محاكاة (غير موجودة أصلاً).
 2. **الشرح بالشرائح:** افتح `https://castpone2026.web.app/guide.html` → شريحة
    البنية ثم شريحة الأسئلة. اقرأ إجابة RUL كما هي: benchmark عام، مش موتورنا.
 3. **الراسبري (قراءة فقط):** `systemctl status pdm-daq.service pdm-cloud.service
@@ -39,12 +38,12 @@
 5. **التشخيص على موتور حقيقي:** افتح `ml/diagnosis_cwru_report.json` وبيّن
    **1.000 (100.0%)** على 1,039 نافذة مقابل **0.4004 (40.04%)** baseline، مع
    فصل الـ blocks من غير تداخل. قل فوراً: أربع فئات حالة محمل، مش فئات ريجنا،
-   ومش RUL. Label: `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`.
+   ومش RUL. Label: `OFFLINE RESULT / NAMED PUBLIC DATASET`.
    لإعادة الإنتاج: `python3 ml/diagnosis_cwru.py --report /tmp/diagnosis_cwru.json`.
 6. **الـ RUL الحقيقي على benchmark:** افتح `ml/rul_fmcg_report.json` في اللوحة
    وبيّن **141.716 h MAE** و**204.069 h RMSE** و**67.7%** دقة إنذار 24 ساعة،
    مع إنها أقل من 80% وأسوأ من الـ baselines. Label:
-   `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`. لإعادة الإنتاج:
+   `OFFLINE RESULT / NAMED PUBLIC DATASET`. لإعادة الإنتاج:
    `python3 ml/rul_fmcg.py --report /tmp/rul_fmcg_report.json`. للمصادر المستقلة
    افتح `ml/rul_pronostia_report.json` و`ml/rul_xjtu_sy_report.json` و
    `ml/rul_nasa_ims_report.json` وبيّن نفس الـ label، مع دقائق التسجيل الاسمية.
@@ -105,7 +104,7 @@ CWRU أو PRONOSTIA/FEMTO-ST أو XJTU-SY أو NASA IMS، وكلٌّ له ريج
 لا. الرقم **1.000 (100.0%)** محسوب على أربع فئات حالة محمل في عيّنة CWRU
 بمقارنة **0.4004 (40.04%)** baseline، بفصل blocks متصلة غير متداخلة. فئات
 الـ runtime عندنا مختلفة، والريج مختلف، ولا يوجد validation ميداني؛ لذلك
-الوصف الإلزامي `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`.
+الوصف الإلزامي `OFFLINE RESULT / NAMED PUBLIC DATASET`.
 
 **س: الرخصة واضحة؟**
 FMCG على Zenodo معلنة CC BY 4.0 (DOI `10.5281/zenodo.15637023`)، ونسخة figshare

@@ -169,7 +169,7 @@
       }
     ]
   },
-  "label": "RUL WARNING BENCHMARK / SIMULATED TURBOFAN / NOT OUR MOTOR / NOT FIELD-VALIDATED",
+  "label": "RUL WARNING RESULT / SIMULATED TURBOFAN / OFFLINE",
   "method": {
     "causal": true,
     "max_depth": 12,

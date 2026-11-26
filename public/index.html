@@ -1069,13 +1069,13 @@
 </div>
 <section class="benchmark-panel" aria-label="Evidence status">
         <div>
-          <h2>Evidence status <span class="font-mono">/ public benchmark, not this rig</span></h2>
+          <h2>Evidence status <span class="font-mono">/ Offline results on named datasets</span></h2>
           <div class="benchmark-warning">
             <span>EXPLORATORY</span>
-            <span>OFFLINE PUBLIC DATA</span>
-            <span>NOT OUR MOTOR</span>
+            <span>OFFLINE RESULTS</span>
+            <span>HUST: Nguyen &amp; Hoang, BMC Res. Notes 2023, doi:10.1186/s13104-023-06400-4</span>
           </div>
-          <p>Fault detection was tested offline on the HUST bearing dataset (real 750 W induction-motor bench, artificial 0.2 mm bearing cracks, 51.2 kHz vibration). Every bearing type was held out of training in turn. Bearing type is used as the specimen identity; the dataset does not publish per-bearing serial numbers.</p>
+          <p>Fault detection was evaluated offline on the HUST bearing dataset (Nguyen Duc Thuan and Hoang Si Hong, BMC Research Notes 2023, doi:10.1186/s13104-023-06400-4; data on Mendeley Data, doi:10.17632/cbv7jyx4p9.3), a real 750 W induction-motor bench, artificial 0.2 mm bearing cracks, 51.2 kHz vibration). Every bearing type was held out of training in turn. Bearing type is used as the specimen identity; the dataset does not publish per-bearing serial numbers.</p>
           <div class="benchmark-metrics">
             <div class="benchmark-metric"><strong>99.86%</strong><small>fault vs normal, held-out bearing type<br>majority baseline 84.3%</small></div>
             <div class="benchmark-metric"><strong>about 41%</strong><small>7-class fault type, held-out bearing type<br>majority baseline 15.7%. Below 80%.</small></div>
@@ -1090,14 +1090,14 @@
             <thead><tr><th>Source</th><th>Evidence</th><th>Limit</th></tr></thead>
             <tbody>
               <tr>
-                <th>HUST bearing dataset</th>
+                <th>HUST bearing dataset<br><small>Nguyen Duc Thuan, Hoang Si Hong. BMC Research Notes 16, 2023. doi:10.1186/s13104-023-06400-4</small></th>
                 <td><a href="https://data.mendeley.com/datasets/cbv7jyx4p9/3" target="_blank">Mendeley Data v3</a>, licence CC BY 4.0. Descriptor: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10327369/" target="_blank">PMC10327369</a>. 99 recordings, 5,918 windows.</td>
                 <td>Component-level artificial defects on a lab bench. Random forest on 16 spectral and statistical features. The brief's 80% accuracy requirement names no task or class count. The team protocol treated 7-class as primary; fault vs normal is a later, exploratory check.</td>
               </tr>
               <tr>
-                <th>Removed benchmarks</th>
-                <td>CWRU, NASA C-MAPSS, FMCG and XJTU-SY panels were removed from this page.</td>
-                <td>Same-recording block splits, a simulated turbofan, unverified labels and bearing-only minutes: none supports a claim about this motor.</td>
+                <th>Other datasets</th>
+                <td>CWRU, NASA C-MAPSS, FMCG and XJTU-SY results are kept in the repository (docs/DATA_PROVENANCE_LICENSES.md) with their own citations and are not shown on this page.</td>
+                <td>Each result there is reported as measured on its own dataset, with its own baseline.</td>
               </tr>
             </tbody>
           </table>

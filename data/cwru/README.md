@@ -75,8 +75,7 @@ python3 ml/diagnosis_cwru.py --report ml/diagnosis_cwru_report.json
 Measured result: **1.000 (100.0%)** accuracy on 1,039 windows, against a
 **0.4004 (40.04%)** majority-class baseline; macro precision / recall / F1 are
 1.000 and every fold and every class recall is 1.000. This is a controlled
-public benchmark with seeded faults: `BENCHMARK / NOT OUR MOTOR /
-NOT FIELD-VALIDATED`. It is not an RUL result, not our deployed taxonomy and
+public benchmark with seeded faults: `OFFLINE RESULT / NAMED PUBLIC DATASET`. It is not an RUL result, not our deployed taxonomy and
 not field validation of the capstone classifier. The exact CWRU reuse licence
 and Reliance catalogue number remain
 `[NEED: explicit CWRU licence; exact catalogue number]`. For another motor,

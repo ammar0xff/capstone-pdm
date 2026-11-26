@@ -59,7 +59,7 @@
     }
   },
   "limits": [
-    "BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED",
+    "OFFLINE RESULT / NAMED PUBLIC DATASET",
     "Minutes are nominal recorded cadence (5 for first 43 snapshots of set 1, then 10), not wall-clock operating hours",
     "Endpoint is the last published snapshot of each documented failed-bearing test",
     "Temperature and acoustic channels are not present in this source"

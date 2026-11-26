@@ -57,7 +57,7 @@ FILE_HASHES = (
 )
 
 LABEL = (
-    "RUL WARNING BENCHMARK / SIMULATED TURBOFAN / NOT OUR MOTOR / NOT FIELD-VALIDATED"
+    "RUL WARNING RESULT / SIMULATED TURBOFAN / OFFLINE"
 )
 WARNING_HORIZON_CYCLES = 30
 N_ESTIMATORS = 200
@@ -279,7 +279,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description=(
             "RUL warning benchmark on public NASA C-MAPSS FD001; "
-            "simulated turbofan, not our motor, not field-validated."
+            "simulated turbofan."
         )
     )
     parser.add_argument("--raw-dir", default=str(DEFAULT_RAW_DIR))

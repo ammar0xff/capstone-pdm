@@ -45,7 +45,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_CSV = ROOT / "data" / "nasa_ims" / "failed_bearings.csv"
 DEFAULT_REPORT = ROOT / "ml" / "rul_nasa_ims_report.json"
 
-LABEL = "BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED"
+LABEL = "OFFLINE RESULT / NAMED PUBLIC DATASET"
 PORTAL_URL = "https://data.nasa.gov/dataset/ims-bearings"
 ARCHIVE_URL = "https://data.nasa.gov/docs/legacy/IMS.zip"
 ARCHIVE_SHA256 = "6cb42c263b0281c725abf99f4b9fcf49915c949f31dbd2333877dc2e06ce9ec2"

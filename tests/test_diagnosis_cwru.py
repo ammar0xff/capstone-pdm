@@ -26,7 +26,7 @@ import diagnosis_cwru as cwru  # noqa: E402
 SCRIPT = os.path.join(ROOT, "ml", "diagnosis_cwru.py")
 DATA_DIR = Path(ROOT) / "data" / "cwru"
 REPORT_PATH = Path(ROOT) / "ml" / "diagnosis_cwru_report.json"
-LABEL = "BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED"
+LABEL = "OFFLINE RESULT / NAMED PUBLIC DATASET"
 EXPECTED_SOURCES = {
     "Normal_0.mat": ("X097_DE_time", "healthy", 0, "ee410e7243aefcd8b7120876556464e7"),
     "IR007_0.mat": (

@@ -19,7 +19,7 @@
     "operating_point": "0 hp, approximately 1797 rpm",
     "sample_rate_hz": 12000
   },
-  "label": "BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED",
+  "label": "OFFLINE RESULT / NAMED PUBLIC DATASET",
   "majority_class_baseline": {
     "accuracy": 0.4004,
     "confusion_tp_fp_fn_support": [

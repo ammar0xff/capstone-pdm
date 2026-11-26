@@ -20,7 +20,7 @@ report and prediction is labelled **not field-validated**.
 |---|---|---|
 | Three-sensor acquisition, features, SPC gate, four-class diagnosis, response plan | `edge/edge_daq.py`, `ml/rf_predictor.py`, `ml/ai_report.md` | Implemented; 100% accuracy is synthetic-only |
 | Local dashboard and Firebase RTDB status mirror | `edge/dashboard.py`, `edge/firebase_mirror.py`, `public/index.html`, `docs/FIREBASE_SETUP.md` | Presentation/read status only; no write endpoint on the hosted dashboard |
-| Real bearing run-to-failure RUL benchmark | `ml/rul_pronostia.py`, `ml/rul_pronostia_report.json`, `data/pronostia/README.md` | Reproduced on PRONOSTIA/FEMTO-ST; not our motor |
+| Real bearing run-to-failure RUL benchmark | `ml/rul_pronostia.py`, `ml/rul_pronostia_report.json`, `data/pronostia/README.md` | Reproduced on PRONOSTIA/FEMTO-ST |
 | Threshold-based degradation estimator | `ml/degradation_rul.py`, `tests/test_degradation_rul.py` | Offline only; needs an operator threshold |
 | **Target-rig RUL trainer/evaluator/predictor** | `ml/rul_from_rig.py`, `tests/test_rul_from_rig.py` | **Ready for operator-supplied data; not field-validated** |
 

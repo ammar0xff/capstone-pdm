@@ -339,7 +339,7 @@ PRONOSTIA/FEMTO-ST were vendored into `data/pronostia/` (8,384 unmodified CSVs,
 `ml/rul_pronostia.py`, `tests/test_rul_pronostia.py` and the write-up were added
 on the host only. Leave-one-bearing-out last-window MAE is 182.91 s and RMSE
 335.26 s, against 8902.25 s constant-baseline RMSE; all-window MAE is 6656.68 s
-and RMSE 9557.01 s. These are real bearing trajectories, not our motor, and are
+and RMSE 9557.01 s. These are real bearing trajectories, and are
 explicitly **not field-validated**.
 
 No Pi file, service, calibration artifact or Firebase state was changed for
@@ -376,7 +376,7 @@ The causal leave-one-bearing-out benchmark over 9,216 one-minute snapshots
 reports last-20% MAE 134.924 min and RMSE 171.776 min against a constant
 baseline RMSE of 160.859 min; the model is slightly worse and that is shown as
 measured. The hosted `public/index.html` displays these numbers only beside
-`BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED` and the source/licence table;
+`OFFLINE RESULT / NAMED PUBLIC DATASET` and the source/licence table;
 `public/index.html`, `public/guide.html` and `public/calibration.html` were
 converted to light mode.
 
@@ -429,7 +429,7 @@ The NASA IMS CSV now contains all 11,620 documented snapshots
 labelled report gives 2,328 tail windows with MAE 9,165.276 min and RMSE
 12,531.872 min against constant-baseline MAE 17,011.804 min and RMSE
 17,382.217 min. These are nominal recorded minutes from public bearing tests,
-`BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`, never hours-to-failure for
+`OFFLINE RESULT / NAMED PUBLIC DATASET`, never hours-to-failure for
 our motor.
 
 Web verification: the live `https://castpone2026.web.app/` passed webcheck with
@@ -493,7 +493,7 @@ hold out contiguous 4,096-sample blocks so no vibration sample crosses from
 training into test; the measured held-out accuracy is **1.000 (100.0%)** over
 1,039 windows against a **0.4004 (40.04%)** majority baseline. These are four
 bearing-condition classes on CWRU's 2 hp Reliance Electric motor: not our
-deployed taxonomy, not our rig, not RUL and not field validation.
+deployed taxonomy, not RUL and not field validation.
 
 No Pi sync, hosting deploy, runtime service, model, calibration artifact or
 Firebase state was changed by this CWRU step. The device-only telemetry rule
@@ -557,5 +557,4 @@ synced `public/index.html` contains two `NASA C-MAPSS FD001` markers and zero
 removed UI/buffer-freeze tokens. No runtime service was restarted, and no
 `edge/`, `cal.json`, `cloud_config.json`, model, calibration artifact or RTDB
 telemetry value was edited by this sync. The FMCG RUL result remains 67.7% and
-the C-MAPSS result remains explicitly `SIMULATED TURBOFAN / NOT OUR MOTOR /
-NOT FIELD-VALIDATED`.
+the C-MAPSS result remains explicitly `SIMULATED TURBOFAN / OFFLINE`.

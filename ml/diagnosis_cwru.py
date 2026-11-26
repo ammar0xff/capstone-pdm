@@ -55,7 +55,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_DATA_DIR = ROOT / "data" / "cwru"
 DEFAULT_REPORT = ROOT / "ml" / "diagnosis_cwru_report.json"
 
-LABEL = "BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED"
+LABEL = "OFFLINE RESULT / NAMED PUBLIC DATASET"
 OPERATOR_LABEL = "OPERATOR-SUPPLIED / PROVENANCE UNVERIFIED / NOT FIELD-VALIDATED"
 LICENCE_GAP = "[NEED: explicit CWRU licence; exact catalogue number]"
 SOURCE_URLS = (

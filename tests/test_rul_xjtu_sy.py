@@ -116,7 +116,7 @@ class XjtuEvaluationTest(unittest.TestCase):
 
         self.assertEqual(report["status"], "benchmark_complete")
         self.assertEqual(
-            report["label"], "BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED"
+            report["label"], "OFFLINE RESULT / NAMED PUBLIC DATASET"
         )
         self.assertIs(report["source"]["our_motor"], False)
         self.assertIs(report["source"]["operator_confirmed_failure"], False)
@@ -168,7 +168,7 @@ class XjtuEvidenceTest(unittest.TestCase):
             encoding="utf-8"
         )
         self.assertEqual(
-            report["label"], "BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED"
+            report["label"], "OFFLINE RESULT / NAMED PUBLIC DATASET"
         )
         for token in ("10.17632/mpn45f4gxc.1", "CC BY 4.0", "not available", "[NEED:"):
             with self.subTest(doc_token=token):

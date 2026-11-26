@@ -34,9 +34,9 @@ relabelled.
 | `run_03` | 9534–10085 | 552 | 814.006 | 0 |
 | `run_04` | 10086–10278 | 193 | 280.998 | 21 |
 
-## Measured benchmark — not our motor
+## Measured result
 
-**Label:** `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`.
+**Label:** `OFFLINE RESULT / NAMED PUBLIC DATASET`.
 
 Reproduce with:
 

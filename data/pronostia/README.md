@@ -42,7 +42,7 @@ counted in `ml/rul_pronostia_report.json`; no timestamp is silently repaired.
 ## Published acquisition facts
 
 - Test rig: **250 W asynchronous motor with gearbox**, rated motor speed
-  2830 rpm; secondary shaft below 2000 rpm. This is not our motor.
+  2830 rpm; secondary shaft below 2000 rpm. This is a named public dataset.
 - Vibration: 25.6 kHz sampling, 2560 horizontal/vertical samples recorded every
   10 s (0.1 s of signal per recording).
 - Temperature: 10 Hz sampling, 600 RTD samples recorded each minute.

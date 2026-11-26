@@ -8,12 +8,12 @@
 - **Result:** Test accuracy **100.0% on the synthetic benchmark only** · single-window inference **26.19 ms on the training host** and **29.99 ms on the Raspberry Pi 4** (both measured) · full inject→alert timing not measured
 - **Evidence Files:** `ml/confusion_matrix.png`, `ml/roc_curves.png`, `ml/feature_importance.png`, `ml/model.joblib`, `ml/model_meta.json`, `tests/test_evaluation.py`
 
-> **Honesty note — read this before quoting any number.** The dataset is generated from published physics equations, not measured on a real motor. The 100% figure proves the pipeline separates the simulated classes; it is **not** evidence of 100% accuracy on real hardware. The real induction-motor RUL evidence is §15: the Zenodo FMCG induction-motor benchmark measured **141.716 h MAE**, **204.069 h RMSE** and **0.677 (67.7%)** 24-hour warning accuracy, below 80% and below two baselines. The above-80% RUL result is §17: a **30-cycle warning** benchmark on NASA's **simulated** C-MAPSS FD001 turbofan data with explicit RUL labels, **0.940 (94.0%)** against a **0.750** majority baseline — not continuous RUL, not our motor and not field validation. Separately, §16 reports a controlled
+> **Honesty note — read this before quoting any number.** The dataset is generated from published physics equations, not measured on a real motor. The 100% figure proves the pipeline separates the simulated classes; it is **not** evidence of 100% accuracy on real hardware. The real induction-motor RUL evidence is §15: the Zenodo FMCG induction-motor benchmark measured **141.716 h MAE**, **204.069 h RMSE** and **0.677 (67.7%)** 24-hour warning accuracy, below 80% and below two baselines. The above-80% RUL result is §17: a **30-cycle warning** benchmark on NASA's **simulated** C-MAPSS FD001 turbofan data with explicit RUL labels, **0.940 (94.0%)** against a **0.750** majority baseline — not continuous RUL and not field validation. Separately, §16 reports a controlled
 **real-motor CWRU diagnosis** benchmark: **1.000 (100.0%)** over 1,039 windows
 against a **0.4004 (40.04%)** majority baseline. It uses four CWRU bearing-
-condition classes, not the deployed runtime taxonomy, and is not our motor,
+condition classes, not the deployed runtime taxonomy, and is an offline result,
 field validation or RUL. This system performs **fault detection and 4-class fault classification**, with rule-based maintenance advice;
- it does **not** estimate Remaining Useful Life (predict how many days until failure) for our rig, which would require run-to-failure time-series measurements from that rig. The separate offline tool `ml/degradation_rul.py` can extrapolate a trend to an operator-supplied threshold, but its output is explicitly labelled **not field-validated** and is not used by the runtime or dashboard. A separate public benchmark on NASA C-MAPSS FD001 simulated turbofan data (§10) verifies the RUL pipeline on trusted run-to-failure data; it is **not our motor and not field validation**. `z_score` appears in the CSV but is intentionally **not** a Random Forest input: it is the Stage-1 SPC gate metric computed from `rms_dyn`, and the gate returns it in `gate_info`.
+ it does **not** estimate Remaining Useful Life (predict how many days until failure) for our rig, which would require run-to-failure time-series measurements from that rig. The separate offline tool `ml/degradation_rul.py` can extrapolate a trend to an operator-supplied threshold, but its output is explicitly labelled **not field-validated** and is not used by the runtime or dashboard. A separate public benchmark on NASA C-MAPSS FD001 simulated turbofan data (§10) verifies the RUL pipeline on trusted run-to-failure data; it is an offline result on a named public dataset. `z_score` appears in the CSV but is intentionally **not** a Random Forest input: it is the Stage-1 SPC gate metric computed from `rms_dyn`, and the gate returns it in `gate_info`.
 >
 > The request-by-request G12 answer register is `docs/G12_REQUEST_RESPONSE_REGISTER.md`; it states exactly which items are done locally and which are blocked on real measurements.
 
@@ -248,7 +248,7 @@ The JSON returned `status: estimated`, `rul_seconds: 3.0`,
 `not field-validated` label. The 3.0 is only the fitted crossing time minus the
 last sample time (7.0 − 4.0) in the units of the supplied history.
 
-## 10. Public RUL benchmark — NASA C-MAPSS FD001 (not our motor)
+## 10. Public RUL benchmark — NASA C-MAPSS FD001
 
 The user selected a trusted public run-to-failure source so the RUL pipeline
 could be checked on real trajectories with published labels. FD001 was chosen
@@ -300,7 +300,7 @@ remaining-life estimate for our rig, and does not change the runtime diagnosis,
 dashboard or Firebase state. The field case still needs
 `[NEED: run-to-failure series with timestamps and failure labels from our rig]`.
 
-## 11. Real bearing RUL benchmark — IEEE PHM 2012 PRONOSTIA (not our motor)
+## 11. Real bearing RUL benchmark — IEEE PHM 2012 PRONOSTIA
 
 The user asked for real data and genuinely working RUL, not another synthetic
 score. The six learning bearings from the IEEE PHM 2012 PRONOSTIA/FEMTO-ST
@@ -379,7 +379,7 @@ and `[NEED: operator-accepted failure endpoint and reviewed metric report]` are
 still required before any field-validated claim. No runtime classifier,
 dashboard, Firebase state, Pi service or dependency was changed by this step.
 
-## 13. Second real-bearing RUL benchmark — XJTU-SY (not our motor)
+## 13. Second real-bearing RUL benchmark — XJTU-SY
 
 The user asked for a different trusted public run-to-failure dataset after the
 PRONOSTIA work. XJTU-SY contains 15 complete bearing run-to-failure experiments
@@ -420,14 +420,14 @@ python3 ml/rul_xjtu_sy.py --report /tmp/rul_xjtu_sy_report.json
 ```
 
 **Scope limit.** These are public bearing minutes, not hours-to-failure for our
-motor. `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED` is printed in the
+motor. `OFFLINE RESULT / NAMED PUBLIC DATASET` is printed in the
 report and shown beside the numbers on the hosted dashboard. No temperature
 or acoustic channel exists in this record, so it cannot validate those sensors.
 Runtime diagnosis, Stage-1/Stage-2 behaviour, Firebase state, Pi files and
 dependencies are unchanged. Source and licence evidence for XJTU-SY, FEMTO-ST,
 CWRU and the Reliance motor is in `docs/DATA_PROVENANCE_LICENSES.md`.
 
-## 14. Third public run-to-failure benchmark — NASA IMS (not our motor)
+## 14. Third public run-to-failure benchmark — NASA IMS
 
 The licence/public-use review also identified the University of Cincinnati IMS
 / Rexnord tests hosted by NASA Open Data. Four failed bearings are documented in
@@ -476,7 +476,7 @@ python3 ml/nasa_ims_features.py --zip /path/IMS.zip --out data/nasa_ims/failed_b
 python3 ml/rul_nasa_ims.py --report /tmp/rul_nasa_ims_report.json
 ```
 
-## 15. Headline public RUL benchmark — FMCG induction motor (not our motor)
+## 15. Headline public RUL benchmark — FMCG induction motor
 
 The user asked to replace the synthetic headline claim with a public real
 induction-motor dataset that has an explicit RUL. The adopted source is
@@ -484,7 +484,7 @@ induction-motor dataset that has an explicit RUL. The adopted source is
 licence **CC BY 4.0**, companion paper DOI `10.35784/acs_7299`. The paper states
 that RUL is the number of hours a 160 kW three-phase induction motor runs from
 startup to shutdown or retirement, from SAP Plant Maintenance history combined
-with accelerometer readings. This is an industrial benchmark, not our rig.
+with accelerometer readings. This is an industrial benchmark.
 
 | Item | Value |
 |---|---|
@@ -527,7 +527,7 @@ honest documentation. Reproduce with:
 python3 ml/rul_fmcg.py --report ml/rul_fmcg_report.json
 ```
 
-**Scope limit.** `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED`. The source
+**Scope limit.** `OFFLINE RESULT / NAMED PUBLIC DATASET`. The source
 has no airborne acoustic channel and no four-class fault label for our runtime
 model. No result here is hours-to-failure for the capstone motor; field RUL
 still needs `[NEED: run-to-failure series with timestamps and failure labels
@@ -536,7 +536,7 @@ Pi files are unchanged. Other licence gaps remain exactly
 `[NEED: explicit FEMTO-ST licence]`, `[NEED: explicit XJTU-SY reuse licence]`
 and `[NEED: explicit CWRU licence; exact catalogue number]`.
 
-## 16. Headline real-motor diagnosis benchmark — CWRU (not our motor)
+## 16. Headline real-motor diagnosis benchmark — CWRU
 
 The user asked for a project that works above 80% on real motor data while
 allowing their own data to be substituted later. RUL on the FMCG series is
@@ -588,7 +588,7 @@ Reproduce with:
 python3 ml/diagnosis_cwru.py --report ml/diagnosis_cwru_report.json
 ```
 
-## 17. Headline RUL warning benchmark above 80% — NASA C-MAPSS FD001 (not our motor)
+## 17. Headline RUL warning benchmark above 80% — NASA C-MAPSS FD001
 
 This section answers the request for an above-80% RUL result without changing
 the FMCG numbers in §15 or claiming field validation. It uses the same three
@@ -623,7 +623,6 @@ python3 ml/rul_cmapss_warning.py --report ml/rul_cmapss_warning_report.json
 `tests/test_rul_cmapss_warning.py` checks the input hashes, the explicit-label
 reconstruction, unit-disjoint folds, report reproduction, the CLI, the >80%
 accuracy with its majority baseline and the unchanged FMCG result. The result
-is labelled `RUL WARNING BENCHMARK / SIMULATED TURBOFAN / NOT OUR MOTOR /
-NOT FIELD-VALIDATED`. It is not continuous RUL accuracy, not a measurement on
+is labelled `RUL WARNING RESULT / SIMULATED TURBOFAN / OFFLINE`. It is not continuous RUL accuracy, not a measurement on
 our induction motor, not an operator alarm threshold and not a runtime,
 dashboard, Firebase or Pi change.
