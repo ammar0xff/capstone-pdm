@@ -1,0 +1,274 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Predictive Maintenance</title>
+<style>
+:root{--bg:#0b1118;--panel:#121a24;--panel2:#16212d;--line:#223041;--tx:#e8eef5;--mut:#8b9bb0;--ok:#2fbf87;--warn:#f0b429;--bad:#ef5b5b;--acc:#4cc2ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1240px;margin:0 auto;padding:20px 24px 40px}
+header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+h1{font-size:19px;margin:0;font-weight:650;letter-spacing:.2px}
+.chip{font-size:12px;padding:4px 10px;border-radius:99px;border:1px solid var(--line);color:var(--mut);background:var(--panel)}
+.chip.live{color:var(--ok);border-color:#1d4a3b}.chip.ref{color:var(--warn);border-color:#5a4511}
+.sp{flex:1}.btn{background:var(--panel2);color:var(--tx);border:1px solid var(--line);padding:7px 13px;border-radius:9px;font-size:13px}
+.btn.pri{background:#0f3a52;border-color:#1c6a93}
+.meta{color:var(--mut);font-size:13px;display:flex;gap:16px;flex-wrap:wrap}
+.banner{border:1px solid #5a4511;background:#231c0a;border-radius:12px;padding:11px 16px;margin-bottom:14px}
+.banner b{display:block;font-size:14.5px;color:#ffd978}.banner .ar{direction:rtl;text-align:right;color:#ffd978;font-weight:600;margin-top:2px}.banner small{color:#bda76b;display:block;margin-top:4px}
+.hero{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin-bottom:16px;position:relative;overflow:hidden}
+.hero:before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--c)}
+.state{display:flex;gap:14px;align-items:center}.dot{width:14px;height:14px;border-radius:50%;background:var(--c);box-shadow:0 0 0 6px color-mix(in srgb,var(--c) 22%,transparent)}
+.state h2{margin:0;font-size:28px;font-weight:700;color:var(--c)}.state p{margin:4px 0 0;color:var(--mut);max-width:520px}
+.zlab{display:flex;justify-content:space-between;color:var(--mut);font-size:12.5px;margin-bottom:6px}
+.zbar{position:relative;height:14px;border-radius:8px;background:linear-gradient(90deg,var(--ok) 0 55%,var(--warn) 55% 75%,var(--bad) 75%);opacity:.9}
+.zmark{position:absolute;top:-5px;width:4px;height:24px;border-radius:2px;background:#fff;box-shadow:0 0 0 3px #0008}
+.zval{font-size:30px;font-weight:700;margin-top:10px}.zval small{font-size:14px;color:var(--mut);font-weight:500}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px 17px}
+.card h3{margin:0 0 8px;font-size:12px;letter-spacing:.8px;text-transform:uppercase;color:var(--mut);font-weight:600;display:flex;justify-content:space-between}
+.card h3 i{font-style:normal;color:#5d7088;text-transform:none;letter-spacing:0}
+.big{font-size:30px;font-weight:700}.big small{font-size:14px;color:var(--mut);font-weight:500;margin-left:4px}.sub{color:var(--mut);font-size:12.5px;margin-top:2px}
+.na{color:#5d7088}
+.cols{align-items:start;display:grid;grid-template-columns:1.7fr 1fr;gap:16px}
+.stack{display:flex;flex-direction:column;gap:16px}
+.row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--line);font-size:13.5px}.row:last-child{border:0}.row span:first-child{color:var(--mut)}
+.pill{padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.def{background:#2a2f3a;color:#b6c0cf}.pill.com{background:#10392c;color:var(--ok)}
+.prog{height:8px;border-radius:5px;background:var(--panel2);overflow:hidden;margin:8px 0}.prog i{display:block;height:100%;background:var(--acc)}
+.note{font-size:12.5px;color:var(--mut);margin-top:8px}
+.btns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+details{margin-top:16px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px 17px}summary{cursor:pointer;color:var(--mut);font-weight:600}
+.eq{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}.eq div{background:var(--panel2);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--mut)}.eq code{display:block;color:var(--tx);margin-bottom:4px;font-size:13.5px}
+svg text{fill:#8b9bb0;font-size:11px}
+@media(max-width:820px){.hero,.cols{grid-template-columns:1fr}.grid4{grid-template-columns:1fr 1fr}.eq{grid-template-columns:1fr}.big{font-size:25px}.state h2{font-size:23px}.wrap{padding:14px}}
+.hero{grid-template-columns:1fr 1fr;padding:14px 20px}.state h2{font-size:24px}
+.g{display:grid;gap:14px;margin-bottom:14px}.g2{grid-template-columns:2fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}
+.card h3 b{color:var(--tx);font-weight:600;text-transform:none;letter-spacing:0;font-size:13px}
+.cur{font-size:22px;font-weight:700;margin:-2px 0 4px}.cur small{font-size:12px;color:var(--mut);font-weight:500}
+.tl{display:flex;height:22px;border-radius:6px;overflow:hidden;margin-top:8px}.tl i{display:block}
+.leg{display:flex;gap:14px;font-size:12px;color:var(--mut);margin-top:6px}.leg span:before{content:"";display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;background:var(--c)}
+@media(max-width:820px){.g2,.g3{grid-template-columns:1fr}}
+
+body.rtl{direction:rtl}body.rtl .banner small,body.rtl .sub{text-align:right}
+a.btn{text-decoration:none;display:inline-block}.hidden{display:none!important}
+</style></head><body><div class="wrap">
+<header><h1 id="t-title">Predictive Maintenance</h1><span class="chip live" id="chip-src">Live sensors</span><span class="chip">Raspberry Pi edge</span><span class="meta"><span id="m-fs">n/a</span><span id="m-up"></span></span><span class="sp"></span>
+<button class="btn" id="btn-sound" onclick="toggleSound()">Sound: OFF</button><button class="btn" id="btn-lang" onclick="toggleLang()">العربية</button>
+<a class="btn" href="https://castpone2026.web.app/calibration.html" target="_blank" rel="noopener noreferrer">Calibration</a><a class="btn pri" href="https://castpone2026.web.app/guide.html" target="_blank" rel="noopener noreferrer">Exhibition deck</a></header>
+<div class="banner hidden" id="plaus-bar" style="border-color:var(--bad)"></div>
+<div class="banner hidden" id="ref-banner"><b id="ref-en"></b><div class="ar" id="ref-ar"></div><small id="ref-detail"></small></div>
+<div class="hero" id="hero" style="--c:var(--mut)"><div class="state"><span class="dot"></span><div><h2 id="h-state">Standby</h2><p id="h-desc">Waiting for the edge DAQ service.</p><p class="sub" id="h-hold" style="font-size:12px;margin-top:6px">Shown state is held for a few seconds to avoid flicker. The gate itself is unchanged.</p></div></div>
+<div style="display:flex;gap:26px;align-items:center;justify-content:flex-end;flex-wrap:wrap"><div><div class="sub">Vibration rms</div><div class="cur" id="k-rms">n/a</div></div><div><div class="sub">Sigma vs baseline</div><div class="cur" id="k-z">n/a</div></div><div><div class="sub">Baseline</div><div class="cur" id="k-base">n/a</div></div></div></div>
+<div class="g g2"><div class="card"><h3><b id="c1">Vibration rms vs control limits</b><i>ADXL345</i></h3><div id="ch-rms"></div></div>
+<div class="card"><h3><b id="c2">Sigma over time (SPC)</b><i>z = (rms - &mu;&#8320;)/&sigma;&#8320;</i></h3><div id="ch-z"></div></div></div>
+<div class="g g3"><div class="card"><h3><b id="c3">Kurtosis</b><i>bearing-defect indicator</i></h3><div class="cur" id="v-kurt">n/a</div><div id="ch-kurt"></div></div>
+<div class="card"><h3><b id="c4">Crest factor</b><i>peak / rms</i></h3><div class="cur" id="v-crest">n/a</div><div id="ch-crest"></div></div>
+<div class="card"><h3><b id="c5">Vibration by axis</b><i>dynamic rms X Y Z</i></h3><div class="cur" id="v-axis">n/a</div><div id="ch-axis"></div></div>
+<div class="card"><h3><b id="c6">Temperature</b><i>MAX6675</i></h3><div class="cur" id="v-temp">n/a</div><div id="ch-temp"></div></div>
+<div class="card"><h3><b id="c7">Sound level</b><i>INMP441, relative dB</i></h3><div class="cur" id="v-snd">n/a</div><div id="ch-snd"></div></div>
+<div class="card"><h3><b id="c8">Baseline vs now</b><i>+/- 3 sigma band</i></h3><div class="sub" id="v-bn"></div><div id="ch-bn"></div></div></div>
+<div class="g" style="grid-template-columns:2fr 1fr"><div class="card"><h3><b id="c9">Fault-state timeline</b><i>rule-based</i></h3><div class="tl" id="tl"></div><div class="leg"><span style="--c:var(--ok)">No rule</span><span style="--c:var(--warn)">Warning</span><span style="--c:var(--bad)">Fault rule</span></div></div>
+<div class="card"><h3><b id="c10">Diagnosis</b><i>rule-based</i></h3><div id="v-diag" style="font-size:16px;font-weight:650">n/a</div><div class="sub" id="v-adv"></div><div class="sub">Confidence: n/a (rule-based, no probability)</div></div></div>
+<div class="g" style="grid-template-columns:1fr 1fr"><div class="card"><h3><b id="c11">Baseline commissioning</b><i id="v-bsrc"></i></h3><div class="note" id="val-comm-status"></div><div class="prog"><i id="comm-prog" style="width:0%"></i></div><div class="btns"><button class="btn pri" id="btn-commission" type="button">Start commissioning (10 min)</button><button class="btn" id="btn-comm-reset" type="button">Reset to default</button></div></div>
+<div class="card" id="rul-card"><h3><b id="c12">Trend indicator</b><i>experimental</i></h3><div id="rul-head" style="font-size:16px;font-weight:650">Waiting for live data</div><div class="sub" id="rul-body">No recent valid readings in this session.</div><div class="sub">Not a validated RUL. A straight-line fit of this session's vibration rms against the fault limit.</div></div></div>
+<details><summary id="c13">How these numbers are calculated</summary><div class="eq"><div><code>RMS = &radic;(1/N &Sigma; a&sup2;)</code>Vibration energy of the window.</div><div><code>K = &mu;&#8324; / &sigma;&#8308;</code>Kurtosis. Gaussian is about 3.</div><div><code>z = (rms - &mu;&#8320;) / &sigma;&#8320;</code>Warning at 2&sigma;, fault at 3&sigma; with rms above 0.04 g.</div></div></details>
+</div>
+<script>
+/* Experimental trend estimate (not validated). Browser-side, from this session's valid packets only. */
+const RulTrend = (function () {
+  const O = { binS: 10, minSpanS: 900, minBins: 60, ucl: 0.155, r2Min: 0.6, riseSdMin: 3, riseFracMin: 0.10, maxFutureSpanRatio: 2 };
+  function median(a) { const s = a.slice().sort((x, y) => x - y); const m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; }
+  function estimate(samples, opt) {
+    const o = Object.assign({}, O, opt || {});
+    const bins = new Map();
+    for (const p of samples) {
+      if (!Number.isFinite(p.t) || !Number.isFinite(p.v)) continue;
+      const k = Math.floor(p.t / o.binS);
+      if (!bins.has(k)) bins.set(k, []);
+      bins.get(k).push(p.v);
+    }
+    const pts = [...bins.entries()].sort((a, b) => a[0] - b[0]).map(([k, v]) => ({ t: (k + 0.5) * o.binS, v: median(v) }));
+    const span = pts.length ? pts[pts.length - 1].t - pts[0].t : 0;
+    if (pts.length < o.minBins || span < o.minSpanS) return { status: "insufficient", bins: pts.length, spanS: span, needBins: o.minBins, needSpanS: o.minSpanS };
+    const n = pts.length, mt = pts.reduce((s, p) => s + p.t, 0) / n, mv = pts.reduce((s, p) => s + p.v, 0) / n;
+    let sxx = 0, sxy = 0, syy = 0;
+    for (const p of pts) { sxx += (p.t - mt) ** 2; sxy += (p.t - mt) * (p.v - mv); syy += (p.v - mv) ** 2; }
+    const slope = sxy / sxx, icpt = mv - slope * mt;
+    let sse = 0; for (const p of pts) sse += (p.v - (icpt + slope * p.t)) ** 2;
+    const r2 = syy > 0 ? 1 - sse / syy : 0, resSd = Math.sqrt(sse / (n - 2)), se = resSd / Math.sqrt(sxx);
+    const rise = slope * span, base = { slopePerHour: slope * 3600, r2, spanS: span, bins: n };
+    if (!(slope > 0) || r2 < o.r2Min || rise < o.riseSdMin * resSd || rise < o.riseFracMin * Math.abs(mv)) return Object.assign({ status: "no_trend" }, base);
+    const cur = icpt + slope * pts[n - 1].t;
+    if (cur >= o.ucl) return Object.assign({ status: "at_limit", current: cur }, base);
+    const hrs = (o.ucl - cur) / slope / 3600;
+    if (hrs * 3600 > o.maxFutureSpanRatio * span) return Object.assign({ status: "too_far", current: cur }, base);
+    const sHi = slope + 1.96 * se, sLo = slope - 1.96 * se;
+    return Object.assign({ status: "estimate", current: cur, hours: hrs, hoursLow: (o.ucl - cur) / sHi / 3600, hoursHigh: sLo > 0 ? (o.ucl - cur) / sLo / 3600 : null }, base);
+  }
+  const buf = []; let lastSeq = null;
+  function observe(data, nowS) {
+    const v = data && data.vibration ? data.vibration.rms_dyn : null;
+    const ok = data && data.state !== "Unknown" && data.input_valid !== false && Number.isFinite(v);
+    if (!ok) return;
+    if (data.seq !== undefined && data.seq === lastSeq) return;
+    lastSeq = data.seq; buf.push({ t: nowS, v }); if (buf.length > 20000) buf.shift();
+  }
+  function text(r) {
+    const mins = (h) => h * 60;
+    const fmt = (h) => h < 1 ? Math.round(mins(h)) + " min" : h.toFixed(1) + " h";
+    if (r.status === "insufficient") return { head: "Insufficient data", body: "Needs about " + Math.round(r.needSpanS / 60) + " min of valid readings in this session (have " + Math.round(r.spanS / 60) + " min)." };
+    if (r.status === "no_trend") return { head: "No upward trend", body: "Vibration RMS shows no clear rise in this session, so no time estimate is given." };
+    if (r.status === "at_limit") return { head: "At the fault limit", body: "The fitted vibration RMS trend is at or above the fault limit. Inspect the machine." };
+    if (r.status === "too_far") return { head: "Trend too slow to extrapolate", body: "The rise is too slow to project beyond what this session observed." };
+    return { head: "about " + fmt(r.hours), body: "Time for the fitted vibration RMS trend to reach the fault limit" + (r.hoursHigh ? " (95% range " + fmt(r.hoursLow) + " to " + fmt(r.hoursHigh) + ")" : " (upper bound open)") + "." };
+  }
+  return { estimate, observe, text, buf, O };
+})();
+if (typeof module !== "undefined") module.exports = RulTrend;
+
+function rulTrendRender(){
+  const h=document.getElementById("rul-head"),b=document.getElementById("rul-body");if(!h||!b)return;
+  const buf=RulTrend.buf,now=Date.now()/1000;
+  if(!buf.length||now-buf[buf.length-1].t>30){h.innerText="Waiting for live data";b.innerText="No recent valid readings in this session.";return;}
+  const t=RulTrend.text(RulTrend.estimate(buf));h.innerText=t.head;b.innerText=t.body;
+}
+setInterval(rulTrendRender,5000);
+</script>
+<script>
+/* Display-state hold (hysteresis). Only changes what the page shows and beeps on. The gate and its 0.04 g rule are not touched.
+   Severity: 0 no rule, 1 warning, 2 fault. A higher state must persist UP_MS before it is shown, a lower state DOWN_MS. */
+const StateHold = (function () {
+  const UP_MS = 2000, DOWN_MS = 6000;
+  let cur = null, dir = 0, since = 0, ext = 0;
+  function update(raw, now) {
+    if (raw < 0 || raw == null) { cur = null; dir = 0; return raw == null ? -1 : raw; }
+    if (cur === null) { cur = raw; dir = 0; return cur; }
+    if (raw === cur) { dir = 0; return cur; }
+    const d = raw > cur ? 1 : -1;
+    if (d !== dir) { dir = d; since = now; ext = raw; }
+    else ext = d > 0 ? Math.min(ext, raw) : Math.max(ext, raw);
+    if (now - since >= (d > 0 ? UP_MS : DOWN_MS)) { cur = ext; dir = 0; }
+    return cur;
+  }
+  function reset() { cur = null; dir = 0; }
+  return { update, reset, UP_MS, DOWN_MS };
+})();
+if (typeof module !== "undefined") module.exports = StateHold;
+</script>
+<script>
+const Plaus = (function () {
+  // Display-only plausibility layer (G32). Works on a COPY of the reading. Raw data, stored values and the DAQ gates are not touched.
+  const CAP = { temp: 60, slope: 20, rms: 16, kurt: 30, crest: 16, ax: 16, ay: 16, az: 16, z: 20, db: 110 };
+  const JUMP_C = 10, MAX_HOLD = 3, FS_MIN = 300;
+  let lastT = null, badT = 0;
+  function clampKey(cl, key, v) {
+    if (!Number.isFinite(v)) return v;
+    if (Math.abs(v) > CAP[key]) { cl[key] = true; return Math.sign(v) * CAP[key]; }
+    return v;
+  }
+  function apply(d) {
+    const out = JSON.parse(JSON.stringify(d));
+    const cl = {}, fl = { temp: false, vib: false, snd: false };
+    if (!d || d.reference_data || !d.online) return { d: out, cl: cl, fl: fl };
+    const t = out.temperature;
+    if (t && Number.isFinite(t.temp_c)) {
+      const raw = t.temp_c;
+      const bad = raw <= 0 || (lastT !== null && Math.abs(raw - lastT) >= JUMP_C);
+      if (bad) fl.temp = true;
+      if (bad && lastT !== null && badT < MAX_HOLD) { t.temp_c = lastT; badT++; }
+      else { badT = 0; lastT = raw; }
+      if (t.temp_c > CAP.temp) fl.temp = true;
+      t.temp_c = clampKey(cl, "temp", t.temp_c);
+      if (Number.isFinite(t.slope_c_per_min)) {
+        if (fl.temp) { t.slope_c_per_min = 0; cl.slope_na = true; }
+        else t.slope_c_per_min = clampKey(cl, "slope", t.slope_c_per_min);
+      }
+    }
+    const v = out.vibration;
+    if (v) {
+      v.rms_dyn = clampKey(cl, "rms", v.rms_dyn);
+      v.kurtosis = clampKey(cl, "kurt", v.kurtosis);
+      v.crest_factor = clampKey(cl, "crest", v.crest_factor);
+      v.ax_dyn = clampKey(cl, "ax", v.ax_dyn); v.ay_dyn = clampKey(cl, "ay", v.ay_dyn); v.az_dyn = clampKey(cl, "az", v.az_dyn);
+      if (v.peak_dyn > 16) { v.peak_dyn = 16; fl.vib = true; }
+      if (Number.isFinite(v.fs_hz) && v.fs_hz < FS_MIN) fl.vib = true;
+    }
+    if (out.spc) out.spc.z_score = clampKey(cl, "z", out.spc.z_score);
+    if (out.acoustic) out.acoustic.db_spl = clampKey(cl, "db", out.acoustic.db_spl);
+    if (cl.rms || cl.kurt || cl.crest || cl.ax || cl.ay || cl.az) fl.vib = true;
+    if (cl.db) fl.snd = true;
+    return { d: out, cl: cl, fl: fl };
+  }
+  function fmt(flag, v, n) {
+    if (!Number.isFinite(v)) return "n/a";
+    return flag ? (v < 0 ? "-" : "") + Math.abs(v).toFixed(n) + "+" : v.toFixed(n);
+  }
+  function reset() { lastT = null; badT = 0; }
+  return { apply: apply, fmt: fmt, reset: reset, CAP: CAP };
+})();
+if (typeof module !== "undefined") module.exports = Plaus;
+</script>
+<script>
+const N=150,H={rms:[],z:[],kurt:[],crest:[],ax:[],ay:[],az:[],temp:[],snd:[],st:[]};let lastSeq=null,last=null,isAr=false,soundOn=false,audioCtx=null,lastState=null;
+const T={en:{Healthy:["No rule triggered","No alarm rule fired. This is a rule result, not a check of motor health."],Warning:["Warning rule flagged","A warning rule fired. This is a rule result, not a validated diagnosis."],Fault:["Fault rule flagged","A fault rule fired. See the diagnosis card. This is a rule result, not a validated diagnosis."],Unknown:["Reading not valid","The sensor reading is not valid right now."],Standby:["Standby / waiting for DAQ","Live telemetry resumes when the edge DAQ service publishes state."],snd:"Sound: ",on:"ON",off:"OFF",lang:"العربية"},
+ar:{Healthy:["لا توجد قاعدة مفعلة","لم تنطلق أي قاعدة إنذار. هذه نتيجة قواعد، وليست فحصا لحالة الموتور."],Warning:["قاعدة تحذير","انطلقت قاعدة تحذير. هذه نتيجة قواعد وليست تشخيصا مؤكدا."],Fault:["قاعدة عطل","انطلقت قاعدة عطل. راجع بطاقة التشخيص. هذه نتيجة قواعد وليست تشخيصا مؤكدا."],Unknown:["القراءة غير صالحة","قراءة الحساس غير صالحة الآن."],Standby:["انتظار","القراءات الحية ترجع عند نشر الحالة من الجهاز."],snd:"الصوت: ",on:"مفعل",off:"معطل",lang:"English"}};
+const L={en:{c1:"Vibration rms vs control limits",c2:"Sigma over time (SPC)",c3:"Kurtosis",c4:"Crest factor",c5:"Vibration by axis",c6:"Temperature",c7:"Sound level",c8:"Baseline vs now",c9:"Fault-state timeline",c10:"Diagnosis",c11:"Baseline commissioning",c12:"Trend indicator",c13:"How these numbers are calculated",t:"Predictive Maintenance"},ar:{c1:"اهتزاز rms مقابل حدود التحكم",c2:"سيجما عبر الزمن (SPC)",c3:"Kurtosis",c4:"Crest factor",c5:"الاهتزاز لكل محور",c6:"الحرارة",c7:"مستوى الصوت",c8:"الـ baseline مقابل الآن",c9:"الخط الزمني للحالة",c10:"التشخيص",c11:"معايرة الـ baseline",c12:"مؤشر الاتجاه",c13:"كيف تُحسب الأرقام",t:"الصيانة التنبؤية"}};
+function toggleLang(){isAr=!isAr;document.body.classList.toggle("rtl",isAr);document.documentElement.lang=isAr?"ar":"en";const d=L[isAr?"ar":"en"];for(const k in d){const e=document.getElementById(k==="t"?"t-title":k);if(e)e.innerText=d[k]}soundLabel();document.getElementById("btn-lang").innerText=T[isAr?"ar":"en"].lang;if(last)render(last)}
+function soundLabel(){const t=T[isAr?"ar":"en"];document.getElementById("btn-sound").innerText=t.snd+(soundOn?t.on:t.off)}
+function toggleSound(){soundOn=!soundOn;if(soundOn&&!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();soundLabel()}
+function beep(f,d){if(!soundOn||!audioCtx)return;try{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type="sawtooth";o.frequency.value=f;g.gain.setValueAtTime(.15,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+d);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+d)}catch(e){}}
+function push(a,v){a.push(Number.isFinite(v)?v:null);if(a.length>N)a.shift()}
+const A="#4cc2ff",Y="#f0b429",R="#ef5b5b",G="#2fbf87";
+function line(sers,o){const W=o.w||520,Ht=o.h||140,P=36,n=Math.max(2,...sers.map(s=>s.d.length)),vals=sers.flatMap(s=>s.d.filter(v=>v!=null)).concat((o.refs||[]).map(r=>r.v));
+if(!sers.some(s=>s.d.some(v=>v!=null)))return `<svg viewBox="0 0 ${W} ${Ht}" width="100%"><text x="${W/2}" y="${Ht/2}" text-anchor="middle">${isAr?"بانتظار البيانات":"Waiting for data"}</text></svg>`;
+let lo=o.lo??Math.min(...vals),hi=o.hi??Math.max(...vals);const pad=(hi-lo)*.1||1;if(o.lo==null)lo-=pad;if(o.hi==null)hi+=pad;
+const y=v=>Ht-16-(v-lo)/(hi-lo)*(Ht-26),x=i=>P+i/(n-1)*(W-P-6);let r=`<svg viewBox="0 0 ${W} ${Ht}" width="100%">`;
+for(const b of o.bands||[]){const t=y(Math.min(hi,b[1])),bt=y(Math.max(lo,b[0]));if(bt>t)r+=`<rect x="${P}" y="${t}" width="${W-P-6}" height="${bt-t}" fill="${b[2]}"/>`}
+for(let k=0;k<=3;k++){const v=lo+(hi-lo)*k/3;r+=`<line x1="${P}" x2="${W-6}" y1="${y(v)}" y2="${y(v)}" stroke="#1d2a39"/><text x="2" y="${y(v)+4}">${v.toFixed(o.dp??2)}</text>`}
+for(const f of o.refs||[])r+=`<line x1="${P}" x2="${W-6}" y1="${y(f.v)}" y2="${y(f.v)}" stroke="${f.c}" stroke-dasharray="${f.dash||"6 4"}"/><text x="${W-8}" y="${y(f.v)+(f.dy??-4)}" text-anchor="end" style="fill:${f.c}">${f.l}</text>`;
+for(const s of sers){const off=n-s.d.length;let pts=[];s.d.forEach((v,i)=>{if(v!=null)pts.push(x(i+off)+","+y(v))});r+=`<polyline fill="none" stroke="${s.c}" stroke-width="2" points="${pts.join(" ")}"/>`}
+return r+`<text x="${P}" y="${Ht-2}">${isAr?"أقدم":"older"}</text><text x="${W-30}" y="${Ht-2}">${isAr?"الآن":"now"}</text></svg>`}
+const SEV={Healthy:0,Warning:1,Fault:2},NAME=["Healthy","Warning","Fault"];let lastLabel="";
+function heldSev(d){if(!d.online)return -1;const raw=d.state in SEV?SEV[d.state]:-1;return StateHold.update(raw,Date.now())}
+const f=(v,n)=>Number.isFinite(v)?v.toFixed(n):"n/a",lastOf=a=>{for(let i=a.length-1;i>=0;i--)if(a[i]!=null)return a[i];return null};
+function observe(d){if(d.seq!==undefined&&d.seq===lastSeq)return;lastSeq=d.seq;const ok=d.online&&d.input_valid!==false&&d.state!=="Unknown"&&d.vibration;const v=ok?d.vibration:{},sp=d.spc||{};
+push(H.rms,ok?v.rms_dyn:null);push(H.z,ok?sp.z_score:null);push(H.kurt,ok?v.kurtosis:null);push(H.crest,ok?v.crest_factor:null);push(H.ax,ok?v.ax_dyn:null);push(H.ay,ok?v.ay_dyn:null);push(H.az,ok?v.az_dyn:null);
+const tOk=d.online&&d.system&&d.system.max6675_ok&&d.temperature&&!d.temperature.open_tc;push(H.temp,tOk?d.temperature.temp_c:null);
+const sOk=d.online&&d.system&&d.system.acoustic_ok&&d.acoustic;push(H.snd,sOk?d.acoustic.db_spl:null);H.st.push(d.__held);if(H.st.length>N)H.st.shift()}
+function render(d){const dict=T[isAr?"ar":"en"],online=Boolean(d.online),st=online?(d.__held>=0?NAME[d.__held]:(d.state||"Healthy")):"Standby",col={Healthy:"var(--ok)",Warning:"var(--warn)",Fault:"var(--bad)"}[st]||"var(--mut)",tt=dict[st]||dict.Standby;
+document.getElementById("hero").style.setProperty("--c",col);document.getElementById("h-state").innerText=tt[0];document.getElementById("h-desc").innerText=tt[1];
+if(st!==lastState){if(st==="Fault")beep(980,.5);else if(st==="Warning")beep(660,.3)}lastState=st;
+const sp=d.spc||{},v=d.vibration||{},rd=d.reference_data,mu=sp.baseline_mu,sg=sp.baseline_sigma,warn=sp.ucl_warning,fault=sp.ucl_fault,haveSpc=online&&sp.baseline_mu!=null;
+document.getElementById("chip-src").className="chip "+(rd?"ref":"live");document.getElementById("chip-src").innerText=rd?(isAr?"بيانات مرجعية":"Reference data"):(isAr?"حساسات حية":"Live sensors");
+document.getElementById("m-fs").innerText=online?(v.fs_hz||0)+" Hz":"n/a";document.getElementById("m-up").innerText=online?" · uptime "+fmtUp(d.uptime_s):"";
+const rb=document.getElementById("ref-banner");rb.classList.toggle("hidden",!rd);document.getElementById("rul-card").classList.toggle("hidden",Boolean(rd));
+if(rd){document.getElementById("ref-en").innerText=rd.label_en;document.getElementById("ref-ar").innerText=rd.label_ar;let t=`${rd.dataset} ${rd.recording}, snapshot ${rd.snapshot}/${rd.snapshots_total} (${rd.dataset_time_h} h into the run), band limited to ${rd.band_hz} Hz, amplitude rescaled x${rd.amplitude_scale} so the healthy start is ${rd.healthy_level_g} g. Not measured on our motor.`;const tr=rd.rul_trend;if(tr){t+=" Trend estimate (dataset time, not a validated RUL): "+(tr.status==="estimate"?`about ${tr.hours_to_limit} h to the active fault limit`:tr.status==="at_limit"?"trend is at the fault limit":tr.status==="no_upward_trend"?"no upward trend":"insufficient data")+`. Dataset run-end in ${tr.true_remaining_h} h.`}document.getElementById("ref-detail").innerText=t}
+document.getElementById("k-rms").innerHTML=online?Plaus.fmt(d.__cl.rms,v.rms_dyn,4)+" <small>g</small>":"n/a";
+document.getElementById("k-z").innerHTML=haveSpc?`<span style="color:${col}">${d.__cl.z?"":(sp.z_score>0?"+":"")}${Plaus.fmt(d.__cl.z,sp.z_score,2)}</span> <small>σ</small>`:"n/a";
+const comm=d.commissioning||{},src=sp.baseline_source==="commissioned";
+document.getElementById("k-base").innerHTML=haveSpc?`${f(mu,4)} <small>g · <span class="pill ${src?"com":"def"}">${src?"Commissioned":"Default (fixed)"}</span></small>`:"n/a";
+document.getElementById("v-bsrc").innerText=src?"commissioned":"default (fixed)";
+let msg="Commissioning: idle. Using the fixed default until commissioned.";if(src)msg="Baseline learned while the operator reported a normal run; motor state not verified.";if(comm.state==="running")msg=`Commissioning: collecting ${Math.round(comm.progress_s)} / ${Math.round(comm.target_s)} s (default limits stay active)`;else if(comm.state==="failed")msg="Commissioning failed: "+(comm.message||"");else if(comm.state==="done")msg+=" Commissioning: done.";
+document.getElementById("val-comm-status").innerText=msg;document.getElementById("comm-prog").style.width=comm.state==="running"&&comm.target_s?Math.min(100,comm.progress_s/comm.target_s*100)+"%":"0%";
+const b=document.getElementById("btn-commission");b.dataset.mode=comm.state==="running"?"cancel":"start";b.innerText=comm.state==="running"?"Cancel commissioning":"Start commissioning (10 min)";
+const refs=haveSpc?[{v:fault,c:R,l:"Fault "+f(fault,3)+" g"},{v:warn,c:Y,l:"Warning "+f(warn,3)+" g",dy:13},{v:mu,c:G,l:"Baseline "+f(mu,4)+" g",dash:"2 4",dy:26}]:[];
+document.getElementById("ch-rms").innerHTML=line([{d:H.rms,c:A}],{w:760,h:230,lo:0,dp:3,bands:haveSpc?[[warn,fault,"#f0b4291c"],[fault,99,"#ef5b5b1c"]]:[],refs});
+document.getElementById("ch-z").innerHTML=line([{d:H.z,c:"#c8a2ff"}],{w:380,h:230,dp:0,bands:[[2,3,"#f0b4291c"],[3,999,"#ef5b5b1c"]],refs:[{v:3,c:R,l:"3σ"},{v:2,c:Y,l:"2σ",dy:12}]});
+document.getElementById("v-kurt").innerHTML=online?Plaus.fmt(d.__cl.kurt,v.kurtosis,2)+" <small>Gaussian ≈ 3</small>":"n/a";document.getElementById("ch-kurt").innerHTML=line([{d:H.kurt,c:Y}],{refs:[{v:3,c:"#5d7088",l:"3",dash:"2 4"}]});
+document.getElementById("v-crest").innerText=online?Plaus.fmt(d.__cl.crest,v.crest_factor,2):"n/a";document.getElementById("ch-crest").innerHTML=line([{d:H.crest,c:"#7be0c3"}],{});
+document.getElementById("v-axis").innerHTML=online?`X ${Plaus.fmt(d.__cl.ax,v.ax_dyn,3)} · Y ${Plaus.fmt(d.__cl.ay,v.ay_dyn,3)} · Z ${Plaus.fmt(d.__cl.az,v.az_dyn,3)} <small>g</small>`:"n/a";document.getElementById("ch-axis").innerHTML=(online&&v.ax_dyn===undefined)?`<div class="sub" style="height:120px">No per-axis data in this source.</div>`:line([{d:H.ax,c:A},{d:H.ay,c:Y},{d:H.az,c:"#ff8fb1"}],{lo:0,dp:3});
+const hasT=lastOf(H.temp)!=null,hasS=lastOf(H.snd)!=null;
+document.getElementById("v-temp").innerHTML=hasT?Plaus.fmt(d.__cl.temp,d.temperature.temp_c,1)+` <small>°C · slope ${d.__cl.slope_na?"n/a":Plaus.fmt(d.__cl.slope,d.temperature.slope_c_per_min,2)} °C/min</small>`:"n/a";document.getElementById("ch-temp").innerHTML=hasT?line([{d:H.temp,c:"#ff9a62"}],{dp:1}):`<div class="sub" style="height:120px">${rd?"Reference data has no temperature.":"No valid temperature reading."}</div>`;
+document.getElementById("v-snd").innerHTML=hasS?Plaus.fmt(d.__cl.db,d.acoustic.db_spl,1)+" <small>dB rel.</small>":"n/a";document.getElementById("ch-snd").innerHTML=hasS?line([{d:H.snd,c:"#6ec1ff"}],{dp:1}):`<div class="sub" style="height:120px">${rd?"Reference data has no sound.":"No valid sound reading."}</div>`;
+document.getElementById("v-bn").innerText=haveSpc?`Baseline ${f(mu,4)} g ± ${f(sg,4)} g (±3σ band) against recent rms.`:"";
+document.getElementById("ch-bn").innerHTML=haveSpc?line([{d:H.rms,c:A}],{h:112,lo:0,dp:3,bands:[[Math.max(0,mu-3*sg),mu+3*sg,"#2fbf8730"]],refs:[{v:mu,c:G,l:"μ₀",dash:"2 4"}]}):"";
+document.getElementById("tl").innerHTML=H.st.map(s=>`<i style="flex:1;background:${["var(--ok)","var(--warn)","var(--bad)"][s]||"#2a3646"}"></i>`).join("");
+if(d.state!=="Healthy"&&d.fault_label)lastLabel=d.fault_label;document.getElementById("v-diag").innerText=online?(st==="Healthy"?"No rule triggered":(d.state!=="Healthy"?(d.fault_label||"No rule triggered"):(lastLabel||"No rule triggered"))):"n/a";document.getElementById("v-diag").style.color=col;document.getElementById("v-adv").innerText=online&&d.advice?d.advice:"";
+}
+function fmtUp(s){s=Math.floor(s||0);const p=n=>String(n).padStart(2,"0");return p(Math.floor(s/3600))+":"+p(Math.floor(s%3600/60))+":"+p(s%60)}
+let plausUntil=0,plausWhat={};
+function plausBar(P){const now=Date.now();if(P.fl.temp||P.fl.vib||P.fl.snd){plausUntil=now+15000;plausWhat={temp:P.fl.temp||plausWhat.temp&&now<plausUntil,vib:P.fl.vib,snd:P.fl.snd}}const el=document.getElementById("plaus-bar");if(!el)return;const on=now<plausUntil;el.classList.toggle("hidden",!on);if(!on){plausWhat={};return}const w=[];if(plausWhat.temp)w.push(isAr?"الحرارة":"temperature");if(plausWhat.vib)w.push(isAr?"الاهتزاز":"vibration");if(plausWhat.snd)w.push(isAr?"الصوت":"sound");el.innerHTML=isAr?`<b>حساس غير موثوق: ${w.join("، ")}</b><small>القراءات قفزت أو خرجت عن المدى المعقول، فالقيم المعروضة محدودة (بعلامة +) أو ثابتة على آخر قراءة سليمة. البيانات الخام وبوابة العطل لم تتغير.</small>`:`<b>Sensor unreliable: ${w.join(", ")}</b><small>Readings jumped or went above the plausible range, so shown values are capped (marked +) or held at the last good value. Raw data and the fault gate are unchanged.</small>`}
+function onData(d){if(!d)return;const P=Plaus.apply(d);d=P.d;d.__cl=P.cl;d.__held=heldSev(d);last=d;try{RulTrend.observe(d,Date.now()/1000);rulTrendRender()}catch(e){}observe(d);render(d);try{plausBar(P)}catch(e){}}
+function initSSE(){const es=new EventSource("/api/stream");es.onmessage=e=>{try{onData(JSON.parse(e.data))}catch(x){console.error(x)}};es.onerror=()=>{es.close();setTimeout(initSSE,3000)}}
+function sendCommission(cmd,ask){if(!confirm(ask))return;fetch("/api/commissioning",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({cmd:cmd,confirm:true})}).then(r=>r.json()).then(j=>{if(!j.ok)alert(j.error||"failed")}).catch(()=>alert("request failed"))}
+document.getElementById("btn-commission").addEventListener("click",function(){if(this.dataset.mode==="cancel")sendCommission("cancel","Cancel the commissioning run? The baseline stays unchanged.");else sendCommission("start","Start a 10 minute commissioning run? Only do this while the machine is running normally. The device will learn its own baseline from it. Default limits stay active until it finishes.")});
+document.getElementById("btn-comm-reset").addEventListener("click",()=>sendCommission("reset","Go back to the default baseline? The commissioned baseline file is kept under a dated name."));
+fetch("/api/history").then(r=>r.json()).then(j=>{for(const p of (j.data||[]).slice(-N)){H.rms.push(p.rms);H.kurt.push(p.kurt);H.st.push(p.state==="Fault"?2:p.state==="Warning"?1:0)}}).catch(()=>{}).finally(()=>{fetch("/api/latest").then(r=>r.json()).then(onData).catch(()=>{});initSSE()});
+</script></body></html>
