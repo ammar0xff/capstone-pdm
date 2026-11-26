@@ -12,4 +12,6 @@ import dashboard  # noqa: E402  (same app as the live dashboard, different state
 if __name__ == "__main__":
     port = int(os.environ.get("G12_REPLAY_PORT", "5002"))
     print("[INFO] Reference-data replay dashboard on 0.0.0.0:%d (state %s)" % (port, STATE))
+    # The replay has its own state dir; the live history file must never feed the reference charts.
+    dashboard.app.view_functions["api_history"] = lambda: dashboard.jsonify({"count": 0, "data": []})
     dashboard.app.run(host=os.environ.get("G12_REPLAY_HOST", "0.0.0.0"), port=port, debug=False, threaded=True)
