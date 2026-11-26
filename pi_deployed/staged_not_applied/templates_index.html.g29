@@ -53,7 +53,7 @@ a.btn{text-decoration:none;display:inline-block}.hidden{display:none!important}
 <button class="btn" id="btn-sound" onclick="toggleSound()">Sound: OFF</button><button class="btn" id="btn-lang" onclick="toggleLang()">العربية</button>
 <a class="btn" href="https://castpone2026.web.app/calibration.html" target="_blank" rel="noopener noreferrer">Calibration</a><a class="btn pri" href="https://castpone2026.web.app/guide.html" target="_blank" rel="noopener noreferrer">Exhibition deck</a></header>
 <div class="banner hidden" id="ref-banner"><b id="ref-en"></b><div class="ar" id="ref-ar"></div><small id="ref-detail"></small></div>
-<div class="hero" id="hero" style="--c:var(--mut)"><div class="state"><span class="dot"></span><div><h2 id="h-state">Standby</h2><p id="h-desc">Waiting for the edge DAQ service.</p></div></div>
+<div class="hero" id="hero" style="--c:var(--mut)"><div class="state"><span class="dot"></span><div><h2 id="h-state">Standby</h2><p id="h-desc">Waiting for the edge DAQ service.</p><p class="sub" id="h-hold" style="font-size:12px;margin-top:6px">Shown state is held for a few seconds to avoid flicker. The gate itself is unchanged.</p></div></div>
 <div style="display:flex;gap:26px;align-items:center;justify-content:flex-end;flex-wrap:wrap"><div><div class="sub">Vibration rms</div><div class="cur" id="k-rms">n/a</div></div><div><div class="sub">Sigma vs baseline</div><div class="cur" id="k-z">n/a</div></div><div><div class="sub">Baseline</div><div class="cur" id="k-base">n/a</div></div></div></div>
 <div class="g g2"><div class="card"><h3><b id="c1">Vibration rms vs control limits</b><i>ADXL345</i></h3><div id="ch-rms"></div></div>
 <div class="card"><h3><b id="c2">Sigma over time (SPC)</b><i>z = (rms - &mu;&#8320;)/&sigma;&#8320;</i></h3><div id="ch-z"></div></div></div>
@@ -131,6 +131,27 @@ function rulTrendRender(){
 setInterval(rulTrendRender,5000);
 </script>
 <script>
+/* Display-state hold (hysteresis). Only changes what the page shows and beeps on. The gate and its 0.04 g rule are not touched.
+   Severity: 0 no rule, 1 warning, 2 fault. A higher state must persist UP_MS before it is shown, a lower state DOWN_MS. */
+const StateHold = (function () {
+  const UP_MS = 2000, DOWN_MS = 6000;
+  let cur = null, dir = 0, since = 0, ext = 0;
+  function update(raw, now) {
+    if (raw < 0 || raw == null) { cur = null; dir = 0; return raw == null ? -1 : raw; }
+    if (cur === null) { cur = raw; dir = 0; return cur; }
+    if (raw === cur) { dir = 0; return cur; }
+    const d = raw > cur ? 1 : -1;
+    if (d !== dir) { dir = d; since = now; ext = raw; }
+    else ext = d > 0 ? Math.min(ext, raw) : Math.max(ext, raw);
+    if (now - since >= (d > 0 ? UP_MS : DOWN_MS)) { cur = ext; dir = 0; }
+    return cur;
+  }
+  function reset() { cur = null; dir = 0; }
+  return { update, reset, UP_MS, DOWN_MS };
+})();
+if (typeof module !== "undefined") module.exports = StateHold;
+</script>
+<script>
 const N=150,H={rms:[],z:[],kurt:[],crest:[],ax:[],ay:[],az:[],temp:[],snd:[],st:[]};let lastSeq=null,last=null,isAr=false,soundOn=false,audioCtx=null,lastState=null;
 const T={en:{Healthy:["No rule triggered","No alarm rule fired. This is a rule result, not a check of motor health."],Warning:["Warning rule flagged","A warning rule fired. This is a rule result, not a validated diagnosis."],Fault:["Fault rule flagged","A fault rule fired. See the diagnosis card. This is a rule result, not a validated diagnosis."],Unknown:["Reading not valid","The sensor reading is not valid right now."],Standby:["Standby / waiting for DAQ","Live telemetry resumes when the edge DAQ service publishes state."],snd:"Sound: ",on:"ON",off:"OFF",lang:"العربية"},
 ar:{Healthy:["لا توجد قاعدة مفعلة","لم تنطلق أي قاعدة إنذار. هذه نتيجة قواعد، وليست فحصا لحالة الموتور."],Warning:["قاعدة تحذير","انطلقت قاعدة تحذير. هذه نتيجة قواعد وليست تشخيصا مؤكدا."],Fault:["قاعدة عطل","انطلقت قاعدة عطل. راجع بطاقة التشخيص. هذه نتيجة قواعد وليست تشخيصا مؤكدا."],Unknown:["القراءة غير صالحة","قراءة الحساس غير صالحة الآن."],Standby:["انتظار","القراءات الحية ترجع عند نشر الحالة من الجهاز."],snd:"الصوت: ",on:"مفعل",off:"معطل",lang:"English"}};
@@ -150,12 +171,14 @@ for(let k=0;k<=3;k++){const v=lo+(hi-lo)*k/3;r+=`<line x1="${P}" x2="${W-6}" y1=
 for(const f of o.refs||[])r+=`<line x1="${P}" x2="${W-6}" y1="${y(f.v)}" y2="${y(f.v)}" stroke="${f.c}" stroke-dasharray="${f.dash||"6 4"}"/><text x="${W-8}" y="${y(f.v)+(f.dy??-4)}" text-anchor="end" style="fill:${f.c}">${f.l}</text>`;
 for(const s of sers){const off=n-s.d.length;let pts=[];s.d.forEach((v,i)=>{if(v!=null)pts.push(x(i+off)+","+y(v))});r+=`<polyline fill="none" stroke="${s.c}" stroke-width="2" points="${pts.join(" ")}"/>`}
 return r+`<text x="${P}" y="${Ht-2}">${isAr?"أقدم":"older"}</text><text x="${W-30}" y="${Ht-2}">${isAr?"الآن":"now"}</text></svg>`}
+const SEV={Healthy:0,Warning:1,Fault:2},NAME=["Healthy","Warning","Fault"];let lastLabel="";
+function heldSev(d){if(!d.online)return -1;const raw=d.state in SEV?SEV[d.state]:-1;return StateHold.update(raw,Date.now())}
 const f=(v,n)=>Number.isFinite(v)?v.toFixed(n):"n/a",lastOf=a=>{for(let i=a.length-1;i>=0;i--)if(a[i]!=null)return a[i];return null};
 function observe(d){if(d.seq!==undefined&&d.seq===lastSeq)return;lastSeq=d.seq;const ok=d.online&&d.input_valid!==false&&d.state!=="Unknown"&&d.vibration;const v=ok?d.vibration:{},sp=d.spc||{};
 push(H.rms,ok?v.rms_dyn:null);push(H.z,ok?sp.z_score:null);push(H.kurt,ok?v.kurtosis:null);push(H.crest,ok?v.crest_factor:null);push(H.ax,ok?v.ax_dyn:null);push(H.ay,ok?v.ay_dyn:null);push(H.az,ok?v.az_dyn:null);
 const tOk=d.online&&d.system&&d.system.max6675_ok&&d.temperature&&!d.temperature.open_tc;push(H.temp,tOk?d.temperature.temp_c:null);
-const sOk=d.online&&d.system&&d.system.acoustic_ok&&d.acoustic;push(H.snd,sOk?d.acoustic.db_spl:null);H.st.push(d.state==="Fault"?2:d.state==="Warning"?1:d.state==="Healthy"?0:-1);if(H.st.length>N)H.st.shift()}
-function render(d){const dict=T[isAr?"ar":"en"],online=Boolean(d.online),st=online?(d.state||"Healthy"):"Standby",col={Healthy:"var(--ok)",Warning:"var(--warn)",Fault:"var(--bad)"}[st]||"var(--mut)",tt=dict[st]||dict.Standby;
+const sOk=d.online&&d.system&&d.system.acoustic_ok&&d.acoustic;push(H.snd,sOk?d.acoustic.db_spl:null);H.st.push(d.__held);if(H.st.length>N)H.st.shift()}
+function render(d){const dict=T[isAr?"ar":"en"],online=Boolean(d.online),st=online?(d.__held>=0?NAME[d.__held]:(d.state||"Healthy")):"Standby",col={Healthy:"var(--ok)",Warning:"var(--warn)",Fault:"var(--bad)"}[st]||"var(--mut)",tt=dict[st]||dict.Standby;
 document.getElementById("hero").style.setProperty("--c",col);document.getElementById("h-state").innerText=tt[0];document.getElementById("h-desc").innerText=tt[1];
 if(st!==lastState){if(st==="Fault")beep(980,.5);else if(st==="Warning")beep(660,.3)}lastState=st;
 const sp=d.spc||{},v=d.vibration||{},rd=d.reference_data,mu=sp.baseline_mu,sg=sp.baseline_sigma,warn=sp.ucl_warning,fault=sp.ucl_fault,haveSpc=online&&sp.baseline_mu!=null;
@@ -183,10 +206,10 @@ document.getElementById("v-snd").innerHTML=hasS?f(d.acoustic.db_spl,1)+" <small>
 document.getElementById("v-bn").innerText=haveSpc?`Baseline ${f(mu,4)} g ± ${f(sg,4)} g (±3σ band) against recent rms.`:"";
 document.getElementById("ch-bn").innerHTML=haveSpc?line([{d:H.rms,c:A}],{h:112,lo:0,dp:3,bands:[[Math.max(0,mu-3*sg),mu+3*sg,"#2fbf8730"]],refs:[{v:mu,c:G,l:"μ₀",dash:"2 4"}]}):"";
 document.getElementById("tl").innerHTML=H.st.map(s=>`<i style="flex:1;background:${["var(--ok)","var(--warn)","var(--bad)"][s]||"#2a3646"}"></i>`).join("");
-document.getElementById("v-diag").innerText=online?(d.state==="Healthy"?"No rule triggered":(d.fault_label||"No rule triggered")):"n/a";document.getElementById("v-diag").style.color=col;document.getElementById("v-adv").innerText=online&&d.advice?d.advice:"";
+if(d.state!=="Healthy"&&d.fault_label)lastLabel=d.fault_label;document.getElementById("v-diag").innerText=online?(st==="Healthy"?"No rule triggered":(d.state!=="Healthy"?(d.fault_label||"No rule triggered"):(lastLabel||"No rule triggered"))):"n/a";document.getElementById("v-diag").style.color=col;document.getElementById("v-adv").innerText=online&&d.advice?d.advice:"";
 }
 function fmtUp(s){s=Math.floor(s||0);const p=n=>String(n).padStart(2,"0");return p(Math.floor(s/3600))+":"+p(Math.floor(s%3600/60))+":"+p(s%60)}
-function onData(d){if(!d)return;last=d;try{RulTrend.observe(d,Date.now()/1000);rulTrendRender()}catch(e){}observe(d);render(d)}
+function onData(d){if(!d)return;d.__held=heldSev(d);last=d;try{RulTrend.observe(d,Date.now()/1000);rulTrendRender()}catch(e){}observe(d);render(d)}
 function initSSE(){const es=new EventSource("/api/stream");es.onmessage=e=>{try{onData(JSON.parse(e.data))}catch(x){console.error(x)}};es.onerror=()=>{es.close();setTimeout(initSSE,3000)}}
 function sendCommission(cmd,ask){if(!confirm(ask))return;fetch("/api/commissioning",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({cmd:cmd,confirm:true})}).then(r=>r.json()).then(j=>{if(!j.ok)alert(j.error||"failed")}).catch(()=>alert("request failed"))}
 document.getElementById("btn-commission").addEventListener("click",function(){if(this.dataset.mode==="cancel")sendCommission("cancel","Cancel the commissioning run? The baseline stays unchanged.");else sendCommission("start","Start a 10 minute commissioning run? Only do this while the machine is running normally. The device will learn its own baseline from it. Default limits stay active until it finishes.")});
