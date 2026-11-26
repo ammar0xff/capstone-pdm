@@ -1,0 +1,1593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Industrial Predictive Maintenance SCADA | Motor-01 Cloud Mirror</title>
+  <meta name="description" content="Live vibration, thermal and acoustic telemetry from a Raspberry Pi industrial motor monitor, with two-stage SPC and Random Forest fault classification.">
+  
+  <!-- Fonts and icons -->
+  <style>
+    @font-face { font-family: 'Inter'; font-style: normal; font-weight: 400; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-400-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'Inter'; font-style: normal; font-weight: 500; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-500-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'Inter'; font-style: normal; font-weight: 600; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-600-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'Inter'; font-style: normal; font-weight: 700; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-700-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-400-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 500; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-500-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 600; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-600-normal.woff2') format('woff2'); }
+    @font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 700; font-display: swap; src: url('https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5/files/jetbrains-mono-latin-700-normal.woff2') format('woff2'); }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root {
+      --bg-base: #f4f7fb;
+      --bg-surface: #ffffff;
+      --bg-surface-elevated: #f8fafc;
+      --bg-subtle: #eef3f8;
+      --border-subtle: #dbe4ee;
+      --border-strong: #b8c7d9;
+
+      --text-main: #182230;
+      --text-secondary: #4b6078;
+      --text-muted: #52677d;
+
+      --status-ok: #0f766e;
+      --status-ok-bg: #ecfdf7;
+      --status-ok-border: #99d5c5;
+
+      --status-warn: #b45309;
+      --status-warn-bg: #fff8eb;
+      --status-warn-border: #f0cf93;
+
+      --status-alarm: #c24141;
+      --status-alarm-bg: #fff1f1;
+      --status-alarm-border: #f0b5b5;
+
+      --accent-blue: #2563eb;
+      --accent-cyan: #0f766e;
+      --accent-purple: #6d28d9;
+      --shadow-card: 0 1px 2px rgba(24, 34, 48, 0.04), 0 8px 24px rgba(24, 34, 48, 0.04);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(180deg, #f7fafc 0%, var(--bg-base) 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      line-height: 1.45;
+      padding: 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .font-mono {
+      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-feature-settings: "tnum" 1;
+    }
+
+    .app-container {
+      max-width: 1480px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Top Utility Header */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 18px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .system-identity {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .system-badge-icon {
+      width: 34px;
+      height: 34px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-strong);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      color: var(--text-secondary);
+    }
+
+    .system-title-group h1 {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .system-title-group p {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .telemetry-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .status-indicator-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 4px;
+      letter-spacing: 0.02em;
+      border: 1px solid transparent;
+    }
+
+    .status-indicator-pill.online {
+      background: var(--status-ok-bg);
+      color: var(--status-ok);
+      border-color: var(--status-ok-border);
+    }
+
+    .status-indicator-pill.stale {
+      background: var(--status-warn-bg);
+      color: var(--status-warn);
+      border-color: var(--status-warn-border);
+    }
+
+    .status-indicator-pill.offline {
+      background: var(--status-alarm-bg);
+      color: var(--status-alarm);
+      border-color: var(--status-alarm-border);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-control {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+
+    .btn-control:hover {
+      background: var(--bg-surface-elevated);
+      border-color: var(--border-strong);
+      color: var(--text-main);
+    }
+
+    .btn-control.active {
+      background: rgba(139, 92, 246, 0.2);
+      border-color: rgba(139, 92, 246, 0.5);
+      color: #c4b5fd;
+    }
+
+    /* Edge Hardware Rig Alert Ribbon */
+    .edge-alert-ribbon {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      border-radius: 4px;
+      font-size: 12px;
+      gap: 12px;
+      border: 1px solid;
+    }
+
+    .edge-alert-ribbon.offline {
+      background: var(--status-alarm-bg);
+      border-color: var(--status-alarm-border);
+      color: #991b1b;
+    }
+
+    .edge-alert-ribbon.stale {
+      background: var(--status-warn-bg);
+      border-color: var(--status-warn-border);
+      color: #92400e;
+    }
+
+    .ribbon-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ribbon-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Main Grid Structure */
+    .dashboard-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Primary State Banner */
+    .scada-hero-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-left: 4px solid var(--status-ok);
+      border-radius: 4px;
+      padding: 16px 20px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 24px;
+      align-items: center;
+      transition: border-left-color 0.25s;
+    }
+
+    .scada-hero-panel.warning { border-left-color: var(--status-warn); }
+    .scada-hero-panel.fault { border-left-color: var(--status-alarm); }
+    .scada-hero-panel.awaiting { border-left-color: var(--border-strong); }
+    .scada-hero-panel.awaiting .state-icon-box {
+      background: var(--bg-subtle);
+      border-color: var(--border-strong);
+      color: var(--text-muted);
+    }
+
+    .state-indicator-block {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .state-icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 4px;
+      background: var(--status-ok-bg);
+      border: 1px solid var(--status-ok-border);
+      color: var(--status-ok);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .scada-hero-panel.warning .state-icon-box {
+      background: var(--status-warn-bg);
+      border-color: var(--status-warn-border);
+      color: var(--status-warn);
+    }
+
+    .scada-hero-panel.fault .state-icon-box {
+      background: var(--status-alarm-bg);
+      border-color: var(--status-alarm-border);
+      color: var(--status-alarm);
+    }
+
+    .state-title-text h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+
+    .state-title-text p {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 3px;
+    }
+
+    .telemetry-kpis {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .kpi-cell {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 8px 14px;
+      min-width: 95px;
+      text-align: right;
+    }
+
+    .kpi-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .kpi-value {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-top: 2px;
+    }
+
+    /* 3-Modality Engineering Cards */
+    .modality-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    @media (max-width: 1100px) {
+      .modality-grid { grid-template-columns: minmax(0, 1fr); }
+      .scada-hero-panel { grid-template-columns: 1fr; }
+      .telemetry-kpis { justify-content: flex-start; }
+    }
+
+    .sensor-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .sensor-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .sensor-name {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sensor-bus-spec {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+
+    /* Metric Grid within Modality Card */
+    .metrics-2x2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .metric-data-card {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 8px 10px;
+    }
+
+    .metric-data-card .header-sub {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .metric-data-card .name {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .metric-data-card .value-display {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-top: 3px;
+    }
+
+    .metric-data-card .unit {
+      font-size: 10px;
+      color: var(--text-secondary);
+      font-weight: 400;
+      margin-left: 2px;
+    }
+
+    /* ISO Standard Vibration Severity Bar */
+    .iso-severity-widget {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .widget-title {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      display: flex;
+      justify-content: space-between;
+      letter-spacing: 0.04em;
+    }
+
+    .iso-track {
+      height: 6px;
+      border-radius: 3px;
+      background: #1e293b;
+      position: relative;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .iso-segment { height: 100%; }
+    .iso-seg-a { width: 25%; background: #10b981; }
+    .iso-seg-b { width: 30%; background: #3b82f6; }
+    .iso-seg-c { width: 25%; background: #f59e0b; }
+    .iso-seg-d { width: 20%; background: #ef4444; }
+
+    .iso-indicator-pointer {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: #ffffff;
+      box-shadow: 0 0 3px #000;
+      transition: left 0.3s ease;
+      left: 8%;
+    }
+
+    .iso-indicator-pointer.is-unavailable { display: none; }
+
+    .iso-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Chart Container */
+    .chart-panel-box {
+      height: 160px;
+      position: relative;
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 6px 8px;
+    }
+
+    .chart-panel-box.no-data canvas {
+      opacity: 0.25;
+    }
+
+    .chart-panel-box.no-data::after {
+      content: attr(data-empty-label);
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* Two-Stage Architecture Section */
+    .two-stage-banner {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 14px 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 800px) {
+      .two-stage-banner { grid-template-columns: 1fr; }
+    }
+
+    .architecture-column {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 12px;
+      border-left: 3px solid var(--border-strong);
+    }
+
+    .architecture-column.active-gate {
+      border-left-color: #8b5cf6;
+      background: rgba(139, 92, 246, 0.05);
+    }
+
+    .architecture-column h3 {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-main);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .architecture-column p {
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+    }
+
+    .gate-badge-tag {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
+    }
+
+    .gate-badge-tag.dormant,
+    .gate-badge-tag.pending {
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+    }
+
+    .gate-badge-tag.active {
+      background: rgba(139, 92, 246, 0.2);
+      color: #5b21b6;
+      border: 1px solid rgba(139, 92, 246, 0.4);
+    }
+
+    /* Mathematical Physics Section */
+    .math-engine-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 14px 18px;
+    }
+
+    .math-engine-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 12px;
+    }
+
+    .math-engine-header h2 {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .math-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 1024px) {
+      .math-grid { grid-template-columns: 1fr; }
+    }
+
+    .math-card {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .math-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .math-code-block {
+      background: #060910;
+      border: 1px solid #1a2234;
+      padding: 6px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+      color: #38bdf8;
+      overflow-x: auto;
+    }
+
+    .math-live-eval {
+      font-size: 12px;
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    .math-live-eval b {
+      color: var(--status-ok);
+    }
+
+    .math-rationale {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* SCADA Footer */
+    .scada-footer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 14px 0 6px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .scada-footer a {
+      color: var(--accent-blue);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 2px 4px;
+    }
+
+    .scada-footer a:hover {
+      color: var(--accent-blue);
+    }
+
+    .scada-footer a:focus-visible {
+      outline: 2px solid var(--accent-blue);
+      outline-offset: 2px;
+    }
+
+    .chart-panel-box.no-data {
+      height: 96px;
+    }
+
+    /* Benchmark and provenance evidence - never live telemetry */
+    .modality-grid > *, .two-stage-banner > *, .dashboard-layout > * { min-width: 0; }
+    .provenance-table { display: block; overflow-x: auto; }
+    .evidence-details > summary { cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-top: 10px; }
+    .cal-note { margin: 10px 0 0; font-size: 11px; color: var(--text-muted); line-height: 1.4; }
+    .dashboard-layout.is-stale .metrics-2x2, .dashboard-layout.is-stale .chart-panel-box { opacity: 0.55; }
+    .benchmark-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      box-shadow: var(--shadow-card);
+      padding: 16px 18px;
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) minmax(260px, 1.4fr);
+      gap: 18px;
+    }
+
+    .benchmark-panel h2 {
+      font-size: 14px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .benchmark-panel p {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      margin-bottom: 8px;
+    }
+
+    .benchmark-warning {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .benchmark-warning span {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 3px 7px;
+      border-radius: 3px;
+      background: var(--status-warn-bg);
+      color: #92400e;
+      border: 1px solid var(--status-warn-border);
+    }
+
+    .benchmark-metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+    }
+
+    .benchmark-metric {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 10px 12px;
+    }
+
+    .benchmark-metric strong {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      font-variant-numeric: tabular-nums;
+      color: var(--accent-blue);
+    }
+
+    .benchmark-metric small {
+      display: block;
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      line-height: 1.35;
+    }
+
+    .provenance-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .provenance-table th,
+    .provenance-table td {
+      text-align: left;
+      vertical-align: top;
+      padding: 7px 8px;
+      border-bottom: 1px solid var(--border-subtle);
+      line-height: 1.45;
+    }
+
+    .provenance-table th {
+      color: var(--text-main);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .provenance-table a {
+      color: var(--accent-blue);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+    }
+
+    .provenance-need {
+      color: #92400e;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+    }
+
+    @media (max-width: 860px) {
+      .benchmark-panel { grid-template-columns: 1fr; }
+      .provenance-table th, .provenance-table td { padding: 6px; }
+    }
+
+    @media (max-width: 480px) {
+      .system-title-group h1 { font-size: 12px; line-height: 1.2; letter-spacing: 0.02em; }
+      .system-title-group h1 span { white-space: nowrap; }
+      .telemetry-meta {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+        gap: 8px;
+      }
+      .telemetry-meta > .status-indicator-pill { grid-column: 1 / -1; justify-self: start; }
+      .telemetry-meta > div:last-child { justify-content: space-between; }
+      .benchmark-panel { padding: 12px; }
+      .benchmark-panel > div { min-width: 0; }
+      .benchmark-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .benchmark-metric { min-width: 0; padding: 8px; }
+      .benchmark-metric strong { font-size: 15px; overflow-wrap: anywhere; }
+      .provenance-table { table-layout: fixed; }
+      .provenance-table th, .provenance-table td { overflow-wrap: anywhere; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Top Utility Bar -->
+    <header class="top-bar">
+      <div class="system-identity">
+        <div class="system-badge-icon">
+          <i class="fa-solid fa-server"></i>
+        </div>
+        <div class="system-title-group">
+          <h1>
+            Predictive Maintenance SCADA
+            <span style="font-size: 11px; font-weight: 500; color: var(--text-muted);">// UNIT-01</span>
+          </h1>
+          <p>Live machine state from the Raspberry Pi mirror</p>
+        </div>
+      </div>
+
+      <div class="telemetry-meta">
+        <div class="status-indicator-pill offline" id="cloud-indicator">
+          <span class="status-dot" id="cloud-dot"></span>
+          <span id="txt-cloud-status" class="font-mono">AWAITING DATA</span>
+        </div>
+        
+        <div style="font-size: 11px; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 12px;">
+          <span>SEQ: <b class="font-mono" style="color: var(--text-main);" id="badge-seq">NO DATA</b></span>
+          <span>UPTIME: <b class="font-mono" style="color: var(--text-main);" id="badge-uptime">NO DATA</b></span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <a href="guide.html" class="btn-control" title="STEM Exhibition Presentation Deck">
+          <i class="fa-solid fa-chalkboard-user"></i>
+          <span>Exhibition Deck</span>
+        </a>
+        <a href="calibration.html" class="btn-control" title="Sensor Metrology &amp; Traceability">
+          <i class="fa-solid fa-ruler-combined"></i>
+          <span>Metrology Suite</span>
+        </a>
+        <button class="btn-control" id="btn-sound" onclick="toggleMute()" title="Audio Alarm Status">
+          <i class="fa-solid fa-volume-high" id="sound-icon"></i>
+          <span id="txt-sound">Alarm ON</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Edge Hardware Rig Alert Ribbon -->
+    <div id="hardware-alert-bar" class="edge-alert-ribbon offline" style="display: none;">
+      <div class="ribbon-info">
+        <i class="fa-solid fa-triangle-exclamation" id="banner-icon"></i>
+        <div>
+          <b id="banner-title">Raspberry Pi Edge Hardware Offline</b>
+          <span id="banner-desc" style="opacity: 0.9; margin-left: 6px;">No recent telemetry received from edge DAQ. Cached cloud mirror displayed.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Dashboard Layout -->
+    <main class="dashboard-layout">
+      
+      <!-- Primary Machine State Banner -->
+      <section class="scada-hero-panel awaiting" id="main-status-card">
+        <div class="state-indicator-block">
+          <div class="state-icon-box" id="status-lamp">
+            <i class="fa-solid fa-circle-question" id="lamp-icon"></i>
+          </div>
+          <div class="state-title-text">
+            <h2 id="status-title">Awaiting telemetry</h2>
+            <p id="status-sub">No classified packet received from the Raspberry Pi mirror yet</p>
+          </div>
+        </div>
+
+        <div class="telemetry-kpis">
+          <div class="kpi-cell">
+            <div class="kpi-label">Last packet</div>
+            <div class="kpi-value font-mono" id="badge-age">NO DATA</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3-Modality Engineering Cards -->
+      <section class="modality-grid">
+        
+        <!-- MODALITY 1: VIBRATION -->
+        <article class="sensor-panel">
+          <div class="sensor-panel-header">
+            <div class="sensor-name">
+              <i class="fa-solid fa-wave-square" style="color: #0369a1;"></i>
+              Vibration
+            </div>
+            <span class="sensor-bus-spec">ADXL345 &bull; I2C 0x53</span>
+          </div>
+
+          <div class="metrics-2x2">
+            <div class="metric-data-card">
+              <div class="name">Dynamic RMS</div>
+              <div class="value-display font-mono" id="val-rms">NO DATA</div>
+            </div>
+            <div class="metric-data-card">
+              <div class="name">Peak Acceleration</div>
+              <div class="value-display font-mono" id="val-peak">NO DATA</div>
+            </div>
+            <div class="metric-data-card">
+              <div class="name">Kurtosis (&kappa;)</div>
+              <div class="value-display font-mono" id="val-kurt">NO DATA</div>
+            </div>
+            <div class="metric-data-card">
+              <div class="name">Crest Factor</div>
+              <div class="value-display font-mono" id="val-cf">NO DATA</div>
+            </div>
+          </div>
+
+
+          <p class="cal-note" id="note-vib">Accelerometer sampling rate: NO DATA.</p>
+
+          <div class="chart-panel-box no-data" data-empty-label="NO TELEMETRY">
+            <canvas id="chart-vib"></canvas>
+          </div>
+        </article>
+
+        <!-- MODALITY 2: THERMAL -->
+        <article class="sensor-panel">
+          <div class="sensor-panel-header">
+            <div class="sensor-name">
+              <i class="fa-solid fa-temperature-half" style="color: #92400e;"></i>
+              Temperature
+            </div>
+            <span class="sensor-bus-spec">MAX6675 &bull; SPI0.0 &bull; Class-1 K</span>
+          </div>
+
+          <div class="metrics-2x2">
+            <div class="metric-data-card">
+              <div class="name">Casing Temp</div>
+              <div class="value-display font-mono" id="val-temp">NO DATA</div>
+            </div>
+            <div class="metric-data-card">
+              <div class="name">Thermal Slope</div>
+              <div class="value-display font-mono" id="val-slope">NO DATA</div>
+            </div>
+            <div class="metric-data-card">
+              <div class="name">Thermocouple Link</div>
+              <div class="value-display font-mono" id="val-tc" style="font-size: 15px;">NO DATA</div>
+            </div>
+            <div class="metric-data-card">
+              <div class="name">Open Thermocouple</div>
+              <div class="value-display font-mono" id="val-open" style="font-size: 15px;">NO DATA</div>
+            </div>
+          </div>
+
+
+          <p class="cal-note">Reading only; no validated limit is applied on this page.</p>
+
+          <div class="chart-panel-box no-data" data-empty-label="NO TELEMETRY">
+            <canvas id="chart-temp"></canvas>
+          </div>
+        </article>
+
+        <!-- MODALITY 3: ACOUSTIC -->
+        <article class="sensor-panel">
+          <div class="sensor-panel-header">
+            <div class="sensor-name">
+              <i class="fa-solid fa-volume-high" style="color: #c084fc;"></i>
+              Microphone
+            </div>
+            <span class="sensor-bus-spec">INMP441 &bull; I2S</span>
+          </div>
+
+          <div class="metrics-2x2">
+            <div class="metric-data-card">
+              <div class="name">Mic Level (dB, relative level)</div>
+              <div class="value-display font-mono" id="val-sound-db">NO DATA</div>
+            </div>
+            <div class="metric-data-card">
+              <div class="name">Zero-Crossing Rate</div>
+              <div class="value-display font-mono" id="val-sound-zcr">NO DATA</div>
+            </div>
+            <div class="metric-data-card">
+              <div class="name">Mic Level (normalised RMS)</div>
+              <div class="value-display font-mono" id="val-sound-rms">NO DATA</div>
+            </div>
+            <div class="metric-data-card">
+              <div class="name">Mic Level, stationary component (dB, relative level)</div>
+              <div class="value-display font-mono" id="val-sound-stat-db">NO DATA</div>
+            </div>
+            <div class="metric-data-card">
+              <div class="name">Microphone Link</div>
+              <div class="value-display font-mono" id="val-mic" style="font-size: 15px;">NO DATA</div>
+            </div>
+          </div>
+
+
+          <p class="cal-note">Relative microphone level. Not a measured sound pressure level.</p>
+          <p class="cal-note">Stationary component: level of the microphone signal after a median-spectrum filter (about 2 s history), shown next to the raw level. It reduces speech-band power only partly and suppresses isolated impacts; it is not speech removal and not a fault indicator.</p>
+
+          <div class="chart-panel-box no-data" data-empty-label="NO TELEMETRY">
+            <canvas id="chart-sound"></canvas>
+          </div>
+        </article>
+
+      </section>
+
+      <section class="two-stage-banner">
+        <div class="architecture-column active-gate" id="step-stage1">
+          <h3><span>State rules on the Raspberry Pi</span><span class="gate-badge-tag pending" id="pill-stage1">AWAITING DATA</span></h3>
+          <p id="txt-gate">Gate status from the last packet: NO DATA. The state above comes from fixed threshold rules on the Pi.</p>
+        </div>
+        <div class="architecture-column" id="step-stage2">
+          <h3><span>Random Forest output</span><span class="gate-badge-tag pending" id="pill-stage2">AWAITING DATA</span></h3>
+          <p id="txt-rf">Class from the last packet: NO DATA. The classifier is trained on generated data and has not been tested on real faults. No probability or confidence is shown, and it gives no remaining-life estimate.</p>
+        </div>
+      </section>
+
+      <section class="benchmark-panel" aria-label="Evidence status">
+        <div>
+          <h2>Evidence status <span class="font-mono">/ public benchmark, not this rig</span></h2>
+          <div class="benchmark-warning">
+            <span>EXPLORATORY</span>
+            <span>OFFLINE PUBLIC DATA</span>
+            <span>NOT OUR MOTOR</span>
+          </div>
+          <p>Fault detection was tested offline on the HUST bearing dataset (real 750 W induction-motor bench, artificial 0.2 mm bearing cracks, 51.2 kHz vibration). Every bearing type was held out of training in turn. Bearing type is used as the specimen identity; the dataset does not publish per-bearing serial numbers.</p>
+          <div class="benchmark-metrics">
+            <div class="benchmark-metric"><strong>99.86%</strong><small>fault vs normal, held-out bearing type<br>majority baseline 84.3%</small></div>
+            <div class="benchmark-metric"><strong>about 41%</strong><small>7-class fault type, held-out bearing type<br>majority baseline 15.7%. Below 80%.</small></div>
+            <div class="benchmark-metric"><strong>baseline</strong><small>fault vs normal at 3.2 kHz and lower (rate test, not comparable to the first row)</small></div>
+            <div class="benchmark-metric"><strong>NONE</strong><small>RUL not demonstrated on a whole motor. No valid run-to-failure data is available, so no RUL number is shown.</small></div>
+          </div>
+          <details class="evidence-details" open><summary>Why this does not apply to the rig</summary>
+          <p style="margin-top:10px">This rig: the accelerometer rate is whatever the latest packet reports (see the vibration panel), and in our rate test the tested detector fell to baseline at 800 Hz and below, so it is not validated for the rig rate. This is our tested approach, not proof that no method could work. No accuracy has been measured on this rig.</p>
+          </details>
+        </div>
+        <div>
+          <details class="evidence-details"><summary>Source &amp; licence evidence</summary>
+          <table class="provenance-table">
+            <thead><tr><th>Source</th><th>Evidence</th><th>Limit</th></tr></thead>
+            <tbody>
+              <tr>
+                <th>HUST bearing dataset</th>
+                <td><a href="https://data.mendeley.com/datasets/cbv7jyx4p9/3" target="_blank">Mendeley Data v3</a>, licence CC BY 4.0. Descriptor: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10327369/" target="_blank">PMC10327369</a>. 99 recordings, 5,918 windows.</td>
+                <td>Component-level artificial defects on a lab bench. Random forest on 16 spectral and statistical features. The brief's 80% accuracy requirement names no task or class count. The team protocol treated 7-class as primary; fault vs normal is a later, exploratory check.</td>
+              </tr>
+              <tr>
+                <th>Removed benchmarks</th>
+                <td>CWRU, NASA C-MAPSS, FMCG and XJTU-SY panels were removed from this page.</td>
+                <td>Same-recording block splits, a simulated turbofan, unverified labels and bearing-only minutes: none supports a claim about this motor.</td>
+              </tr>
+            </tbody>
+          </table>
+          </details>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Professional Footer -->
+    <footer class="scada-footer">
+      <div>
+        <b>Grade 12 STEM Capstone 2026/2027</b> &bull; Theme: Communication, Sensing, Information &amp; Informatics &bull; Machine: fan-motor test rig
+      </div>
+      <div class="font-mono">
+        Raspberry Pi 4B &bull; Realtime Cloud Mirror: <a href="https://castpone2026-default-rtdb.firebaseio.com/motor1.json" target="_blank">castpone2026-default-rtdb</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Audio Context & Client Controller -->
+  <script>
+    const FIREBASE_RTDB_URL = "https://castpone2026-default-rtdb.firebaseio.com/motor1.json";
+    let isMuted = false;
+    let audioCtx = null;
+    let lastAlertTime = 0;
+    let lastProcessedSeq = null;
+
+    // Charts references
+    let chartVib, chartTemp, chartSound;
+    const historyData = {
+      labels: [],
+      rms: [],
+      peak: [],
+      temp: [],
+      slope: [],
+      sound_db: []
+    };
+
+    function initCharts() {
+      if (typeof Chart === "undefined") return;
+      const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 300 },
+        plugins: { 
+          legend: { 
+            position: 'top',
+            align: 'end',
+            labels: {
+              color: '#4b6078',
+              boxWidth: 8,
+              boxHeight: 8,
+              font: { size: 10, family: 'Inter' }
+            }
+          } 
+        },
+        scales: {
+          x: { display: false },
+          y: {
+            grid: { color: 'rgba(24, 34, 48, 0.08)' },
+            ticks: {
+              color: '#52677d',
+              font: { size: 9, family: 'JetBrains Mono' },
+              maxTicksLimit: 4
+            }
+          }
+        }
+      };
+
+      // Vibration Chart
+      chartVib = new Chart(document.getElementById('chart-vib'), {
+        type: 'line',
+        data: {
+          labels: historyData.labels,
+          datasets: [
+            { label: 'RMS (g)', data: historyData.rms, borderColor: '#0369a1', borderWidth: 1.5, pointRadius: 0, tension: 0.2 },
+            { label: 'Peak (g)', data: historyData.peak, borderColor: '#52677d', borderWidth: 1, borderDash: [3, 3], pointRadius: 0, tension: 0.2 }
+          ]
+        },
+        options: commonOptions
+      });
+
+      // Temp Chart
+      chartTemp = new Chart(document.getElementById('chart-temp'), {
+        type: 'line',
+        data: {
+          labels: historyData.labels,
+          datasets: [
+            { label: 'Temp (°C)', data: historyData.temp, borderColor: '#b45309', borderWidth: 1.5, pointRadius: 0, tension: 0.2 }
+          ]
+        },
+        options: commonOptions
+      });
+
+      // Sound Chart
+      chartSound = new Chart(document.getElementById('chart-sound'), {
+        type: 'line',
+        data: {
+          labels: historyData.labels,
+          datasets: [
+            { label: 'Sound (dB)', data: historyData.sound_db, borderColor: '#6d28d9', borderWidth: 1.5, pointRadius: 0, tension: 0.2 }
+          ]
+        },
+        options: commonOptions
+      });
+    }
+
+    function playBeep(freq = 880, duration = 0.2) {
+      if (isMuted) return;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) { }
+    }
+
+    function toggleMute() {
+      isMuted = !isMuted;
+      document.getElementById('txt-sound').innerText = isMuted ? "Alarm OFF" : "Alarm ON";
+      document.getElementById('sound-icon').className = isMuted ? "fa-solid fa-volume-xmark" : "fa-solid fa-volume-high";
+    }
+
+    function readFinite(value) {
+      if (value === null || value === undefined || value === "" || typeof value === "boolean") return null;
+      const number = typeof value === "number" ? value : Number(String(value).trim());
+      return Number.isFinite(number) ? number : null;
+    }
+
+    function firstFinite(...values) {
+      for (const value of values) {
+        const number = readFinite(value);
+        if (number !== null) return number;
+      }
+      return null;
+    }
+
+    function textOrNull(value) {
+      if (typeof value !== "string") return null;
+      const text = value.trim();
+      return text || null;
+    }
+
+    function formatValue(value, digits, unit, signed = false) {
+      const suffix = unit ? `<span class="unit">${unit}</span>` : "";
+      if (value === null) return "NO DATA";
+      const prefix = signed && value >= 0 ? "+" : "";
+      return `${prefix}${value.toFixed(digits)}${suffix}`;
+    }
+
+    function renderValue(id, value, digits, unit, signed = false, color = null) {
+      const element = document.getElementById(id);
+      element.innerHTML = formatValue(value, digits, unit, signed);
+      if (value === null) element.style.removeProperty("color");
+      else if (color) element.style.color = color;
+    }
+
+    const TEXT_ONLY_IDS = ["val-tc", "val-open", "val-mic"];
+    let lastDataTs = null;
+    let lastData = null;
+
+    function setText(id, text, color) {
+      const element = document.getElementById(id);
+      element.innerText = text;
+      if (color) element.style.color = color; else element.style.removeProperty("color");
+    }
+
+    function linkLabel(flag) {
+      if (flag === true) return ["OK", "var(--status-ok)"];
+      if (flag === false) return ["FAULT", "var(--status-alarm)"];
+      return ["NO DATA", null];
+    }
+
+    const GATE_TEXT_IDLE = "Gate status from the last packet: NO DATA. The state above comes from fixed threshold rules on the Pi.";
+    const RF_TEXT_IDLE = "Class from the last packet: NO DATA. The classifier is trained on generated data and has not been tested on real faults. No probability or confidence is shown, and it gives no remaining-life estimate.";
+
+    function setGates(gateText, rfText, knownState, isStale, rfExecuted) {
+      const pill1 = document.getElementById("pill-stage1");
+      const pill2 = document.getElementById("pill-stage2");
+      if (!knownState) {
+        pill1.className = "gate-badge-tag pending"; pill1.innerText = "AWAITING DATA";
+        pill2.className = "gate-badge-tag pending"; pill2.innerText = "AWAITING DATA";
+        document.getElementById("txt-gate").innerText = GATE_TEXT_IDLE;
+        document.getElementById("txt-rf").innerText = RF_TEXT_IDLE;
+        return;
+      }
+      const gated = Boolean(gateText && /gated|no alarm/i.test(gateText));
+      if (isStale) {
+        pill1.className = "gate-badge-tag pending"; pill1.innerText = "OLD PACKET";
+        pill2.className = "gate-badge-tag pending"; pill2.innerText = "OLD PACKET";
+      } else {
+        pill1.className = "gate-badge-tag " + (knownState === "Healthy" ? "active" : "dormant");
+        pill1.innerText = knownState === "Healthy" ? "NO BREACH" : "RULE BREACHED";
+        pill2.className = "gate-badge-tag pending";
+        pill2.innerText = rfExecuted === true ? "RAN, UNVALIDATED" : (rfExecuted === false ? "NOT RUN" : "NOT REPORTED");
+      }
+      document.getElementById("txt-gate").innerText = "Gate status from the last packet: " + (gateText || "NO DATA") + ". The state above comes from fixed threshold rules on the Pi.";
+      const rfTail = "The classifier is trained on generated data and has not been tested on real faults. No probability or confidence is shown, and it gives no remaining-life estimate.";
+      let rfLead;
+      if (rfExecuted === true) rfLead = "Random Forest ran on this packet (class " + (rfText || "unknown") + "). Its class is used only when a threshold rule flags a warning or fault. ";
+      else if (rfExecuted === false) rfLead = "Random Forest was not run on this packet, so no class is reported. ";
+      else rfLead = "This Pi build does not report whether Random Forest ran, so the class shown (" + (rfText || "NO DATA") + ") is not confirmed as a prediction. ";
+      document.getElementById("txt-rf").innerText = rfLead + rfTail;
+    }
+
+    function showAwaitingState() {
+      const card = document.getElementById("main-status-card");
+      card.className = "scada-hero-panel awaiting";
+      document.getElementById("lamp-icon").className = "fa-solid fa-circle-question";
+      document.getElementById("status-title").innerText = "Awaiting telemetry";
+      document.getElementById("status-sub").innerText = "No classified packet received from the Raspberry Pi mirror yet";
+      document.getElementById("badge-age").innerText = "NO DATA";
+      document.getElementById("badge-seq").innerText = "NO DATA";
+      document.getElementById("badge-uptime").innerText = "NO DATA";
+      for (const id of [
+        "val-rms", "val-peak", "val-kurt", "val-cf", "val-temp",
+        "val-slope", "val-sound-db", "val-sound-zcr", "val-sound-rms", "val-sound-stat-db"
+      ]) renderValue(id, null, 0, "");
+      for (const id of TEXT_ONLY_IDS) setText(id, "NO DATA", null);
+      document.getElementById("note-vib").innerText = "Accelerometer sampling rate: NO DATA.";
+      setGates(null, null, null, false);
+    }
+
+    function updateDashboard(data) {
+      if (!data || typeof data !== "object") {
+        showAwaitingState();
+        return;
+      }
+      showAwaitingState();
+
+      const state = textOrNull(data.state);
+      const fault = textOrNull(data.fault) || textOrNull(data.fault_label);
+      const rms = firstFinite(data.rms, data.vibration?.rms_dyn);
+      const peak = firstFinite(data.peak, data.vibration?.peak_dyn);
+      const kurt = firstFinite(data.kurt, data.vibration?.kurtosis);
+      const cf = firstFinite(data.cf, data.vibration?.crest_factor);
+      const temp = firstFinite(data.temp, data.temperature?.temp_c);
+      const slope = firstFinite(data.slope, data.temperature?.slope_c_per_min);
+      const sound_db = firstFinite(data.sound_db, data.acoustic?.db_spl);
+      const sound_rms = firstFinite(data.acoustic?.rms);
+      const zcr = firstFinite(data.zcr, data.acoustic?.zcr);
+      const fsHz = firstFinite(data.vibration?.fs_hz);
+      const seq = firstFinite(data.seq);
+      const uptime = firstFinite(data.uptime_s);
+      const dataTs = firstFinite(data.ts);
+      lastDataTs = dataTs;
+      lastData = data;
+      const ageSec = dataTs === null ? null : Math.max(0, Date.now() / 1000 - dataTs);
+      const isStaleTelemetry = ageSec === null || ageSec > 20;
+      const invalidInput = data.input_valid === false || state === "Unknown";
+      const knownState = !invalidInput && state && ["Healthy", "Warning", "Fault"].includes(state) ? state : null;
+      document.getElementById("main-status-card").dataset.stale = isStaleTelemetry ? "1" : "0";
+      document.querySelector(".dashboard-layout").classList.toggle("is-stale", isStaleTelemetry);
+
+      if (invalidInput) {
+        const card = document.getElementById("main-status-card");
+        card.className = "scada-hero-panel awaiting";
+        document.getElementById("lamp-icon").className = "fa-solid fa-circle-question";
+        document.getElementById("status-title").innerText = "Sensor input invalid";
+        document.getElementById("status-sub").innerText = "A sensor value in the last packet was not a valid number. No health state is shown until valid readings return.";
+      }
+      // Only a classified packet can change the state lamp. An old packet never shows a health state.
+      if (knownState) {
+        const card = document.getElementById("main-status-card");
+        const icon = document.getElementById("lamp-icon");
+        const title = document.getElementById("status-title");
+        const sub = document.getElementById("status-sub");
+        const displayFault = fault || "Classified telemetry";
+
+        if (isStaleTelemetry) {
+          card.className = "scada-hero-panel awaiting";
+          icon.className = "fa-solid fa-clock-rotate-left";
+          title.innerText = "No live data";
+          sub.innerText = `Last packet ${formatTimeAgo(ageSec)} reported: ${displayFault}. That is old, not the current machine state.`;
+        } else {
+          card.className = "scada-hero-panel";
+          if (knownState === "Healthy") {
+            icon.className = "fa-solid fa-check";
+            title.innerText = "No rule triggered";
+            sub.innerText = "No threshold rule fired in the last packet. This is a rule result, not validated motor health.";
+          } else if (knownState === "Warning") {
+            card.classList.add("warning");
+            icon.className = "fa-solid fa-triangle-exclamation";
+            title.innerText = `Warning: ${displayFault}`;
+            sub.innerText = "A threshold rule on the Pi was breached. Inspect the machine.";
+            if (Date.now() - lastAlertTime > 5000) { playBeep(660, 0.3); lastAlertTime = Date.now(); }
+          } else {
+            card.classList.add("fault");
+            icon.className = "fa-solid fa-triangle-exclamation";
+            title.innerText = `Fault flagged: ${displayFault}`;
+            sub.innerText = "The Pi's threshold rules flagged a fault. Inspect the machine.";
+            if (Date.now() - lastAlertTime > 2000) { playBeep(980, 0.4); lastAlertTime = Date.now(); }
+          }
+        }
+      }
+
+      setGates(textOrNull(data.ai?.gate_status), textOrNull(data.ai?.predicted_class), knownState, isStaleTelemetry, typeof data.rf_executed === 'boolean' ? data.rf_executed : (typeof data.ai?.rf_executed === 'boolean' ? data.ai.rf_executed : null));
+
+      if (seq !== null) document.getElementById("badge-seq").innerText = "#" + seq;
+      if (uptime !== null) {
+        document.getElementById("badge-uptime").innerText = uptime >= 60
+          ? (uptime / 60).toFixed(1) + "m"
+          : uptime.toFixed(0) + "s";
+      }
+      updateAge();
+
+      // A missing or non-finite field is shown as unavailable, not filled in.
+      renderValue("val-rms", rms, 4, "g");
+      renderValue("val-peak", peak, 4, "g");
+      renderValue("val-kurt", kurt, 2, "&kappa;");
+      renderValue("val-cf", cf, 2, "CF");
+      renderValue("val-temp", temp, 2, "&deg;C");
+      renderValue("val-slope", slope, 2, "&deg;C/m", true);
+      renderValue("val-sound-db", sound_db, 1, "dB");
+      renderValue("val-sound-zcr", zcr, 4, "cross/sample");
+      renderValue("val-sound-rms", sound_rms, 4, "");
+      renderValue("val-sound-stat-db", firstFinite(data.acoustic?.stat_db), 1, "dB");
+
+      const flag = (v) => (typeof v === "boolean" ? v : (v === 0 || v === 1 ? v === 1 : null));
+      const sys = data.system || {};
+      const openTc = data.temperature && data.temperature.open_tc !== undefined ? flag(data.temperature.open_tc) : null;
+      const [tcLabel, tcColor] = linkLabel(flag(sys.max6675_ok));
+      setText("val-tc", tcLabel, tcColor);
+      setText("val-open", openTc === null ? "NO DATA" : (openTc ? "OPEN" : "NO"), openTc === true ? "var(--status-alarm)" : null);
+      const [micLabel, micColor] = linkLabel(flag(sys.acoustic_ok));
+      setText("val-mic", micLabel, micColor);
+      const adxlOk = flag(sys.adxl_ok);
+      if (fsHz !== null) {
+        document.getElementById("note-vib").innerText = `Accelerometer link: ${adxlOk === null ? "NO DATA" : (adxlOk ? "OK" : "FAULT")}. Sampling rate: ${fsHz.toFixed(1)} Hz, too slow for bearing-fault frequencies.`;
+      }
+
+      // Charts advance only on a fresh sequence with all plotted values present.
+      const isFreshHardwareData = seq !== null && dataTs !== null && lastProcessedSeq !== seq && ageSec < 60;
+      const hasChartValues = rms !== null && peak !== null && temp !== null && sound_db !== null;
+      const shouldPushChart = isFreshHardwareData && hasChartValues;
+
+      document.querySelectorAll(".chart-panel-box").forEach(box => {
+        box.dataset.emptyLabel = "NO TELEMETRY";
+        box.classList.toggle("no-data", historyData.labels.length === 0 && !shouldPushChart);
+      });
+
+      if (shouldPushChart && chartVib && chartTemp && chartSound) {
+        lastProcessedSeq = seq;
+        historyData.labels.push(new Date().toLocaleTimeString());
+        historyData.rms.push(rms);
+        historyData.peak.push(peak);
+        historyData.temp.push(temp);
+        historyData.slope.push(slope);
+        historyData.sound_db.push(sound_db);
+        if (historyData.labels.length > 25) {
+          for (const k of Object.keys(historyData)) historyData[k].shift();
+        }
+        chartVib.update();
+        chartTemp.update();
+        chartSound.update();
+      }
+    }
+
+    function updateAge() {
+      const el = document.getElementById("badge-age");
+      if (lastDataTs === null) { el.innerText = "NO DATA"; return; }
+      el.innerText = formatTimeAgo(Math.max(0, Date.now() / 1000 - lastDataTs));
+    }
+
+    function formatTimeAgo(seconds) {
+      if (seconds === null || isNaN(seconds) || seconds < 0) return "unknown time";
+      if (seconds < 60) return `${Math.max(1, Math.round(seconds))}s ago`;
+      const mins = Math.floor(seconds / 60);
+      if (mins < 60) return `${mins}m ago`;
+      const hours = Math.floor(mins / 60);
+      if (hours < 24) return `${hours}h ago`;
+      const days = Math.floor(hours / 24);
+      return `${days}d ago`;
+    }
+
+    function updateHardwareStatus(data, isError = false) {
+      const indicator = document.getElementById('cloud-indicator');
+      const txtStatus = document.getElementById('txt-cloud-status');
+      const banner = document.getElementById('hardware-alert-bar');
+      const bannerTitle = document.getElementById('banner-title');
+      const bannerDesc = document.getElementById('banner-desc');
+      const bannerIcon = document.getElementById('banner-icon');
+
+      if (isError || !data) {
+        indicator.className = "status-indicator-pill offline";
+        txtStatus.innerText = "RIG OFFLINE";
+        banner.style.display = "flex";
+        banner.className = "edge-alert-ribbon offline";
+        bannerIcon.className = "fa-solid fa-triangle-exclamation";
+        bannerTitle.innerText = "Edge Rig Disconnected";
+        bannerDesc.innerText = "Unable to reach Firebase RTDB or Raspberry Pi telemetry stream. Verify Pi power supply and Tailscale network.";
+        return;
+      }
+
+      const nowSec = Date.now() / 1000;
+      const dataTs = firstFinite(data.ts);
+      const ageSec = dataTs === null ? null : Math.max(0, nowSec - dataTs);
+      const timeAgoStr = formatTimeAgo(ageSec);
+      const seq = firstFinite(data.seq);
+      const seqLabel = seq === null ? "NO DATA" : seq;
+
+      if (ageSec !== null && ageSec <= 20) {
+        indicator.className = "status-indicator-pill online";
+        txtStatus.innerText = `STREAMING (${Math.round(ageSec)}s old)`;
+        banner.style.display = "none";
+      } else if (ageSec !== null && ageSec < 90) {
+        indicator.className = "status-indicator-pill stale";
+        txtStatus.innerText = `STALE (${timeAgoStr})`;
+        banner.style.display = "flex";
+        banner.className = "edge-alert-ribbon stale";
+        bannerIcon.className = "fa-solid fa-clock-rotate-left";
+        bannerTitle.innerText = "Raspberry Pi Telemetry Delayed";
+        bannerDesc.innerText = `Last sensor packet received ${timeAgoStr} (Frame #${seqLabel}). Edge daemon sampling or sleeping.`;
+      } else {
+        indicator.className = "status-indicator-pill offline";
+        txtStatus.innerText = `OFFLINE (${timeAgoStr})`;
+        banner.style.display = "flex";
+        banner.className = "edge-alert-ribbon offline";
+        bannerIcon.className = "fa-solid fa-plug-circle-xmark";
+        bannerTitle.innerText = "Raspberry Pi Edge Rig Offline";
+        bannerDesc.innerText = `No updates received since ${timeAgoStr} (Frame #${seqLabel}). Charts are holding the last received packet; waiting for fresh telemetry.`;
+      }
+    }
+
+    function fetchLatest() {
+      fetch(FIREBASE_RTDB_URL + "?shallow=false")
+        .then(res => res.json())
+        .then(data => {
+          if (data) {
+            updateDashboard(data);
+            updateHardwareStatus(data);
+          }
+        })
+        .catch(() => {
+          updateHardwareStatus(null, true);
+        });
+    }
+
+    let sseLastEventMs = 0;
+    let sseRetryMs = 1000;
+    let sseSource = null;
+
+    function openStream() {
+      try {
+        if (sseSource) { try { sseSource.close(); } catch (e) {} }
+        const sse = new EventSource(FIREBASE_RTDB_URL);
+        sseSource = sse;
+        sse.addEventListener('put', function(e) {
+          sseLastEventMs = Date.now();
+          sseRetryMs = 1000;
+          try {
+            const parsed = JSON.parse(e.data);
+            if (parsed && parsed.data) {
+              updateDashboard(parsed.data);
+              updateHardwareStatus(parsed.data);
+            }
+          } catch (err) { }
+        });
+        sse.addEventListener('keep-alive', function() { sseLastEventMs = Date.now(); });
+        sse.onerror = function() {
+          // Reconnect with backoff instead of silently dropping to polling only.
+          sse.close();
+          sseLastEventMs = 0;
+          setTimeout(openStream, sseRetryMs);
+          sseRetryMs = Math.min(sseRetryMs * 2, 30000);
+        };
+      } catch (err) { }
+    }
+
+    function scheduleFetch() {
+      // Full-node poll is the fallback: fast (2.5 s) when the stream is not delivering, slow (10 s) when it is.
+      const streamHealthy = sseLastEventMs && (Date.now() - sseLastEventMs) < 20000;
+      setTimeout(() => { fetchLatest(); scheduleFetch(); }, streamHealthy ? 10000 : 2500);
+    }
+
+    function connectFirebase() {
+      fetchLatest();
+      scheduleFetch();
+      setInterval(() => { if (lastData) { updateDashboard(lastData); updateHardwareStatus(lastData); } }, 1000);
+      openStream();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initCharts();
+      connectFirebase();
+    });
+  </script>
+</body>
+</html>
