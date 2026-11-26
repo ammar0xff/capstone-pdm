@@ -1,0 +1,55 @@
+{
+ "note": "REAL MAFAULDA held-out recordings (12 groups) through a rig-like front end (about 249 Hz with timing jitter, 3 mg noise, 3.9 mg/LSB, +-16 g). Training used noise/rate/gain augmentation. Balanced accuracy, 3 classes, window level.",
+ "model_400hz_on_249hz_stream": {
+  "balanced_acc": 0.6766,
+  "acc": 0.8953
+ },
+ "native_250hz_radial_basic8": {
+  "balanced_acc": 0.7759,
+  "macro_f1": 0.6829,
+  "acc": 0.8235
+ },
+ "r250b": {
+  "radial_rich": {
+   "balanced_acc": 0.7287,
+   "macro_f1": 0.6895,
+   "acc": 0.8652
+  },
+  "three_rich": {
+   "balanced_acc": 0.7902,
+   "macro_f1": 0.7397,
+   "acc": 0.9114
+  },
+  "three_rich_et": {
+   "balanced_acc": 0.778,
+   "macro_f1": 0.7275,
+   "acc": 0.9032
+  }
+ },
+ "r250c": {
+  "three_basic_msl3": {
+   "window": {
+    "balanced_acc": 0.7983,
+    "macro_f1": 0.7501,
+    "acc": 0.9142
+   },
+   "avg8_windows": {
+    "balanced_acc": 0.7471,
+    "macro_f1": 0.7291,
+    "acc": 0.9206
+   }
+  },
+  "three_rich_msl10": {
+   "window": {
+    "balanced_acc": 0.7747,
+    "macro_f1": 0.753,
+    "acc": 0.9315
+   },
+   "avg8_windows": {
+    "balanced_acc": 0.7618,
+    "macro_f1": 0.757,
+    "acc": 0.943
+   }
+  }
+ }
+}
