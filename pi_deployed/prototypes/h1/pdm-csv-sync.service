@@ -1,0 +1,15 @@
+[Unit]
+Description=PDM hot_backup.csv syncer (tmpfs log to durable file)
+# pdm-daq is ordered After this unit, so on stop pdm-daq stops FIRST and this unit stops LAST (final drain).
+Before=pdm-daq.service
+
+[Service]
+User=renad
+ExecStart=/usr/bin/python3 /home/renad/pdm/edge/csv_sync2.py /dev/shm/pdm/hot_backup.live.csv /home/renad/pdm/edge/hot_backup.csv /dev/shm/pdm/csv_sync.state /dev/shm/pdm/csv_sync_stats.json 1.0
+KillSignal=SIGTERM
+TimeoutStopSec=40
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
