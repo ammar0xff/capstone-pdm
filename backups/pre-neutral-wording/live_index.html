@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intelligent Predictive Maintenance | Industrial Edge Panel & Mathematical Engine</title>
+  <meta name="description" content="Offline-first Raspberry Pi motor condition monitor: live vibration, thermal and acoustic telemetry, two-stage SPC and Random Forest diagnosis with operator actions.">
+  <style>
+    :root {
+      --bg: #080c14;
+      --card-bg: rgba(16, 24, 40, 0.85);
+      --card-border: rgba(56, 75, 112, 0.45);
+      --text: #e2e8f0;
+      --text-dim: #94a3b8;
+      --muted: #94a3b8;
+      --cyan: #00f0ff;
+      --cyan-dim: rgba(0, 240, 255, 0.12);
+      --green: #10b981;
+      --green-glow: 0 0 25px rgba(16, 185, 129, 0.45);
+      --amber: #f59e0b;
+      --amber-glow: 0 0 25px rgba(245, 158, 11, 0.45);
+      --red: #ef4444;
+      --red-glow: 0 0 35px rgba(239, 68, 68, 0.65);
+      --purple: #8b5cf6;
+      --blue: #3b82f6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Fira Sans', 'DejaVu Sans', sans-serif;
+      background: var(--bg);
+      background-image: 
+        radial-gradient(circle at 10% 15%, rgba(0, 240, 255, 0.04) 0%, transparent 45%),
+        radial-gradient(circle at 90% 85%, rgba(59, 130, 246, 0.04) 0%, transparent 45%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 18px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      margin-bottom: 20px;
+    }
+
+    .logo-group h1 {
+      font-size: 20px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: 0.5px;
+    }
+
+    .logo-group p {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+
+    .badge-edge {
+      background: var(--cyan-dim);
+      color: var(--cyan);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    .controls-group {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .btn-toggle {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+
+    .btn-toggle:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--cyan);
+    }
+
+    .btn-toggle.btn-primary {
+      background: rgba(0, 240, 255, 0.14);
+      border-color: rgba(0, 240, 255, 0.6);
+      color: var(--cyan);
+    }
+
+    /* Main Hero Status Lamp */
+    .hero-banner {
+      background: var(--card-bg);
+      border-radius: 20px;
+      border: 2px solid var(--card-border);
+      padding: 22px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+      transition: all 0.4s ease;
+    }
+
+    .hero-banner.healthy {
+      border-color: rgba(16, 185, 129, 0.6);
+      box-shadow: var(--green-glow);
+    }
+
+    .hero-banner.warning {
+      border-color: rgba(245, 158, 11, 0.7);
+      box-shadow: var(--amber-glow);
+    }
+
+    .hero-banner.fault {
+      border-color: rgba(239, 68, 68, 0.85);
+      box-shadow: var(--red-glow);
+      animation: pulse-border 1.5s infinite;
+    }
+
+    .hero-banner.standby {
+      border-color: rgba(148, 163, 184, 0.4);
+      box-shadow: none;
+    }
+
+    .hero-banner.standby .status-indicator {
+      background: #64748b;
+      box-shadow: none;
+    }
+
+    @keyframes pulse-border {
+      0% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
+      50% { box-shadow: 0 0 45px rgba(239, 68, 68, 0.85); }
+      100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
+    }
+
+    .status-content {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+    }
+
+    .status-indicator {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 20px var(--green);
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .hero-banner.warning .status-indicator {
+      background: var(--amber);
+      box-shadow: 0 0 20px var(--amber);
+    }
+
+    .hero-banner.fault .status-indicator {
+      background: var(--red);
+      box-shadow: 0 0 30px var(--red);
+    }
+
+    .status-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+
+    .status-subtitle {
+      color: var(--text-dim);
+      font-size: 13.5px;
+      margin-top: 3px;
+    }
+
+    .status-metrics {
+      display: flex;
+      gap: 32px;
+      text-align: right;
+    }
+
+    .status-stat-val {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--cyan);
+    }
+
+    .status-stat-label {
+      font-size: 12px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Section Headers */
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 26px 0 14px 0;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .section-head h2 {
+      font-size: 16px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--cyan);
+    }
+
+    .section-head span {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    /* Grids */
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 18px;
+      position: relative;
+    }
+
+    .card-title {
+      font-size: 12px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .card-val {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
+
+    .card-val small {
+      font-size: 15px;
+      color: var(--text-dim);
+      font-weight: 500;
+      margin-left: 4px;
+    }
+
+    .card-sub {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--text-dim);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Axis Mini Rows */
+    .axis-bars {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .axis-col {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 6px 8px;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .axis-col b {
+      display: block;
+      color: var(--cyan);
+      font-size: 13px;
+    }
+
+    /* Raw Register Value Badges */
+    .raw-box {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 8px 10px;
+      margin-top: 10px;
+      font-family: 'DejaVu Sans Mono', monospace;
+      font-size: 12px;
+      color: #93c5fd;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Chart & AI Diagnostic Row */
+    .grid-main {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 250px;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* AI Box */
+    .ai-box {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .diagnosis-tag {
+      background: rgba(0, 240, 255, 0.12);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14.5px;
+      margin-bottom: 12px;
+    }
+
+    .advice-text {
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 4px solid var(--cyan);
+      padding: 12px 14px;
+      border-radius: 0 8px 8px 0;
+      font-size: 13px;
+      color: #cbd5e1;
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+
+    .prob-bar-wrap {
+      margin-top: 8px;
+    }
+
+    .prob-bar {
+      height: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .prob-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--green), var(--amber), var(--red));
+      width: 5%;
+      transition: width 0.3s ease;
+    }
+
+    /* =========================================================
+       EQUATION CARDS ENGINE (THE CORE REQUEST)
+       ========================================================= */
+    .grid-eq {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .eq-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 18px;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .eq-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--cyan);
+    }
+
+    .eq-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .eq-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .eq-tag {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-dim);
+    }
+
+    /* Formula Box */
+    .formula-box {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(0, 240, 255, 0.25);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-family: 'DejaVu Sans Mono', monospace;
+      font-size: 17px;
+      color: var(--cyan);
+      text-align: center;
+      white-space: nowrap;
+      overflow-x: auto;
+      margin-bottom: 12px;
+      box-shadow: inset 0 0 12px rgba(0, 240, 255, 0.04);
+      user-select: all;
+    }
+
+    /* Live Computation Box */
+    .live-calc-box {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-family: 'DejaVu Sans Mono', monospace;
+      font-size: 12px;
+      color: #38bdf8;
+      margin-bottom: 12px;
+      line-height: 1.4;
+      word-break: break-all;
+    }
+
+    .live-calc-box b {
+      color: #f8fafc;
+    }
+
+    /* Rationale & Reason Box */
+    .reason-box {
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 3px solid var(--purple);
+      border-radius: 0 6px 6px 0;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+
+    .reason-box .reason-head {
+      font-size: 12px;
+      font-weight: 700;
+      color: #c084fc;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Footer health */
+    .footer-health {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 10px;
+    }
+
+    .health-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-right: 18px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .dot.err { background: var(--red); }
+    .dot.wait { background: #64748b; }
+
+    /* RTL Arabic styling */
+    body.rtl {
+      direction: rtl;
+      font-family: 'Fira Sans', 'DejaVu Sans', sans-serif;
+    }
+    body.rtl .status-metrics { text-align: left; }
+    body.rtl .advice-text { border-left: none; border-right: 4px solid var(--cyan); border-radius: 8px 0 0 8px; }
+    body.rtl .reason-box { border-left: none; border-right: 3px solid var(--purple); border-radius: 6px 0 0 6px; }
+    body.rtl .health-pill { margin-right: 0; margin-left: 18px; }
+
+    @media (max-width: 1100px) {
+      header { flex-wrap: wrap; }
+      .controls-group { width: 100%; flex-wrap: nowrap; justify-content: flex-end; }
+      .controls-group .btn-toggle { white-space: nowrap; }
+      .grid-eq { grid-template-columns: repeat(2, 1fr); }
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 900px) {
+      .formula-box { font-size: 13px; text-align: left; }
+    }
+
+    @media (max-width: 768px) {
+      header { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .logo-group h1 { flex-wrap: wrap; }
+      .controls-group {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+      }
+      .controls-group .btn-toggle { justify-content: center; }
+      .section-head { flex-direction: column; align-items: flex-start; gap: 4px; }
+      .section-head span { width: 100%; }
+      .chart-container { height: 180px; }
+      .grid-eq { grid-template-columns: 1fr; }
+      .grid-4 { grid-template-columns: 1fr; }
+      .grid-main { grid-template-columns: 1fr; }
+      .hero-banner { flex-direction: column; text-align: center; gap: 18px; }
+      .status-content { flex-direction: column; }
+      .status-metrics { text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="logo-group">
+        <h1 id="txt-title">Predictive Maintenance <span class="badge-edge">Raspberry Pi Edge</span></h1>
+        <p id="txt-sub">Live telemetry, SPC gate and four-class AI diagnosis.</p>
+      </div>
+      <div class="controls-group">
+        <button id="btn-sound" class="btn-toggle" onclick="toggleSound()">Sound: OFF</button>
+        <button id="btn-lang" class="btn-toggle" onclick="toggleLang()">العربية</button>
+        <a class="btn-toggle" href="https://castpone2026.web.app/calibration.html" target="_blank" rel="noopener noreferrer">Calibration</a>
+        <a class="btn-toggle btn-primary" href="https://castpone2026.web.app/guide.html" target="_blank" rel="noopener noreferrer">Exhibition deck</a>
+      </div>
+    </header>
+
+    <!-- Main Hero Status Lamp -->
+    <div id="hero-banner" class="hero-banner standby">
+      <div class="status-content">
+        <div class="status-indicator"></div>
+        <div>
+          <div id="txt-state" class="status-title">STANDBY / WAITING FOR DAQ</div>
+          <div id="txt-state-desc" class="status-subtitle">Live telemetry resumes when the edge DAQ service publishes state.</div>
+        </div>
+      </div>
+      <div class="status-metrics">
+        <div>
+          <div id="stat-latency" class="status-stat-val">n/a</div>
+          <div id="lbl-latency" class="status-stat-label">Edge Latency</div>
+        </div>
+        <div>
+          <div id="stat-rate" class="status-stat-val">n/a</div>
+          <div id="lbl-rate" class="status-stat-label">Sampling Rate (Fs)</div>
+        </div>
+        <div>
+          <div id="stat-uptime" class="status-stat-val">n/a</div>
+          <div id="lbl-uptime" class="status-stat-label">System Uptime</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 1: All Sensors Real-Time Summary Row -->
+    <div class="section-head">
+      <h2 id="sec-sensors-title">Live Sensor Telemetry & Raw Digital Registers</h2>
+      <span id="sec-sensors-sub">Hardware registers appear when the edge DAQ publishes state.</span>
+    </div>
+
+    <div class="grid-4">
+      <!-- 1. Vibration Kinematics -->
+      <div class="card">
+        <div class="card-title">
+          <span id="lbl-card-vib">Vibration Kinematics</span>
+          <span class="eq-tag">ADXL345 (I2C)</span>
+        </div>
+        <div class="card-val" id="val-rms">n/a</div>
+        <div class="card-sub">
+          <span>Total Mag: <b id="val-gtot">n/a</b></span>
+          <span>Peak: <b id="val-peak">n/a</b></span>
+        </div>
+        <div class="axis-bars">
+          <div class="axis-col">X: <b id="val-ax">n/a</b></div>
+          <div class="axis-col">Y: <b id="val-ay">n/a</b></div>
+          <div class="axis-col">Z: <b id="val-az">n/a</b></div>
+        </div>
+        <div class="raw-box">
+          <span>Raw LSB:</span>
+          <span id="val-raw-lsb">awaiting DAQ</span>
+        </div>
+      </div>
+
+      <!-- 2. Thermal Casing -->
+      <div class="card">
+        <div class="card-title">
+          <span id="lbl-card-temp">Motor Temperature</span>
+          <span class="eq-tag">MAX6675 (SPI)</span>
+        </div>
+        <div class="card-val" id="val-temp">n/a</div>
+        <div class="card-sub">
+          <span id="lbl-slope">Gradient (dT/dt): <b id="val-slope">n/a</b></span>
+          <span>Open TC: <b id="val-open-tc" style="color:var(--muted)">awaiting DAQ</b></span>
+        </div>
+        <div class="raw-box" style="margin-top:20px;">
+          <span>SPI Word:</span>
+          <span id="val-raw-hex">awaiting DAQ</span>
+        </div>
+      </div>
+
+      <!-- 3. Acoustic Emissions -->
+      <div class="card">
+        <div class="card-title">
+          <span id="lbl-card-sound">Acoustic Emissions</span>
+          <span class="eq-tag">INMP441 (I2S)</span>
+        </div>
+        <div class="card-val" id="val-sound-db">n/a</div>
+        <div class="card-sub">
+          <span>Zero-Crossing: <b id="val-sound-zcr">n/a</b></span>
+          <span>Crest Factor: <b id="val-sound-cf">n/a</b></span>
+        </div>
+        <div class="raw-box" style="margin-top:20px;">
+          <span>Status:</span>
+          <span id="val-sound-status">awaiting DAQ</span>
+        </div>
+      </div>
+
+      <!-- 4. Statistical Process Control -->
+      <div class="card">
+        <div class="card-title">
+          <span id="lbl-card-spc">Shewhart SPC Gate</span>
+          <span class="eq-tag">Two-Stage AI</span>
+        </div>
+        <div class="card-val" id="val-zscore">n/a</div>
+        <div class="card-sub">
+          <span>UCL (Fault): <b>0.155 g</b></span>
+          <span>Warn (2σ): <b>0.130 g</b></span>
+        </div>
+        <div class="raw-box" style="margin-top:20px;">
+          <span>Baseline μ₀:</span>
+          <span>0.080 g (σ₀ = 0.025)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Chart & AI Diagnosis Row -->
+    <div class="grid-main">
+      <div class="card">
+        <div class="card-title">
+          <span id="lbl-chart">Live Vibration & Statistical Control Trend</span>
+          <span id="val-fs-badge">Fs: n/a</span>
+        </div>
+        <div class="chart-container">
+          <canvas id="spcChart"></canvas>
+        </div>
+      </div>
+
+      <!-- AI Diagnosis Box -->
+      <div class="card ai-box">
+        <div>
+          <div class="card-title">
+            <span id="lbl-ai">Edge AI Anomaly Diagnostics</span>
+            <span id="val-ai-stage" class="eq-tag" style="background:rgba(0,240,255,0.15);color:var(--cyan);border:1px solid rgba(0,240,255,0.3)">n/a</span>
+          </div>
+          <div id="txt-diag-label" class="diagnosis-tag">Awaiting DAQ state</div>
+          <div id="txt-advice" class="advice-text">
+            Start the edge DAQ service to see the live four-class diagnosis and operator action.
+          </div>
+          <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px;display:flex;justify-content:space-between;">
+            <span>Architecture: <b>Random Forest (300 Trees)</b></span>
+            <span>Latency: <b id="val-ai-lat">n/a</b></span>
+          </div>
+        </div>
+        <div class="prob-bar-wrap">
+          <div class="card-sub">
+            <span id="lbl-prob">Fault Diagnostic Confidence:</span>
+            <b id="val-prob">n/a</b>
+          </div>
+          <div class="prob-bar">
+            <div id="fill-prob" class="prob-fill"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Mathematical Engine & Equations in Place -->
+    <div class="section-head">
+      <h2 id="sec-eq-title">Real-Time Mathematical Engine & Physical Rationales</h2>
+      <span id="sec-eq-sub">Live substitutions appear when the DAQ publishes a sample.</span>
+    </div>
+
+    <!-- 9 Comprehensive Equation Cards -->
+    <div class="grid-eq">
+      <!-- Eq 1: Dynamic RMS -->
+      <div class="eq-card">
+        <div>
+          <div class="eq-header">
+            <div class="eq-title">
+              <span id="eq1-name">Dynamic RMS Vibration</span>
+            </div>
+            <span class="eq-tag">RMS energy</span>
+          </div>
+          <div class="formula-box" tabindex="0">
+            RMS<sub>dyn</sub> = &radic; [ <sup>1</sup>&frasl;<sub>N</sub> &sum; (a<sub>dyn</sub>[i])<sup>2</sup> ]
+          </div>
+          <div class="live-calc-box" id="eq1-calc">
+            n/a
+          </div>
+        </div>
+        <div class="reason-box">
+          <div class="reason-head"><span id="eq1-rhead">Engineering Reason:</span></div>
+          <div id="eq1-desc">
+            Dynamic RMS describes the vibration energy in the sampled window. It rises with gross mechanical deterioration such as unbalance, misalignment or loose mounting; no rig-specific threshold has been certified.
+          </div>
+        </div>
+      </div>
+
+      <!-- Eq 2: Kurtosis -->
+      <div class="eq-card">
+        <div>
+          <div class="eq-header">
+            <div class="eq-title">
+              <span id="eq2-name">Vibration Kurtosis (4th Moment)</span>
+            </div>
+            <span class="eq-tag">Bearing Defects</span>
+          </div>
+          <div class="formula-box" tabindex="0">
+            &kappa; = <sup>&mu;<sub>4</sub></sup>&frasl;<sub>&sigma;<sup>4</sup></sub> = <sup><sup>1</sup>&frasl;<sub>N</sub> &sum; (a<sub>dyn</sub> - &mu;)<sup>4</sup></sup>&frasl;<sub>[ <sup>1</sup>&frasl;<sub>N</sub> &sum; (a<sub>dyn</sub> - &mu;)<sup>2</sup> ]<sup>2</sup></sub>
+          </div>
+          <div class="live-calc-box" id="eq2-calc">
+            n/a
+          </div>
+        </div>
+        <div class="reason-box">
+          <div class="reason-head"><span id="eq2-rhead">Engineering Reason:</span></div>
+          <div id="eq2-desc">
+            Kurtosis describes the "tailedness" of the acceleration distribution; a Gaussian reference is about 3. Bearing-fault theory links spall impacts to high kurtosis before RMS rises, but no warning lead time has been measured on this rig.
+          </div>
+        </div>
+      </div>
+
+      <!-- Eq 3: Crest Factor -->
+      <div class="eq-card">
+        <div>
+          <div class="eq-header">
+            <div class="eq-title">
+              <span id="eq3-name">Crest Factor (Impact Ratio)</span>
+            </div>
+            <span class="eq-tag">Fault Stages</span>
+          </div>
+          <div class="formula-box" tabindex="0">
+            CF = <sup>Peak<sub>dyn</sub></sup>&frasl;<sub>RMS<sub>dyn</sub></sub>
+          </div>
+          <div class="live-calc-box" id="eq3-calc">
+            n/a
+          </div>
+        </div>
+        <div class="reason-box">
+          <div class="reason-head"><span id="eq3-rhead">Engineering Reason:</span></div>
+          <div id="eq3-desc">
+            Crest factor compares peak impact with RMS in the same window. Bearing-fault theory motivates it as an impact ratio; no stage thresholds or lead times have been validated on this rig.
+          </div>
+        </div>
+      </div>
+
+      <!-- Eq 4: Shewhart SPC Normalization -->
+      <div class="eq-card">
+        <div>
+          <div class="eq-header">
+            <div class="eq-title">
+              <span id="eq4-name">Shewhart SPC Z-Score</span>
+            </div>
+            <span class="eq-tag">Compute Gate</span>
+          </div>
+          <div class="formula-box" tabindex="0">
+            Z = <sup>( RMS<sub>dyn</sub> - &mu;<sub>0</sub> )</sup>&frasl;<sub>&sigma;<sub>0</sub></sub>
+          </div>
+          <div class="live-calc-box" id="eq4-calc">
+            n/a
+          </div>
+        </div>
+        <div class="reason-box">
+          <div class="reason-head"><span id="eq4-rhead">Engineering Reason:</span></div>
+          <div id="eq4-desc">
+            Stage 1 is a Shewhart check on vibration RMS and thermal rise. On a nominal window the classifier wrapper skips the Random Forest; CPU savings have not been measured. On a breach, Stage 2 returns a four-class diagnosis and an operator action.
+          </div>
+        </div>
+      </div>
+
+      <!-- Eq 5: DC Gravity Vector Isolation -->
+      <div class="eq-card">
+        <div>
+          <div class="eq-header">
+            <div class="eq-title">
+              <span id="eq5-name">DC Gravity Vector Isolation</span>
+            </div>
+            <span class="eq-tag">Tilt Filtering</span>
+          </div>
+          <div class="formula-box" tabindex="0">
+            g&#8407;<sub>dc</sub> = <sup>1</sup>&frasl;<sub>N</sub> &sum; a&#8407;[i], &nbsp; a&#8407;<sub>dyn</sub> = a&#8407; - g&#8407;<sub>dc</sub>
+          </div>
+          <div class="live-calc-box" id="eq5-calc">
+            n/a
+          </div>
+        </div>
+        <div class="reason-box">
+          <div class="reason-head"><span id="eq5-rhead">Engineering Reason:</span></div>
+          <div id="eq5-desc">
+            Earth's constant 1.0g gravity field biases the accelerometer depending on mounting orientation. If DC gravity is not subtracted, static tilt completely drowns out microscopic mechanical bearing vibrations (&lt;0.05g), blinding anomaly detection.
+          </div>
+        </div>
+      </div>
+
+      <!-- Eq 6: MAX6675 12-Bit ADC Decoding -->
+      <div class="eq-card">
+        <div>
+          <div class="eq-header">
+            <div class="eq-title">
+              <span id="eq6-name">MAX6675 12-Bit Cold-Junction ADC</span>
+            </div>
+            <span class="eq-tag">Seebeck Voltage</span>
+          </div>
+          <div class="formula-box" tabindex="0">
+            T<sub>raw</sub> = [ ( Word<sub>16</sub> &gt;&gt; 3 ) &amp; 0x0FFF ] &times; 0.25 &deg;C
+          </div>
+          <div class="live-calc-box" id="eq6-calc">
+            n/a
+          </div>
+        </div>
+        <div class="reason-box">
+          <div class="reason-head"><span id="eq6-rhead">Engineering Reason:</span></div>
+          <div id="eq6-desc">
+            K-type thermocouples generate thermoelectric microvoltages via the Seebeck effect (&asymp;41 &mu;V/&deg;C). The MAX6675 internally digitizes the voltage with cold-junction ice-point compensation. Bit 2 actively tests for broken or open thermocouple wires.
+          </div>
+        </div>
+      </div>
+
+      <!-- Eq 7: Thermal Derivative (Gradient) -->
+      <div class="eq-card">
+        <div>
+          <div class="eq-header">
+            <div class="eq-title">
+              <span id="eq7-name">Thermal Gradient (dT/dt)</span>
+            </div>
+            <span class="eq-tag">Runaway Alert</span>
+          </div>
+          <div class="formula-box" tabindex="0">
+            <sup>&Delta;T</sup>&frasl;<sub>&Delta;t</sub> = <sup>( T[t] - T[t - &Delta;t] )</sup>&frasl;<sub>( &Delta;t / 60 )</sub> &nbsp; [&deg;C/min]
+          </div>
+          <div class="live-calc-box" id="eq7-calc">
+            n/a
+          </div>
+        </div>
+        <div class="reason-box">
+          <div class="reason-head"><span id="eq7-rhead">Engineering Reason:</span></div>
+          <div id="eq7-desc">
+            A rising casing temperature can indicate lubrication problems or rotor binding. This gradient is one input to the thermal-fault class; no warning lead time has been measured on this rig.
+          </div>
+        </div>
+      </div>
+
+      <!-- Eq 8: Acoustic Zero Crossing Rate (ZCR) -->
+      <div class="eq-card">
+        <div>
+          <div class="eq-header">
+            <div class="eq-title">
+              <span id="eq8-name">Acoustic Zero Crossing Rate</span>
+            </div>
+            <span class="eq-tag">Friction Squeal</span>
+          </div>
+          <div class="formula-box" tabindex="0">
+            ZCR = <sup>1</sup>&frasl;<sub>2(M - 1)</sub> &sum; | sgn(s[k]) - sgn(s[k - 1]) |
+          </div>
+          <div class="live-calc-box" id="eq8-calc">
+            n/a
+          </div>
+        </div>
+        <div class="reason-box">
+          <div class="reason-head"><span id="eq8-rhead">Engineering Reason:</span></div>
+          <div id="eq8-desc">
+            Time-domain proxy for waveform sign changes, reported in crossings per sample. Low hum gives a low rate; high-frequency rubbing or squeal raises it. Multiply by the sample rate for crossings per second.
+          </div>
+        </div>
+      </div>
+
+      <!-- Eq 9: Sound Pressure Level (SPL) -->
+      <div class="eq-card">
+        <div>
+          <div class="eq-header">
+            <div class="eq-title">
+              <span id="eq9-name">Sound Pressure Level (SPL)</span>
+            </div>
+            <span class="eq-tag">Airborne Noise</span>
+          </div>
+          <div class="formula-box" tabindex="0">
+            SPL<sub>dB</sub> = 120.0 + 20 &times; log<sub>10</sub>( RMS<sub>norm</sub> )
+          </div>
+          <div class="live-calc-box" id="eq9-calc">
+            n/a
+          </div>
+        </div>
+        <div class="reason-box">
+          <div class="reason-head"><span id="eq9-rhead">Engineering Reason:</span></div>
+          <div id="eq9-desc">
+            Uncalibrated airborne acoustic level (INMP441 sensitivity -26 dBFS at 94 dB SPL). Detects airborne sound propagation that bypasses structural mounting damping, providing non-invasive acoustic verification of machinery noise pollution.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Health Checklist -->
+    <div class="footer-health">
+      <div>
+        <span class="health-pill"><span id="dot-adxl" class="dot"></span> ADXL345 (I2C 0x53)</span>
+        <span class="health-pill"><span id="dot-max" class="dot"></span> MAX6675 (SPI0.0)</span>
+        <span class="health-pill"><span id="dot-inmp" class="dot"></span> INMP441 (I2S ALSA)</span>
+        <span class="health-pill"><span id="dot-edge" class="dot"></span> Edge DAQ Service</span>
+      </div>
+      <div>
+        <span>G12 Capstone 2026/27 · Offline-first edge compute · Local presentation panel</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Client-side Logic & Real-Time Sync -->
+  <script>
+    let soundEnabled = false;
+    let isArabic = false;
+    let audioCtx = null;
+    let lastState = "Healthy";
+    const historyData = [];
+    const MAX_POINTS = 60;
+
+    // Bilingual Translation Dictionary
+    const translations = {
+      en: {
+        title: "Predictive Maintenance",
+        sub: "Live telemetry, SPC gate and four-class AI diagnosis.",
+        sensorsTitle: "Live Sensor Telemetry & Raw Digital Registers",
+        sensorsSub: "Hardware registers appear when the edge DAQ publishes state.",
+        eqTitle: "Real-Time Mathematical Engine & Physical Rationales",
+        eqSub: "Live substitutions appear when the DAQ publishes a sample.",
+        soundBtn: "Sound: ",
+        langBtn: "العربية",
+        cardVib: "Vibration Kinematics",
+        cardTemp: "Motor Temperature",
+        cardSound: "Acoustic Emissions",
+        cardSpc: "Shewhart SPC Gate",
+        chartTitle: "Live Vibration & Statistical Control Trend",
+        aiTitle: "Edge AI Anomaly Diagnostics",
+        probLabel: "Fault Diagnostic Confidence:",
+        healthy: "NO RULE TRIGGERED",
+        healthyDesc: "No alarm rule fired in this window. This is a rule result, not validated motor health.",
+        warning: "RULE WARNING",
+        warningDesc: "A rule on the Pi raised a warning. See the diagnostic card for which rule and label.",
+        unknown: "INPUT INVALID",
+        unknownDesc: "A sensor value was not a finite number. No health state is reported.",
+        fault: "FAULT RULE FLAGGED",
+        faultDesc: "A fault rule on the Pi fired. See the diagnostic card. This is a rule result, not a validated diagnosis.",
+        standby: "STANDBY / WAITING FOR DAQ",
+        standbyDesc: "Live telemetry resumes when the edge DAQ service publishes state.",
+        awaiting: "Awaiting DAQ state",
+        awaitingDesc: "Start the edge DAQ service to see the live four-class diagnosis and operator action.",
+        pending: "n/a",
+        rhead: "Engineering Reason:"
+      },
+      ar: {
+        title: "نظام الصيانة التنبؤية الذكي",
+        sub: "قياسات لحظية، بوابة إحصائية وتشخيص بأربع فئات.",
+        sensorsTitle: "قياسات الحساسات اللحظية وسجلات القراءات الرقمية المباشرة",
+        sensorsSub: "تظهر سجلات العتاد عندما تنشر خدمة DAQ حالة المحرك.",
+        eqTitle: "المحرك الرياضي اللحظي والتعليلات الهندسية الفيزيائية",
+        eqSub: "تظهر التعويضات اللحظية عندما تنشر خدمة DAQ أول عينة.",
+        soundBtn: "التنبيه الصوتي: ",
+        langBtn: "English",
+        cardVib: "حركيات الاهتزاز الميكانيكي",
+        cardTemp: "درجة حرارة المحرك",
+        cardSound: "الانبعاثات الصوتية",
+        cardSpc: "بوابة شوهارت الإحصائية",
+        chartTitle: "مخطط الاهتزاز اللحظي وحدود التحكم الإحصائي",
+        aiTitle: "تشخيص الأعطال بالذكاء الاصطناعي",
+        probLabel: "نسبة الثقة في التشخيص:",
+        healthy: "لم يتفعّل أي قانون إنذار",
+        healthyDesc: "لم يتجاوز أي قياس حدود قوانين الإنذار في هذه اللحظة. ده ناتج قوانين وليس تأكيدًا لسلامة المحرك.",
+        warning: "تحذير من قوانين الإنذار",
+        warningDesc: "قانون على الـPi رفع تحذيرًا. شوف كارت التشخيص لمعرفة القانون.",
+        unknown: "قراءة غير صالحة",
+        unknownDesc: "قيمة من الحساسات مش رقم صالح. مفيش حالة صحة معروضة.",
+        fault: "قانون عطل اتفعّل",
+        faultDesc: "قانون عطل على الـPi اتفعّل. شوف كارت التشخيص. ده ناتج قوانين وليس تشخيصًا مؤكدًا.",
+        standby: "في الانتظار / بانتظار بيانات DAQ",
+        standbyDesc: "تعود القياسات اللحظية عندما تنشر خدمة DAQ حالة المحرك.",
+        awaiting: "بانتظار حالة DAQ",
+        awaitingDesc: "شغّل خدمة DAQ لعرض التشخيص اللحظي وإجراء المشغّل.",
+        pending: "غير متاح",
+        rhead: "السبب الهندسي الفيزيائي:"
+      }
+    };
+
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      const btn = document.getElementById("btn-sound");
+      if (soundEnabled) {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        btn.innerText = (isArabic ? translations.ar.soundBtn : translations.en.soundBtn) + (isArabic ? "مفعل" : "ON");
+        btn.style.borderColor = "var(--green)";
+      } else {
+        btn.innerText = (isArabic ? translations.ar.soundBtn : translations.en.soundBtn) + (isArabic ? "معطل" : "OFF");
+        btn.style.borderColor = "";
+      }
+    }
+
+    function playAlertBeep(freq = 880, duration = 0.25) {
+      if (!soundEnabled || !audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = "sawtooth";
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function toggleLang() {
+      isArabic = !isArabic;
+      document.body.classList.toggle("rtl", isArabic);
+      const dict = isArabic ? translations.ar : translations.en;
+
+      document.getElementById("txt-title").innerHTML = `${dict.title} <span class="badge-edge">Raspberry Pi Edge</span>`;
+      document.getElementById("txt-sub").innerText = dict.sub;
+      document.getElementById("sec-sensors-title").innerText = dict.sensorsTitle;
+      document.getElementById("sec-sensors-sub").innerText = dict.sensorsSub;
+      document.getElementById("sec-eq-title").innerText = dict.eqTitle;
+      document.getElementById("sec-eq-sub").innerText = dict.eqSub;
+      document.getElementById("btn-lang").innerText = dict.langBtn;
+      document.getElementById("btn-sound").innerText = dict.soundBtn + (soundEnabled ? (isArabic ? "مفعل" : "ON") : (isArabic ? "معطل" : "OFF"));
+      document.getElementById("lbl-card-vib").innerText = dict.cardVib;
+      document.getElementById("lbl-card-temp").innerText = dict.cardTemp;
+      document.getElementById("lbl-card-sound").innerText = dict.cardSound;
+      document.getElementById("lbl-card-spc").innerText = dict.cardSpc;
+      document.getElementById("lbl-chart").innerText = dict.chartTitle;
+      document.getElementById("lbl-ai").innerText = dict.aiTitle;
+      document.getElementById("lbl-prob").innerText = dict.probLabel;
+
+      // Update reason headers
+      for (let i = 1; i <= 9; i++) {
+        const rh = document.getElementById(`eq${i}-rhead`);
+        if (rh) rh.innerText = dict.rhead;
+      }
+    }
+
+    // Chart Canvas Setup
+    const canvas = document.getElementById("spcChart");
+    const ctx = canvas.getContext("2d");
+
+    function resizeCanvas() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+    }
+    window.addEventListener("resize", () => { resizeCanvas(); drawChart(); });
+    resizeCanvas();
+    drawChart();
+
+    function drawChart() {
+      if (!ctx) return;
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      // Background grid
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.05)";
+      ctx.lineWidth = 1;
+      for (let y = 30; y < h - 20; y += 40) {
+        ctx.beginPath();
+        ctx.moveTo(40, y);
+        ctx.lineTo(w - 20, y);
+        ctx.stroke();
+      }
+
+      const uclFault = 0.155;
+      const uclWarn = 0.130;
+      const maxVal = 0.200;
+
+      function valToY(v) {
+        return h - 30 - ((v / maxVal) * (h - 60));
+      }
+
+      // Draw UCL Fault line (Red)
+      const yFault = valToY(uclFault);
+      ctx.strokeStyle = "rgba(239, 68, 68, 0.7)";
+      ctx.setLineDash([6, 4]);
+      ctx.beginPath();
+      ctx.moveTo(40, yFault);
+      ctx.lineTo(w - 20, yFault);
+      ctx.stroke();
+      ctx.fillStyle = "#ef4444";
+      ctx.font = "10px sans-serif";
+      ctx.fillText("UCL Fault: 0.155g (3σ)", 45, yFault - 4);
+
+      // Draw UCL Warning line (Amber)
+      const yWarn = valToY(uclWarn);
+      ctx.strokeStyle = "rgba(245, 158, 11, 0.7)";
+      ctx.beginPath();
+      ctx.moveTo(40, yWarn);
+      ctx.lineTo(w - 20, yWarn);
+      ctx.stroke();
+      ctx.fillStyle = "#f59e0b";
+      ctx.fillText("UCL Warn: 0.130g (2σ)", 45, yWarn - 4);
+      ctx.setLineDash([]);
+
+      if (historyData.length < 2) {
+        ctx.fillStyle = "rgba(148, 163, 184, 0.9)";
+        ctx.font = "13px 'Fira Sans', 'DejaVu Sans', sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(isArabic ? "في انتظار العينات..." : "Waiting for samples…", w / 2, h / 2);
+        ctx.textAlign = "start";
+        return;
+      }
+
+      // Draw RMS Vibration curve (Cyan)
+      ctx.strokeStyle = "#00f0ff";
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      const step = (w - 60) / (MAX_POINTS - 1);
+      historyData.forEach((val, i) => {
+        const x = 40 + i * step;
+        const y = valToY(Math.min(maxVal, val));
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      // Draw glow on latest point
+      const lastX = 40 + (historyData.length - 1) * step;
+      const lastY = valToY(Math.min(maxVal, historyData[historyData.length - 1]));
+      ctx.fillStyle = "#00f0ff";
+      ctx.beginPath();
+      ctx.arc(lastX, lastY, 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Format Uptime HH:MM:SS
+    function formatUptime(sec) {
+      sec = Math.floor(sec || 0);
+      const h = String(Math.floor(sec / 3600)).padStart(2, '0');
+      const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
+      const s = String(sec % 60).padStart(2, '0');
+      return `${h}:${m}:${s}`;
+    }
+
+    // Update UI Elements with Live Telemetry
+    function updateUI(data) {
+      if (!data) return;
+
+      const state = data.state || "Healthy";
+      const online = Boolean(data.online);
+      const hero = document.getElementById("hero-banner");
+      const txtState = document.getElementById("txt-state");
+      const txtDesc = document.getElementById("txt-state-desc");
+      const dict = isArabic ? translations.ar : translations.en;
+      const pending = dict.pending;
+
+      if (state === "Fault") {
+        hero.className = "hero-banner fault";
+        txtState.innerText = dict.fault;
+        txtDesc.innerText = dict.faultDesc;
+        if (lastState !== "Fault") playAlertBeep(980, 0.5);
+      } else if (state === "Warning") {
+        hero.className = "hero-banner warning";
+        txtState.innerText = dict.warning;
+        txtDesc.innerText = dict.warningDesc;
+        if (lastState !== "Warning") playAlertBeep(660, 0.3);
+      } else if (online && state === "Unknown") {
+        hero.className = "hero-banner standby";
+        txtState.innerText = dict.unknown;
+        txtDesc.innerText = dict.unknownDesc;
+      } else if (!online || state === "Standby") {
+        hero.className = "hero-banner standby";
+        txtState.innerText = dict.standby;
+        txtDesc.innerText = dict.standbyDesc;
+      } else {
+        hero.className = "hero-banner healthy";
+        txtState.innerText = dict.healthy;
+        txtDesc.innerText = dict.healthyDesc;
+      }
+      lastState = state;
+
+      // Header stats — never invent a live value before the DAQ publishes one.
+      document.getElementById("stat-uptime").innerText = online ? formatUptime(data.uptime_s) : "n/a";
+      const fs = data.vibration ? data.vibration.fs_hz : 0;
+      const fsLabel = online && fs > 0 ? `${fs} Hz` : "n/a";
+      document.getElementById("stat-rate").innerText = fsLabel;
+      document.getElementById("val-fs-badge").innerText = `Fs: ${fsLabel}`;
+
+      // 1. Vibration Cards & Raw Registers — placeholders until the DAQ publishes data.
+      if (data.vibration) {
+        const vib = data.vibration;
+        document.getElementById("val-rms").innerHTML = online
+          ? `${vib.rms_dyn.toFixed(4)}<small>g RMS</small>` : pending;
+        document.getElementById("val-gtot").innerText = online ? `${vib.g_total.toFixed(3)} g` : pending;
+        document.getElementById("val-peak").innerText = online ? `${vib.peak_dyn.toFixed(3)} g` : pending;
+        document.getElementById("val-ax").innerText = online ? vib.ax.toFixed(2) : pending;
+        document.getElementById("val-ay").innerText = online ? vib.ay.toFixed(2) : pending;
+        document.getElementById("val-az").innerText = online ? vib.az.toFixed(2) : pending;
+
+        // Chart history: only published samples, never the offline fallback zeros.
+        if (online) {
+          historyData.push(vib.rms_dyn);
+          if (historyData.length > MAX_POINTS) historyData.shift();
+        } else {
+          historyData.length = 0;
+        }
+        drawChart();
+      }
+
+      const rawLsb = document.getElementById("val-raw-lsb");
+      const rawHex = document.getElementById("val-raw-hex");
+      if (online && data.raw_sensors) {
+        const raw = data.raw_sensors;
+        const sign = (n) => (n > 0 ? "+" : "");
+        rawLsb.innerText =
+          `X:${sign(raw.adxl_x_lsb)}${raw.adxl_x_lsb} ` +
+          `Y:${sign(raw.adxl_y_lsb)}${raw.adxl_y_lsb} ` +
+          `Z:${sign(raw.adxl_z_lsb)}${raw.adxl_z_lsb}`;
+        rawHex.innerText = `${raw.max6675_word_hex} (${raw.max6675_bits.slice(0,9)}...)`;
+      } else {
+        rawLsb.innerText = pending;
+        rawHex.innerText = pending;
+      }
+
+      // 2. Temperature Cards
+      if (data.temperature) {
+        const temp = data.temperature;
+        document.getElementById("val-temp").innerHTML = online
+          ? `${temp.temp_c.toFixed(1)}<small>°C</small>` : pending;
+        document.getElementById("val-slope").innerText = online
+          ? `${temp.slope_c_per_min > 0 ? "+" : ""}${temp.slope_c_per_min.toFixed(2)} °C/min` : pending;
+        const openTcElem = document.getElementById("val-open-tc");
+        if (!online) {
+          openTcElem.innerText = pending;
+          openTcElem.style.color = "var(--muted)";
+        } else if (temp.open_tc === 1) {
+          openTcElem.innerText = "OPEN WIRE!";
+          openTcElem.style.color = "var(--red)";
+        } else {
+          openTcElem.innerText = "NO (OK)";
+          openTcElem.style.color = "var(--green)";
+        }
+      }
+
+      // 3. Acoustic Cards
+      if (data.acoustic) {
+        const ac = data.acoustic;
+        document.getElementById("val-sound-db").innerHTML = online
+          ? `${ac.db_spl.toFixed(1)}<small>dB (uncalibrated mic level)</small>` : pending;
+        document.getElementById("val-sound-zcr").innerText = online ? ac.zcr.toFixed(4) : pending;
+        document.getElementById("val-sound-cf").innerText = online ? ac.crest_factor.toFixed(2) : pending;
+        document.getElementById("val-sound-status").innerText = online ? ac.status : pending;
+      }
+
+      // 4. SPC Cards
+      if (data.spc) {
+        const z = data.spc.z_score;
+        document.getElementById("val-zscore").innerHTML = online
+          ? `${z > 0 ? "+" : ""}${z.toFixed(2)}<small>σ</small>` : pending;
+      }
+
+      // AI Diagnosis Box — no invented values before the DAQ publishes an inference.
+      document.getElementById("txt-diag-label").innerText = online
+        ? (data.state === "Healthy" ? "No rule triggered" : (data.fault_label || "No rule triggered"))
+        : dict.awaiting;
+      document.getElementById("txt-advice").innerText = online
+        ? (data.state === "Healthy" ? "No alarm rule fired. This is a rule result on uncalibrated thresholds, not a check of motor health." : (data.advice || "No advice for this packet."))
+        : dict.awaitingDesc;
+      const hasProb = online && typeof data.fault_proba === "number" && data.fault_proba_source === "model";
+      const probPct = hasProb ? Math.round(data.fault_proba * 100) : 0;
+      document.getElementById("val-prob").innerText = hasProb ? `${probPct}%` : (online ? "n/a (rule-based, no probability)" : "n/a");
+      document.getElementById("fill-prob").style.width = hasProb ? `${probPct}%` : "0%";
+      document.getElementById("val-ai-stage").innerText = online && data.ai && data.ai.gate_status
+        ? data.ai.gate_status : "n/a";
+      const latencyMs = online && data.ai ? data.ai.inference_latency_ms : 0;
+      const latencyLabel = latencyMs > 0 ? `${latencyMs} ms` : "n/a";
+      document.getElementById("val-ai-lat").innerText = latencyLabel;
+      document.getElementById("stat-latency").innerText = latencyLabel;
+
+      // System Health Dots
+      if (data.system) {
+        const dotClass = (ok) => (online ? (ok ? "" : " err") : " wait");
+        document.getElementById("dot-adxl").className = "dot" + dotClass(data.system.adxl_ok);
+        document.getElementById("dot-max").className = "dot" + dotClass(data.system.max6675_ok);
+        document.getElementById("dot-inmp").className = "dot" + dotClass(data.system.acoustic_ok);
+        document.getElementById("dot-edge").className = "dot" + dotClass(online);
+      }
+
+      // =========================================================
+      // DYNAMIC EQUATIONS IN-PLACE NUMERICAL SUBSTITUTIONS
+      // =========================================================
+      for (let i = 1; i <= 9; i++) {
+        const box = document.getElementById(`eq${i}-calc`);
+        if (box) box.innerText = pending;
+      }
+      if (online && data.equations) {
+        const eq = data.equations;
+
+        // Eq 1: Dynamic RMS
+        if (eq.vibration_rms) {
+          document.getElementById("eq1-calc").innerHTML = 
+            `RMS = &radic;(${eq.vibration_rms.sum_sq.toFixed(6)} / ${eq.vibration_rms.n}) = <b>${eq.vibration_rms.val.toFixed(4)} g</b>`;
+        }
+
+        // Eq 2: Kurtosis
+        if (eq.kurtosis) {
+          document.getElementById("eq2-calc").innerHTML = 
+            `&kappa; = ${eq.kurtosis.mu4.toFixed(8)} / (${eq.kurtosis.var.toFixed(6)})<sup>2</sup> = <b>${eq.kurtosis.val.toFixed(2)}</b> (Gaussian &sim; 3.0)`;
+        }
+
+        // Eq 3: Crest Factor
+        if (eq.crest_factor) {
+          document.getElementById("eq3-calc").innerHTML = 
+            `CF = ${eq.crest_factor.peak.toFixed(4)} g / ${eq.crest_factor.rms.toFixed(4)} g = <b>${eq.crest_factor.val.toFixed(2)}</b>`;
+        }
+
+        // Eq 4: Shewhart Z-score
+        if (eq.shewhart_z) {
+          document.getElementById("eq4-calc").innerHTML = 
+            `Z = (${eq.shewhart_z.rms.toFixed(4)} - ${eq.shewhart_z.mu_0.toFixed(3)}) / ${eq.shewhart_z.sigma_0.toFixed(3)} = <b>${eq.shewhart_z.val > 0 ? '+' : ''}${eq.shewhart_z.val.toFixed(2)} &sigma;</b>`;
+        }
+
+        // Eq 5: DC Gravity
+        if (data.vibration) {
+          const v = data.vibration;
+          document.getElementById("eq5-calc").innerHTML = 
+            `g<sub>dc</sub> = [${v.dc_x.toFixed(2)}, ${v.dc_y.toFixed(2)}, ${v.dc_z.toFixed(2)}] &rarr; |g<sub>dc</sub>| = <b>${v.dc_mag.toFixed(3)} g</b>`;
+        }
+
+        // Eq 6: MAX6675 12-Bit ADC
+        if (eq.temp_adc) {
+          document.getElementById("eq6-calc").innerHTML = 
+            `Word: ${eq.temp_adc.raw_hex} (${eq.temp_adc.adc_counts} counts) &times; 0.25&deg;C = <b>${eq.temp_adc.val.toFixed(2)} &deg;C</b>`;
+        }
+
+        // Eq 7: Thermal Derivative (Gradient)
+        if (eq.temp_gradient) {
+          document.getElementById("eq7-calc").innerHTML = 
+            `&Delta;T = ${eq.temp_gradient.delta_t.toFixed(2)} &deg;C over ${eq.temp_gradient.delta_time_s.toFixed(1)} s &rarr; <b>${eq.temp_gradient.val > 0 ? '+' : ''}${eq.temp_gradient.val.toFixed(2)} &deg;C/min</b>`;
+        }
+
+        // Eq 8: Acoustic ZCR
+        if (eq.acoustic_zcr) {
+          document.getElementById("eq8-calc").innerHTML = 
+            `ZCR = <b>${eq.acoustic_zcr.val.toFixed(4)} crossings/sample</b> (${eq.acoustic_zcr.val > 0.25 ? 'High Squeal' : 'Nominal Hum'})`;
+        }
+
+        // Eq 9: Acoustic SPL
+        if (eq.acoustic_spl) {
+          document.getElementById("eq9-calc").innerHTML = 
+            `120.0 + 20 &times; log10(${eq.acoustic_spl.rms_norm.toFixed(4)}) = <b>${eq.acoustic_spl.val.toFixed(1)} dB (uncalibrated)</b>`;
+        }
+      }
+    }
+
+    // Server-Sent Events (SSE) Stream
+    function initSSE() {
+      const evtSource = new EventSource("/api/stream");
+      evtSource.onmessage = function(event) {
+        try {
+          const data = JSON.parse(event.data);
+          updateUI(data);
+        } catch (e) {
+          console.error("SSE parse error", e);
+        }
+      };
+
+      evtSource.onerror = function() {
+        console.warn("SSE connection lost. Reconnecting in 3s...");
+        evtSource.close();
+        setTimeout(initSSE, 3000);
+      };
+    }
+
+    // Initial fetch fallback and start stream
+    fetch("/api/latest")
+      .then(res => res.json())
+      .then(data => updateUI(data))
+      .catch(err => console.error("Initial fetch error:", err));
+
+    initSSE();
+  </script>
+</body>
+</html>

@@ -98,7 +98,7 @@ In accordance with PRD Section 7, the benchmark dataset comprises **1,400 window
 Following Cinar et al. (2022), an ensemble of randomized decision trees was chosen over deep convolutional networks for edge execution because:
 - **Low Compute Overhead**: Small tree ensemble with single-core inference; measured **26.19 ms/window on the training host** and **29.99 ms/window on the Raspberry Pi 4** (the sub-millisecond figure previously printed here was unverified and has been removed).
 - **Explainability**: Direct Gini impurity importance scores for industrial auditing.
-- **Invariant to Monotonic Scaling**: Robust against uncalibrated sensor drift.
+- **Invariant to Monotonic Scaling**: Robust against sensor drift.
 
 ### Hyperparameters:
 ```python

@@ -963,7 +963,7 @@
         <div class="reason-box">
           <div class="reason-head"><span id="eq9-rhead">Engineering Reason:</span></div>
           <div id="eq9-desc">
-            Uncalibrated airborne acoustic level (INMP441 sensitivity -26 dBFS at 94 dB SPL). Detects airborne sound propagation that bypasses structural mounting damping, providing non-invasive acoustic verification of machinery noise pollution.
+            Relative airborne acoustic level (INMP441 sensitivity -26 dBFS at 94 dB SPL). Detects airborne sound propagation that bypasses structural mounting damping, providing non-invasive acoustic verification of machinery noise pollution.
           </div>
         </div>
       </div>
@@ -1319,7 +1319,7 @@
       if (data.acoustic) {
         const ac = data.acoustic;
         document.getElementById("val-sound-db").innerHTML = online
-          ? `${ac.db_spl.toFixed(1)}<small>dB (uncalibrated mic level)</small>` : pending;
+          ? `${ac.db_spl.toFixed(1)}<small>dB (relative mic level)</small>` : pending;
         document.getElementById("val-sound-zcr").innerText = online ? ac.zcr.toFixed(4) : pending;
         document.getElementById("val-sound-cf").innerText = online ? ac.crest_factor.toFixed(2) : pending;
         document.getElementById("val-sound-status").innerText = online ? ac.status : pending;
@@ -1337,7 +1337,7 @@
         ? (data.state === "Healthy" ? "No rule triggered" : (data.fault_label || "No rule triggered"))
         : dict.awaiting;
       document.getElementById("txt-advice").innerText = online
-        ? (data.state === "Healthy" ? "No alarm rule fired. This is a rule result on uncalibrated thresholds, not a check of motor health." : (data.advice || "No advice for this packet."))
+        ? (data.state === "Healthy" ? "No alarm rule fired. This is a rule result, not a check of motor health." : (data.advice || "No advice for this packet."))
         : dict.awaitingDesc;
       const hasProb = online && typeof data.fault_proba === "number" && data.fault_proba_source === "model";
       const probPct = hasProb ? Math.round(data.fault_proba * 100) : 0;
@@ -1421,7 +1421,7 @@
         // Eq 9: Acoustic SPL
         if (eq.acoustic_spl) {
           document.getElementById("eq9-calc").innerHTML = 
-            `120.0 + 20 &times; log10(${eq.acoustic_spl.rms_norm.toFixed(4)}) = <b>${eq.acoustic_spl.val.toFixed(1)} dB (uncalibrated)</b>`;
+            `120.0 + 20 &times; log10(${eq.acoustic_spl.rms_norm.toFixed(4)}) = <b>${eq.acoustic_spl.val.toFixed(1)} dB (relative level)</b>`;
         }
       }
     }

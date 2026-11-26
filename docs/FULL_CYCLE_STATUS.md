@@ -8,7 +8,7 @@ Scope: read-only checks of the live Pi (services, code, state), the Firebase cop
 |---|---|---|---|
 | ADXL345 vibration | Polled in the main loop, software timestamps | REAL, rate unstable | Polled rate in the packet ranged 8 to 382 Hz (40 samples: median 245 to 287 Hz, 10 to 15% of seconds under 50 Hz). Sensor output rate is 400 Hz. |
 | MAX6675 temperature | Read every 250 ms | REAL | adxl_ok / max6675_ok flags true in latest_state.json |
-| INMP441 microphone | arecord stream, level, ZCR | REAL, uncalibrated level | acoustic_ok true; dB value is not a calibrated sound pressure level |
+| INMP441 microphone | arecord stream, level, ZCR | REAL, relative level | acoustic_ok true; dB value is not a calibrated sound pressure level |
 | Stationary mic component (stat_*) | Median-spectrum filter, display only | REAL, experimental | Enabled 00:52 with G12_MIC_STAT=1; not an input to the gate or the classifier; about 6 to 12 dB below raw, so not comparable; not speech removal |
 | Features | rms, peak, crest, kurtosis, temp slope, sound | REAL values | computed on the Pi each 100 ms window |
 | Stage 1 SPC gate | Shewhart rule on rms_dyn | NOT CALIBRATED FOR THIS RIG | Hard-coded baseline 0.080 g, sigma 0.025 g, warning 0.13 g. Live rms_dyn about 0.007 g, z about -2.9. The gate cannot breach at this scale. "Healthy / Normal Operation" is a result of this, not proof of motor health. |
