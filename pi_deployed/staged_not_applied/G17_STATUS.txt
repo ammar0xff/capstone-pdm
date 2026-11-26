@@ -1,0 +1,1 @@
+g17 staged, NOT approved, NOT applied. Spill is a separate file, never auto-merged.
