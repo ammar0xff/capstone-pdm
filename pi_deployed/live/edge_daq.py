@@ -40,6 +40,9 @@ TMP_STATE_FILE = os.path.join(os.environ.get("G12_STATE_DIR") or BASE_DIR, "late
 if os.environ.get("G12_STATE_DIR"):
     os.makedirs(os.environ["G12_STATE_DIR"], exist_ok=True)  # tmpfs dir is empty after every boot
 HISTORY_FILE = os.path.join(BASE_DIR, "hot_backup.csv")
+# Local history recording is OFF by default (user decision 2026-11-26: speed over new recording).
+# Existing hot_backup.csv is never touched while off. Set G12_CSV_RECORDING=1 to record again.
+CSV_RECORDING_ENABLED = os.environ.get("G12_CSV_RECORDING", "0") == "1"
 CAL_FILE = os.path.join(BASE_DIR, "cal.json")
 
 # Machine Learning Module Path
@@ -96,11 +99,22 @@ class ADXL345Driver:
         self.address = address
         self.bus = None
         self.connected = False
+        self._next_try = 0.0
         self.init_sensor()
+
+    def _close(self):
+        # G12: close the old handle before any reopen (a retry loop leaked /dev/i2c-1 fds until EMFILE).
+        b, self.bus = self.bus, None
+        if b is not None:
+            try:
+                b.close()
+            except Exception:
+                pass
 
     def init_sensor(self):
         if not smbus2:
             return False
+        self._close()
         try:
             self.bus = smbus2.SMBus(self.bus_num)
             dev_id = self.bus.read_byte_data(self.address, 0x00)
@@ -117,19 +131,33 @@ class ADXL345Driver:
             return True
         except Exception as e:
             print(f"[ERR] Failed to init ADXL345: {e}")
+            self._close()
             self.connected = False
+            self._next_try = time.monotonic() + 1.0   # G12: at most one re-init per second
             return False
 
     def read_raw(self):
         if not self.connected:
+            if time.monotonic() < self._next_try:
+                return None
             if not self.init_sensor():
                 return None
         try:
             data = self.bus.read_i2c_block_data(self.address, 0x32, 6)
             x, y, z = struct.unpack("<hhh", bytes(data))
+            self._consec = 0
             return x, y, z
         except Exception as e:
+            # a single read error reopens at once (no backoff); only a failed re-init backs off 1 s
             self.connected = False
+            self.read_errors = getattr(self, "read_errors", 0) + 1
+            self._consec = getattr(self, "_consec", 0) + 1
+            if self._consec >= 3:   # sustained errors: back off 1 s so re-open churn stays bounded
+                self._next_try = time.monotonic() + 1.0
+            nowm = time.monotonic()
+            if nowm - getattr(self, "_last_err_log", 0.0) >= 10.0:
+                self._last_err_log = nowm
+                print(f"[WARN] ADXL345 read error (total {self.read_errors}): {e}")
             return None
 
 
@@ -144,11 +172,21 @@ class MAX6675Driver:
         self.dev_num = device
         self.spi = None
         self.connected = False
+        self._next_try = 0.0
         self.init_sensor()
+
+    def _close(self):
+        sp, self.spi = self.spi, None
+        if sp is not None:
+            try:
+                sp.close()
+            except Exception:
+                pass
 
     def init_sensor(self):
         if not spidev:
             return False
+        self._close()
         try:
             self.spi = spidev.SpiDev()
             self.spi.open(self.bus_num, self.dev_num)
@@ -159,11 +197,15 @@ class MAX6675Driver:
             return True
         except Exception as e:
             print(f"[ERR] Failed to init MAX6675: {e}")
+            self._close()
             self.connected = False
+            self._next_try = time.monotonic() + 1.0
             return False
 
     def read_temp(self):
         if not self.connected:
+            if time.monotonic() < self._next_try:
+                return None, 1, 0
             if not self.init_sensor():
                 return None, 1, 0
         try:
@@ -175,6 +217,7 @@ class MAX6675Driver:
             return temp_c, open_tc, raw
         except Exception as e:
             self.connected = False
+            self._next_try = time.monotonic() + 1.0
             return None, 1, 0
 
 
@@ -373,12 +416,15 @@ def main():
     raw_tc_word = 0
     open_tc_flag = 0
     last_state_pub = 0.0
+    last_adxl_ok = time.time()   # G12: time of the last accelerometer sample actually read
     last_csv_log = 0.0
 
     latest_raw_xyz = (0, 0, 0)
 
     # Ensure CSV header
-    if not os.path.exists(HISTORY_FILE):
+    if not CSV_RECORDING_ENABLED:
+        print("[INFO] local CSV recording disabled; existing history file left untouched")
+    if CSV_RECORDING_ENABLED and not os.path.exists(HISTORY_FILE):
         with open(HISTORY_FILE, "w", newline="") as f:
             writer = csv.writer(f)
             writer.writerow(
@@ -416,6 +462,7 @@ def main():
             ay = (y_raw * scale) - cal.get("g_bias_y", 0.0)
             az = (z_raw * scale) - cal.get("g_bias_z", 0.0)
             raw_window.append((ax, ay, az))
+            last_adxl_ok = now_wall
             ts_window.append(now_wall)
         else:
             time.sleep(0.002)
@@ -432,6 +479,12 @@ def main():
                     last_temp_c = temp_val * cal.get("t_a", 1.0) + cal.get("t_b", 0.0)
                     temp_history.append((now_wall, last_temp_c))
 
+        # G12: if the accelerometer never delivered a full window, seed NaN samples so an explicit
+        # Unknown packet (accelerometer data stale) still publishes instead of freezing the state/cloud.
+        if len(raw_window) < 64 and (now_wall - last_adxl_ok) > 2.0:
+            for _k in range(64 - len(raw_window)):
+                raw_window.append((float("nan"),) * 3)
+                ts_window.append(now_wall - 0.01 * (64 - _k))
         # 3. Publish State & Compute Features every 100ms (10Hz state update, 400Hz sampling)
         if len(raw_window) >= 64 and (now_wall - last_state_pub >= 0.10):
             last_state_pub = now_wall
@@ -477,7 +530,7 @@ def main():
                 kurtosis = float(m4 / (var**2))
             else:
                 m4 = 0.0
-                kurtosis = 3.0
+                kurtosis = 3.0 if math.isfinite(var) else float("nan")   # G12: no fabricated 3.0 for a NaN window
 
             # Temperature slope dT/dt (°C / min)
             if len(temp_history) >= 2:
@@ -509,6 +562,9 @@ def main():
             sound_cf = ac_data.get("crest_factor", 3.0)
             sound_status = ac_data.get("status", "Active")
 
+            # G12: no accelerometer sample for >2 s means the window is stale; never classify it as healthy
+            accel_stale = (now_wall - last_adxl_ok) > 2.0
+
             # 4. Shewhart SPC Gating & Industrial Anomaly Classification
             # Stage 1: Coarse Statistical & Thermal Gating
             is_thermal_fault = (last_temp_c > 70.0) or (temp_slope > 10.0)
@@ -539,7 +595,8 @@ def main():
             }
 
             # G12: inputs must be finite; NaN compares false and would otherwise look healthy
-            input_valid = all(math.isfinite(v) for v in feature_dict.values())
+            finite_ok = all(math.isfinite(v) for v in feature_dict.values())
+            input_valid = finite_ok and not accel_stale
             rf_ran = False
             # Run Stage 2 Fine ML Inference (Random Forest)
             if classifier and input_valid:
@@ -606,13 +663,13 @@ def main():
                         "Thermal Trend Warning"
                         if is_thermal_warn
                         else (
-                            "Loud acoustic level (uncalibrated), not a fault diagnosis"
+                            "Loud acoustic level (relative mic level), not a fault diagnosis"
                             if (is_sound_fault and not is_vib_warn)
                             else "Incipient Vibration Warning (2-Sigma Breach)"
                         )
                     )
                     if is_sound_fault and not (is_vib_warn or is_thermal_warn):
-                        advice = "Microphone level or zero-crossing rate is high. The mic is uncalibrated and this is not a vibration or bearing diagnosis. Check room noise first."
+                        advice = "Microphone level or zero-crossing rate is high. The mic reading is a relative level and this is not a vibration or bearing diagnosis. Check room noise first."
                     advice = "Vibration amplitude exceeded 2-sigma Shewhart threshold. Schedule preventive inspection."
             else:
                 state = "Healthy"
@@ -621,13 +678,16 @@ def main():
                 fault_proba = 0.05
                 advice = "Machine operating within nominal limits. Continuous baseline monitoring active."
 
-            if not input_valid:
+            # a thermal fault stays reported when only the accelerometer is stale (temperature is independent)
+            if not input_valid and not (accel_stale and math.isfinite(last_temp_c) and math.isfinite(temp_slope) and is_thermal_fault):
                 # explicit unknown status: never present non-finite inputs as a fresh healthy reading
                 state = "Unknown"
                 led.set(0)
-                fault_label = "Input invalid (sensor value not finite)"
+                fault_label = "Input invalid (accelerometer data stale)" if accel_stale else "Input invalid (sensor value not finite)"
                 fault_proba = 0.0
-                advice = "A sensor value was not a finite number in this window. No health state is reported until valid readings return."
+                advice = ("The accelerometer has not delivered samples for over 2 s. No health state is reported until it returns."
+                          if accel_stale else
+                          "A sensor value was not a finite number in this window. No health state is reported until valid readings return.")
             # 5. Build Complete Telemetry & Mathematical Breakdown Packet
             raw_bin_str = f"{raw_tc_word:016b}"
             formatted_bin = f"{raw_bin_str[0:4]} {raw_bin_str[4:8]} {raw_bin_str[8:12]} {raw_bin_str[12:16]}"
@@ -653,8 +713,8 @@ def main():
                         else "Rule layer: no alarm" if state == "Healthy"
                         else "Rule layer: " + str(state).lower() + " raised"
                     ) + ("; RF ran (unvalidated)" if rf_ran else "; RF not run"),
-                    "predicted_class_id": ml_cid,
-                    "predicted_class": ml_label,
+                    "predicted_class_id": ml_cid if rf_ran else None,
+                    "predicted_class": ml_label if rf_ran else None,
                     "confidence": round(fault_proba, 2) if (ml_cid != 0 and state not in ("Healthy", "Unknown") and not str(fault_label).startswith("Loud acoustic")) else None,
                     "response_plan": response_plan,
                     "features_input": feature_dict,
@@ -844,7 +904,7 @@ def main():
                 print(f"[ERR] Failed to write state file: {e}")
 
             # 7. Append to hot_backup.csv every ~1 second
-            if now_wall - last_csv_log >= 1.0:
+            if CSV_RECORDING_ENABLED and now_wall - last_csv_log >= 1.0:
                 last_csv_log = now_wall
                 try:
                     with open(HISTORY_FILE, "a", newline="") as f:

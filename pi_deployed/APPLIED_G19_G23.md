@@ -24,3 +24,10 @@ Known limits (not validated):
 - Recording is off by the user's choice for speed. hot_backup.csv (12,415,541 bytes, last modified 07:47:11) is preserved and still readable; /api/history returns the last 100 old rows and no longer advances.
 - The state labels come from an uncalibrated rule gate. The user states the motor has been stopped since the last recording yesterday (exact time unknown), so today's Healthy, Unknown and Fault readings are unvalidated stopped-rig readings, not mechanical findings. The historical CSV is not a healthy baseline.
 - No RUL is supported for this rig.
+
+## g24 (2026-11-26 09:03 EET, routine repair)
+- edge_daq.py md5 d9245a42. One pdm-daq restart at 09:03:17. Backup ~/stat_stage/g24_backup_20261126T090313 on the Pi, rollback ~/stat_stage/g24_rollback.sh (not run).
+- ai.predicted_class and ai.predicted_class_id are null when rf_executed is false (before: "Normal Operation" / 0, including for Unknown packets).
+- Loud-sound label and advice use "relative mic level" wording. Thresholds unchanged.
+- Measured after restart: 48 cloud reads over 100 s, median 2.5 s, max 5.5 s, 0 over 8 s, 0 errors, no NaN/Infinity tokens. CSV untouched. The dashboard pages render with live data.
+- Hosted page text for the "RF not run" case now says no class is reported.

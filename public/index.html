@@ -1302,7 +1302,7 @@
       const rfTail = "The classifier is trained on generated data and has not been tested on real faults. No probability or confidence is shown, and it gives no remaining-life estimate.";
       let rfLead;
       if (rfExecuted === true) rfLead = "Random Forest ran on this packet (class " + (rfText || "unknown") + "). Its class is used only when a threshold rule flags a warning or fault. ";
-      else if (rfExecuted === false) rfLead = "Random Forest was not run on this packet; the class shown is a default, not a prediction. ";
+      else if (rfExecuted === false) rfLead = "Random Forest was not run on this packet, so no class is reported. ";
       else rfLead = "This Pi build does not report whether Random Forest ran, so the class shown (" + (rfText || "NO DATA") + ") is not confirmed as a prediction. ";
       document.getElementById("txt-rf").innerText = rfLead + rfTail;
     }
