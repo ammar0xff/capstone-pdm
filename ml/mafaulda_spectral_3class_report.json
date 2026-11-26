@@ -1,0 +1,65 @@
+{
+ "test_files": 252,
+ "train_files": 628,
+ "note": "REAL MAFAULDA held-out recordings; train-time noise/gain augmentation is SIMULATED; eval front end (noise 3 mg, 3.9 mg/LSB, clip) is SIMULATED ADXL345",
+ "three|clean_train|eval_clean": {
+  "balanced_acc": 0.8022,
+  "macro_f1": 0.7971,
+  "acc": 0.941
+ },
+ "three|clean+augmented_train|eval_clean": {
+  "balanced_acc": 0.8285,
+  "macro_f1": 0.7726,
+  "acc": 0.9167
+ },
+ "three|clean_train|eval_adxl_pm16g": {
+  "balanced_acc": 0.8023,
+  "macro_f1": 0.7944,
+  "acc": 0.9405
+ },
+ "three|clean+augmented_train|eval_adxl_pm16g": {
+  "balanced_acc": 0.8233,
+  "macro_f1": 0.7679,
+  "acc": 0.915
+ },
+ "three|clean_train|eval_adxl_pm4g": {
+  "balanced_acc": 0.6719,
+  "macro_f1": 0.6852,
+  "acc": 0.9422
+ },
+ "three|clean+augmented_train|eval_adxl_pm4g": {
+  "balanced_acc": 0.71,
+  "macro_f1": 0.7456,
+  "acc": 0.9416
+ },
+ "radial|clean_train|eval_clean": {
+  "balanced_acc": 0.789,
+  "macro_f1": 0.7842,
+  "acc": 0.9172
+ },
+ "radial|clean+augmented_train|eval_clean": {
+  "balanced_acc": 0.8408,
+  "macro_f1": 0.7841,
+  "acc": 0.9042
+ },
+ "radial|clean_train|eval_adxl_pm16g": {
+  "balanced_acc": 0.7841,
+  "macro_f1": 0.7815,
+  "acc": 0.9167
+ },
+ "radial|clean+augmented_train|eval_adxl_pm16g": {
+  "balanced_acc": 0.8408,
+  "macro_f1": 0.7848,
+  "acc": 0.9042
+ },
+ "radial|clean_train|eval_adxl_pm4g": {
+  "balanced_acc": 0.7879,
+  "macro_f1": 0.7814,
+  "acc": 0.9155
+ },
+ "radial|clean+augmented_train|eval_adxl_pm4g": {
+  "balanced_acc": 0.8503,
+  "macro_f1": 0.7887,
+  "acc": 0.9053
+ }
+}
