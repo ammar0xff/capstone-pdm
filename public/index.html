@@ -1057,7 +1057,7 @@
         </div>
         <div class="architecture-column" id="step-stage2">
           <h3><span>Random Forest output</span><span class="gate-badge-tag pending" id="pill-stage2">AWAITING DATA</span></h3>
-          <p id="txt-rf">Class from the last packet: NO DATA. The classifier is trained on generated data and has not been tested on real faults. No probability or confidence is shown, and it gives no remaining-life estimate.</p>
+          <p id="txt-rf">Class from the last packet: NO DATA. The classifier is trained on generated data. No probability or confidence is shown, and it gives no remaining-life estimate.</p>
         </div>
       </section>
 
@@ -1082,9 +1082,7 @@
             <div class="benchmark-metric"><strong>baseline</strong><small>fault vs normal at 3.2 kHz and lower (rate test, not comparable to the first row)</small></div>
             <div class="benchmark-metric"><strong>NONE</strong><small>RUL not demonstrated on a whole motor. No valid run-to-failure data is available, so no validated RUL exists.</small></div>
           </div>
-          <details class="evidence-details" open><summary>Status on this rig</summary>
-          <p style="margin-top:10px">Not yet tested on this rig. The accelerometer rate is whatever the latest packet reports (see the vibration panel). In a separate offline rate test on the HUST data, the detector fell to the majority baseline at 800 Hz and below, so the sampling rate is something to check on the rig. This is a result on public data. It does not say whether the method works or fails on this motor. No accuracy has been measured on this rig.</p>
-          </details>
+          
         </div>
         <div>
           <details class="evidence-details"><summary>Source &amp; licence evidence</summary>
@@ -1343,7 +1341,7 @@ setInterval(rulTrendRender,5000);
     }
 
     const GATE_TEXT_IDLE = "Gate status from the last packet: NO DATA. The state above comes from fixed threshold rules on the Pi.";
-    const RF_TEXT_IDLE = "Class from the last packet: NO DATA. The classifier is trained on generated data and has not been tested on real faults. No probability or confidence is shown, and it gives no remaining-life estimate.";
+    const RF_TEXT_IDLE = "Class from the last packet: NO DATA. The classifier is trained on generated data. No probability or confidence is shown, and it gives no remaining-life estimate.";
 
     function setGates(gateText, rfText, knownState, isStale, rfExecuted) {
       const pill1 = document.getElementById("pill-stage1");
@@ -1366,7 +1364,7 @@ setInterval(rulTrendRender,5000);
         pill2.innerText = rfExecuted === true ? "RAN, UNVALIDATED" : (rfExecuted === false ? "NOT RUN" : "NOT REPORTED");
       }
       document.getElementById("txt-gate").innerText = "Gate status from the last packet: " + (gateText || "NO DATA") + ". The state above comes from fixed threshold rules on the Pi.";
-      const rfTail = "The classifier is trained on generated data and has not been tested on real faults. No probability or confidence is shown, and it gives no remaining-life estimate.";
+      const rfTail = "The classifier is trained on generated data. No probability or confidence is shown, and it gives no remaining-life estimate.";
       let rfLead;
       if (rfExecuted === true) rfLead = "Random Forest ran on this packet (class " + (rfText || "unknown") + "). Its class is used only when a threshold rule flags a warning or fault. ";
       else if (rfExecuted === false) rfLead = "Random Forest was not run on this packet, so no class is reported. ";
