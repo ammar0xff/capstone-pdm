@@ -1,0 +1,259 @@
+{
+ "classes": [
+  "normal",
+  "imbalance",
+  "horiz",
+  "vert",
+  "bearing"
+ ],
+ "held_out_groups": [
+  "horizontal-misalignment/1.5mm",
+  "imbalance/10g",
+  "imbalance/35g",
+  "normal_3",
+  "overhang/ball_fault/20g",
+  "overhang/ball_fault/6g",
+  "overhang/outer_race/20g",
+  "underhang/ball_fault/6g",
+  "underhang/cage_fault/0g",
+  "underhang/outer_race/0g",
+  "vertical-misalignment/1.40mm",
+  "vertical-misalignment/1.90mm"
+ ],
+ "n_files_train": 1435,
+ "n_files_test": 516,
+ "radial": {
+  "train_windows": 10045,
+  "test_windows": 3612,
+  "train_class_counts": [
+   273,
+   1680,
+   1036,
+   1407,
+   5649
+  ],
+  "test_class_counts": [
+   70,
+   651,
+   343,
+   700,
+   1848
+  ],
+  "group_cv_on_train": {
+   "acc": 0.4977,
+   "balanced_acc": 0.4503,
+   "macro_f1": 0.3091
+  },
+  "group_cv_folds_balanced_acc": [
+   0.5025,
+   0.4084,
+   0.4931,
+   0.4402,
+   0.4075
+  ],
+  "heldout_groups_test": {
+   "acc": 0.51,
+   "balanced_acc": 0.448,
+   "macro_f1": 0.4077
+  },
+  "majority_baseline_acc": 0.5116,
+  "chance_balanced_acc": 0.2,
+  "confusion_rows_true_cols_pred": [
+   [
+    24,
+    0,
+    32,
+    13,
+    1
+   ],
+   [
+    4,
+    254,
+    12,
+    81,
+    300
+   ],
+   [
+    18,
+    11,
+    125,
+    174,
+    15
+   ],
+   [
+    73,
+    32,
+    152,
+    410,
+    33
+   ],
+   [
+    54,
+    210,
+    178,
+    377,
+    1029
+   ]
+  ]
+ },
+ "three_axis": {
+  "train_windows": 10045,
+  "test_windows": 3612,
+  "train_class_counts": [
+   273,
+   1680,
+   1036,
+   1407,
+   5649
+  ],
+  "test_class_counts": [
+   70,
+   651,
+   343,
+   700,
+   1848
+  ],
+  "group_cv_on_train": {
+   "acc": 0.6077,
+   "balanced_acc": 0.5555,
+   "macro_f1": 0.3736
+  },
+  "group_cv_folds_balanced_acc": [
+   0.6393,
+   0.5153,
+   0.6275,
+   0.6251,
+   0.3705
+  ],
+  "heldout_groups_test": {
+   "acc": 0.5723,
+   "balanced_acc": 0.5143,
+   "macro_f1": 0.4603
+  },
+  "majority_baseline_acc": 0.5116,
+  "chance_balanced_acc": 0.2,
+  "confusion_rows_true_cols_pred": [
+   [
+    38,
+    0,
+    9,
+    23,
+    0
+   ],
+   [
+    1,
+    252,
+    20,
+    22,
+    356
+   ],
+   [
+    25,
+    0,
+    85,
+    199,
+    34
+   ],
+   [
+    77,
+    0,
+    72,
+    539,
+    12
+   ],
+   [
+    68,
+    59,
+    353,
+    215,
+    1153
+   ]
+  ]
+ },
+ "replay": {
+  "radial|ideal": {
+   "recording_vote": {
+    "acc": 0.5291,
+    "balanced_acc": 0.5065,
+    "macro_f1": 0.4437
+   },
+   "window": {
+    "acc": 0.51,
+    "balanced_acc": 0.448,
+    "macro_f1": 0.4077
+   },
+   "n_recordings": 516,
+   "frac_windows_beyond_range": 0.0
+  },
+  "three_axis|ideal": {
+   "recording_vote": {
+    "acc": 0.5853,
+    "balanced_acc": 0.542,
+    "macro_f1": 0.4878
+   },
+   "window": {
+    "acc": 0.5723,
+    "balanced_acc": 0.5143,
+    "macro_f1": 0.4603
+   },
+   "n_recordings": 516,
+   "frac_windows_beyond_range": 0.0
+  },
+  "radial|pm16g": {
+   "recording_vote": {
+    "acc": 0.5155,
+    "balanced_acc": 0.4976,
+    "macro_f1": 0.4341
+   },
+   "window": {
+    "acc": 0.4922,
+    "balanced_acc": 0.4348,
+    "macro_f1": 0.3925
+   },
+   "n_recordings": 516,
+   "frac_windows_beyond_range": 0.0405
+  },
+  "three_axis|pm16g": {
+   "recording_vote": {
+    "acc": 0.5717,
+    "balanced_acc": 0.5381,
+    "macro_f1": 0.4798
+   },
+   "window": {
+    "acc": 0.5573,
+    "balanced_acc": 0.5087,
+    "macro_f1": 0.4513
+   },
+   "n_recordings": 516,
+   "frac_windows_beyond_range": 0.0328
+  },
+  "radial|pm4g": {
+   "recording_vote": {
+    "acc": 0.4826,
+    "balanced_acc": 0.4461,
+    "macro_f1": 0.3653
+   },
+   "window": {
+    "acc": 0.4665,
+    "balanced_acc": 0.3955,
+    "macro_f1": 0.3357
+   },
+   "n_recordings": 516,
+   "frac_windows_beyond_range": 0.2171
+  },
+  "three_axis|pm4g": {
+   "recording_vote": {
+    "acc": 0.4787,
+    "balanced_acc": 0.3982,
+    "macro_f1": 0.3694
+   },
+   "window": {
+    "acc": 0.4718,
+    "balanced_acc": 0.3839,
+    "macro_f1": 0.3535
+   },
+   "n_recordings": 516,
+   "frac_windows_beyond_range": 0.1921
+  }
+ }
+}
