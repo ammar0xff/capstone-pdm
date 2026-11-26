@@ -15,14 +15,18 @@ sample-disjoint contiguous-block folds, against a **0.4004 (40.04%)**
 majority-class baseline. Those four classes (healthy / inner race / ball /
 outer race) are **not** the deployed runtime taxonomy, and the result is
 `BENCHMARK / NOT OUR MOTOR / NOT FIELD-VALIDATED` — not "on our motor".
-The above-80% RUL evidence is a separate **30-cycle RUL warning** benchmark on
+The only result above 80% on an RUL-style task is a separate **30-cycle RUL warning** (binary classification) benchmark on
 NASA's simulated C-MAPSS FD001 turbofan data (DOI
 `10.5281/zenodo.15346912`, CC BY 4.0): **0.940 (94.0%)** accuracy on the 100
 official last-cycle units against a **0.750** majority baseline, precision
 **0.9524**, recall **0.800** and five unit-disjoint folds averaging **0.9705**.
 It uses explicit RUL labels, but it is a simulated short-horizon warning task,
 not continuous RUL, not our induction motor, not an operator alarm and not field
-validation. The separate real induction-motor RUL evidence remains a real 160 kW three-phase
+validation. It is not evidence that RUL works on a real motor. Regression error
+(MAE/RMSE, in hours or minutes) and warning classification metrics
+(accuracy/precision/recall, against a majority or no-warning baseline) are
+different measures and are reported separately below. The real induction-motor RUL
+evidence is a real 160 kW three-phase
 induction-motor dataset with an explicit operating-hours RUL label (Zenodo DOI
 `10.5281/zenodo.15637023`, CC BY 4.0). Four leave-one-run-out RUL-to-zero trials
 measured MAE **141.716 h**, RMSE **204.069 h** and 24-hour warning accuracy
@@ -34,9 +38,12 @@ estimator is available as an analysis tool only; it requires an operator-
 supplied threshold. Other public checks remain NASA C-MAPSS FD001 (simulated
 turbofan), six PRONOSTIA/FEMTO-ST bearings (last-window MAE **182.91 s**, RMSE
 **335.26 s**), 15 XJTU-SY bearings (tail MAE **134.924 min**, RMSE **171.776 min**
-against **160.859 min** baseline RMSE) and four documented NASA IMS failures
-(tail MAE **9165.28 min**, RMSE **12531.9 min** against **17382.2 min** baseline
-RMSE), all benchmark-only. CWRU has no run-to-failure series, so it supports
+against a constant baseline of MAE **136.558 min** and RMSE **160.859 min**, so MAE is
+about 1% better and RMSE is worse than the constant baseline) and four documented
+NASA IMS failures (tail MAE **9165.28 min**, RMSE **12531.9 min** against a constant
+baseline MAE **17011.8 min** and RMSE **17382.2 min**; better than the constant
+baseline, nominal recorded minutes). PRONOSTIA is scored on each bearing's last
+window only (constant baseline MAE **8900 s**). All of these are benchmark-only. CWRU has no run-to-failure series, so it supports
 diagnosis but not an RUL claim. A target-rig readiness path is in place: once
 the operator supplies real run-to-failure CSVs from our motor,
 `ml/rul_from_rig.py` can evaluate, fit and predict RUL; it is not field-validated
@@ -107,9 +114,11 @@ INMP441 (I2S) ─┘          │                       │
   non-overlapping sample blocks, with a majority baseline and a `--manifest`
   option for another motor's labelled recordings. Its 100.0% result is not the
   deployed four-class taxonomy and is not our motor.
-- `ml/rul_fmcg.py` is the headline public RUL benchmark on real 160 kW
-  three-phase induction-motor data with explicit operating-hour RUL labels. Its
-  measured 67.7% 24-hour warning accuracy is below 80% and is reported as-is.
+- `ml/rul_fmcg.py` is the public real-motor RUL benchmark (four runs of a 160 kW
+  three-phase induction motor, explicit operating-hour RUL labels). It is not a
+  success result: its regression MAE is worse than a constant-zero baseline and
+  its 67.7% 24-hour warning accuracy is below the 0.686 no-warning baseline (recall
+  0.029). Reported as-is.
 - `ml/rul_from_rig.py` is the offline target-rig readiness path: it validates
   operator-supplied run-to-failure CSVs, evaluates causally and run-disjointly,
   fits a final RUL regressor and predicts from a current run. No field result is
@@ -218,7 +227,7 @@ See `docs/FIREBASE_SETUP.md` before altering the rules or client behavior.
 | Real-bearing RUL benchmark | `ml/rul_pronostia.py`, `data/pronostia/`, `tests/test_rul_pronostia.py` | Complete on six PRONOSTIA run-to-failure bearings; not our motor, not field-validated |
 | Second real-bearing RUL benchmark | `ml/rul_xjtu_sy.py`, `data/xjtu_sy_mendeley/`, `tests/test_rul_xjtu_sy.py` | Complete on 15 XJTU-SY bearings; labelled benchmark, baseline comparison reported honestly; not our motor |
 | Third public RUL benchmark | `ml/rul_nasa_ims.py`, `data/nasa_ims/`, `tests/test_rul_nasa_ims.py` | Four documented NASA IMS failed bearings; benchmark only, nominal recorded minutes, not field-validated |
-| Headline real induction-motor RUL benchmark | `ml/rul_fmcg.py`, `data/fmcg_induction_rul/`, `tests/test_rul_fmcg.py` | Four RUL-to-zero runs from Zenodo DOI `10.5281/zenodo.15637023`, CC BY 4.0; measured 141.716 h MAE, 204.069 h RMSE and 67.7% 24 h warning accuracy; not our motor |
+| Public real induction-motor RUL benchmark (below both baselines) | `ml/rul_fmcg.py`, `data/fmcg_induction_rul/`, `tests/test_rul_fmcg.py` | Four RUL-to-zero runs from Zenodo DOI `10.5281/zenodo.15637023`, CC BY 4.0; measured 141.716 h MAE, 204.069 h RMSE and 67.7% 24 h warning accuracy; not our motor |
 | Simulator removed from cloud path | `edge/stream_live.py`, `tests/test_device_only_telemetry.py` | Retired stub cannot generate or upload packets; only `edge/firebase_mirror.py` writes RTDB |
 | Dataset provenance and licences | `docs/DATA_PROVENANCE_LICENSES.md`, `tests/test_rul_xjtu_sy.py` | CC BY 4.0 derived record and US Government Work metadata for NASA IMS; original XJTU-SY, FEMTO-ST, CWRU SPDX names and Reliance catalogue number remain `[NEED: ...]` |
 | Real-motor sample | `data/cwru/`, `tests/test_cwru_data.py` | CWRU 2 hp Reliance Electric; seeded faults, no run-to-failure |
@@ -449,9 +458,9 @@ The exact CWRU reuse licence and Reliance catalogue number remain
 `--manifest` is labelled `OPERATOR-SUPPLIED / PROVENANCE UNVERIFIED /
 NOT FIELD-VALIDATED` and does not inherit CWRU source metadata.
 
-## Headline public RUL benchmark — FMCG induction motor (not our motor)
+## Public real-motor RUL benchmark — FMCG induction motor (not our motor, below baselines)
 
-The headline RUL evidence was changed from a synthetic score to a real
+The RUL evidence that is based on a real motor (not a headline success; see the baselines below) uses a real
 three-phase induction-motor dataset: Zenodo DOI
 `10.5281/zenodo.15637023` (CC BY 4.0), companion paper DOI
 `10.35784/acs_7299`. The paper defines RUL as the hours a motor runs from
