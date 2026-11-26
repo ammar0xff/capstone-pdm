@@ -38,13 +38,13 @@ def default_baseline():
     return {"source": SOURCE_DEFAULT, "mu": DEFAULT_MU, "sigma": DEFAULT_SIGMA}
 
 
-def compute_baseline(samples):
+def compute_baseline(samples, min_samples=MIN_SAMPLES):
     """samples: list of rms_dyn values (g), one per non-overlapping window.
     Returns (ok, result_or_None, message)."""
     xs = [float(x) for x in samples if x is not None and math.isfinite(float(x))]
     n = len(xs)
-    if n < MIN_SAMPLES:
-        return False, None, "too few windows (%d, need %d)" % (n, MIN_SAMPLES)
+    if n < min_samples:
+        return False, None, "too few windows (%d, need %d)" % (n, min_samples)
     mean = sum(xs) / n
     sd = math.sqrt(sum((x - mean) ** 2 for x in xs) / (n - 1))
     if mean < NOISE_FLOOR_G:
@@ -90,9 +90,13 @@ def _valid_baseline(d):
 
 
 class Commissioner:
-    def __init__(self, baseline_path, clock=time.time):
+    def __init__(self, baseline_path, clock=time.time, target_s=None, min_samples=None, min_gap_s=None):
+        """The three optional overrides exist for the reference-data replay (snapshots are 10 s apart).
+        The live service never passes them, so its rules are the module constants above."""
         self.path = baseline_path
         self.clock = clock
+        self.min_samples = MIN_SAMPLES if min_samples is None else min_samples
+        self.min_gap_s = MIN_SAMPLE_GAP_S if min_gap_s is None else min_gap_s
         self.state = "idle"          # idle | running | done | failed
         self.message = ""
         self.samples = []
@@ -100,7 +104,7 @@ class Commissioner:
         self.windows_invalid = 0
         self.started = None
         self.last_sample_t = None
-        self.target_s = TARGET_S
+        self.target_s = TARGET_S if target_s is None else target_s
         self.baseline = default_baseline()
         self.load()
 
@@ -155,7 +159,7 @@ class Commissioner:
         if self.state != "running":
             return False
         now = self.clock()
-        if self.last_sample_t is None or now - self.last_sample_t >= MIN_SAMPLE_GAP_S:
+        if self.last_sample_t is None or now - self.last_sample_t >= self.min_gap_s:
             self.last_sample_t = now
             self.windows_seen += 1
             if valid and rms_dyn is not None and math.isfinite(rms_dyn):
@@ -171,7 +175,7 @@ class Commissioner:
         if frac < MIN_VALID_FRACTION:
             ok, res, msg = False, None, "too many invalid windows (%.0f%% valid)" % (100 * frac)
         else:
-            ok, res, msg = compute_baseline(self.samples)
+            ok, res, msg = compute_baseline(self.samples, self.min_samples)
         if ok:
             res.update({
                 "started_at": self.started, "finished_at": self.clock(),

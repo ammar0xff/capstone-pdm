@@ -597,6 +597,12 @@
         <a class="btn-toggle btn-primary" href="https://castpone2026.web.app/guide.html" target="_blank" rel="noopener noreferrer">Exhibition deck</a>
       </div>
     </header>
+    <!-- G28: shown only when the packet carries reference_data (replay dashboard). Live packets never do. -->
+    <div id="ref-banner" style="display:none;margin:10px 0;padding:10px 14px;border:1px solid #f59e0b;border-radius:8px;background:rgba(245,158,11,0.10);">
+      <div id="ref-banner-en" style="font-weight:600;"></div>
+      <div id="ref-banner-ar" dir="rtl" style="font-weight:600;margin-top:2px;"></div>
+      <div id="ref-banner-detail" class="card-sub" style="margin-top:4px;"></div>
+    </div>
 
     <!-- Main Hero Status Lamp -->
     <div id="hero-banner" class="hero-banner standby">
@@ -1220,9 +1226,11 @@ setInterval(rulTrendRender,5000);
         ctx.stroke();
       }
 
-      const uclFault = 0.155;
-      const uclWarn = 0.130;
-      const maxVal = 0.200;
+      // G28: limits follow the active baseline (default 0.155/0.130 until a commissioned baseline exists)
+      const lim = window.__ucl || { f: 0.155, w: 0.130, last: 0 };
+      const uclFault = lim.f;
+      const uclWarn = lim.w;
+      const maxVal = window.__ucl ? Math.max(lim.f * 1.4, lim.last * 1.1, 0.02) : 0.200;
 
       function valToY(v) {
         return h - 30 - ((v / maxVal) * (h - 60));
@@ -1238,7 +1246,7 @@ setInterval(rulTrendRender,5000);
       ctx.stroke();
       ctx.fillStyle = "#ef4444";
       ctx.font = "10px sans-serif";
-      ctx.fillText("UCL Fault: 0.155g (3σ)", 45, yFault - 4);
+      ctx.fillText(`UCL Fault: ${uclFault.toFixed(3)}g (3σ)`, 45, yFault - 4);
 
       // Draw UCL Warning line (Amber)
       const yWarn = valToY(uclWarn);
@@ -1248,7 +1256,7 @@ setInterval(rulTrendRender,5000);
       ctx.lineTo(w - 20, yWarn);
       ctx.stroke();
       ctx.fillStyle = "#f59e0b";
-      ctx.fillText("UCL Warn: 0.130g (2σ)", 45, yWarn - 4);
+      ctx.fillText(`UCL Warn: ${uclWarn.toFixed(3)}g (2σ)`, 45, yWarn - 4);
       ctx.setLineDash([]);
 
       if (historyData.length < 2) {
@@ -1402,19 +1410,45 @@ setInterval(rulTrendRender,5000);
         document.getElementById("val-sound-status").innerText = online ? ac.status : pending;
       }
 
+      // 4a. Reference-data source label (G28): only when the packet says its signal is a public benchmark.
+      const rb = document.getElementById("ref-banner");
+      const rulCard = document.getElementById("rul-card");
+      if (rulCard) rulCard.style.display = data.reference_data ? "none" : "";
+      if (data.reference_data) {
+        const rd = data.reference_data;
+        document.getElementById("ref-banner-en").innerText = rd.label_en;
+        document.getElementById("ref-banner-ar").innerText = rd.label_ar;
+        document.getElementById("ref-banner-detail").innerText =
+          `${rd.dataset} ${rd.recording}, snapshot ${rd.snapshot}/${rd.snapshots_total} (${rd.dataset_time_h} h into the run), ` +
+          `band limited to ${rd.band_hz} Hz, amplitude rescaled x${rd.amplitude_scale} so the healthy start is ${rd.healthy_level_g} g.`;
+        const tr = rd.rul_trend;
+        if (tr) {
+          let tt = "Trend estimate (dataset time, not a validated RUL): ";
+          if (tr.status === "estimate") tt += `about ${tr.hours_to_limit} h to the active fault limit`;
+          else if (tr.status === "at_limit") tt += "trend is at the fault limit";
+          else if (tr.status === "no_upward_trend") tt += "no upward trend";
+          else tt += "insufficient data";
+          tt += `. Dataset run-end in ${tr.true_remaining_h} h.`;
+          document.getElementById("ref-banner-detail").innerText += " " + tt;
+        }
+        rb.style.display = "block";
+      } else {
+        rb.style.display = "none";
+      }
+
       // 4b. Commissioning baseline (G28). Source is always shown; motor state is never claimed.
       if (data.spc && online) {
         const sp = data.spc, cm = data.commissioning || {};
-        const src = sp.baseline_source === "commissioned"
-          ? "commissioned (collected while the operator reported a healthy run; motor state not verified)"
-          : "default (fixed, not measured on this rig)";
+        const src = sp.baseline_source === "commissioned" ? "commissioned" : "default (fixed)";
         document.getElementById("val-baseline").innerText = `${sp.baseline_mu.toFixed(4)} g (σ₀ = ${sp.baseline_sigma.toFixed(4)})`;
         document.getElementById("val-baseline-source").innerText = src;
+        window.__ucl = { f: sp.ucl_fault, w: sp.ucl_warning, last: (data.vibration && data.vibration.rms_dyn) || 0 };
         document.getElementById("val-ucl-fault").innerText = `${sp.ucl_fault.toFixed(3)} g`;
         document.getElementById("val-ucl-warn").innerText = `${sp.ucl_warning.toFixed(3)} g`;
         let txt = "Commissioning: idle";
+        if (sp.baseline_source === "commissioned") txt = "Baseline learned while the operator reported a healthy run; motor state not verified.";
         if (cm.state === "running") txt = `Commissioning: collecting ${Math.round(cm.progress_s)} / ${Math.round(cm.target_s)} s (default limits stay active)`;
-        else if (cm.state === "done") txt = "Commissioning: done. " + (cm.message || "");
+        else if (cm.state === "done") txt += " Commissioning: done.";
         else if (cm.state === "failed") txt = "Commissioning failed: " + (cm.message || "");
         document.getElementById("val-comm-status").innerText = txt;
         const b = document.getElementById("btn-commission");
