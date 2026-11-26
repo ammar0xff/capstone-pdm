@@ -12,4 +12,4 @@ import dashboard  # noqa: E402  (same app as the live dashboard, different state
 if __name__ == "__main__":
     port = int(os.environ.get("G12_REPLAY_PORT", "5002"))
     print("[INFO] Reference-data replay dashboard on 0.0.0.0:%d (state %s)" % (port, STATE))
-    dashboard.app.run(host="0.0.0.0", port=port, debug=False, threaded=True)
+    dashboard.app.run(host=os.environ.get("G12_REPLAY_HOST", "0.0.0.0"), port=port, debug=False, threaded=True)
