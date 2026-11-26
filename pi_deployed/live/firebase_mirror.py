@@ -74,11 +74,37 @@ def load_cloud_config():
     return dict(DEFAULT_CONFIG)
 
 def save_cloud_config(cfg):
+    """Immediate save (settings changes, midnight reset, clean shutdown). Atomic via temp file + rename."""
     try:
-        with open(CONFIG_FILE, 'w') as f:
+        tmp = CONFIG_FILE + ".tmp"
+        with open(tmp, 'w') as f:
             json.dump(cfg, f, indent=2)
+        os.replace(tmp, CONFIG_FILE)
     except Exception:
         pass
+
+# G12: the per-PUT save forced an ext4 journal commit every 5 s on a slow SD card.
+# Throttled save: write at most every SAVE_EVERY_S, or at once when the status text changes.
+# The daily write counter is never reset by this: a clean stop flushes it exactly; after an unclean stop
+# it is rounded UP on load by the writes that could have gone unsaved, so the guard never under-counts.
+SAVE_EVERY_S = float(os.environ.get("G12_CONFIG_SAVE_EVERY_S", "0"))   # 0 keeps the old save-per-PUT behaviour
+_last_save = 0.0
+_last_status = None
+_cfg_ref = None
+
+def save_cloud_config_throttled(cfg):
+    global _last_save, _last_status
+    now = time.time()
+    if SAVE_EVERY_S <= 0 or now - _last_save >= SAVE_EVERY_S or cfg.get("last_sync_status") != _last_status:
+        cfg["clean_shutdown"] = False
+        save_cloud_config(cfg)
+        _last_save = now
+        _last_status = cfg.get("last_sync_status")
+
+def flush_config_on_exit(*_a):
+    if _cfg_ref is not None and SAVE_EVERY_S > 0:
+        _cfg_ref["clean_shutdown"] = True
+        save_cloud_config(_cfg_ref)
 
 def sync_loop():
     print("=" * 65)
@@ -86,7 +112,17 @@ def sync_loop():
     print("  Free-Tier Spark Lock | Quota Guard Active (<15k writes/day)")
     print("=" * 65)
 
+    global _cfg_ref
     config = load_cloud_config()
+    if SAVE_EVERY_S > 0 and config.get("last_day") == time.strftime("%Y-%m-%d") and config.get("clean_shutdown") is not True:
+        # previous run did not flush: round the counter up by the writes that may have gone unsaved
+        config["daily_writes_today"] = int(config.get("daily_writes_today", 0)) + int(SAVE_EVERY_S / max(float(_INTERVAL_ENV) if _INTERVAL_ENV else float(config.get("sync_interval_s", 5.0)), 0.05)) + 2
+    config["clean_shutdown"] = False
+    save_cloud_config(config)
+    _cfg_ref = config
+    import signal, atexit
+    signal.signal(signal.SIGTERM, lambda *a: (flush_config_on_exit(), sys.exit(0)))
+    atexit.register(flush_config_on_exit)
     backlog = []
 
     if os.path.exists(BACKLOG_FILE):
@@ -162,7 +198,7 @@ def sync_loop():
                 config["daily_writes_today"] += 1
                 config["last_sync_status"] = f"OK (HTTP {status})"
                 config["last_sync_time"] = time.time()
-                save_cloud_config(config)
+                save_cloud_config_throttled(config)
                 print(f"[FIREBASE] Synced frame seq={payload['seq']} | Writes today: {config['daily_writes_today']}/{config['max_daily_writes']}", flush=True)
                 # Flushed successfully; clear backlog
                 if backlog:
@@ -172,7 +208,7 @@ def sync_loop():
         except urllib.error.URLError as e:
             # Offline Survival (PRD §0.3 F5 / §6.1 F3): Queue locally without crash
             config["last_sync_status"] = f"Offline Buffering: {str(e)[:30]}"
-            save_cloud_config(config)
+            save_cloud_config_throttled(config)
             if len(backlog) < 200:
                 backlog.append(payload)
                 try:
@@ -183,7 +219,7 @@ def sync_loop():
             print(f"[FIREBASE OFFLINE] Sync paused ({e}). Queued {len(backlog)} frames locally.")
         except Exception as e:
             config["last_sync_status"] = f"Error: {str(e)[:30]}"
-            save_cloud_config(config)
+            save_cloud_config_throttled(config)
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:

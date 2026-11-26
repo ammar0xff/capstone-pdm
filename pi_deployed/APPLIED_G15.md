@@ -1,0 +1,1 @@
+g15 applied 2026-11-26 01:58 EET (pdm-cloud + pdm-dashboard restart). live/firebase_mirror.py md5 6cbecc52, live/index.html md5 7784aa51. Pi backup: ~/stat_stage/g15_backup_20261126T015809. Other live files unchanged (see MANIFEST.md). Staged g15 copies in staged_not_applied/ are now live.
