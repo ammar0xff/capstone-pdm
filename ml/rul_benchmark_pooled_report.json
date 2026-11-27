@@ -1,0 +1,276 @@
+{
+ "label": "OFFLINE RESULT / NAMED PUBLIC DATASETS / NOT OUR MOTOR",
+ "target": "remaining life fraction of the run (1=new, 0=end)",
+ "features": [
+  "norm_log_rms_med20",
+  "slope40",
+  "kurt_mean20",
+  "run_max_norm",
+  "norm_log_rms_raw"
+ ],
+ "validation": "leave-one-bearing-out over all pooled bearings",
+ "per_bearing": {
+  "NASA IMS s1_b3": {
+   "snapshots": 2156,
+   "mae_all": 0.23773147164585742,
+   "mae_tail20": 0.26646087341809227,
+   "const_mae_all": 0.2501164397418955,
+   "const_mae_tail20": 0.39930394431554533,
+   "corr": 0.36234766655023437,
+   "warn_hit": true,
+   "false_warn_early": 0.0
+  },
+  "NASA IMS s1_b4": {
+   "snapshots": 2156,
+   "mae_all": 0.26868448620594954,
+   "mae_tail20": 0.1046981246742912,
+   "const_mae_all": 0.2501164397418955,
+   "const_mae_tail20": 0.39930394431554533,
+   "corr": 0.5253645076276798,
+   "warn_hit": true,
+   "false_warn_early": 0.7777777777777778
+  },
+  "NASA IMS s2_b1": {
+   "snapshots": 984,
+   "mae_all": 0.20253819633253617,
+   "mae_tail20": 0.08408194837087063,
+   "const_mae_all": 0.2502543234994914,
+   "const_mae_tail20": 0.4003051881993896,
+   "corr": 0.8669519676148153,
+   "warn_hit": true,
+   "false_warn_early": 0.0
+  },
+  "NASA IMS s3_b3": {
+   "snapshots": 6324,
+   "mae_all": 0.2979858277714249,
+   "mae_tail20": 0.6350437378666249,
+   "const_mae_all": 0.2500402884442538,
+   "const_mae_tail20": 0.3995729875059308,
+   "corr": -0.09548956746188257,
+   "warn_hit": true,
+   "false_warn_early": 0.0
+  },
+  "PRONOSTIA Bearing1_1": {
+   "snapshots": 2803,
+   "mae_all": 0.16891836942729602,
+   "mae_tail20": 0.06626138702763443,
+   "const_mae_all": 0.25026750691192057,
+   "const_mae_tail20": 0.40024982155603134,
+   "corr": 0.6771644969258933,
+   "warn_hit": true,
+   "false_warn_early": 0.0498220640569395
+  },
+  "PRONOSTIA Bearing1_2": {
+   "snapshots": 871,
+   "mae_all": 0.2798752154854054,
+   "mae_tail20": 0.2600093385819954,
+   "const_mae_all": 0.2502870264064294,
+   "const_mae_tail20": 0.3999999999999999,
+   "corr": 0.2437859708074271,
+   "warn_hit": true,
+   "false_warn_early": 0.49195402298850577
+  },
+  "PRONOSTIA Bearing2_1": {
+   "snapshots": 911,
+   "mae_all": 0.24400802188291182,
+   "mae_tail20": 0.06666022287699833,
+   "const_mae_all": 0.2502744237102086,
+   "const_mae_tail20": 0.4,
+   "corr": 0.688831579237605,
+   "warn_hit": true,
+   "false_warn_early": 0.567032967032967
+  },
+  "PRONOSTIA Bearing2_2": {
+   "snapshots": 797,
+   "mae_all": 0.25669521301471027,
+   "mae_tail20": 0.04685271221149309,
+   "const_mae_all": 0.25031367628607276,
+   "const_mae_tail20": 0.4001256281407035,
+   "corr": 0.7748338825024113,
+   "warn_hit": true,
+   "false_warn_early": 0.4748743718592965
+  },
+  "PRONOSTIA Bearing3_1": {
+   "snapshots": 515,
+   "mae_all": 0.24191646611503367,
+   "mae_tail20": 0.4788629982220464,
+   "const_mae_all": 0.2504854368932039,
+   "const_mae_tail20": 0.40077821011673165,
+   "corr": 0.2976572901279713,
+   "warn_hit": true,
+   "false_warn_early": 0.0
+  },
+  "PRONOSTIA Bearing3_2": {
+   "snapshots": 1637,
+   "mae_all": 0.24664530412385033,
+   "mae_tail20": 0.5248761794878951,
+   "const_mae_all": 0.2503056234718827,
+   "const_mae_tail20": 0.40036674816625917,
+   "corr": 0.25520842230576724,
+   "warn_hit": true,
+   "false_warn_early": 0.0
+  },
+  "XJTU-SY bearing1": {
+   "snapshots": 123,
+   "mae_all": 0.1370363658403802,
+   "mae_tail20": 0.09131782352806204,
+   "const_mae_all": 0.25203252032520324,
+   "const_mae_tail20": 0.4016393442622951,
+   "corr": 0.8379322932156735,
+   "warn_hit": true,
+   "false_warn_early": 0.0
+  },
+  "XJTU-SY bearing10": {
+   "snapshots": 339,
+   "mae_all": 0.14255708917365936,
+   "mae_tail20": 0.24946668116053303,
+   "const_mae_all": 0.25073746312684364,
+   "const_mae_tail20": 0.40088757396449703,
+   "corr": 0.808438736557831,
+   "warn_hit": true,
+   "false_warn_early": 0.0
+  },
+  "XJTU-SY bearing11": {
+   "snapshots": 2538,
+   "mae_all": 0.2639739265343903,
+   "mae_tail20": 0.22987477947197926,
+   "const_mae_all": 0.25029562475364603,
+   "const_mae_tail20": 0.39968466692944427,
+   "corr": 0.25599536482499635,
+   "warn_hit": true,
+   "false_warn_early": 0.0
+  },
+  "XJTU-SY bearing12": {
+   "snapshots": 2496,
+   "mae_all": 0.2546544900230855,
+   "mae_tail20": 0.4920222632627395,
+   "const_mae_all": 0.2501002004008016,
+   "const_mae_tail20": 0.39939879759519037,
+   "corr": 0.17157380740658584,
+   "warn_hit": false,
+   "false_warn_early": 0.0
+  },
+  "XJTU-SY bearing13": {
+   "snapshots": 371,
+   "mae_all": 0.23224731783996544,
+   "mae_tail20": 0.23992452437798092,
+   "const_mae_all": 0.25067385444743934,
+   "const_mae_tail20": 0.4,
+   "corr": 0.5312810512513055,
+   "warn_hit": true,
+   "false_warn_early": 0.0
+  },
+  "XJTU-SY bearing14": {
+   "snapshots": 1515,
+   "mae_all": 0.17313738809577303,
+   "mae_tail20": 0.27989309731248896,
+   "const_mae_all": 0.25016545247655547,
+   "const_mae_tail20": 0.3996036988110964,
+   "corr": 0.7197318745635193,
+   "warn_hit": true,
+   "false_warn_early": 0.0
+  },
+  "XJTU-SY bearing15": {
+   "snapshots": 114,
+   "mae_all": 0.2642274198838854,
+   "mae_tail20": 0.3661785363486359,
+   "const_mae_all": 0.25221238938053103,
+   "const_mae_tail20": 0.4026548672566372,
+   "corr": 0.08583167362111926,
+   "warn_hit": false,
+   "false_warn_early": 0.0
+  },
+  "XJTU-SY bearing2": {
+   "snapshots": 161,
+   "mae_all": 0.1277610206660482,
+   "mae_tail20": 0.2604351538126419,
+   "const_mae_all": 0.2515527950310559,
+   "const_mae_tail20": 0.4,
+   "corr": 0.8170532231567348,
+   "warn_hit": true,
+   "false_warn_early": 0.0375
+  },
+  "XJTU-SY bearing3": {
+   "snapshots": 158,
+   "mae_all": 0.21770948401916895,
+   "mae_tail20": 0.22123662474118416,
+   "const_mae_all": 0.25159235668789814,
+   "const_mae_tail20": 0.4012738853503185,
+   "corr": 0.5093250870007576,
+   "warn_hit": true,
+   "false_warn_early": 0.0
+  },
+  "XJTU-SY bearing4": {
+   "snapshots": 122,
+   "mae_all": 0.24223632436710554,
+   "mae_tail20": 0.38027605279625915,
+   "const_mae_all": 0.25206611570247933,
+   "const_mae_tail20": 0.40082644628099173,
+   "corr": 0.34779732736431046,
+   "warn_hit": false,
+   "false_warn_early": 0.0
+  },
+  "XJTU-SY bearing5": {
+   "snapshots": 52,
+   "mae_all": 0.31156238908199463,
+   "mae_tail20": 0.5875397533952023,
+   "const_mae_all": 0.2549019607843137,
+   "const_mae_tail20": 0.4019607843137255,
+   "corr": 0.7147526878188458,
+   "warn_hit": false,
+   "false_warn_early": 0.0
+  },
+  "XJTU-SY bearing6": {
+   "snapshots": 491,
+   "mae_all": 0.15771224698334751,
+   "mae_tail20": 0.3470567624994764,
+   "const_mae_all": 0.2505091649694501,
+   "const_mae_tail20": 0.4,
+   "corr": 0.8223519395610596,
+   "warn_hit": false,
+   "false_warn_early": 0.0
+  },
+  "XJTU-SY bearing7": {
+   "snapshots": 161,
+   "mae_all": 0.14186661145608975,
+   "mae_tail20": 0.16831724285696767,
+   "const_mae_all": 0.2515527950310559,
+   "const_mae_tail20": 0.4,
+   "corr": 0.9337417598220477,
+   "warn_hit": true,
+   "false_warn_early": 0.0
+  },
+  "XJTU-SY bearing8": {
+   "snapshots": 533,
+   "mae_all": 0.20614228746242427,
+   "mae_tail20": 0.10867817698535479,
+   "const_mae_all": 0.25046904315197,
+   "const_mae_tail20": 0.400375939849624,
+   "corr": 0.7148159359595341,
+   "warn_hit": true,
+   "false_warn_early": 0.0
+  },
+  "XJTU-SY bearing9": {
+   "snapshots": 42,
+   "mae_all": 0.31149359677047805,
+   "mae_tail20": 0.60353794895291,
+   "const_mae_all": 0.2560975609756098,
+   "const_mae_tail20": 0.4024390243902439,
+   "corr": 0.7914118485439655,
+   "warn_hit": false,
+   "false_warn_early": 0.0
+  }
+ },
+ "aggregate": {
+  "mae_all": 0.22517266120811086,
+  "mae_tail20": 0.2863825177696143,
+  "const_mae_all": 0.2510968192940843,
+  "const_mae_tail20": 0.40043006005280807,
+  "corr": 0.5463476330762483,
+  "false_warn_early": 0.09595844814861947,
+  "bearings_warned_in_last_20pct": 19,
+  "n_bearings": 25
+ },
+ "not_our_motor": true,
+ "not_field_validated": true
+}
